@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, ArrowUpRight, MapPin, Navigation, Package, User, Radio } from 'lucide-react';
+import { Bell, ArrowUpRight, MapPin, Navigation, Package, User } from 'lucide-react';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyActiveLoads } from '@/services/loads.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
-import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
+
 import type { Load } from '@freightx/shared';
 
 const QUICK_ACTIONS = [
@@ -42,7 +42,7 @@ export default function CarrierDashboard() {
   const { profile, company, user } = useAuth();
   const [loads, setLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
-  const [sharingLocation, setSharingLocation] = useState(false);
+
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
   useEffect(() => {
@@ -55,13 +55,7 @@ export default function CarrierDashboard() {
   const currentLoad = loads.find((l) =>
     ['dispatched', 'in_transit', 'awarded'].includes(l.status)
   ) ?? loads[0] ?? null;
-  const inTransitLoad = loads.find((l) => l.status === 'in_transit') ?? null;
 
-  // Activates GPS pinging whenever the toggle is on AND there's an in_transit load
-  useDriverLocation({
-    loadNumber: inTransitLoad?.loadNumber ?? '',
-    active: sharingLocation && inTransitLoad != null,
-  });
 
   const name = profile?.full_name ?? 'Driver';
   const companyName = company?.name ?? '';
@@ -111,53 +105,6 @@ export default function CarrierDashboard() {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto scrollbar-hide px-5 space-y-6 pb-2">
-        {/* Share Location banner — only when carrier has an in_transit load */}
-        {inTransitLoad && (
-          <button
-            onClick={() => setSharingLocation((v) => !v)}
-            className="w-full flex items-center justify-between rounded-ios p-4 active-scale card-highlight"
-            style={{
-              background: sharingLocation
-                ? 'linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.08))'
-                : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${sharingLocation ? 'rgba(34,197,94,0.35)' : 'rgba(255,255,255,0.08)'}`,
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                style={{
-                  background: sharingLocation
-                    ? 'rgba(34,197,94,0.2)'
-                    : 'rgba(232,96,48,0.12)',
-                }}
-              >
-                <Radio
-                  size={18}
-                  className={sharingLocation ? 'text-green-400' : 'text-fx-orange'}
-                />
-              </div>
-              <div className="text-left">
-                <p className="text-[14px] font-semibold text-white">Share Location</p>
-                <p className="text-[11px] text-fx-text-dim mt-0.5">
-                  {sharingLocation
-                    ? `Sharing GPS for ${inTransitLoad.loadNumber}`
-                    : 'Tap to share your GPS with dispatchers'}
-                </p>
-              </div>
-            </div>
-            <div
-              className="w-12 h-7 rounded-full relative transition-colors"
-              style={{ background: sharingLocation ? '#22c55e' : 'rgba(255,255,255,0.12)' }}
-            >
-              <div
-                className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform"
-                style={{ transform: sharingLocation ? 'translateX(22px)' : 'translateX(2px)' }}
-              />
-            </div>
-          </button>
-        )}
-
         {/* Quick actions 2×2 */}
         <div className="grid grid-cols-2 gap-3">
           {QUICK_ACTIONS.map((item) => (
