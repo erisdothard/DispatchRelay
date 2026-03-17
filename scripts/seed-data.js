@@ -73,25 +73,31 @@ function warn(msg) { console.warn('  ⚠  ' + msg); }
 function header(msg) { console.log('\n' + msg); }
 
 async function upsertUser({ email, full_name, role }) {
-  const { data: { users }, error: listErr } = await sb.auth.admin.listUsers({ perPage: 1000 });
-  if (listErr) throw new Error('listUsers: ' + listErr.message);
-
-  const existing = users.find(u => u.email === email);
-  if (existing) {
-    log(`↩  ${email} (existing) - Updating password`);
-    await sb.auth.admin.updateUserById(existing.id, { password: PASSWORD });
-    return existing.id;
-  }
-
+  // Try to create first
   const { data, error } = await sb.auth.admin.createUser({
     email,
     password: PASSWORD,
     email_confirm: true,
     user_metadata: { full_name, role },
   });
-  if (error) throw new Error(`createUser ${email}: ${error.message}`);
-  log(`✅  ${email} created`);
-  return data.user.id;
+
+  if (!error) {
+    log(`✅  ${email} created`);
+    return data.user.id;
+  }
+
+  // User already exists — look up by profile email and update password
+  if (error.message.includes('already') || error.message.includes('exists') || error.status === 422) {
+    const { data: profile } = await sb
+      .from('profiles').select('id').eq('email', email).maybeSingle();
+    if (profile) {
+      await sb.auth.admin.updateUserById(profile.id, { password: PASSWORD });
+      log(`↩  ${email} (existing) - Updated password`);
+      return profile.id;
+    }
+  }
+
+  throw new Error(`createUser ${email}: ${error.message}`);
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
