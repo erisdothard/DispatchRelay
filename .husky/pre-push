@@ -1,0 +1,24 @@
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  FreightX pre-push checks"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# 1. Type check
+echo "\n▶ Typechecking..."
+cd Desktop/FreightX && pnpm --filter @freightx/web typecheck || { echo "❌ Typecheck failed — fix errors before pushing"; exit 1; }
+echo "✅ Typecheck passed"
+
+# 2. Run tests
+echo "\n▶ Running tests..."
+pnpm test || { echo "❌ Tests failed — fix failing tests before pushing"; exit 1; }
+echo "✅ All tests passed"
+
+# 3. Generate audit report
+echo "\n▶ Generating audit report..."
+node Desktop/FreightX/scripts/audit.js 2>/dev/null || true
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  ✅ All checks passed — pushing"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""

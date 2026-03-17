@@ -1,0 +1,313 @@
+import { corsHeaders } from '../_shared/cors.ts';
+
+const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
+
+// Haiku — fast, cheap, deterministic. Used for query parsing.
+const MODEL_HAIKU  = 'claude-haiku-4-5-20251001';
+// Sonnet — complex reasoning. Used for rate suggestions.
+const MODEL_SONNET = 'claude-sonnet-4-6';
+
+interface ParsedFilters {
+  equipment?: string;
+  search?: string;
+  origin_state?: string;
+  dest_states?: string[];
+  pickup_within_days?: number;
+  min_rate_per_mile?: number;
+}
+
+interface LaneStats {
+  avg_rate_per_mile: number | null;
+  min_rate_per_mile: number | null;
+  max_rate_per_mile: number | null;
+  sample_count: number;
+}
+
+interface RateSuggestion {
+  suggested_low: number;
+  suggested_mid: number;
+  suggested_high: number;
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+  sample_count: number;
+}
+
+/**
+ * Keyword-based fallback parser — no API key required.
+ */
+function keywordParse(query: string): ParsedFilters {
+  const q = query.toLowerCase();
+  const filters: ParsedFilters = {};
+
+  if (q.includes('flatbed')) filters.equipment = 'flatbed';
+  else if (q.includes('reefer') || q.includes('refrigerated')) filters.equipment = 'reefer';
+  else if (q.includes('step deck') || q.includes('stepdeck')) filters.equipment = 'step_deck';
+  else if (q.includes('lowboy')) filters.equipment = 'lowboy';
+  else if (q.includes('tanker')) filters.equipment = 'tanker';
+  else if (q.includes('box truck') || q.includes('box van')) filters.equipment = 'box_truck';
+  else if (q.includes('sprinter')) filters.equipment = 'sprinter';
+  else if (q.includes('van') || q.includes('dry van')) filters.equipment = 'van';
+
+  if (q.includes('today') || q.includes('asap')) filters.pickup_within_days = 1;
+  else if (q.includes('tomorrow')) filters.pickup_within_days = 2;
+  else if (q.includes('this week')) filters.pickup_within_days = 7;
+
+  const stateMap: Record<string, string> = {
+    'texas': 'TX', 'california': 'CA', 'florida': 'FL', 'new york': 'NY',
+    'illinois': 'IL', 'ohio': 'OH', 'georgia': 'GA', 'michigan': 'MI',
+    'pennsylvania': 'PA', 'north carolina': 'NC', 'tennessee': 'TN',
+    'arizona': 'AZ', 'indiana': 'IN', 'missouri': 'MO', 'wisconsin': 'WI',
+    'colorado': 'CO', 'washington': 'WA', 'oregon': 'OR', 'nevada': 'NV',
+    'oklahoma': 'OK', 'louisiana': 'LA', 'alabama': 'AL', 'kentucky': 'KY',
+  };
+  for (const [name, code] of Object.entries(stateMap)) {
+    if (q.includes(name) || q.includes(code.toLowerCase())) {
+      const originPattern = new RegExp(`(out of|from|leaving|departing).*${name}`);
+      if (originPattern.test(q)) {
+        filters.origin_state = code;
+      }
+    }
+  }
+
+  const stripped = query
+    .replace(/\b(flatbed|reefer|van|tanker|lowboy|sprinter|step deck)\b/gi, '')
+    .replace(/\b(today|tomorrow|this week|asap|monday|tuesday|wednesday|thursday|friday)\b/gi, '')
+    .replace(/\b(load|loads|out of|from|going|heading|to the|good rate|high rate)\b/gi, '')
+    .trim();
+  if (stripped.length > 2) filters.search = stripped;
+
+  return filters;
+}
+
+/**
+ * Suggest rate using Claude Sonnet — complex market reasoning.
+ */
+async function suggestRateWithSonnet(params: {
+  originState: string;
+  destState: string;
+  equipment: string;
+  totalMiles: number;
+  laneStats: LaneStats;
+  apiKey: string;
+}): Promise<RateSuggestion> {
+  const { originState, destState, equipment, totalMiles, laneStats, apiKey } = params;
+
+  const hasData = laneStats.sample_count > 0 && laneStats.avg_rate_per_mile != null;
+
+  const systemPrompt = `You are a freight rate analyst for a trucking marketplace.
+Given lane data, suggest a competitive rate range for a load posting.
+Return ONLY valid JSON with these exact fields:
+- suggested_low: number ($/mile — low end of competitive range)
+- suggested_mid: number ($/mile — midpoint, recommended posting rate)
+- suggested_high: number ($/mile — premium rate)
+- confidence: "high" | "medium" | "low" (based on sample size and data recency)
+- reasoning: string (1-2 sentences explaining the suggestion, mention key factors)
+- sample_count: number (pass through from input)
+
+Consider: equipment type premium, lane direction (headhaul vs backhaul), fuel costs, driver availability.
+For reefer: add $0.15-0.25/mi premium. For flatbed: add $0.10-0.20/mi premium.
+For low sample counts (<5): widen the range and lower confidence.`;
+
+  const userMessage = `Lane: ${originState} → ${destState}
+Equipment: ${equipment}
+Distance: ${totalMiles} miles
+${hasData ? `Historical data (last 90 days):
+  - Avg rate/mile: $${laneStats.avg_rate_per_mile}
+  - Min: $${laneStats.min_rate_per_mile}, Max: $${laneStats.max_rate_per_mile}
+  - Sample count: ${laneStats.sample_count}` : 'No historical data for this lane yet.'}
+
+Suggest a competitive rate range for this load.`;
+
+  const response = await fetch(ANTHROPIC_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: MODEL_SONNET,
+      max_tokens: 512,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Anthropic API error: ${response.status}`);
+  }
+
+  const claudeData = await response.json();
+  const text = claudeData?.content?.[0]?.text ?? '{}';
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON in Sonnet response');
+
+  const result = JSON.parse(jsonMatch[0]) as RateSuggestion;
+  result.sample_count = laneStats.sample_count;
+  return result;
+}
+
+/**
+ * Fallback rate suggestion when no API key or Sonnet fails.
+ * Uses simple market heuristics.
+ */
+function fallbackRateSuggestion(params: {
+  equipment: string;
+  totalMiles: number;
+  laneStats: LaneStats;
+}): RateSuggestion {
+  const { equipment, laneStats } = params;
+
+  let base = 2.20; // national avg dry van
+  if (equipment === 'reefer') base = 2.55;
+  else if (equipment === 'flatbed') base = 2.45;
+  else if (equipment === 'step_deck') base = 2.60;
+  else if (equipment === 'lowboy') base = 3.00;
+  else if (equipment === 'tanker') base = 2.80;
+
+  // Use historical data if available
+  if (laneStats.sample_count > 0 && laneStats.avg_rate_per_mile != null) {
+    base = laneStats.avg_rate_per_mile;
+  }
+
+  return {
+    suggested_low: +(base * 0.92).toFixed(2),
+    suggested_mid: +base.toFixed(2),
+    suggested_high: +(base * 1.12).toFixed(2),
+    confidence: laneStats.sample_count >= 10 ? 'high' : laneStats.sample_count >= 3 ? 'medium' : 'low',
+    reasoning: laneStats.sample_count > 0
+      ? `Based on ${laneStats.sample_count} recent transactions on this lane.`
+      : 'Based on national averages for this equipment type. No lane-specific data yet.',
+    sample_count: laneStats.sample_count,
+  };
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    const body = await req.json() as {
+      action?: string;
+      query?: string;
+      // Rate suggestion inputs
+      origin_state?: string;
+      dest_state?: string;
+      equipment?: string;
+      total_miles?: number;
+      lane_stats?: LaneStats;
+    };
+
+    const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+
+    // ── Mode: suggest_rate (Claude Sonnet) ────────────────────────────────────
+    if (body.action === 'suggest_rate') {
+      const { origin_state, dest_state, equipment, total_miles, lane_stats } = body;
+
+      if (!origin_state || !dest_state || !equipment || !total_miles) {
+        return new Response(JSON.stringify({ error: 'origin_state, dest_state, equipment, total_miles required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const stats: LaneStats = lane_stats ?? { avg_rate_per_mile: null, min_rate_per_mile: null, max_rate_per_mile: null, sample_count: 0 };
+
+      if (!apiKey) {
+        const suggestion = fallbackRateSuggestion({ equipment, totalMiles: total_miles, laneStats: stats });
+        return new Response(JSON.stringify(suggestion), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      try {
+        const suggestion = await suggestRateWithSonnet({
+          originState: origin_state,
+          destState: dest_state,
+          equipment,
+          totalMiles: total_miles,
+          laneStats: stats,
+          apiKey,
+        });
+        return new Response(JSON.stringify(suggestion), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (err) {
+        // Fallback on Sonnet failure
+        console.error('[ai-load-search] Sonnet rate suggestion failed:', err);
+        const suggestion = fallbackRateSuggestion({ equipment, totalMiles: total_miles, laneStats: stats });
+        return new Response(JSON.stringify(suggestion), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ── Mode: parse_query (Claude Haiku) ──────────────────────────────────────
+    const { query } = body;
+
+    if (!query?.trim()) {
+      return new Response(JSON.stringify({ error: 'query is required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!apiKey) {
+      const filters = keywordParse(query);
+      return new Response(JSON.stringify(filters), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const systemPrompt = `You are a freight load search parser.
+Given a carrier's natural language description of the load they want, extract structured search filters.
+Return ONLY valid JSON with these optional fields:
+- equipment: one of "van" | "reefer" | "flatbed" | "step_deck" | "lowboy" | "tanker" | "box_truck" | "sprinter"
+- origin_state: 2-letter US state code (where the load should pick up)
+- dest_states: array of 2-letter US state codes (where the load should deliver)
+- pickup_within_days: number (how many days until pickup — e.g. "this week" = 7, "today" = 1)
+- min_rate_per_mile: number (minimum $/mile the carrier wants)
+- search: string (any other keywords like city name or commodity)
+Only include fields that are clearly mentioned. Return empty object {} if nothing is clear.`;
+
+    const response = await fetch(ANTHROPIC_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: MODEL_HAIKU,
+        max_tokens: 256,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: query }],
+      }),
+    });
+
+    if (!response.ok) {
+      const filters = keywordParse(query);
+      return new Response(JSON.stringify(filters), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const claudeData = await response.json();
+    const text = claudeData?.content?.[0]?.text ?? '{}';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const filters: ParsedFilters = jsonMatch ? JSON.parse(jsonMatch[0]) : keywordParse(query);
+
+    return new Response(JSON.stringify(filters), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: err instanceof Error ? err.message : 'Parse failed' }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
+    );
+  }
+});
