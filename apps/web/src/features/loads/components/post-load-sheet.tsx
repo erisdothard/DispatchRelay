@@ -183,6 +183,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         temp_controlled: form.tempControlled,
         posted_at: new Date().toISOString(),
         broker_credit_score: null,
+        assigned_driver_id: null,
       });
 
       setForm(EMPTY_FORM);

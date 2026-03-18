@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, ArrowUpRight, MapPin, Navigation, Package, User } from 'lucide-react';
+import { Bell, ArrowUpRight, MapPin, Navigation, Package, User, UserCheck } from 'lucide-react';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyActiveLoads } from '@/services/loads.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
+import { AssignDriverSheet } from '@/features/loads/components/assign-driver-sheet';
 
 import type { Load } from '@freightx/shared';
 
@@ -42,6 +43,7 @@ export default function CarrierDashboard() {
   const { profile, company, user } = useAuth();
   const [loads, setLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
+  const [assignLoad, setAssignLoad] = useState<Load | null>(null);
 
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
@@ -183,6 +185,26 @@ export default function CarrierDashboard() {
                   </p>
                 </div>
               </div>
+
+              {/* Assign Driver button */}
+              {!currentLoad.assignedDriverId && ['awarded', 'dispatched'].includes(currentLoad.status) && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAssignLoad(currentLoad);
+                  }}
+                  className="mt-4 w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
+                >
+                  <UserCheck size={14} />
+                  Assign Driver
+                </button>
+              )}
+              {currentLoad.assignedDriverId && (
+                <div className="mt-4 flex items-center gap-2 text-xs text-green-400 font-semibold">
+                  <UserCheck size={14} />
+                  Driver Assigned
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -256,6 +278,18 @@ export default function CarrierDashboard() {
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
       />
+
+      {assignLoad && (
+        <AssignDriverSheet
+          open={!!assignLoad}
+          onClose={() => setAssignLoad(null)}
+          load={assignLoad}
+          onAssigned={() => {
+            setAssignLoad(null);
+            if (user?.id) getMyActiveLoads(user.id).then(setLoads).catch(console.error);
+          }}
+        />
+      )}
     </div>
   );
 }

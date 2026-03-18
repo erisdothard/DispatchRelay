@@ -29,6 +29,7 @@ export function rowToLoad(row: LoadRow): Load {
     tempControlled: row.temp_controlled,
     postedAt: row.posted_at,
     brokerCreditScore: row.broker_credit_score ?? undefined,
+    assignedDriverId: row.assigned_driver_id ?? undefined,
   };
 }
 
@@ -47,6 +48,7 @@ export function rowToTruck(row: TruckRow): Truck {
     weightCapacityLbs: row.weight_capacity_lbs ?? undefined,
     driverName: row.driver_name ?? undefined,
     driverPhone: row.driver_phone ?? undefined,
+    driverId: row.driver_id ?? undefined,
     status: row.status,
   };
 }

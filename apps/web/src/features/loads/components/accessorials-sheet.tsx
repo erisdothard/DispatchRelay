@@ -27,7 +27,7 @@ interface AccessorialsSheetProps {
   loadId: string;
   bookingId?: string | null;
   baseRate: number;
-  role: 'carrier' | 'broker' | 'shipper' | 'admin';
+  role: 'carrier' | 'broker' | 'shipper' | 'admin' | 'driver';
 }
 
 export function AccessorialsSheet({ open, onClose, loadId, bookingId, baseRate, role }: AccessorialsSheetProps) {

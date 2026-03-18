@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Truck, Briefcase, Package, ChevronLeft, ArrowRight, CheckCircle2,
-  Mail, Lock, User, Building2,
+  Mail, Lock, User, Building2, UserCheck,
 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils';
@@ -44,6 +44,14 @@ const roles: RoleCard[] = [
     detail: 'Book carriers, post shipments, and track freight end-to-end.',
     icon: <Package size={28} />,
     route: '/shipper',
+  },
+  {
+    id: 'driver',
+    label: 'Driver',
+    description: 'I drive trucks',
+    detail: 'View assigned loads, share GPS, update status, and upload documents.',
+    icon: <UserCheck size={28} />,
+    route: '/driver',
   },
 ];
 

@@ -229,7 +229,7 @@ export default function TeamPage() {
         )}
       </div>
 
-      <BottomNav role={profile?.role ?? 'carrier'} />
+      <BottomNav role={(profile?.role === 'admin' ? 'carrier' : profile?.role) as 'carrier' | 'broker' | 'shipper' | 'driver' ?? 'carrier'} />
     </div>
   );
 }

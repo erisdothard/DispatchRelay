@@ -241,6 +241,69 @@ export async function getMyActiveLoads(carrierId: string): Promise<Load[]> {
   return (data ?? []).map(rowToLoad);
 }
 
+/**
+ * Assign a driver to a load.
+ */
+export async function assignDriver(loadId: string, driverId: string): Promise<Load> {
+  const { data, error } = await supabase
+    .from('loads')
+    .update({ assigned_driver_id: driverId })
+    .eq('id', loadId)
+    .select()
+    .single();
+  if (error) throw error;
+
+  // Notify driver of assignment
+  await supabase.from('notifications').insert({
+    user_id: driverId,
+    type: 'load_assigned',
+    title: 'New Load Assigned',
+    body: `You have been assigned load ${data.load_number}: ${data.origin_city}, ${data.origin_state} → ${data.dest_city}, ${data.dest_state}`,
+    load_id: data.id,
+  });
+
+  return rowToLoad(data);
+}
+
+/**
+ * Get loads assigned to a specific driver.
+ */
+export async function getDriverLoads(driverId: string, status?: string): Promise<Load[]> {
+  let query = supabase
+    .from('loads')
+    .select('*')
+    .eq('assigned_driver_id', driverId)
+    .order('pickup_date', { ascending: true });
+
+  if (status) {
+    query = query.eq('status', status as LoadStatus);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []).map(rowToLoad);
+}
+
+/**
+ * Get company drivers (profiles that are company_members with role 'driver' or profiles with role 'driver' in the same company).
+ */
+export async function getCompanyDrivers(companyId: string): Promise<Array<{ id: string; fullName: string; email: string }>> {
+  const { data, error } = await (supabase as any)
+    .from('company_members')
+    .select('user_id, profiles!inner(id, full_name, email, role)')
+    .eq('company_id', companyId);
+
+  if (error) throw error;
+
+  return (data ?? [])
+    .filter((m: any) => m.profiles?.role === 'driver')
+    .map((m: any) => ({
+      id: m.profiles.id,
+      fullName: m.profiles.full_name ?? m.profiles.email,
+      email: m.profiles.email,
+    }));
+}
+
 export async function getTrackingMilestones(loadNumber: string): Promise<TrackingMilestone[]> {
   const { data, error } = await supabase
     .from('tracking_milestones')

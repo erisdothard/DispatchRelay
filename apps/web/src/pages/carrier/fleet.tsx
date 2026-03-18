@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Truck, MapPin, Calendar, Pencil, Trash2, WifiOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Truck, MapPin, Calendar, Pencil, Trash2, WifiOff, Radio, Navigation } from 'lucide-react';
 import { FleetMap } from '@/shared/components/fleet-map';
 import type { TruckPin } from '@/shared/components/fleet-map';
 import { TopHeader } from '@/shared/components/top-header';
@@ -10,8 +10,57 @@ import { PostTruckSheet } from '@/features/trucks/components/post-truck-sheet';
 import { useTrucks } from '@/features/trucks/hooks/use-trucks';
 import { useAuth } from '@/contexts/AuthContext';
 import { deleteTruck } from '@/services/trucks.service';
+import { getMyActiveLoads } from '@/services/loads.service';
+import { useLiveTracking } from '@/features/loads/hooks/use-live-tracking';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
-import type { Truck as TruckType } from '@freightx/shared';
+import type { Truck as TruckType, Load } from '@freightx/shared';
+
+/** Shows live GPS status for a single in-transit load */
+function DriverGpsRow({ load }: { load: Load }) {
+  const ping = useLiveTracking(load.loadNumber);
+  const speedKmh = ping?.speed_ms != null ? Math.round(ping.speed_ms * 3.6) : null;
+  const lastPing = ping?.recorded_at
+    ? new Date(ping.recorded_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    : null;
+
+  return (
+    <div className="bg-fx-surface border border-fx-border rounded-2xl p-4">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
+        {ping ? (
+          <span className="text-xs text-green-400 font-medium flex items-center gap-1">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            Live
+          </span>
+        ) : (
+          <span className="text-xs text-fx-text-dim font-medium flex items-center gap-1">
+            <span className="w-2 h-2 bg-fx-text-dim rounded-full" />
+            Awaiting GPS
+          </span>
+        )}
+      </div>
+      <p className="text-sm font-semibold text-fx-text mb-1">
+        {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
+      </p>
+      <div className="flex items-center gap-3 text-xs text-fx-text-muted">
+        {speedKmh != null && (
+          <span className="flex items-center gap-1">
+            <Navigation size={11} className="text-fx-orange" />
+            {speedKmh} km/h
+          </span>
+        )}
+        {lastPing && (
+          <span>Last ping: {lastPing}</span>
+        )}
+        {ping && (
+          <span className="ml-auto text-green-400 font-semibold flex items-center gap-1">
+            <Radio size={11} /> GPS
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function CarrierFleetPage() {
   const { user } = useAuth();
@@ -19,8 +68,18 @@ export default function CarrierFleetPage() {
   const [editingTruck, setEditingTruck] = useState<TruckType | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [activeLoads, setActiveLoads] = useState<Load[]>([]);
 
   const { trucks, loading, error, refresh } = useTrucks(user ? { postedBy: user.id } : {});
+
+  // Fetch in-transit loads with assigned drivers for GPS tracking
+  useEffect(() => {
+    if (user?.id) {
+      getMyActiveLoads(user.id)
+        .then((loads) => setActiveLoads(loads.filter((l) => l.status === 'in_transit' && l.assignedDriverId)))
+        .catch(console.error);
+    }
+  }, [user?.id]);
 
   async function handleDelete(id: string) {
     if (confirmDeleteId !== id) {
@@ -75,6 +134,20 @@ export default function CarrierFleetPage() {
               }),
             )}
           />
+        </div>
+      )}
+
+      {/* Active Driver GPS section */}
+      {activeLoads.length > 0 && (
+        <div className="px-5 pb-4">
+          <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+            Driver GPS Tracking
+          </h2>
+          <div className="space-y-3">
+            {activeLoads.map((load) => (
+              <DriverGpsRow key={load.id} load={load} />
+            ))}
+          </div>
         </div>
       )}
 

@@ -101,6 +101,7 @@ export function PostTruckSheet({ open, onClose, onCreated, truck }: PostTruckShe
           company_id: company?.id ?? null,
           company_name: company?.name ?? 'Independent Carrier',
           status: 'available',
+          driver_id: null,
         });
       }
 

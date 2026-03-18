@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, MessageSquare, User, Truck, Package, BarChart2, Plus } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-type NavRole = 'carrier' | 'broker' | 'shipper';
+type NavRole = 'carrier' | 'broker' | 'shipper' | 'driver';
 
 interface NavItem {
   label: string;
@@ -34,10 +34,19 @@ const shipperNav: NavItem[] = [
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
 
+const driverNav: NavItem[] = [
+  { label: 'Home', icon: <Home size={22} />, path: '/driver' },
+  { label: 'My Loads', icon: <Package size={22} />, path: '/driver/loads' },
+  { label: 'Track', icon: <BarChart2 size={22} />, path: '/track' },
+  { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
+  { label: 'Profile', icon: <User size={22} />, path: '/profile' },
+];
+
 const navByRole: Record<NavRole, NavItem[]> = {
   carrier: carrierNav,
   broker: brokerNav,
   shipper: shipperNav,
+  driver: driverNav,
 };
 
 export function BottomNav({ role }: { role: NavRole }) {
@@ -55,7 +64,7 @@ export function BottomNav({ role }: { role: NavRole }) {
       <div className="relative flex items-center justify-around px-1 pb-safe pt-2 h-[68px]">
         {items.map((item) => {
           const isActive =
-            item.path === '/carrier' || item.path === '/broker' || item.path === '/shipper'
+            item.path === '/carrier' || item.path === '/broker' || item.path === '/shipper' || item.path === '/driver'
               ? location.pathname === item.path
               : location.pathname.startsWith(item.path);
 

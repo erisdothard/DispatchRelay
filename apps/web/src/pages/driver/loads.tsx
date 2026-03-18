@@ -1,0 +1,193 @@
+import { useState, useEffect, useCallback } from 'react';
+import { Search, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { TopHeader } from '@/shared/components/top-header';
+import { BottomNav } from '@/shared/components/bottom-nav';
+import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
+import { Badge } from '@/shared/components/ui/badge';
+import { cn } from '@/shared/lib/utils';
+import { getDriverLoads } from '@/services/loads.service';
+import { useAuth } from '@/contexts/AuthContext';
+import type { Load } from '@freightx/shared';
+
+const STATUS_FILTERS = ['All', 'dispatched', 'in_transit', 'delivered'];
+const STATUS_LABELS: Record<string, string> = {
+  All: 'All Loads',
+  dispatched: 'Dispatched',
+  awarded: 'Awarded',
+  in_transit: 'In Transit',
+  delivered: 'Delivered',
+};
+const STATUS_BADGE: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
+  dispatched: 'blue',
+  awarded: 'blue',
+  in_transit: 'orange',
+  delivered: 'green',
+};
+
+export default function DriverLoadsPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [loads, setLoads] = useState<Load[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
+
+  const fetchLoads = useCallback(() => {
+    if (!user?.id) return;
+    setLoading(true);
+    getDriverLoads(user.id)
+      .then(setLoads)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [user?.id]);
+
+  useEffect(() => {
+    fetchLoads();
+  }, [fetchLoads]);
+
+  const filtered = loads.filter((l) => {
+    if (statusFilter !== 'All' && l.status !== statusFilter) return false;
+    if (search) {
+      const s = search.toLowerCase();
+      return (
+        l.loadNumber.toLowerCase().includes(s) ||
+        l.originCity.toLowerCase().includes(s) ||
+        l.destCity.toLowerCase().includes(s) ||
+        l.commodity?.toLowerCase().includes(s)
+      );
+    }
+    return true;
+  });
+
+  return (
+    <div className="min-h-dvh flex flex-col pb-[84px]">
+      <TopHeader title="My Loads" showBack />
+
+      <div className="px-5 py-3 space-y-3">
+        {/* Search */}
+        <div className="relative">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-orange" />
+          <input
+            type="text"
+            placeholder="Search by load #, lane, commodity..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full h-12 bg-fx-surface border border-fx-border rounded-2xl pl-10 pr-10 text-sm text-fx-text placeholder:text-fx-text-dim focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* Status filter chips */}
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+          {STATUS_FILTERS.map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={cn(
+                'shrink-0 h-8 px-4 rounded-xl text-xs font-semibold border transition-all duration-200',
+                statusFilter === s
+                  ? 'bg-fx-orange text-white border-fx-orange'
+                  : 'bg-fx-surface border-fx-border text-fx-text-muted hover:border-fx-border-2',
+              )}
+            >
+              {STATUS_LABELS[s] ?? s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Count */}
+      <div className="px-5 mb-3">
+        <span className="text-xs font-semibold text-fx-text-muted">
+          {loading ? 'Loading...' : `${filtered.length} load${filtered.length !== 1 ? 's' : ''}`}
+        </span>
+      </div>
+
+      {/* Load list */}
+      <div className="flex-1 overflow-y-auto px-5 space-y-3">
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <span className="w-8 h-8 border-2 border-fx-border border-t-fx-orange rounded-full animate-spin" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="text-5xl mb-4">🚛</div>
+            <p className="font-bold text-fx-text">No loads assigned</p>
+            <p className="text-sm text-fx-text-muted mt-1">
+              Your carrier will assign loads to you
+            </p>
+          </div>
+        ) : (
+          filtered.map((load) => (
+            <div
+              key={load.id}
+              onClick={() => setSelectedLoad(load)}
+              className="bg-fx-surface border border-fx-border rounded-2xl p-4 cursor-pointer active-scale transition-colors hover:border-fx-orange/30"
+            >
+              {/* Header row */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
+                <Badge variant={STATUS_BADGE[load.status] ?? 'gray'} size="sm">
+                  {STATUS_LABELS[load.status] ?? load.status}
+                </Badge>
+              </div>
+
+              {/* Route */}
+              <p className="text-sm font-bold text-fx-text mb-1">
+                {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
+              </p>
+
+              {/* Meta row */}
+              <div className="flex items-center gap-3 text-xs text-fx-text-muted">
+                <span>
+                  Pickup{' '}
+                  {new Date(load.pickupDate + 'T12:00:00').toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+                {load.totalMiles && <span>· {load.totalMiles} mi</span>}
+                <span className="ml-auto font-semibold text-fx-text">
+                  ${load.rateUsd.toLocaleString()}
+                </span>
+              </div>
+
+              {load.commodity && <p className="text-xs text-fx-text-dim mt-1">{load.commodity}</p>}
+
+              {/* Track button for in-transit */}
+              {load.status === 'in_transit' && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/track/${load.loadNumber}`);
+                  }}
+                  className="mt-3 w-full h-8 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold hover:bg-fx-orange/10 transition-colors"
+                >
+                  Track Load →
+                </button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      <BottomNav role="driver" />
+
+      <LoadDetailSheet
+        load={selectedLoad}
+        onClose={() => setSelectedLoad(null)}
+        showBidButton={false}
+        role="driver"
+      />
+    </div>
+  );
+}

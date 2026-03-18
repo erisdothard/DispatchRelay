@@ -210,8 +210,8 @@ export default function TrackingPage() {
 
               {/* GPS buttons — different for shipper vs carrier/admin */}
               {load.status === 'in_transit' && !livePosition && (
-                user?.id === load.postedBy || profile?.role === 'shipper' ? (
-                  /* Shipper sees "Send Live GPS" — activates their own GPS sharing */
+                user?.id === load.postedBy || profile?.role === 'driver' || profile?.role === 'shipper' ? (
+                  /* Driver sees "Send Live GPS" — activates their own GPS sharing */
                   <button
                     disabled={gpsSending}
                     onClick={() => {

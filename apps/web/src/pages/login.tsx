@@ -8,6 +8,7 @@ const ROLE_ROUTES: Record<string, string> = {
   carrier: '/carrier',
   broker: '/broker',
   shipper: '/shipper',
+  driver: '/driver',
   admin: '/admin',
 };
 

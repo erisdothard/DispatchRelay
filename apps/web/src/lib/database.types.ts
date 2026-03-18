@@ -1,4 +1,4 @@
-export type UserRole = 'carrier' | 'broker' | 'shipper' | 'admin';
+export type UserRole = 'carrier' | 'broker' | 'shipper' | 'admin' | 'driver';
 export type VerificationStatus = 'pending' | 'verified' | 'failed' | 'expired';
 export type SubscriptionTier =
   | 'free'
@@ -170,6 +170,7 @@ export type Database = {
           temp_controlled: boolean;
           posted_at: string;
           broker_credit_score: number | null;
+          assigned_driver_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -196,6 +197,7 @@ export type Database = {
           temp_controlled?: boolean;
           posted_at?: string;
           broker_credit_score?: number | null;
+          assigned_driver_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -222,6 +224,7 @@ export type Database = {
           temp_controlled?: boolean;
           posted_at?: string;
           broker_credit_score?: number | null;
+          assigned_driver_id?: string | null;
           created_at?: string;
         };
         Relationships: [];
@@ -242,6 +245,7 @@ export type Database = {
           weight_capacity_lbs: number | null;
           driver_name: string | null;
           driver_phone: string | null;
+          driver_id: string | null;
           status: TruckStatus;
           created_at: string;
         };
@@ -260,6 +264,7 @@ export type Database = {
           weight_capacity_lbs?: number | null;
           driver_name?: string | null;
           driver_phone?: string | null;
+          driver_id?: string | null;
           status?: TruckStatus;
           created_at?: string;
         };
@@ -278,6 +283,7 @@ export type Database = {
           weight_capacity_lbs?: number | null;
           driver_name?: string | null;
           driver_phone?: string | null;
+          driver_id?: string | null;
           status?: TruckStatus;
           created_at?: string;
         };

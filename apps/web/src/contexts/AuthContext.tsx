@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const { error: companyErr } = await supabase.from('companies').insert({
         owner_id: user.id,
-        type: profile.role === 'admin' ? 'carrier' : profile.role,
+        type: profile.role === 'admin' || profile.role === 'driver' ? 'carrier' : profile.role,
         name: data.name,
         mc_number: data.mc_number ?? null,
         dot_number: data.dot_number ?? null,

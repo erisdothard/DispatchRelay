@@ -22,6 +22,9 @@ const BrokerLoadsPage = lazy(() => import('@/pages/broker/loads'));
 const ShipperDashboard = lazy(() => import('@/pages/shipper/dashboard'));
 const ShipperLoadsPage = lazy(() => import('@/pages/shipper/loads'));
 
+const DriverDashboard = lazy(() => import('@/pages/driver/dashboard'));
+const DriverLoadsPage = lazy(() => import('@/pages/driver/loads'));
+
 const TrackingPage = lazy(() => import('@/pages/tracking'));
 const MessagesPage = lazy(() => import('@/pages/messages'));
 const ProfilePage = lazy(() => import('@/pages/profile'));
@@ -108,6 +111,24 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="shipper">
                 <ShipperLoadsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Driver */}
+          <Route
+            path="/driver"
+            element={
+              <ProtectedRoute requiredRole="driver">
+                <DriverDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/driver/loads"
+            element={
+              <ProtectedRoute requiredRole="driver">
+                <DriverLoadsPage />
               </ProtectedRoute>
             }
           />

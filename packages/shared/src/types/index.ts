@@ -1,4 +1,4 @@
-export type UserRole = 'carrier' | 'broker' | 'shipper' | 'admin';
+export type UserRole = 'carrier' | 'broker' | 'shipper' | 'admin' | 'driver';
 
 export type EquipmentType = 'van' | 'reefer' | 'flatbed' | 'step_deck' | 'lowboy' | 'tanker' | 'box_truck' | 'sprinter';
 
@@ -60,6 +60,7 @@ export interface Load {
   tempControlled?: boolean;
   postedAt?: string;        // ISO timestamp for load age
   brokerCreditScore?: number; // 0-100
+  assignedDriverId?: string;
 }
 
 export interface Truck {
@@ -76,6 +77,7 @@ export interface Truck {
   weightCapacityLbs?: number;
   driverName?: string;
   driverPhone?: string;
+  driverId?: string;
   status: TruckStatus;
 }
 

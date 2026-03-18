@@ -65,6 +65,7 @@ const TEST_USERS = [
   { idKey: 'broker', email: 'broker@freightx.com', full_name: 'Test Broker', role: 'broker' },
   { idKey: 'carrier', email: 'carrier@freightx.com', full_name: 'Test Carrier', role: 'carrier' },
   { idKey: 'shipper', email: 'shipper@freightx.com', full_name: 'Test Shipper', role: 'shipper' },
+  { idKey: 'driver', email: 'driver@freightx.com', full_name: 'Test Driver', role: 'driver' },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -271,6 +272,30 @@ async function main() {
     else log(`✅  $${b.amount_usd} on ${b.load_number}  [${b.status}]`);
   }
 
+  // ── 6. Driver → Company Member + Load Assignment ──────────────────────────
+  header('6/6  Driver Setup');
+
+  // Add driver to carrier's company
+  if (companyIds.carrier && ids.driver) {
+    const { error: memberErr } = await sb.from('company_members').upsert({
+      company_id: companyIds.carrier,
+      user_id: ids.driver,
+      role: 'driver',
+      joined_at: new Date().toISOString(),
+    }, { onConflict: 'company_id,user_id' });
+    if (memberErr) warn(`company member: ${memberErr.message}`);
+    else log('✅  driver added to carrier company');
+  }
+
+  // Assign in-transit load to driver
+  if (loadIds['FX-TEST-0009'] && ids.driver) {
+    const { error: assignErr } = await sb.from('loads')
+      .update({ assigned_driver_id: ids.driver })
+      .eq('id', loadIds['FX-TEST-0009']);
+    if (assignErr) warn(`assign driver: ${assignErr.message}`);
+    else log('✅  FX-TEST-0009 assigned to driver');
+  }
+
   // ── Done ───────────────────────────────────────────────────────────────────
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('✅  Seed complete!\n');
@@ -279,12 +304,14 @@ async function main() {
   console.log(`  broker@freightx.com         broker    ${PASSWORD}`);
   console.log(`  carrier@freightx.com        carrier   ${PASSWORD}`);
   console.log(`  shipper@freightx.com        shipper   ${PASSWORD}`);
+  console.log(`  driver@freightx.com         driver    ${PASSWORD}`);
   console.log('');
   console.log('What\'s seeded:');
   console.log('  • 10 loads across all statuses (posted → delivered)');
   console.log('  • 3 trucks (van, reefer, flatbed) posted by carrier');
   console.log('  • 6 bids — 3 pending, 3 accepted');
   console.log('  • Companies with ratings, verification, credit scores');
+  console.log('  • Driver assigned to carrier company + in-transit load FX-TEST-0009');
 }
 
 main().catch(err => {
