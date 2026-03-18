@@ -7,6 +7,7 @@ import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLoadByNumber, getTrackingMilestones } from '@/services/loads.service';
 import { useLiveTracking } from '@/features/loads/hooks/use-live-tracking';
+import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
 import { supabase } from '@/lib/supabase';
 import type { Load, TrackingMilestone } from '@freightx/shared';
 
@@ -23,6 +24,7 @@ export default function TrackingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [gpsRequested, setGpsRequested] = useState(false);
+  const [gpsSending, setGpsSending] = useState(false);
 
   async function fetchTracking(id: string) {
     if (!id.trim()) return;
@@ -57,6 +59,12 @@ export default function TrackingPage() {
   const livePosition: [number, number] | undefined =
     livePing ? [livePing.latitude, livePing.longitude] : undefined;
   const heading = livePing?.heading_deg ?? undefined;
+
+  // Shipper GPS — activates when shipper taps "Send Live GPS" on this page
+  useDriverLocation({
+    loadNumber: load?.loadNumber ?? '',
+    active: gpsSending && !!load,
+  });
 
   // Human-readable speed (km/h) and accuracy
   const speedKmh =
@@ -200,31 +208,51 @@ export default function TrackingPage() {
                 className="h-44 mb-3"
               />
 
-              {/* Request GPS button — only for carrier/admin, not the shipper themselves */}
-              {load.status === 'in_transit' && !livePosition && user?.id !== load.postedBy && (
-                <button
-                  disabled={gpsRequested}
-                  onClick={async () => {
-                    if (!load.postedBy) return;
-                    const { error } = await supabase.from('notifications').insert({
-                      user_id: load.postedBy,
-                      type: 'gps_request',
-                      title: 'GPS Location Requested',
-                      body: `Carrier is requesting live GPS for load ${load.loadNumber}. Tap to open your dashboard and enable location sharing.`,
-                      load_id: load.id,
-                    });
-                    if (error) console.error('[gps-request] Insert failed:', error);
-                    setGpsRequested(true);
-                  }}
-                  className={`w-full h-11 rounded-ios-xs flex items-center justify-center gap-2 text-sm font-semibold mb-3 active-scale transition-colors ${
-                    gpsRequested
-                      ? 'bg-green-500/15 text-green-400 border border-green-500/25'
-                      : 'bg-fx-orange/15 text-fx-orange border border-fx-orange/25 hover:bg-fx-orange/25'
-                  }`}
-                >
-                  <Radio size={15} />
-                  {gpsRequested ? 'GPS Request Sent' : 'Request Live GPS'}
-                </button>
+              {/* GPS buttons — different for shipper vs carrier/admin */}
+              {load.status === 'in_transit' && !livePosition && (
+                user?.id === load.postedBy || profile?.role === 'shipper' ? (
+                  /* Shipper sees "Send Live GPS" — activates their own GPS sharing */
+                  <button
+                    disabled={gpsSending}
+                    onClick={() => {
+                      localStorage.setItem('fx-gps-sharing', 'true');
+                      setGpsSending(true);
+                    }}
+                    className={`w-full h-11 rounded-ios-xs flex items-center justify-center gap-2 text-sm font-semibold mb-3 active-scale transition-colors ${
+                      gpsSending
+                        ? 'bg-green-500/15 text-green-400 border border-green-500/25'
+                        : 'bg-green-500/15 text-green-400 border border-green-500/25 hover:bg-green-500/25'
+                    }`}
+                  >
+                    <Radio size={15} />
+                    {gpsSending ? 'GPS Sharing Enabled' : 'Send Live GPS'}
+                  </button>
+                ) : (
+                  /* Carrier/admin sees "Request Live GPS" — sends notification to shipper */
+                  <button
+                    disabled={gpsRequested}
+                    onClick={async () => {
+                      if (!load.postedBy) return;
+                      const { error } = await supabase.from('notifications').insert({
+                        user_id: load.postedBy,
+                        type: 'gps_request',
+                        title: 'GPS Location Requested',
+                        body: `Carrier is requesting live GPS for load ${load.loadNumber}. Tap to open your dashboard and enable location sharing.`,
+                        load_id: load.id,
+                      });
+                      if (error) console.error('[gps-request] Insert failed:', error);
+                      setGpsRequested(true);
+                    }}
+                    className={`w-full h-11 rounded-ios-xs flex items-center justify-center gap-2 text-sm font-semibold mb-3 active-scale transition-colors ${
+                      gpsRequested
+                        ? 'bg-green-500/15 text-green-400 border border-green-500/25'
+                        : 'bg-fx-orange/15 text-fx-orange border border-fx-orange/25 hover:bg-fx-orange/25'
+                    }`}
+                  >
+                    <Radio size={15} />
+                    {gpsRequested ? 'GPS Request Sent' : 'Request Live GPS'}
+                  </button>
+                )
               )}
 
               {/* Distance info */}
