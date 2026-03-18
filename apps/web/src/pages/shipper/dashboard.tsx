@@ -13,6 +13,12 @@ import { NotificationSheet } from '@/features/notifications/components/notificat
 import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
 import type { Load } from '@freightx/shared';
 
+/** Renders nothing — just activates GPS pinging for a single load */
+function GpsPinger({ loadNumber }: { loadNumber: string }) {
+  useDriverLocation({ loadNumber, active: true });
+  return null;
+}
+
 const statusBadge: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
   in_transit: 'orange',
   posted: 'blue',
@@ -31,8 +37,15 @@ export default function ShipperDashboard() {
   const [loads, setLoads] = useState<Load[]>([]);
   const [activeLoads, setActiveLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
-  const [sharingLocation, setSharingLocation] = useState(false);
+  const [sharingLocation, setSharingLocation] = useState(() => {
+    try { return localStorage.getItem('fx-gps-sharing') === 'true'; } catch { return false; }
+  });
   const { notifications, unreadCount, markAllRead } = useNotifications();
+
+  // Persist GPS sharing toggle across sessions
+  useEffect(() => {
+    try { localStorage.setItem('fx-gps-sharing', String(sharingLocation)); } catch {}
+  }, [sharingLocation]);
 
   useEffect(() => {
     getLoads()
@@ -45,14 +58,6 @@ export default function ShipperDashboard() {
       getLoads({ postedBy: user.id, status: 'in_transit' }).then(setActiveLoads).catch(console.error);
     }
   }, [user?.id]);
-
-  const inTransitLoad = activeLoads.find((l) => l.status === 'in_transit') ?? null;
-
-  // Activates GPS pinging whenever the shipper toggles sharing on
-  useDriverLocation({
-    loadNumber: inTransitLoad?.loadNumber ?? 'shipper-live',
-    active: sharingLocation,
-  });
 
   const name = profile?.full_name ?? 'Shipper';
 
@@ -75,6 +80,11 @@ export default function ShipperDashboard() {
           <span className="text-sm text-fx-text-dim font-medium">Track by load # or PRO…</span>
         </button>
       </div>
+
+      {/* GPS pingers — one per in-transit load, only when sharing is on */}
+      {sharingLocation && activeLoads.map((l) => (
+        <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />
+      ))}
 
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
         {/* Share Location banner — always visible so shipper can share GPS anytime */}
@@ -106,8 +116,8 @@ export default function ShipperDashboard() {
               <p className="text-[14px] font-semibold text-white">Share Location</p>
               <p className="text-[11px] text-fx-text-dim mt-0.5">
                 {sharingLocation
-                  ? inTransitLoad
-                    ? `Sharing GPS for ${inTransitLoad.loadNumber}`
+                  ? activeLoads.length > 0
+                    ? `Sharing GPS for ${activeLoads.length} load${activeLoads.length > 1 ? 's' : ''}`
                     : 'Sharing live GPS'
                   : 'Tap to share your GPS with carrier'}
               </p>

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Bell, Package, MessageSquare, Zap, CheckCheck } from 'lucide-react';
+import { Bell, Package, MessageSquare, Zap, CheckCheck, Radio } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import type { AppNotification } from '../hooks/use-notifications';
 
@@ -11,6 +11,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   load_status_change: <Package size={14} className="text-fx-orange" />,
   load_booked: <Package size={14} className="text-green-400" />,
   load_cancelled: <Package size={14} className="text-red-400" />,
+  gps_request: <Radio size={14} className="text-green-400" />,
 };
 
 function timeAgo(iso: string): string {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, MoreVertical, Phone, Search, MapPin, Navigation } from 'lucide-react';
+import { ArrowLeft, MoreVertical, Phone, Search, MapPin, Navigation, Radio } from 'lucide-react';
 import { MapView } from '@/shared/components/map-view';
 import { useParams, useNavigate } from 'react-router-dom';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
@@ -7,6 +7,7 @@ import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLoadByNumber, getTrackingMilestones } from '@/services/loads.service';
 import { useLiveTracking } from '@/features/loads/hooks/use-live-tracking';
+import { supabase } from '@/lib/supabase';
 import type { Load, TrackingMilestone } from '@freightx/shared';
 
 export default function TrackingPage() {
@@ -21,6 +22,7 @@ export default function TrackingPage() {
   const [notFound, setNotFound] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [gpsRequested, setGpsRequested] = useState(false);
 
   async function fetchTracking(id: string) {
     if (!id.trim()) return;
@@ -197,6 +199,32 @@ export default function TrackingPage() {
                 heading={heading}
                 className="h-44 mb-3"
               />
+
+              {/* Request GPS button — shown when in transit but no live pings */}
+              {load.status === 'in_transit' && !livePosition && (
+                <button
+                  disabled={gpsRequested}
+                  onClick={async () => {
+                    if (!load.postedBy) return;
+                    await supabase.from('notifications').insert({
+                      user_id: load.postedBy,
+                      type: 'gps_request',
+                      title: 'GPS Location Requested',
+                      body: `Carrier is requesting live GPS for load ${load.loadNumber}. Tap to open your dashboard and enable location sharing.`,
+                      load_id: load.id,
+                    });
+                    setGpsRequested(true);
+                  }}
+                  className={`w-full h-11 rounded-ios-xs flex items-center justify-center gap-2 text-sm font-semibold mb-3 active-scale transition-colors ${
+                    gpsRequested
+                      ? 'bg-green-500/15 text-green-400 border border-green-500/25'
+                      : 'bg-fx-orange/15 text-fx-orange border border-fx-orange/25 hover:bg-fx-orange/25'
+                  }`}
+                >
+                  <Radio size={15} />
+                  {gpsRequested ? 'GPS Request Sent' : 'Request Live GPS'}
+                </button>
+              )}
 
               {/* Distance info */}
               <div className="flex items-center justify-between text-xs">
