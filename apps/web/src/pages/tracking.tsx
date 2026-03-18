@@ -206,13 +206,14 @@ export default function TrackingPage() {
                   disabled={gpsRequested}
                   onClick={async () => {
                     if (!load.postedBy) return;
-                    await supabase.from('notifications').insert({
+                    const { error } = await supabase.from('notifications').insert({
                       user_id: load.postedBy,
                       type: 'gps_request',
                       title: 'GPS Location Requested',
                       body: `Carrier is requesting live GPS for load ${load.loadNumber}. Tap to open your dashboard and enable location sharing.`,
                       load_id: load.id,
                     });
+                    if (error) console.error('[gps-request] Insert failed:', error);
                     setGpsRequested(true);
                   }}
                   className={`w-full h-11 rounded-ios-xs flex items-center justify-center gap-2 text-sm font-semibold mb-3 active-scale transition-colors ${

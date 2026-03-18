@@ -69,6 +69,13 @@ export function useNotifications(): UseNotificationsResult {
     };
   }, [user, fetch]);
 
+  // Polling fallback — in case Realtime isn't enabled for the table yet
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(fetch, 15_000);
+    return () => clearInterval(interval);
+  }, [user, fetch]);
+
   async function markAllRead() {
     if (!user) return;
     await supabase

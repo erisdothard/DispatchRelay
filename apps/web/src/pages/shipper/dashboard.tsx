@@ -227,8 +227,8 @@ export default function ShipperDashboard() {
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Book Shipment', icon: '📦', action: () => navigate('/shipper/loads') },
-              { label: 'Track Load', icon: '📍', action: () => navigate('/track') },
-              { label: 'Documents', icon: '📄', action: () => {} },
+              { label: 'Send Live GPS', icon: '📍', action: () => setSharingLocation(true) },
+              { label: 'Track Load', icon: '🔍', action: () => navigate('/track') },
               { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
             ].map((item) => (
               <button
