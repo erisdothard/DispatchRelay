@@ -7,7 +7,7 @@ import { StatCard } from '@/shared/components/stat-card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLoads, getMyActiveLoads } from '@/services/loads.service';
+import { getLoads } from '@/services/loads.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
@@ -42,16 +42,16 @@ export default function ShipperDashboard() {
 
   useEffect(() => {
     if (user?.id) {
-      getMyActiveLoads(user.id).then(setActiveLoads).catch(console.error);
+      getLoads({ postedBy: user.id, status: 'in_transit' }).then(setActiveLoads).catch(console.error);
     }
   }, [user?.id]);
 
   const inTransitLoad = activeLoads.find((l) => l.status === 'in_transit') ?? null;
 
-  // Activates GPS pinging when toggle is on AND there's an in_transit load
+  // Activates GPS pinging whenever the shipper toggles sharing on
   useDriverLocation({
-    loadNumber: inTransitLoad?.loadNumber ?? '',
-    active: sharingLocation && inTransitLoad != null,
+    loadNumber: inTransitLoad?.loadNumber ?? 'shipper-live',
+    active: sharingLocation,
   });
 
   const name = profile?.full_name ?? 'Shipper';
@@ -77,52 +77,52 @@ export default function ShipperDashboard() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
-        {/* Share Location banner — shipper is the driver, shares GPS with carrier/broker */}
-        {inTransitLoad && (
-          <button
-            onClick={() => setSharingLocation((v) => !v)}
-            className="w-full flex items-center justify-between rounded-2xl p-4 active-scale"
-            style={{
-              background: sharingLocation
-                ? 'linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.08))'
-                : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${sharingLocation ? 'rgba(34,197,94,0.35)' : 'rgba(255,255,255,0.08)'}`,
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                style={{
-                  background: sharingLocation
-                    ? 'rgba(34,197,94,0.2)'
-                    : 'rgba(232,96,48,0.12)',
-                }}
-              >
-                <Radio
-                  size={18}
-                  className={sharingLocation ? 'text-green-400' : 'text-fx-orange'}
-                />
-              </div>
-              <div className="text-left">
-                <p className="text-[14px] font-semibold text-white">Share Location</p>
-                <p className="text-[11px] text-fx-text-dim mt-0.5">
-                  {sharingLocation
-                    ? `Sharing GPS for ${inTransitLoad.loadNumber}`
-                    : 'Tap to share your GPS with carrier'}
-                </p>
-              </div>
-            </div>
+        {/* Share Location banner — always visible so shipper can share GPS anytime */}
+        <button
+          onClick={() => setSharingLocation((v) => !v)}
+          className="w-full flex items-center justify-between rounded-2xl p-4 active-scale"
+          style={{
+            background: sharingLocation
+              ? 'linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.08))'
+              : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${sharingLocation ? 'rgba(34,197,94,0.35)' : 'rgba(255,255,255,0.08)'}`,
+          }}
+        >
+          <div className="flex items-center gap-3">
             <div
-              className="w-12 h-7 rounded-full relative transition-colors"
-              style={{ background: sharingLocation ? '#22c55e' : 'rgba(255,255,255,0.12)' }}
+              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+              style={{
+                background: sharingLocation
+                  ? 'rgba(34,197,94,0.2)'
+                  : 'rgba(232,96,48,0.12)',
+              }}
             >
-              <div
-                className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform"
-                style={{ transform: sharingLocation ? 'translateX(22px)' : 'translateX(2px)' }}
+              <Radio
+                size={18}
+                className={sharingLocation ? 'text-green-400' : 'text-fx-orange'}
               />
             </div>
-          </button>
-        )}
+            <div className="text-left">
+              <p className="text-[14px] font-semibold text-white">Share Location</p>
+              <p className="text-[11px] text-fx-text-dim mt-0.5">
+                {sharingLocation
+                  ? inTransitLoad
+                    ? `Sharing GPS for ${inTransitLoad.loadNumber}`
+                    : 'Sharing live GPS'
+                  : 'Tap to share your GPS with carrier'}
+              </p>
+            </div>
+          </div>
+          <div
+            className="w-12 h-7 rounded-full relative transition-colors"
+            style={{ background: sharingLocation ? '#22c55e' : 'rgba(255,255,255,0.12)' }}
+          >
+            <div
+              className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform"
+              style={{ transform: sharingLocation ? 'translateX(22px)' : 'translateX(2px)' }}
+            />
+          </div>
+        </button>
 
         {/* Stats */}
         <div>
