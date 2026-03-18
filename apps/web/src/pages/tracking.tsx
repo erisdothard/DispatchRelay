@@ -52,7 +52,7 @@ export default function TrackingPage() {
 
   const completedCount = milestones.filter((m) => m.completed).length;
   const progress = milestones.length > 0 ? (completedCount / milestones.length) * 100 : 0;
-  const role = (profile?.role === 'admin' ? 'carrier' : profile?.role) ?? 'carrier';
+  const role = (profile?.role === 'admin' ? 'carrier' : profile?.role === 'driver' || profile?.role === 'shipper' ? 'driver' : profile?.role) ?? 'carrier';
 
   // Live GPS tracking — only subscribes when a load is loaded
   const livePing = useLiveTracking(load?.loadNumber ?? null);

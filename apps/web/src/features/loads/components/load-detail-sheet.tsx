@@ -131,7 +131,7 @@ export function LoadDetailSheet({
     : '—';
 
   const showStepper = ACTIVE_STATUSES.includes(liveStatus);
-  const showDocs = ACTIVE_STATUSES.includes(liveStatus) && role && role !== 'shipper';
+  const showDocs = ACTIVE_STATUSES.includes(liveStatus) && !!role;
   const isBroker = role === 'broker' || role === 'admin';
   const isCarrier = role === 'carrier';
 

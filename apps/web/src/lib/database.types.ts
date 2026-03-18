@@ -1,3 +1,5 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+
 export type UserRole = 'carrier' | 'broker' | 'shipper' | 'admin' | 'driver';
 export type VerificationStatus = 'pending' | 'verified' | 'failed' | 'expired';
 export type SubscriptionTier =
@@ -698,12 +700,167 @@ export type Database = {
         };
         Relationships: [];
       };
+      saved_searches: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          filters: Json;
+          alert_enabled: boolean;
+          last_alerted_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          filters?: Json;
+          alert_enabled?: boolean;
+          last_alerted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          filters?: Json;
+          alert_enabled?: boolean;
+          last_alerted_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      rate_history: {
+        Row: {
+          id: string;
+          lane_hash: string;
+          origin_state: string;
+          dest_state: string;
+          equipment: string;
+          rate_usd: number;
+          total_miles: number | null;
+          rate_per_mile: number | null;
+          load_id: string | null;
+          recorded_at: string;
+        };
+        Insert: {
+          id?: string;
+          lane_hash: string;
+          origin_state: string;
+          dest_state: string;
+          equipment: string;
+          rate_usd: number;
+          total_miles?: number | null;
+          rate_per_mile?: number | null;
+          load_id?: string | null;
+          recorded_at?: string;
+        };
+        Update: {
+          rate_usd?: number;
+          total_miles?: number | null;
+          rate_per_mile?: number | null;
+        };
+        Relationships: [];
+      };
+      notification_preferences: {
+        Row: {
+          user_id: string;
+          settings: Record<string, unknown>;
+          phone_number: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          settings?: Record<string, unknown>;
+          phone_number?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          settings?: Record<string, unknown>;
+          phone_number?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      notification_queue: {
+        Row: {
+          id: string;
+          type: string;
+          recipient: string;
+          subject: string | null;
+          payload: Record<string, unknown>;
+          status: string;
+          attempts: number;
+          max_attempts: number;
+          next_retry_at: string;
+          sent_at: string | null;
+          error_message: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          type: string;
+          recipient: string;
+          subject?: string | null;
+          payload?: Record<string, unknown>;
+          status?: string;
+          attempts?: number;
+          max_attempts?: number;
+          next_retry_at?: string;
+          sent_at?: string | null;
+          error_message?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          status?: string;
+          attempts?: number;
+          next_retry_at?: string;
+          sent_at?: string | null;
+          error_message?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
       accept_bid: { Args: { bid_id: string }; Returns: void };
       book_now: { Args: { p_load_id: string }; Returns: void };
       increment_bid_count: { Args: { load_id: string }; Returns: void };
+      enqueue_notification: {
+        Args: {
+          p_type: string;
+          p_recipient: string;
+          p_subject: string | null;
+          p_payload: Record<string, unknown>;
+        };
+        Returns: string;
+      };
+      get_lane_stats: {
+        Args: {
+          p_origin_state: string;
+          p_dest_state: string;
+          p_equipment: string;
+          p_days?: number;
+        };
+        Returns: {
+          avg_rate_per_mile: number | null;
+          min_rate_per_mile: number | null;
+          max_rate_per_mile: number | null;
+          sample_count: number;
+          last_recorded_at: string | null;
+        }[];
+      };
+      get_lane_trend: {
+        Args: {
+          p_origin_state: string;
+          p_dest_state: string;
+          p_equipment: string;
+        };
+        Returns: {
+          day: string;
+          avg_rate_per_mile: number;
+        }[];
+      };
     };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };

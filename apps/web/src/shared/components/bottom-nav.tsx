@@ -1,8 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, MessageSquare, User, Truck, Package, BarChart2, Plus } from 'lucide-react';
+import { Home, Search, MessageSquare, User, Truck, Package, BarChart2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-type NavRole = 'carrier' | 'broker' | 'shipper' | 'driver';
+type NavRole = 'carrier' | 'broker' | 'driver';
 
 interface NavItem {
   label: string;
@@ -26,18 +26,9 @@ const brokerNav: NavItem[] = [
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
 
-const shipperNav: NavItem[] = [
-  { label: 'Home', icon: <Home size={22} />, path: '/shipper' },
-  { label: 'Shipments', icon: <Package size={22} />, path: '/shipper/loads' },
-  { label: 'Track', icon: <BarChart2 size={22} />, path: '/track' },
-  { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
-  { label: 'Profile', icon: <User size={22} />, path: '/profile' },
-];
-
 const driverNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/driver' },
   { label: 'My Loads', icon: <Package size={22} />, path: '/driver/loads' },
-  { label: 'Track', icon: <BarChart2 size={22} />, path: '/track' },
   { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
@@ -45,13 +36,13 @@ const driverNav: NavItem[] = [
 const navByRole: Record<NavRole, NavItem[]> = {
   carrier: carrierNav,
   broker: brokerNav,
-  shipper: shipperNav,
   driver: driverNav,
 };
 
-export function BottomNav({ role }: { role: NavRole }) {
+export function BottomNav({ role }: { role: NavRole | 'shipper' }) {
   const location = useLocation();
-  const items = navByRole[role];
+  const resolvedRole: NavRole = role === 'shipper' ? 'driver' : role;
+  const items = navByRole[resolvedRole];
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50">
@@ -64,7 +55,7 @@ export function BottomNav({ role }: { role: NavRole }) {
       <div className="relative flex items-center justify-around px-1 pb-safe pt-2 h-[68px]">
         {items.map((item) => {
           const isActive =
-            item.path === '/carrier' || item.path === '/broker' || item.path === '/shipper' || item.path === '/driver'
+            item.path === '/carrier' || item.path === '/broker' || item.path === '/driver'
               ? location.pathname === item.path
               : location.pathname.startsWith(item.path);
 

@@ -55,7 +55,7 @@ const PLANS: Plan[] = [
   },
   {
     tier: 'shipper',
-    name: 'Shipper',
+    name: 'Driver',
     price: '$199/mo',
     description: '25 loads/month. Direct to carrier.',
     features: ['25 loads/month', 'Direct carrier booking', 'Load tracking', 'Document management'],

@@ -1,7 +1,5 @@
 import { supabase } from '@/lib/supabase';
 import type { BidRow } from '@/lib/database.types';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const rpc = supabase.rpc.bind(supabase) as any;
 import {
   notifyNewBid,
   notifyBidAccepted,
@@ -74,7 +72,7 @@ export async function submitBid(params: {
     const { data: poster } = await supabase
       .from('profiles')
       .select('email')
-      .eq('id', load.posted_by)
+      .eq('id', load.posted_by!)
       .single();
 
     if (poster?.email) {
@@ -162,7 +160,7 @@ export async function bookNow(loadId: string): Promise<void> {
         .single();
 
       const { data: notifPrefs } = await supabase
-        .from('notification_preferences' as any)
+        .from('notification_preferences')
         .select('phone_number, settings')
         .eq('user_id', carrierId)
         .maybeSingle();
@@ -191,21 +189,23 @@ export async function bookNow(loadId: string): Promise<void> {
     }
 
     // Email load poster — booking confirmed
-    const { data: poster } = await supabase
-      .from('profiles')
-      .select('email')
-      .eq('id', load.posted_by)
-      .single();
+    if (load.posted_by) {
+      const { data: poster } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('id', load.posted_by)
+        .single();
 
-    if (poster?.email) {
-      notifyBookingConfirmed({
-        email: poster.email as string,
-        loadNumber: load.load_number,
-        origin: `${load.origin_city}, ${load.origin_state}`,
-        dest: `${load.dest_city}, ${load.dest_state}`,
-        pickupDate: load.pickup_date ?? '',
-        amount: load.rate_usd ?? 0,
-      }).then(() => undefined, () => undefined);
+      if (poster?.email) {
+        notifyBookingConfirmed({
+          email: poster.email as string,
+          loadNumber: load.load_number,
+          origin: `${load.origin_city}, ${load.origin_state}`,
+          dest: `${load.dest_city}, ${load.dest_state}`,
+          pickupDate: load.pickup_date ?? '',
+          amount: load.rate_usd ?? 0,
+        }).then(() => undefined, () => undefined);
+      }
     }
   }
 }

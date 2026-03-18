@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import type { Json } from '@/lib/database.types';
 import type { LoadFilters } from './loads.service';
 
 export interface SavedSearch {
@@ -35,7 +36,7 @@ export async function createSavedSearch(params: {
     .insert({
       user_id: authData.user.id,
       name: params.name,
-      filters: params.filters,
+      filters: params.filters as unknown as Json,
       alert_enabled: params.alertEnabled ?? true,
     })
     .select()
@@ -51,7 +52,7 @@ export async function updateSavedSearch(
 ): Promise<void> {
   const { error } = await supabase
     .from('saved_searches')
-    .update(updates)
+    .update({ ...updates, filters: updates.filters ? (updates.filters as unknown as Json) : undefined })
     .eq('id', id);
 
   if (error) throw new Error(error.message);

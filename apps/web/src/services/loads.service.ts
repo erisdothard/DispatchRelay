@@ -177,7 +177,7 @@ export async function updateLoad(id: string, updates: Partial<LoadRow>): Promise
 
 
   // Email on status change — get poster email
-  if (updates.status && before?.status !== updates.status) {
+  if (updates.status && before?.status !== updates.status && data.posted_by) {
     const { data: poster } = await supabase
       .from('profiles')
       .select('email')

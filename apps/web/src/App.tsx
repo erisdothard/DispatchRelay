@@ -19,9 +19,6 @@ const CarrierFleetPage = lazy(() => import('@/pages/carrier/fleet'));
 const BrokerDashboard = lazy(() => import('@/pages/broker/dashboard'));
 const BrokerLoadsPage = lazy(() => import('@/pages/broker/loads'));
 
-const ShipperDashboard = lazy(() => import('@/pages/shipper/dashboard'));
-const ShipperLoadsPage = lazy(() => import('@/pages/shipper/loads'));
-
 const DriverDashboard = lazy(() => import('@/pages/driver/dashboard'));
 const DriverLoadsPage = lazy(() => import('@/pages/driver/loads'));
 
@@ -97,23 +94,9 @@ export default function App() {
             }
           />
 
-          {/* Shipper */}
-          <Route
-            path="/shipper"
-            element={
-              <ProtectedRoute requiredRole="shipper">
-                <ShipperDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/shipper/loads"
-            element={
-              <ProtectedRoute requiredRole="shipper">
-                <ShipperLoadsPage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Shipper → Driver redirects */}
+          <Route path="/shipper" element={<Navigate to="/driver" replace />} />
+          <Route path="/shipper/*" element={<Navigate to="/driver" replace />} />
 
           {/* Driver */}
           <Route
