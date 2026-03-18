@@ -13,7 +13,7 @@ import type { Load, TrackingMilestone } from '@freightx/shared';
 export default function TrackingPage() {
   const { loadId } = useParams();
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
 
   const [query, setQuery] = useState(loadId ?? '');
   const [load, setLoad] = useState<Load | null>(null);
@@ -200,8 +200,8 @@ export default function TrackingPage() {
                 className="h-44 mb-3"
               />
 
-              {/* Request GPS button — shown when in transit but no live pings */}
-              {load.status === 'in_transit' && !livePosition && (
+              {/* Request GPS button — only for carrier/admin, not the shipper themselves */}
+              {load.status === 'in_transit' && !livePosition && user?.id !== load.postedBy && (
                 <button
                   disabled={gpsRequested}
                   onClick={async () => {
