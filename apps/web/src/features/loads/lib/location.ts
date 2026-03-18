@@ -26,6 +26,7 @@ export async function insertLocationPing(ping: LocationPing) {
   });
 
   if (error) {
+    console.error('[location-ping] Insert failed:', error);
     return null;
   }
 

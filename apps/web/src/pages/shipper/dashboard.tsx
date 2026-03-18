@@ -55,7 +55,7 @@ export default function ShipperDashboard() {
 
   useEffect(() => {
     if (user?.id) {
-      getLoads({ postedBy: user.id, status: 'in_transit' }).then(setActiveLoads).catch(console.error);
+      getLoads({ status: 'in_transit' }).then(setActiveLoads).catch(console.error);
     }
   }, [user?.id]);
 
