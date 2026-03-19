@@ -34,6 +34,7 @@ const BrokerLoadsPage = lazyRetry(() => import('@/pages/broker/loads'));
 
 const DriverDashboard = lazyRetry(() => import('@/pages/driver/dashboard'));
 const DriverLoadsPage = lazyRetry(() => import('@/pages/driver/loads'));
+const DriverDocumentsPage = lazyRetry(() => import('@/pages/driver/documents'));
 
 const TrackingPage = lazyRetry(() => import('@/pages/tracking'));
 const MessagesPage = lazyRetry(() => import('@/pages/messages'));
@@ -141,6 +142,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="driver">
                 <DriverLoadsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/driver/documents"
+            element={
+              <ProtectedRoute requiredRole="driver">
+                <DriverDocumentsPage />
               </ProtectedRoute>
             }
           />

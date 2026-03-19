@@ -410,6 +410,9 @@ export type Database = {
           file_url: string;
           file_size_bytes: number | null;
           mime_type: string | null;
+          signed_at: string | null;
+          signature_url: string | null;
+          signatory_name: string | null;
           created_at: string;
         };
         Insert: {
@@ -422,9 +425,16 @@ export type Database = {
           file_url: string;
           file_size_bytes?: number | null;
           mime_type?: string | null;
+          signed_at?: string | null;
+          signature_url?: string | null;
+          signatory_name?: string | null;
           created_at?: string;
         };
-        Update: { [_ in never]: never };
+        Update: {
+          signed_at?: string | null;
+          signature_url?: string | null;
+          signatory_name?: string | null;
+        };
         Relationships: [];
       };
       notifications: {

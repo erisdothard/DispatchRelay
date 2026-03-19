@@ -142,6 +142,26 @@ export async function notifyNewMessage(params: {
   });
 }
 
+export async function notifyBolSigned(params: {
+  email: string;
+  loadNumber: string;
+  origin: string;
+  dest: string;
+  signedBy: string;
+}): Promise<void> {
+  await enqueue({
+    template: 'bol_signed',
+    to: params.email,
+    subject: `BOL signed for load ${params.loadNumber}`,
+    data: {
+      load_number: params.loadNumber,
+      origin: params.origin,
+      dest: params.dest,
+      signed_by: params.signedBy,
+    },
+  });
+}
+
 // ── SMS helpers ──────────────────────────────────────────────────────────────
 
 export async function enqueueSms(params: {

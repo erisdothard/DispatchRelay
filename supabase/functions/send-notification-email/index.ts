@@ -135,6 +135,23 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
         ${footer}
       </div>`,
 
+    bol_signed: `
+      <div style="${baseStyle}">
+        <div style="${cardStyle}">
+          ${header}
+          <h2 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 8px;">BOL Signed</h2>
+          <p style="color:${mutedColor};margin:0 0 24px;font-size:14px;">The Bill of Lading for load <strong style="color:#fff;">${data.load_number ?? ''}</strong> has been signed.</p>
+          <div style="background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:20px;">
+            <div style="font-size:13px;color:${mutedColor};margin-bottom:4px;">Route</div>
+            <div style="font-size:16px;font-weight:600;color:#fff;">${data.origin ?? ''} → ${data.dest ?? ''}</div>
+            <div style="font-size:13px;color:${mutedColor};margin-top:12px;">Signed by</div>
+            <div style="font-size:14px;font-weight:600;color:${accentColor};">${data.signed_by ?? ''}</div>
+          </div>
+          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Document</a>
+        </div>
+        ${footer}
+      </div>`,
+
     lane_alert: `
       <div style="${baseStyle}">
         <div style="${cardStyle}">

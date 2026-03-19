@@ -5,8 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { DocumentRow, DocumentType } from '@/lib/database.types';
 
 const DOC_TYPES: { type: DocumentType; label: string; roles: string[] }[] = [
-  { type: 'bill_of_lading', label: 'Bill of Lading', roles: ['carrier', 'broker', 'admin'] },
-  { type: 'proof_of_delivery', label: 'Proof of Delivery', roles: ['carrier', 'admin'] },
+  { type: 'bill_of_lading', label: 'Bill of Lading', roles: ['carrier', 'broker', 'admin', 'driver'] },
+  { type: 'proof_of_delivery', label: 'Proof of Delivery', roles: ['carrier', 'admin', 'driver'] },
   { type: 'rate_confirmation', label: 'Rate Confirmation', roles: ['broker', 'admin'] },
   { type: 'other', label: 'Other Document', roles: ['carrier', 'broker', 'admin'] },
 ];

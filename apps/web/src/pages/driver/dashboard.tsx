@@ -60,7 +60,20 @@ export default function DriverDashboard() {
   useEffect(() => {
     if (user?.id) {
       getDriverLoads(user.id)
-        .then((all) => setLoads(all.slice(0, 5)))
+        .then((all) => {
+          // Sort: in_transit first, then dispatched/awarded, then delivered/completed
+          const priority: Record<string, number> = {
+            in_transit: 0,
+            dispatched: 1,
+            awarded: 2,
+            delivered: 3,
+            completed: 4,
+          };
+          const sorted = [...all].sort(
+            (a, b) => (priority[a.status] ?? 5) - (priority[b.status] ?? 5),
+          );
+          setLoads(sorted.slice(0, 5));
+        })
         .catch(console.error);
     }
   }, [user?.id]);
@@ -239,7 +252,7 @@ export default function DriverDashboard() {
             {[
               { label: 'My Loads', icon: '📦', action: () => navigate('/driver/loads') },
               { label: 'Send Live GPS', icon: '📍', action: () => setSharingLocation(true) },
-              { label: 'Track Load', icon: '🔍', action: () => navigate('/track') },
+              { label: 'Documents', icon: '📄', action: () => navigate('/driver/documents') },
               { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
             ].map((item) => (
               <button
