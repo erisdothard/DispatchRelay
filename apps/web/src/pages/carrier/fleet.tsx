@@ -42,6 +42,16 @@ function DriverGpsRow({ load }: { load: Load }) {
       <p className="text-sm font-semibold text-fx-text mb-1">
         {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
       </p>
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-[10px] font-bold text-fx-orange bg-fx-orange/15 px-1.5 py-0.5 rounded-full">
+          {EQUIPMENT_LABELS[load.equipment] ?? load.equipment}
+        </span>
+        {load.weightLbs > 0 && (
+          <span className="text-[10px] text-fx-text-dim">
+            {load.weightLbs.toLocaleString()} lbs
+          </span>
+        )}
+      </div>
       <div className="flex items-center gap-3 text-xs text-fx-text-muted">
         {speedKmh != null && (
           <span className="flex items-center gap-1">

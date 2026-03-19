@@ -9,6 +9,7 @@ import { useNotifications } from '@/features/notifications/hooks/use-notificatio
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { AssignDriverSheet } from '@/features/loads/components/assign-driver-sheet';
 
+import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
 
 const QUICK_ACTIONS = [
@@ -139,9 +140,22 @@ export default function CarrierDashboard() {
             </div>
 
             <div className="bg-fx-surface rounded-ios p-5 card-highlight">
-              <p className="text-[13px] font-medium text-fx-text-dim mb-4">
+              <p className="text-[13px] font-medium text-fx-text-dim">
                 ID {currentLoad.loadNumber}
               </p>
+              <div className="flex items-center gap-2 mt-1 mb-4">
+                <span className="text-[11px] font-bold text-fx-orange bg-fx-orange/15 px-2 py-0.5 rounded-full">
+                  {EQUIPMENT_LABELS[currentLoad.equipment] ?? currentLoad.equipment}
+                </span>
+                {currentLoad.weightLbs > 0 && (
+                  <span className="text-[11px] text-fx-text-dim">
+                    {currentLoad.weightLbs.toLocaleString()} lbs
+                  </span>
+                )}
+                <span className="text-[11px] text-fx-text-dim">
+                  ${currentLoad.rateUsd.toLocaleString()}
+                </span>
+              </div>
 
               {/* Progress track */}
               <div className="relative mb-4">

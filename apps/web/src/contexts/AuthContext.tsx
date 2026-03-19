@@ -43,20 +43,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchCompany = useCallback(async (profileId: string) => {
-    const { data } = await supabase
-      .from('companies')
-      .select('*')
-      .eq('owner_id', profileId)
+  const fetchCompany = useCallback(async (profileId: string, role?: string) => {
+    // 1. For non-drivers, check owned company first
+    if (role !== 'driver') {
+      const { data } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('owner_id', profileId)
+        .maybeSingle();
+      if (data) { setCompany(data); return; }
+    }
+
+    // 2. Fallback: find company via company_members
+    const { data: membership } = await (supabase as any)
+      .from('company_members')
+      .select('company_id')
+      .eq('user_id', profileId)
+      .limit(1)
       .maybeSingle();
-    setCompany(data ?? null);
+    if (membership) {
+      const { data: co } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('id', membership.company_id)
+        .single();
+      setCompany(co ?? null);
+      return;
+    }
+
+    // 3. Last resort for drivers: check owned company
+    if (role === 'driver') {
+      const { data } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('owner_id', profileId)
+        .maybeSingle();
+      setCompany(data ?? null);
+      return;
+    }
+
+    setCompany(null);
   }, []);
 
   const fetchProfile = useCallback(
     async (userId: string) => {
       const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
       setProfile(data ?? null);
-      if (data) await fetchCompany(data.id);
+      if (data) await fetchCompany(data.id, data.role);
     },
     [fetchCompany],
   );
@@ -141,6 +174,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: data.email ?? null,
       });
       if (companyErr) return { error: companyErr.message };
+
+      // Add owner as company_member so RLS policies work
+      const { data: newCompany } = await supabase
+        .from('companies')
+        .select('id')
+        .eq('owner_id', user.id)
+        .single();
+      if (newCompany) {
+        await (supabase as any).from('company_members').insert({
+          company_id: newCompany.id,
+          user_id: user.id,
+          role: 'owner',
+          joined_at: new Date().toISOString(),
+        });
+      }
 
       // Mark onboarding complete
       await supabase.from('profiles').update({ onboarding_complete: true }).eq('id', user.id);
