@@ -43,13 +43,19 @@ export default function TeamPage() {
   const canManage = myRole === 'owner' || myRole === 'admin';
 
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId) {
+      setLoading(false);
+      return;
+    }
     Promise.all([
       getCompanyMembers(companyId),
       getCompanyInvites(companyId),
     ]).then(([m, i]) => {
       setMembers(m);
       setInvites(i);
+    }).catch((err) => {
+      console.error('Failed to load team data:', err);
+    }).finally(() => {
       setLoading(false);
     });
   }, [companyId]);

@@ -67,12 +67,16 @@ export default function ProfilePage() {
           description: 'MC, DOT, insurance',
           onPress: () => navigate('/profile/documents'),
         },
-        {
-          icon: Truck,
-          label: 'Equipment',
-          description: 'Trucks & trailers',
-          onPress: () => navigate('/carrier/fleet'),
-        },
+        ...(role !== 'driver'
+          ? [
+              {
+                icon: Truck,
+                label: 'Equipment',
+                description: 'Trucks & trailers',
+                onPress: () => navigate('/carrier/fleet'),
+              },
+            ]
+          : []),
         {
           icon: Users,
           label: 'Team Members',

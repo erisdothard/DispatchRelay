@@ -175,21 +175,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (companyErr) return { error: companyErr.message };
 
-      // Add owner as company_member so RLS policies work
-      const { data: newCompany } = await supabase
-        .from('companies')
-        .select('id')
-        .eq('owner_id', user.id)
-        .single();
-      if (newCompany) {
-        await (supabase as any).from('company_members').insert({
-          company_id: newCompany.id,
-          user_id: user.id,
-          role: 'owner',
-          joined_at: new Date().toISOString(),
-        });
-      }
-
       // Mark onboarding complete
       await supabase.from('profiles').update({ onboarding_complete: true }).eq('id', user.id);
 
