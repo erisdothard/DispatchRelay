@@ -28,12 +28,12 @@ import {
 
 /* ── Constants ─────────────────────────────────────────────────── */
 
-const ROLE_META: Record<MemberRole, { label: string; icon: React.ElementType; color: string }> = {
-  owner: { label: 'Owner', icon: Crown, color: 'text-yellow-400' },
-  admin: { label: 'Admin', icon: Shield, color: 'text-blue-400' },
-  dispatcher: { label: 'Dispatcher', icon: Truck, color: 'text-fx-orange' },
-  accounting: { label: 'Accounting', icon: Calculator, color: 'text-green-400' },
-  viewer: { label: 'Viewer', icon: Eye, color: 'text-fx-text-dim' },
+const ROLE_META: Record<MemberRole, { label: string; desc: string; icon: React.ElementType; color: string }> = {
+  owner: { label: 'Owner', desc: 'Full control, billing, and member management', icon: Crown, color: 'text-yellow-400' },
+  admin: { label: 'Admin', desc: 'Manage team, loads, and settings', icon: Shield, color: 'text-blue-400' },
+  dispatcher: { label: 'Dispatcher', desc: 'Assign drivers, dispatch loads, update status', icon: Truck, color: 'text-fx-orange' },
+  accounting: { label: 'Accounting', desc: 'View rates, invoices, and financials', icon: Calculator, color: 'text-green-400' },
+  viewer: { label: 'Viewer', desc: 'Read-only access to loads and team', icon: Eye, color: 'text-fx-text-dim' },
 };
 
 const INVITE_ROLES: MemberRole[] = ['admin', 'dispatcher', 'accounting', 'viewer'];
@@ -149,7 +149,7 @@ export default function CarrierTeamSettingsPage() {
                     >
                       {INVITE_ROLES.map((r) => (
                         <option key={r} value={r} style={{ background: '#141414' }}>
-                          {ROLE_META[r].label}
+                          {ROLE_META[r].label} — {ROLE_META[r].desc}
                         </option>
                       ))}
                     </select>
