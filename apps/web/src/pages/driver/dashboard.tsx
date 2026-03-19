@@ -80,7 +80,11 @@ export default function DriverDashboard() {
 
   useEffect(() => {
     if (user?.id) {
-      getDriverLoads(user.id, 'in_transit').then(setActiveLoads).catch(console.error);
+      // Fetch all assigned loads, filter to GPS-eligible (everything before delivered)
+      const terminal = new Set(['delivered', 'cancelled', 'tonu', 'rejected', 'draft', 'pending_approval']);
+      getDriverLoads(user.id)
+        .then((all) => setActiveLoads(all.filter((l) => !terminal.has(l.status))))
+        .catch(console.error);
     }
   }, [user?.id]);
 
@@ -106,7 +110,7 @@ export default function DriverDashboard() {
         </button>
       </div>
 
-      {/* GPS pingers — one per in-transit load, only when sharing is on */}
+      {/* GPS pingers — one per active (non-delivered) load, only when sharing is on */}
       {sharingLocation &&
         activeLoads.map((l) => <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />)}
 

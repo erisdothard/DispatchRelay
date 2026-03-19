@@ -63,7 +63,11 @@ export default function ShipperDashboard() {
 
   useEffect(() => {
     if (user?.id) {
-      getLoads({ status: 'in_transit' }).then(setActiveLoads).catch(console.error);
+      // Fetch all loads, filter to GPS-eligible (everything before delivered)
+      const terminal = new Set(['delivered', 'cancelled', 'tonu', 'rejected', 'draft', 'pending_approval']);
+      getLoads()
+        .then((all) => setActiveLoads(all.filter((l) => !terminal.has(l.status))))
+        .catch(console.error);
     }
   }, [user?.id]);
 
@@ -89,7 +93,7 @@ export default function ShipperDashboard() {
         </button>
       </div>
 
-      {/* GPS pingers — one per in-transit load, only when sharing is on */}
+      {/* GPS pingers — one per active (non-delivered) load, only when sharing is on */}
       {sharingLocation &&
         activeLoads.map((l) => <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />)}
 

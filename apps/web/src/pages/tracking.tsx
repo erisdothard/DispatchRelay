@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, MoreVertical, Phone, Search, MapPin, Navigation, Radio } from 'lucide-react';
 import { MapView } from '@/shared/components/map-view';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -52,6 +52,11 @@ export default function TrackingPage() {
 
   const completedCount = milestones.filter((m) => m.completed).length;
   const progress = milestones.length > 0 ? (completedCount / milestones.length) * 100 : 0;
+
+  // GPS stays active for any non-terminal status (i.e. until delivered)
+  const GPS_TERMINAL = new Set(['delivered', 'cancelled', 'tonu', 'rejected', 'draft', 'pending_approval']);
+  const gpsEligible = !!load && !GPS_TERMINAL.has(load.status);
+
   const role =
     (profile?.role === 'admin'
       ? 'carrier'
@@ -75,6 +80,24 @@ export default function TrackingPage() {
   // Human-readable speed (km/h) and accuracy
   const speedKmh = livePing?.speed_ms != null ? Math.round(livePing.speed_ms * 3.6) : null;
   const accuracyM = livePing?.accuracy_m ?? null;
+
+  // Staleness tracking — re-renders every 15 s to keep "X min ago" fresh
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 15_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const { agoLabel, isStale } = useMemo(() => {
+    if (!livePing?.recorded_at) return { agoLabel: null, isStale: false };
+    const diffS = Math.floor((now - new Date(livePing.recorded_at).getTime()) / 1000);
+    if (diffS < 60) return { agoLabel: 'just now', isStale: false };
+    const diffM = Math.floor(diffS / 60);
+    const stale = diffM >= 2; // >2 min = stale
+    if (diffM < 60) return { agoLabel: `${diffM}m ago`, isStale: stale };
+    const diffH = Math.floor(diffM / 60);
+    return { agoLabel: `${diffH}h ${diffM % 60}m ago`, isStale: true };
+  }, [livePing?.recorded_at, now]);
 
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">
@@ -162,7 +185,11 @@ export default function TrackingPage() {
                         ? 'In Transit'
                         : load.status === 'delivered'
                           ? 'Delivered'
-                          : 'Posted',
+                          : load.status === 'dispatched'
+                            ? 'Dispatched'
+                            : load.status === 'awarded'
+                              ? 'Awarded'
+                              : load.status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
                     accent: true,
                   },
                   {
@@ -189,13 +216,19 @@ export default function TrackingPage() {
             <div className="bg-fx-surface rounded-ios p-4 card-highlight">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-semibold text-white">Live Tracking</p>
-                {load.status === 'in_transit' && livePosition && (
+                {gpsEligible && livePosition && !isStale && (
                   <span className="text-xs text-green-400 font-medium flex items-center gap-1">
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                    Live
+                    Live {agoLabel && `· ${agoLabel}`}
                   </span>
                 )}
-                {load.status === 'in_transit' && !livePosition && (
+                {gpsEligible && livePosition && isStale && (
+                  <span className="text-xs text-yellow-400 font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 bg-yellow-400 rounded-full" />
+                    Stale · {agoLabel}
+                  </span>
+                )}
+                {gpsEligible && !livePosition && (
                   <span className="text-xs text-fx-text-dim font-medium flex items-center gap-1">
                     <span className="w-2 h-2 bg-fx-text-dim rounded-full" />
                     Awaiting GPS
@@ -207,14 +240,14 @@ export default function TrackingPage() {
                 origin={{ city: load.originCity, state: load.originState }}
                 destination={{ city: load.destCity, state: load.destState }}
                 progress={progress}
-                inTransit={load.status === 'in_transit'}
+                inTransit={gpsEligible}
                 livePosition={livePosition}
                 heading={heading}
                 className="h-44 mb-3"
               />
 
               {/* GPS buttons — different for shipper vs carrier/admin */}
-              {load.status === 'in_transit' &&
+              {gpsEligible &&
                 !livePosition &&
                 (user?.id === load.postedBy ||
                 profile?.role === 'driver' ||
