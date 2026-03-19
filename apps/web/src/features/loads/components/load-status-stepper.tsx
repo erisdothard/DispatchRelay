@@ -28,10 +28,13 @@ const NEXT_STATUS: Partial<Record<LoadStatus, LoadStatus>> = {
   delivered: 'completed',
 };
 
+const REQUIRES_DRIVER: LoadStatus[] = ['dispatched', 'in_transit'];
+
 interface LoadStatusStepperProps {
   loadId: string;
   currentStatus: LoadStatus;
   role: UserRole;
+  hasDriverAssigned?: boolean;
   onStatusAdvanced?: (newStatus: LoadStatus) => void;
 }
 
@@ -39,6 +42,7 @@ export function LoadStatusStepper({
   loadId,
   currentStatus,
   role,
+  hasDriverAssigned = false,
   onStatusAdvanced,
 }: LoadStatusStepperProps) {
   const [advancing, setAdvancing] = useState(false);
@@ -48,9 +52,14 @@ export function LoadStatusStepper({
   const nextStatus = NEXT_STATUS[currentStatus];
   const canAdvance =
     nextStatus !== undefined && (ROLE_CAN_ADVANCE[role] ?? []).includes(nextStatus);
+  const needsDriver = nextStatus !== undefined && REQUIRES_DRIVER.includes(nextStatus) && !hasDriverAssigned;
 
   async function handleAdvance() {
     if (!nextStatus) return;
+    if (needsDriver) {
+      setError('Assign a driver before advancing to ' + (STEPS.find((s) => s.status === nextStatus)?.label ?? nextStatus));
+      return;
+    }
     setAdvancing(true);
     setError(null);
     try {

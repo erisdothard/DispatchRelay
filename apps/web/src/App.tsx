@@ -1,8 +1,19 @@
 import { lazy, Suspense } from 'react';
+import type { ComponentType } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 import { PageSkeleton } from '@/shared/components/PageSkeleton';
 import { ErrorBoundary } from '@/shared/components/error-boundary';
+
+// Auto-retry lazy imports once on chunk-load failure (stale deploy cache)
+function lazyRetry(fn: () => Promise<{ default: ComponentType }>) {
+  return lazy(() =>
+    fn().catch(() => {
+      window.location.reload();
+      return new Promise<{ default: ComponentType }>(() => {});
+    }),
+  );
+}
 
 // Public pages — small, load eagerly
 import SplashPage from '@/pages/splash';
@@ -12,29 +23,29 @@ import ResetPasswordPage from '@/pages/reset-password';
 import OnboardingPage from '@/pages/onboarding';
 
 // Lazy-loaded — only downloaded when the user navigates to that role
-const CarrierDashboard = lazy(() => import('@/pages/carrier/dashboard'));
-const CarrierLoadsPage = lazy(() => import('@/pages/carrier/loads'));
-const CarrierFleetPage = lazy(() => import('@/pages/carrier/fleet'));
-const CarrierTeamPage = lazy(() => import('@/pages/carrier/team'));
-const CarrierTeamSettingsPage = lazy(() => import('@/pages/carrier/team-settings'));
+const CarrierDashboard = lazyRetry(() => import('@/pages/carrier/dashboard'));
+const CarrierLoadsPage = lazyRetry(() => import('@/pages/carrier/loads'));
+const CarrierFleetPage = lazyRetry(() => import('@/pages/carrier/fleet'));
+const CarrierTeamPage = lazyRetry(() => import('@/pages/carrier/team'));
+const CarrierTeamSettingsPage = lazyRetry(() => import('@/pages/carrier/team-settings'));
 
-const BrokerDashboard = lazy(() => import('@/pages/broker/dashboard'));
-const BrokerLoadsPage = lazy(() => import('@/pages/broker/loads'));
+const BrokerDashboard = lazyRetry(() => import('@/pages/broker/dashboard'));
+const BrokerLoadsPage = lazyRetry(() => import('@/pages/broker/loads'));
 
-const DriverDashboard = lazy(() => import('@/pages/driver/dashboard'));
-const DriverLoadsPage = lazy(() => import('@/pages/driver/loads'));
+const DriverDashboard = lazyRetry(() => import('@/pages/driver/dashboard'));
+const DriverLoadsPage = lazyRetry(() => import('@/pages/driver/loads'));
 
-const TrackingPage = lazy(() => import('@/pages/tracking'));
-const MessagesPage = lazy(() => import('@/pages/messages'));
-const ProfilePage = lazy(() => import('@/pages/profile'));
-const HelpCenterPage = lazy(() => import('@/pages/profile/help-center'));
-const NotificationsPage = lazy(() => import('@/pages/profile/notifications'));
-const DocumentsPage = lazy(() => import('@/pages/profile/documents'));
-const PrivacyPage = lazy(() => import('@/pages/legal/privacy'));
-const TermsPage = lazy(() => import('@/pages/legal/terms'));
-const AdminDashboard = lazy(() => import('@/pages/admin/dashboard'));
-const AuditLogPage = lazy(() => import('@/pages/admin/audit-log'));
-const NotFound = lazy(() => import('@/pages/not-found'));
+const TrackingPage = lazyRetry(() => import('@/pages/tracking'));
+const MessagesPage = lazyRetry(() => import('@/pages/messages'));
+const ProfilePage = lazyRetry(() => import('@/pages/profile'));
+const HelpCenterPage = lazyRetry(() => import('@/pages/profile/help-center'));
+const NotificationsPage = lazyRetry(() => import('@/pages/profile/notifications'));
+const DocumentsPage = lazyRetry(() => import('@/pages/profile/documents'));
+const PrivacyPage = lazyRetry(() => import('@/pages/legal/privacy'));
+const TermsPage = lazyRetry(() => import('@/pages/legal/terms'));
+const AdminDashboard = lazyRetry(() => import('@/pages/admin/dashboard'));
+const AuditLogPage = lazyRetry(() => import('@/pages/admin/audit-log'));
+const NotFound = lazyRetry(() => import('@/pages/not-found'));
 
 export default function App() {
   return (

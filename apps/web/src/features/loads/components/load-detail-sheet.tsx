@@ -242,6 +242,7 @@ export function LoadDetailSheet({
               loadId={load.id}
               currentStatus={liveStatus}
               role={role}
+              hasDriverAssigned={!!load.assignedDriverId}
               onStatusAdvanced={(s) => setCurrentStatus(s)}
             />
           </div>
