@@ -80,7 +80,9 @@ export function useLoads(filters: LoadFilters = {}): UseLoadsResult {
         if (pageRef.current === 0) fetchPage(0, false);
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchPage]);
 
   return { loads, loading, loadingMore, error, hasMore, total, refresh, loadMore };

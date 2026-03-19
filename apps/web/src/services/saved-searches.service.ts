@@ -52,7 +52,10 @@ export async function updateSavedSearch(
 ): Promise<void> {
   const { error } = await supabase
     .from('saved_searches')
-    .update({ ...updates, filters: updates.filters ? (updates.filters as unknown as Json) : undefined })
+    .update({
+      ...updates,
+      filters: updates.filters ? (updates.filters as unknown as Json) : undefined,
+    })
     .eq('id', id);
 
   if (error) throw new Error(error.message);

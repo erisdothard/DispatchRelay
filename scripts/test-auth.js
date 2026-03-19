@@ -8,10 +8,10 @@ const sb = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 async function run() {
-  console.log("Testing listUsers...");
+  console.log('Testing listUsers...');
   const { data, error } = await sb.auth.admin.listUsers();
-  console.log("Data:", data ? data.users.length : null);
-  console.log("Error:", error);
+  console.log('Data:', data ? data.users.length : null);
+  console.log('Error:', error);
 }
 
 run();

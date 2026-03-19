@@ -26,7 +26,9 @@ export async function getRelationships(): Promise<CarrierRelationship[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('carrier_relationships')
-    .select('id, broker_company_id, carrier_company_id, status, notes, created_at, companies:carrier_company_id(name)')
+    .select(
+      'id, broker_company_id, carrier_company_id, status, notes, created_at, companies:carrier_company_id(name)',
+    )
     .order('created_at', { ascending: false });
 
   if (error) throw new Error((error as { message: string }).message);
@@ -65,26 +67,21 @@ export async function upsertRelationship(
   if (!companyId) throw new Error('No company found');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from('carrier_relationships')
-    .upsert(
-      {
-        broker_company_id: companyId,
-        carrier_company_id: carrierId,
-        status,
-        notes: notes ?? null,
-      },
-      { onConflict: 'broker_company_id,carrier_company_id' },
-    );
+  const { error } = await (supabase as any).from('carrier_relationships').upsert(
+    {
+      broker_company_id: companyId,
+      carrier_company_id: carrierId,
+      status,
+      notes: notes ?? null,
+    },
+    { onConflict: 'broker_company_id,carrier_company_id' },
+  );
 
   if (error) throw new Error((error as { message: string }).message);
 }
 
 export async function removeRelationship(id: string): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from('carrier_relationships')
-    .delete()
-    .eq('id', id);
+  const { error } = await (supabase as any).from('carrier_relationships').delete().eq('id', id);
   if (error) throw new Error((error as { message: string }).message);
 }

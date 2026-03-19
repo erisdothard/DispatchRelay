@@ -28,11 +28,11 @@ No single platform serves all three. Users pay for three products, switch betwee
 
 FreightX unifies all three roles in one SaaS platform:
 
-| Role | What They Do on FreightX |
-|---|---|
-| **Carrier** | Post available trucks, search loads, bid, book, update status, upload POD, get paid |
-| **Broker** | Post loads, search trucks, accept bids, generate rate confirmations, track shipments, invoice |
-| **Shipper** | Post freight, book direct or via broker, track shipment live, receive POD |
+| Role        | What They Do on FreightX                                                                      |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| **Carrier** | Post available trucks, search loads, bid, book, update status, upload POD, get paid           |
+| **Broker**  | Post loads, search trucks, accept bids, generate rate confirmations, track shipments, invoice |
+| **Shipper** | Post freight, book direct or via broker, track shipment live, receive POD                     |
 
 All three see the same data in real time. One login. One platform.
 
@@ -41,15 +41,19 @@ All three see the same data in real time. One login. One platform.
 ## Key Differentiators
 
 ### 1. Multi-Role Unified Platform
+
 The only load board where Carriers, Brokers, and Shippers all operate in the same system. No switching between apps. No duplicated data entry.
 
 ### 2. Real-Time Everything
+
 New load postings appear instantly. Status updates push to all parties. Chat is live. The board is a living, breathing marketplace — not a static list refreshed by F5.
 
 ### 3. Booking-to-Payment Workflow
+
 From posting to payment, every step is in FreightX. Rate confirmation auto-generated on booking. Invoice auto-generated on delivery. Payment processed in-platform. No more chasing paper.
 
 ### 4. Carrier Verification Built-In
+
 MC/DOT numbers verified against FMCSA SAFER on signup. Insurance certificates tracked with auto-expiry alerts. Verified badge shown on every carrier profile. Trust is built into the system.
 
 ---
@@ -57,18 +61,21 @@ MC/DOT numbers verified against FMCSA SAFER on signup. Insurance certificates tr
 ## Target Users
 
 ### Primary: Small-to-Mid Freight Brokerages (5–50 employees)
+
 - Currently using DAT or Truckstop for the load board
 - Using email, phone, and fax for carrier communication
 - Paying per-seat for tools that don't talk to each other
 - Pain: manual everything, no visibility, slow payments
 
 ### Secondary: Independent Owner-Operators and Small Fleets (1–10 trucks)
+
 - Checking 2–3 load boards daily for freight
 - Losing margin to brokers because they lack negotiating leverage
 - Getting paid 30–60 days out, cash-flow constrained
 - Pain: too many tools, no transparency, slow pay
 
 ### Tertiary: Regional Shippers (50–500 shipments/month)
+
 - Booking freight via broker relationships or directly via phone
 - No visibility on where their freight is between pickup and delivery
 - Reconciling invoices manually
@@ -80,16 +87,17 @@ MC/DOT numbers verified against FMCSA SAFER on signup. Insurance certificates tr
 
 ### SaaS Subscriptions (Primary Revenue)
 
-| Tier | Price | Target |
-|---|---|---|
-| Carrier Free | $0 | Independent owner-operators |
-| Carrier Pro | $49/mo | Small fleets (2–10 trucks) |
-| Broker Starter | $149/mo | Boutique brokerages |
-| Broker Growth | $349/mo | Mid-size brokerages |
-| Shipper | $199/mo | Regional shippers |
-| Enterprise | Custom | Large fleets and brokerages |
+| Tier           | Price   | Target                      |
+| -------------- | ------- | --------------------------- |
+| Carrier Free   | $0      | Independent owner-operators |
+| Carrier Pro    | $49/mo  | Small fleets (2–10 trucks)  |
+| Broker Starter | $149/mo | Boutique brokerages         |
+| Broker Growth  | $349/mo | Mid-size brokerages         |
+| Shipper        | $199/mo | Regional shippers           |
+| Enterprise     | Custom  | Large fleets and brokerages |
 
 ### Transaction Fees (Secondary Revenue)
+
 - 0.5–1% on in-platform payments processed through FreightX
 - Quick Pay fee: 2% for 2-day payment vs net-30
 
@@ -97,16 +105,16 @@ MC/DOT numbers verified against FMCSA SAFER on signup. Insurance certificates tr
 
 ## Competitive Landscape
 
-| Feature | DAT | Truckstop | Convoy | **FreightX** |
-|---|---|---|---|---|
-| Multi-role (C+B+S) | No | No | No | **Yes** |
-| Real-time messaging | Basic | Basic | Yes | Yes |
-| In-platform payments | No | Yes | Yes | Yes |
-| Carrier verification | Yes | Yes | Yes | Yes |
-| Live GPS tracking | Yes | Yes | Yes | Planned |
-| AI matching | No | Limited | Yes | Planned |
-| Open API | Limited | Yes | No | Planned |
-| Price | $50+/mo | $50+/mo | Commission | $49–$349/mo |
+| Feature              | DAT     | Truckstop | Convoy     | **FreightX** |
+| -------------------- | ------- | --------- | ---------- | ------------ |
+| Multi-role (C+B+S)   | No      | No        | No         | **Yes**      |
+| Real-time messaging  | Basic   | Basic     | Yes        | Yes          |
+| In-platform payments | No      | Yes       | Yes        | Yes          |
+| Carrier verification | Yes     | Yes       | Yes        | Yes          |
+| Live GPS tracking    | Yes     | Yes       | Yes        | Planned      |
+| AI matching          | No      | Limited   | Yes        | Planned      |
+| Open API             | Limited | Yes       | No         | Planned      |
+| Price                | $50+/mo | $50+/mo   | Commission | $49–$349/mo  |
 
 ---
 
@@ -135,14 +143,14 @@ The minimum viable product for a **closed beta launch**:
 
 ## Success Metrics (Beta)
 
-| Metric | Target at 90 days post-launch |
-|---|---|
-| Registered companies | 50+ |
-| Active users (weekly) | 100+ |
-| Loads posted | 500+ |
-| Bookings completed | 100+ |
-| NPS score | > 40 |
-| Uptime | > 99.5% |
+| Metric                | Target at 90 days post-launch |
+| --------------------- | ----------------------------- |
+| Registered companies  | 50+                           |
+| Active users (weekly) | 100+                          |
+| Loads posted          | 500+                          |
+| Bookings completed    | 100+                          |
+| NPS score             | > 40                          |
+| Uptime                | > 99.5%                       |
 
 ---
 
@@ -156,4 +164,4 @@ The minimum viable product for a **closed beta launch**:
 
 ---
 
-*This brief is a living document. Update it as product decisions are made.*
+_This brief is a living document. Update it as product decisions are made._

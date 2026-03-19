@@ -62,8 +62,8 @@
 
 ```yaml
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
 ```
 
 ### `turbo.json`
@@ -119,6 +119,7 @@ npx shadcn@latest init
 ```
 
 Config choices:
+
 - Style: Default
 - Base color: Neutral
 - CSS variables: Yes
@@ -142,7 +143,7 @@ In `apps/web/src/index.css`, set CSS variables:
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 8%;
     --popover-foreground: 0 0% 98%;
-    --primary: 24 95% 53%;          /* orange-500 #f97316 */
+    --primary: 24 95% 53%; /* orange-500 #f97316 */
     --primary-foreground: 0 0% 9%;
     --secondary: 0 0% 14%;
     --secondary-foreground: 0 0% 98%;
@@ -264,31 +265,50 @@ pnpm husky init
 ```
 
 ### `.husky/pre-commit`
+
 ```sh
 pnpm lint-staged
 ```
 
 ### `.husky/commit-msg`
+
 ```sh
 pnpm commitlint --edit $1
 ```
 
 ### `commitlint.config.js`
+
 ```js
 module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    'scope-enum': [2, 'always', [
-      'web', 'shared', 'db', 'auth',
-      'loads', 'trucks', 'bookings', 'messages',
-      'notifications', 'payments', 'ci', 'docs', 'deps', 'config'
-    ]],
+    'scope-enum': [
+      2,
+      'always',
+      [
+        'web',
+        'shared',
+        'db',
+        'auth',
+        'loads',
+        'trucks',
+        'bookings',
+        'messages',
+        'notifications',
+        'payments',
+        'ci',
+        'docs',
+        'deps',
+        'config',
+      ],
+    ],
     'scope-empty': [1, 'never'],
   },
 };
 ```
 
 ### `.prettierrc`
+
 ```json
 {
   "semi": true,

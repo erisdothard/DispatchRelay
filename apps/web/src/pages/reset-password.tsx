@@ -5,19 +5,21 @@ import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { supabase } from '@/lib/supabase';
 
 export default function ResetPasswordPage() {
-  const [password, setPassword]           = useState('');
-  const [confirm, setConfirm]             = useState('');
-  const [showPassword, setShowPassword]   = useState(false);
-  const [loading, setLoading]             = useState(false);
-  const [done, setDone]                   = useState(false);
-  const [error, setError]                 = useState<string | null>(null);
-  const [sessionReady, setSessionReady]   = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
   const navigate = useNavigate();
 
   // Supabase fires PASSWORD_RECOVERY when the user arrives via the reset link.
   // This sets a temporary session so updateUser() works.
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') setSessionReady(true);
     });
     // Also check if there's already a session (page refresh case)
@@ -29,13 +31,22 @@ export default function ResetPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (password !== confirm) { setError('Passwords do not match.'); return; }
-    if (password.length < 8)  { setError('Password must be at least 8 characters.'); return; }
+    if (password !== confirm) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
     setError(null);
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) { setError(error.message); return; }
+    if (error) {
+      setError(error.message);
+      return;
+    }
     setDone(true);
     setTimeout(() => navigate('/login', { replace: true }), 2500);
   }
@@ -53,7 +64,9 @@ export default function ResetPasswordPage() {
       >
         <div>
           <h1 className="text-xl font-bold text-fx-text">New Password</h1>
-          <p className="text-xs text-fx-text-muted mt-0.5">Choose a strong password for your account.</p>
+          <p className="text-xs text-fx-text-muted mt-0.5">
+            Choose a strong password for your account.
+          </p>
         </div>
       </div>
 
@@ -75,7 +88,10 @@ export default function ResetPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
           <div className="relative">
-            <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim" />
+            <Lock
+              size={15}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
+            />
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="New password (min. 8 characters)"
@@ -96,7 +112,10 @@ export default function ResetPasswordPage() {
           </div>
 
           <div className="relative">
-            <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim" />
+            <Lock
+              size={15}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
+            />
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="Confirm new password"
@@ -109,7 +128,9 @@ export default function ResetPasswordPage() {
           </div>
 
           {error && (
-            <p className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3">{error}</p>
+            <p className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3">
+              {error}
+            </p>
           )}
 
           <button

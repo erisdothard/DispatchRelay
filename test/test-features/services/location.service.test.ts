@@ -25,10 +25,8 @@ function makeBuilder(result: unknown) {
   for (const m of ['insert', 'select', 'eq']) {
     self[m] = vi.fn().mockReturnValue(self);
   }
-  self.then = (
-    onfulfilled: (v: unknown) => unknown,
-    onrejected: (v: unknown) => unknown,
-  ) => Promise.resolve(result).then(onfulfilled, onrejected);
+  self.then = (onfulfilled: (v: unknown) => unknown, onrejected: (v: unknown) => unknown) =>
+    Promise.resolve(result).then(onfulfilled, onrejected);
   return self;
 }
 

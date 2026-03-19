@@ -41,7 +41,9 @@ export function DocumentUpload({ loadId, role }: DocumentUploadProps) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const fetchDocs = useCallback(() => {
-    getDocumentsForLoad(loadId).then(setDocs).catch(() => undefined);
+    getDocumentsForLoad(loadId)
+      .then(setDocs)
+      .catch(() => undefined);
   }, [loadId]);
 
   useEffect(() => {

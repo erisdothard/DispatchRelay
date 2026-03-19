@@ -13,12 +13,19 @@ import {
 } from '@/services/accessorials.service';
 import { useAuth } from '@/contexts/AuthContext';
 
-const TYPES: AccessorialType[] = ['detention', 'lumper', 'layover', 'tonu', 'fuel_surcharge', 'other'];
+const TYPES: AccessorialType[] = [
+  'detention',
+  'lumper',
+  'layover',
+  'tonu',
+  'fuel_surcharge',
+  'other',
+];
 
 const STATUS_COLORS = {
-  pending:  'text-yellow-400 bg-yellow-400/10',
+  pending: 'text-yellow-400 bg-yellow-400/10',
   approved: 'text-green-400 bg-green-400/10',
-  denied:   'text-red-400 bg-red-400/10',
+  denied: 'text-red-400 bg-red-400/10',
 };
 
 interface AccessorialsSheetProps {
@@ -30,7 +37,14 @@ interface AccessorialsSheetProps {
   role: 'carrier' | 'broker' | 'shipper' | 'admin' | 'driver';
 }
 
-export function AccessorialsSheet({ open, onClose, loadId, bookingId, baseRate, role }: AccessorialsSheetProps) {
+export function AccessorialsSheet({
+  open,
+  onClose,
+  loadId,
+  bookingId,
+  baseRate,
+  role,
+}: AccessorialsSheetProps) {
   const { user } = useAuth();
   const [charges, setCharges] = useState<AccessorialCharge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,14 +97,14 @@ export function AccessorialsSheet({ open, onClose, loadId, bookingId, baseRate, 
 
   async function handleApprove(id: string) {
     await approveAccessorial(id);
-    setCharges((prev) => prev.map((c) => c.id === id ? { ...c, status: 'approved' } : c));
+    setCharges((prev) => prev.map((c) => (c.id === id ? { ...c, status: 'approved' } : c)));
     const total = await getApprovedAccessorialTotal(loadId);
     setApprovedTotal(total);
   }
 
   async function handleDeny(id: string) {
     await denyAccessorial(id);
-    setCharges((prev) => prev.map((c) => c.id === id ? { ...c, status: 'denied' } : c));
+    setCharges((prev) => prev.map((c) => (c.id === id ? { ...c, status: 'denied' } : c)));
   }
 
   const invoiceTotal = baseRate + approvedTotal;
@@ -104,18 +118,28 @@ export function AccessorialsSheet({ open, onClose, loadId, bookingId, baseRate, 
           style={{ background: 'rgba(232,96,48,0.06)', border: '1px solid rgba(232,96,48,0.15)' }}
         >
           <div className="flex justify-between items-center">
-            <span className="text-xs font-bold text-fx-text-muted uppercase tracking-wider">Base Rate</span>
+            <span className="text-xs font-bold text-fx-text-muted uppercase tracking-wider">
+              Base Rate
+            </span>
             <span className="text-sm font-bold text-fx-text">${baseRate.toLocaleString()}</span>
           </div>
           {approvedTotal > 0 && (
             <div className="flex justify-between items-center mt-1.5">
-              <span className="text-xs font-bold text-fx-text-muted uppercase tracking-wider">Accessorials</span>
-              <span className="text-sm font-bold text-green-400">+${approvedTotal.toLocaleString()}</span>
+              <span className="text-xs font-bold text-fx-text-muted uppercase tracking-wider">
+                Accessorials
+              </span>
+              <span className="text-sm font-bold text-green-400">
+                +${approvedTotal.toLocaleString()}
+              </span>
             </div>
           )}
           <div className="border-t border-fx-border mt-2.5 pt-2.5 flex justify-between items-center">
-            <span className="text-xs font-bold text-fx-orange uppercase tracking-wider">Invoice Total</span>
-            <span className="text-lg font-black text-fx-orange">${invoiceTotal.toLocaleString()}</span>
+            <span className="text-xs font-bold text-fx-orange uppercase tracking-wider">
+              Invoice Total
+            </span>
+            <span className="text-lg font-black text-fx-orange">
+              ${invoiceTotal.toLocaleString()}
+            </span>
           </div>
         </div>
 
@@ -132,7 +156,10 @@ export function AccessorialsSheet({ open, onClose, loadId, bookingId, baseRate, 
 
         {/* Add form */}
         {showAdd && (
-          <form onSubmit={handleAdd} className="bg-fx-surface border border-fx-border rounded-xl p-4 space-y-3">
+          <form
+            onSubmit={handleAdd}
+            className="bg-fx-surface border border-fx-border rounded-xl p-4 space-y-3"
+          >
             <select
               value={addType}
               onChange={(e) => setAddType(e.target.value as AccessorialType)}
@@ -140,7 +167,9 @@ export function AccessorialsSheet({ open, onClose, loadId, bookingId, baseRate, 
               style={{ colorScheme: 'dark' }}
             >
               {TYPES.map((t) => (
-                <option key={t} value={t} style={{ background: '#141414' }}>{ACCESSORIAL_LABELS[t]}</option>
+                <option key={t} value={t} style={{ background: '#141414' }}>
+                  {ACCESSORIAL_LABELS[t]}
+                </option>
               ))}
             </select>
             <input
@@ -194,8 +223,12 @@ export function AccessorialsSheet({ open, onClose, loadId, bookingId, baseRate, 
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-fx-text">{ACCESSORIAL_LABELS[charge.type]}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_COLORS[charge.status]}`}>
+                      <span className="text-sm font-bold text-fx-text">
+                        {ACCESSORIAL_LABELS[charge.type]}
+                      </span>
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_COLORS[charge.status]}`}
+                      >
                         {charge.status}
                       </span>
                     </div>

@@ -145,7 +145,7 @@ export async function notifyNewMessage(params: {
 // ── SMS helpers ──────────────────────────────────────────────────────────────
 
 export async function enqueueSms(params: {
-  to: string;  // E.164
+  to: string; // E.164
   message: string;
 }): Promise<void> {
   const { error } = await supabase.rpc('enqueue_notification', {

@@ -1,6 +1,14 @@
 export type UserRole = 'carrier' | 'broker' | 'shipper' | 'admin' | 'driver';
 
-export type EquipmentType = 'van' | 'reefer' | 'flatbed' | 'step_deck' | 'lowboy' | 'tanker' | 'box_truck' | 'sprinter';
+export type EquipmentType =
+  | 'van'
+  | 'reefer'
+  | 'flatbed'
+  | 'step_deck'
+  | 'lowboy'
+  | 'tanker'
+  | 'box_truck'
+  | 'sprinter';
 
 export type LoadStatus =
   | 'draft'
@@ -58,7 +66,7 @@ export interface Load {
   bidCount?: number;
   hazmat?: boolean;
   tempControlled?: boolean;
-  postedAt?: string;        // ISO timestamp for load age
+  postedAt?: string; // ISO timestamp for load age
   brokerCreditScore?: number; // 0-100
   assignedDriverId?: string;
 }

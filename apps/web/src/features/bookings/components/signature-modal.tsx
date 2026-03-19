@@ -15,7 +15,13 @@ interface SignatureModalProps {
  * Captures signature as PNG, uploads to Supabase Storage,
  * and writes signed_at/signature_url/signatory_name to bids table.
  */
-export function SignatureModal({ open, onClose, bookingId, loadNumber, onSigned }: SignatureModalProps) {
+export function SignatureModal({
+  open,
+  onClose,
+  bookingId,
+  loadNumber,
+  onSigned,
+}: SignatureModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
@@ -104,7 +110,11 @@ export function SignatureModal({ open, onClose, bookingId, loadNumber, onSigned 
     try {
       // Convert canvas to blob
       const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((b) => b ? resolve(b) : reject(new Error('Canvas empty')), 'image/png', 0.95);
+        canvas.toBlob(
+          (b) => (b ? resolve(b) : reject(new Error('Canvas empty'))),
+          'image/png',
+          0.95,
+        );
       });
 
       // Upload to Supabase Storage
@@ -155,7 +165,10 @@ export function SignatureModal({ open, onClose, bookingId, loadNumber, onSigned 
         </div>
 
         {/* Signature pad */}
-        <div className="rounded-xl overflow-hidden border border-fx-border" style={{ touchAction: 'none' }}>
+        <div
+          className="rounded-xl overflow-hidden border border-fx-border"
+          style={{ touchAction: 'none' }}
+        >
           <canvas
             ref={canvasRef}
             width={600}
@@ -212,9 +225,13 @@ export function SignatureModal({ open, onClose, bookingId, loadNumber, onSigned 
             className="flex-1 h-12 rounded-2xl font-bold text-sm bg-fx-orange text-white disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {saving ? (
-              <><Loader2 size={16} className="animate-spin" /> Saving…</>
+              <>
+                <Loader2 size={16} className="animate-spin" /> Saving…
+              </>
             ) : (
-              <><Check size={16} /> Sign & Confirm</>
+              <>
+                <Check size={16} /> Sign & Confirm
+              </>
             )}
           </button>
         </div>

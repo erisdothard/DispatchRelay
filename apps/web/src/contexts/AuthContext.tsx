@@ -51,7 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select('*')
         .eq('owner_id', profileId)
         .maybeSingle();
-      if (data) { setCompany(data); return; }
+      if (data) {
+        setCompany(data);
+        return;
+      }
     }
 
     // 2. Fallback: find company via company_members

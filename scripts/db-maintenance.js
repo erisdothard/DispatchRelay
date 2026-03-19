@@ -30,7 +30,10 @@ async function expireOldLoads() {
     .eq('status', 'posted')
     .lt('posted_at', cutoff)
     .select('id', { count: 'exact', head: true });
-  if (error) { console.error('expire loads:', error.message); return; }
+  if (error) {
+    console.error('expire loads:', error.message);
+    return;
+  }
   console.log(`✅  Expired ${count ?? 0} old loads`);
 }
 
@@ -41,7 +44,10 @@ async function pruneLocationPings() {
     .delete()
     .lt('created_at', cutoff)
     .select('id', { count: 'exact', head: true });
-  if (error) { console.error('prune pings:', error.message); return; }
+  if (error) {
+    console.error('prune pings:', error.message);
+    return;
+  }
   console.log(`✅  Pruned ${count ?? 0} stale location pings`);
 }
 

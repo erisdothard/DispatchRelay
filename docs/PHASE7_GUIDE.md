@@ -582,4 +582,3 @@ const bid = await sdk.submitBid(load.id, 3200);
 ---
 
 _These scripts are your insurance policy against production fires._
-

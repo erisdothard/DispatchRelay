@@ -18,14 +18,14 @@ interface AuditEntry {
 }
 
 const ACTION_COLORS: Record<string, string> = {
-  created:            'text-green-400  bg-green-400/10',
-  updated:            'text-blue-400   bg-blue-400/10',
-  deleted:            'text-red-400    bg-red-400/10',
-  status_changed:     'text-yellow-400 bg-yellow-400/10',
-  bid_accepted:       'text-green-400  bg-green-400/10',
-  bid_declined:       'text-red-400    bg-red-400/10',
-  booking_confirmed:  'text-fx-orange  bg-orange-500/10',
-  payment_recorded:   'text-purple-400 bg-purple-400/10',
+  created: 'text-green-400  bg-green-400/10',
+  updated: 'text-blue-400   bg-blue-400/10',
+  deleted: 'text-red-400    bg-red-400/10',
+  status_changed: 'text-yellow-400 bg-yellow-400/10',
+  bid_accepted: 'text-green-400  bg-green-400/10',
+  bid_declined: 'text-red-400    bg-red-400/10',
+  booking_confirmed: 'text-fx-orange  bg-orange-500/10',
+  payment_recorded: 'text-purple-400 bg-purple-400/10',
 };
 
 const PAGE_SIZE = 50;
@@ -52,7 +52,7 @@ export default function AuditLogPage() {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (query as any);
+    const { data } = await (query as any);
     const rows = (data ?? []) as AuditEntry[];
     setEntries((prev) => (append ? [...prev, ...rows] : rows));
     setHasMore(rows.length === PAGE_SIZE);
@@ -96,11 +96,21 @@ export default function AuditLogPage() {
             className="h-10 bg-fx-surface border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
             style={{ colorScheme: 'dark' }}
           >
-            <option value="" style={{ background: '#141414' }}>All Events</option>
-            <option value="load" style={{ background: '#141414' }}>Loads</option>
-            <option value="bid" style={{ background: '#141414' }}>Bids</option>
-            <option value="booking_confirmed" style={{ background: '#141414' }}>Bookings</option>
-            <option value="payment_recorded" style={{ background: '#141414' }}>Payments</option>
+            <option value="" style={{ background: '#141414' }}>
+              All Events
+            </option>
+            <option value="load" style={{ background: '#141414' }}>
+              Loads
+            </option>
+            <option value="bid" style={{ background: '#141414' }}>
+              Bids
+            </option>
+            <option value="booking_confirmed" style={{ background: '#141414' }}>
+              Bookings
+            </option>
+            <option value="payment_recorded" style={{ background: '#141414' }}>
+              Payments
+            </option>
           </select>
         </div>
 
@@ -113,14 +123,20 @@ export default function AuditLogPage() {
         ) : (
           <div className="space-y-2">
             {entries.map((entry) => {
-              const colorClass = ACTION_COLORS[entry.action] ?? 'text-fx-text-muted bg-fx-surface-2';
+              const colorClass =
+                ACTION_COLORS[entry.action] ?? 'text-fx-text-muted bg-fx-surface-2';
               const actor = entry.profiles;
               return (
-                <div key={entry.id} className="bg-fx-surface border border-fx-border rounded-xl p-3">
+                <div
+                  key={entry.id}
+                  className="bg-fx-surface border border-fx-border rounded-xl p-3"
+                >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${colorClass}`}>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${colorClass}`}
+                        >
                           {entry.action.replace(/_/g, ' ')}
                         </span>
                         <span className="text-[11px] text-fx-text-dim">
@@ -132,7 +148,9 @@ export default function AuditLogPage() {
                       </p>
                       {entry.diff && (
                         <details className="mt-1">
-                          <summary className="text-[10px] text-fx-text-dim cursor-pointer">View diff</summary>
+                          <summary className="text-[10px] text-fx-text-dim cursor-pointer">
+                            View diff
+                          </summary>
                           <pre className="text-[9px] text-fx-text-dim mt-1 overflow-x-auto whitespace-pre-wrap">
                             {JSON.stringify(entry.diff, null, 2)}
                           </pre>

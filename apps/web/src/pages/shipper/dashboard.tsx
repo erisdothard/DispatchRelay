@@ -38,13 +38,21 @@ export default function ShipperDashboard() {
   const [activeLoads, setActiveLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
   const [sharingLocation, setSharingLocation] = useState(() => {
-    try { return localStorage.getItem('fx-gps-sharing') === 'true'; } catch { return false; }
+    try {
+      return localStorage.getItem('fx-gps-sharing') === 'true';
+    } catch {
+      return false;
+    }
   });
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
   // Persist GPS sharing toggle across sessions
   useEffect(() => {
-    try { localStorage.setItem('fx-gps-sharing', String(sharingLocation)); } catch {}
+    try {
+      localStorage.setItem('fx-gps-sharing', String(sharingLocation));
+    } catch {
+      /* ignored */
+    }
   }, [sharingLocation]);
 
   useEffect(() => {
@@ -82,9 +90,8 @@ export default function ShipperDashboard() {
       </div>
 
       {/* GPS pingers — one per in-transit load, only when sharing is on */}
-      {sharingLocation && activeLoads.map((l) => (
-        <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />
-      ))}
+      {sharingLocation &&
+        activeLoads.map((l) => <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />)}
 
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
         {/* Share Location banner — always visible so shipper can share GPS anytime */}
@@ -102,15 +109,10 @@ export default function ShipperDashboard() {
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
               style={{
-                background: sharingLocation
-                  ? 'rgba(34,197,94,0.2)'
-                  : 'rgba(232,96,48,0.12)',
+                background: sharingLocation ? 'rgba(34,197,94,0.2)' : 'rgba(232,96,48,0.12)',
               }}
             >
-              <Radio
-                size={18}
-                className={sharingLocation ? 'text-green-400' : 'text-fx-orange'}
-              />
+              <Radio size={18} className={sharingLocation ? 'text-green-400' : 'text-fx-orange'} />
             </div>
             <div className="text-left">
               <p className="text-[14px] font-semibold text-white">Share Location</p>

@@ -17,7 +17,12 @@ interface SavedSearchesSheetProps {
   onApply: (filters: LoadFilters) => void;
 }
 
-export function SavedSearchesSheet({ open, onClose, currentFilters, onApply }: SavedSearchesSheetProps) {
+export function SavedSearchesSheet({
+  open,
+  onClose,
+  currentFilters,
+  onApply,
+}: SavedSearchesSheetProps) {
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [loading, setLoading] = useState(true);
   const [saveName, setSaveName] = useState('');
@@ -48,7 +53,7 @@ export function SavedSearchesSheet({ open, onClose, currentFilters, onApply }: S
   async function handleToggleAlert(search: SavedSearch) {
     await updateSavedSearch(search.id, { alert_enabled: !search.alert_enabled });
     setSearches((prev) =>
-      prev.map((s) => s.id === search.id ? { ...s, alert_enabled: !s.alert_enabled } : s),
+      prev.map((s) => (s.id === search.id ? { ...s, alert_enabled: !s.alert_enabled } : s)),
     );
   }
 
@@ -59,7 +64,8 @@ export function SavedSearchesSheet({ open, onClose, currentFilters, onApply }: S
 
   function describeFilters(filters: LoadFilters): string {
     const parts: string[] = [];
-    if (filters.equipment && filters.equipment !== 'all') parts.push(filters.equipment.replace(/_/g, ' '));
+    if (filters.equipment && filters.equipment !== 'all')
+      parts.push(filters.equipment.replace(/_/g, ' '));
     if (filters.originState) parts.push(`from ${filters.originState}`);
     if (filters.destState) parts.push(`to ${filters.destState}`);
     if (filters.minRatePerMile) parts.push(`$${filters.minRatePerMile}+/mi`);
@@ -120,7 +126,9 @@ export function SavedSearchesSheet({ open, onClose, currentFilters, onApply }: S
           <div className="text-center py-8">
             <Bookmark size={28} className="text-fx-text-dim mx-auto mb-2" />
             <p className="text-sm text-fx-text-dim">No saved searches yet</p>
-            <p className="text-xs text-fx-text-dim mt-1">Filter loads then save your search for instant recall</p>
+            <p className="text-xs text-fx-text-dim mt-1">
+              Filter loads then save your search for instant recall
+            </p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -131,12 +139,17 @@ export function SavedSearchesSheet({ open, onClose, currentFilters, onApply }: S
               >
                 <div className="flex-1 min-w-0">
                   <button
-                    onClick={() => { onApply(search.filters); onClose(); }}
+                    onClick={() => {
+                      onApply(search.filters);
+                      onClose();
+                    }}
                     className="text-sm font-bold text-fx-text hover:text-fx-orange transition-colors text-left w-full"
                   >
                     {search.name}
                   </button>
-                  <p className="text-[11px] text-fx-text-dim mt-0.5">{describeFilters(search.filters)}</p>
+                  <p className="text-[11px] text-fx-text-dim mt-0.5">
+                    {describeFilters(search.filters)}
+                  </p>
                   {search.last_alerted_at && (
                     <p className="text-[10px] text-fx-text-dim mt-0.5">
                       Last alert: {new Date(search.last_alerted_at).toLocaleDateString()}

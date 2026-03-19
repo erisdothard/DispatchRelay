@@ -9,15 +9,15 @@ const config: Config = {
           orange: '#E86030',
           'orange-hover': '#D05020',
           'orange-light': '#F07848',
-          bg: '#0D0D0D',              // near-black with warmth
-          surface: '#1C1C1E',         // iOS dark grouped background
-          'surface-2': '#2C2C2E',     // iOS elevated surface
-          'surface-3': '#3A3A3C',     // highest elevation
-          border: '#38383A',          // iOS separator
+          bg: '#0D0D0D', // near-black with warmth
+          surface: '#1C1C1E', // iOS dark grouped background
+          'surface-2': '#2C2C2E', // iOS elevated surface
+          'surface-3': '#3A3A3C', // highest elevation
+          border: '#38383A', // iOS separator
           'border-2': '#48484A',
           text: '#FFFFFF',
-          'text-muted': '#EBEBF5',    // iOS secondary label (at 60% opacity)
-          'text-dim': '#636366',      // iOS tertiary label
+          'text-muted': '#EBEBF5', // iOS secondary label (at 60% opacity)
+          'text-dim': '#636366', // iOS tertiary label
         },
       },
       fontFamily: {
@@ -31,7 +31,7 @@ const config: Config = {
       boxShadow: {
         'orange-glow': '0 0 28px rgba(232, 96, 48, 0.40)',
         'orange-glow-sm': '0 0 14px rgba(232, 96, 48, 0.28)',
-        'card': '0 4px 32px rgba(0, 0, 0, 0.6)',
+        card: '0 4px 32px rgba(0, 0, 0, 0.6)',
         'card-orange': '0 8px 40px rgba(232, 96, 48, 0.35)',
         'ios-nav': '0 -1px 0 rgba(255,255,255,0.06)',
       },

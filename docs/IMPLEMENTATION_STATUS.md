@@ -8,6 +8,7 @@ This document provides a comprehensive overview of what has been implemented in 
 ## 🟢 COMPLETED FEATURES
 
 ### Phase 0 — Repo, CI/CD, Tooling ✅
+
 - [x] pnpm + Turborepo monorepo initialized
 - [x] `apps/web` scaffolded (React 19 + Vite 6 + TypeScript strict)
 - [x] `packages/shared` scaffolded (types, schemas, constants)
@@ -22,6 +23,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] README complete with setup instructions
 
 ### Phase 1 — Database, Auth, Infra ✅
+
 - [x] Supabase project created (dev & production)
 - [x] Complete database schema with 6 tables (profiles, companies, loads, trucks, conversations, messages, tracking_milestones)
 - [x] RLS policies on all tables
@@ -39,6 +41,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] Seed data in migration (6 loads, 3 trucks, tracking milestones)
 
 ### Phase 2 — Core Data Layer & CRUD ✅
+
 - [x] Migration 003: `loads` — full schema with status lifecycle
 - [x] Migration 004: `trucks` — equipment postings
 - [x] Migration 005: `bookings` — load-carrier assignments (stub)
@@ -61,6 +64,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [ ] Server-side pagination on all list views
 
 ### Phase 3 — Real-Time & Messaging ✅
+
 - [x] Migration 006: `messages` — conversation threads per booking
 - [x] Migration 007: `message_items` — individual messages
 - [x] Migration 008: `notifications` — system notifications
@@ -78,6 +82,7 @@ This document provides a comprehensive overview of what has been implemented in 
 ## 🟢 COMPLETED FEATURES
 
 ### Phase 4 — Booking Workflow & Documents ✅
+
 - [x] Migration 009: `bids` — carrier bids with amount, status, expiry
 - [x] Migration 010: `documents` — BOL, POD, rate confirmations
 - [x] Supabase Storage buckets: `documents`, `profile-photos`
@@ -96,6 +101,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] Load completion — finalize with actual miles, weights, accessorials
 
 ### Phase 5 — Verification, Payments & Ratings ✅
+
 - [x] Migration 011: `carrier_verifications` — MC/DOT/insurance records
 - [x] Migration 012: `ratings` — post-load ratings both directions
 - [x] Migration 013: `subscriptions` — Stripe billing records
@@ -115,6 +121,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] Performance metrics — on-time %, load count, avg rating
 
 ### Phase 6 — Testing, Hardening & Launch ✅
+
 - [x] Vitest unit tests — all shared utility functions and schemas
 - [x] Component tests — critical UI flows (login, load post, bid flow)
 - [x] Service integration tests — loads, bids, stripe, documents, location (mocked Supabase, `test/test-features/services/`)
@@ -142,6 +149,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] Support channel established (Discord, email, or Intercom)
 
 ### Phase 6 (Part 2) — Production Hardening ✅
+
 - [x] Redis setup (Upstash or self-hosted)
 - [x] Rate limiting implementation
 - [x] Webhook system with retry logic
@@ -153,6 +161,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] Database optimization
 
 ### Phase 7 — Elite Automation Scripts ✅
+
 - [x] Health check script
 - [x] Security audit script
 - [x] Load testing suite
@@ -162,6 +171,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] Data seeding script
 
 ### Phase 8 — Study Guide & Learning Platform ✅
+
 - [x] FreightX Academy Next.js app
 - [x] Interactive architecture diagrams
 - [x] Database schema visualizer
@@ -172,6 +182,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] Interactive tutorials
 
 ### Phase 9 — Apple Maps-Style Live Maps ✅
+
 - [x] Map Tile System with Stadia Alidade Smooth Dark tiles
 - [x] SVG teardrop pins for loads with dual-layer route glow
 - [x] Animated truck markers with direction indicators
@@ -183,6 +194,7 @@ This document provides a comprehensive overview of what has been implemented in 
 - [x] Independent carrier truck posting enabled
 
 ### Phase 10 — Interactive Maps & Profiles ✅
+
 - [x] Help Center page with FAQ accordion
 - [x] Notifications Settings page with push/email/SMS toggles
 - [x] Documents page for upload/verification status
@@ -206,6 +218,7 @@ This document provides a comprehensive overview of what has been implemented in 
 **Next Major Milestone:** Production Launch
 
 **Key Achievements:**
+
 - ✅ Complete authentication and user management system
 - ✅ Full database schema with RLS policies
 - ✅ Real-time load board with live updates
@@ -229,6 +242,7 @@ This document provides a comprehensive overview of what has been implemented in 
 **MVP Status:** Complete ✅
 
 All critical components are implemented:
+
 1. **Phase 4 Complete** ✅ - Bidding and booking system
 2. **Phase 5 Complete** ✅ - Carrier verification and payments
 3. **Phase 6 Complete** ✅ - Testing and polish
@@ -242,29 +256,34 @@ All critical components are implemented:
 ## 📈 FEATURE COMPLETION BY CATEGORY
 
 ### Core Platform Infrastructure: 100% Complete
+
 - Database, Auth, Real-time, CRUD operations, RLS policies
 
-### User Experience: 100% Complete  
+### User Experience: 100% Complete
+
 - Multi-role dashboards, messaging, notifications, real-time updates
 
 ### Business Logic: 100% Complete
+
 - Load posting, truck posting, bidding, booking, payments, verification
 
 ### Production Readiness: 100% Complete
+
 - Testing, monitoring, deployment automation, security, performance
 
 ---
 
-**Note:** This document is updated regularly as features are completed. Check the individual phase guides for detailed implementation steps.
----
+## **Note:** This document is updated regularly as features are completed. Check the individual phase guides for detailed implementation steps.
 
 ### Phase 11 — AI Load Seeking ✅
+
 - [x] AI-powered natural language load search (Claude Haiku)
 - [x] `ai-load-search` edge function with keyword fallback
 - [x] Carrier preferences UI
 - [x] Migration 011: `carrier_preferences` table (gap fix in Phase 13)
 
 ### Phase 12 — GPS Real-Time Tracking ✅
+
 - [x] `location_pings` table (Migration 012)
 - [x] `useDriverLocation` hook — smart interval GPS writes
 - [x] `useLiveTracking` hook — Supabase Realtime map updates
@@ -272,7 +291,9 @@ All critical components are implemented:
 - [x] pg_cron schedule (gap fix documented in Phase 13)
 
 ### Phase 13 — Enterprise Completion ✅
+
 **13A — Critical Completions**
+
 - [x] Email notifications — Resend, 7 role-aware HTML templates
 - [x] SMS notifications — Twilio, critical events only
 - [x] Server-side pagination — `.range()` on all list queries, `loadMore()` hooks
@@ -280,12 +301,14 @@ All critical components are implemented:
 - [x] Notification preferences — persisted to DB with phone number for SMS
 
 **13B — Enterprise Operations**
+
 - [x] Multi-user company accounts — Migration 013, invite/role/revoke UI
 - [x] Load templates — Migration 014, save/apply in post-load sheet
 - [x] Digital e-signature — Canvas → Supabase Storage → signed_at on bids
 - [x] Accessorial charges — Migration 015, submit/approve/deny, live invoice total
 
 **13C — Trust & Intelligence**
+
 - [x] Saved searches + lane alerts — Migration 016, `lane-alert` edge function
 - [x] Broker credit score — Migration 017, inline "Pays ~18d · 94% on-time" badge
 - [x] Preferred carrier lists + blocking — Migration 018, RLS enforced
@@ -294,6 +317,7 @@ All critical components are implemented:
 - [x] AI rate suggestion — Claude Sonnet via `suggest_rate` mode in ai-load-search
 
 **13D — Scale Infrastructure**
+
 - [x] Full-text search — Migration 022, GIN indexes, `search_vector` generated column
 - [x] Background notification queue — Migration 021, `notification-worker` edge function
 - [x] Real rate limiting — Vercel Edge Middleware, sliding window via Vercel KV
@@ -301,11 +325,19 @@ All critical components are implemented:
 ## 📈 FEATURE COMPLETION BY CATEGORY (Updated)
 
 ### Core Platform Infrastructure: 100% ✅
+
 ### User Experience: 100% ✅
+
 ### Business Logic: 100% ✅
+
 ### Enterprise Features: 100% ✅ (NEW)
+
 - Multi-user teams, templates, e-signatures, accessorials, audit trail
+
 ### Trust & Intelligence: 100% ✅ (NEW)
+
 - Lane rate data, broker credit scores, preferred carriers, AI rate suggestions
+
 ### Scale Infrastructure: 100% ✅ (NEW)
+
 - Paginated queries, full-text search, background queue, edge rate limiting

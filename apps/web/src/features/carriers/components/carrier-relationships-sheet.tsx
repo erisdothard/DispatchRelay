@@ -19,9 +19,24 @@ const STATUS_CONFIG: Record<
   RelationshipStatus,
   { label: string; color: string; bg: string; icon: React.ElementType }
 > = {
-  preferred: { label: 'Preferred', color: 'text-green-400', bg: 'bg-green-400/10 border-green-400/20', icon: Star },
-  blocked:   { label: 'Blocked',   color: 'text-red-400',   bg: 'bg-red-400/10 border-red-400/20',     icon: Ban  },
-  neutral:   { label: 'Neutral',   color: 'text-fx-text-muted', bg: 'bg-fx-surface-2 border-fx-border', icon: Minus },
+  preferred: {
+    label: 'Preferred',
+    color: 'text-green-400',
+    bg: 'bg-green-400/10 border-green-400/20',
+    icon: Star,
+  },
+  blocked: {
+    label: 'Blocked',
+    color: 'text-red-400',
+    bg: 'bg-red-400/10 border-red-400/20',
+    icon: Ban,
+  },
+  neutral: {
+    label: 'Neutral',
+    color: 'text-fx-text-muted',
+    bg: 'bg-fx-surface-2 border-fx-border',
+    icon: Minus,
+  },
 };
 
 interface CompanyRow {
@@ -53,7 +68,10 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
 
   async function handleSearch(q: string) {
     setSearchQuery(q);
-    if (q.trim().length < 2) { setSearchResults([]); return; }
+    if (q.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
     setSearching(true);
     const { data } = await supabase
       .from('companies')
@@ -126,7 +144,10 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
       {showAdd && (
         <div className="mb-4 space-y-2">
           <div className="relative">
-            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim" />
+            <Search
+              size={14}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
+            />
             <input
               type="text"
               placeholder="Search carrier companies…"
@@ -136,7 +157,10 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
               autoFocus
             />
             {searching && (
-              <Loader2 size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim animate-spin" />
+              <Loader2
+                size={14}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim animate-spin"
+              />
             )}
           </div>
           {searchResults.length > 0 && (
@@ -183,20 +207,28 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${cfg.bg} ${cfg.color}`}>
+                    <span
+                      className={`flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${cfg.bg} ${cfg.color}`}
+                    >
                       <Icon size={10} />
                       {cfg.label}
                     </span>
                     <button
                       onClick={() => {
-                        if (isEditing) { setEditId(null); return; }
+                        if (isEditing) {
+                          setEditId(null);
+                          return;
+                        }
                         setEditId(rel.id);
                         setEditStatus(rel.status);
                         setEditNotes(rel.notes ?? '');
                       }}
                       className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-fx-surface-2 transition-colors"
                     >
-                      <ChevronDown size={14} className={`text-fx-text-dim transition-transform ${isEditing ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        size={14}
+                        className={`text-fx-text-dim transition-transform ${isEditing ? 'rotate-180' : ''}`}
+                      />
                     </button>
                   </div>
                 </div>
@@ -212,7 +244,9 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
                             key={s}
                             onClick={() => setEditStatus(s)}
                             className={`flex-1 h-8 rounded-xl text-xs font-semibold border transition-all ${
-                              editStatus === s ? `${sc.bg} ${sc.color}` : 'border-fx-border text-fx-text-dim'
+                              editStatus === s
+                                ? `${sc.bg} ${sc.color}`
+                                : 'border-fx-border text-fx-text-dim'
                             }`}
                           >
                             {sc.label}

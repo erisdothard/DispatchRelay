@@ -11,6 +11,7 @@
 FreightX is a **unified freight marketplace** that serves Carriers, Brokers, and Shippers in a single platform. The application is built with modern technologies and is ready for production deployment.
 
 ### Key Statistics
+
 - **100% of planned features completed**
 - **13 full phases implemented** (Phase 0-13 complete)
 - **22 database migrations** applied
@@ -23,12 +24,14 @@ FreightX is a **unified freight marketplace** that serves Carriers, Brokers, and
 ## 📦 What's Included
 
 ### Core Application
+
 - **Frontend:** React 19 + Vite 6 + TypeScript + Tailwind CSS
 - **Backend:** Supabase (PostgreSQL + Auth + Realtime + Storage)
 - **Deployment:** Vercel with automated CI/CD
 - **Database:** Complete schema with 22 migrations and RLS policies
 
 ### Features Implemented
+
 ✅ **Phase 1:** Database, Auth, Infrastructure
 ✅ **Phase 2:** Core Data Layer & CRUD Operations
 ✅ **Phase 3:** Real-Time & Messaging
@@ -44,6 +47,7 @@ FreightX is a **unified freight marketplace** that serves Carriers, Brokers, and
 ✅ **Phase 13:** Enterprise Completion
 
 ### Key Functionality
+
 - Multi-role platform (Carrier, Broker, Shipper)
 - Real-time load board with instant updates
 - Bidding system with counter-offers
@@ -68,19 +72,23 @@ FreightX is a **unified freight marketplace** that serves Carriers, Brokers, and
 ## 🚀 Deployment Instructions
 
 ### Prerequisites
+
 - Supabase account (dev project: qeovhjdrwihnyfcbnujk)
 - Vercel account
 - Stripe account (for payments)
 - FMCSA API key (for carrier verification)
 
 ### Step 1: Database Setup
+
 1. Create Supabase project
 2. Run migrations in `database/migrations/` directory
 3. Set up RLS policies (included in migrations)
 4. Configure Supabase Auth (email/password)
 
 ### Step 2: Environment Variables
+
 Copy `.env.example` to `.env.local` and configure:
+
 ```bash
 # Supabase
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -113,6 +121,7 @@ VITE_SENTRY_DSN=your-dsn
 ```
 
 ### Step 3: Frontend Deployment
+
 1. Connect GitHub repository to Vercel
 2. Set build command: `pnpm build:web`
 3. Set output directory: `dist`
@@ -120,7 +129,9 @@ VITE_SENTRY_DSN=your-dsn
 5. Deploy to production
 
 ### Step 4: Edge Functions
+
 Deploy the following Supabase Edge Functions:
+
 - `webhook-delivery` - Handles webhook deliveries with retry logic
 - `health` - Health check endpoint
 - `stripe-webhook` - Stripe payment webhooks
@@ -175,6 +186,7 @@ FreightX/
 ## 🔧 Technology Stack
 
 ### Frontend
+
 - **React 19** - UI framework
 - **Vite 6** - Build tool and dev server
 - **TypeScript** - Type safety
@@ -184,6 +196,7 @@ FreightX/
 - **React Router** - Client-side routing
 
 ### Backend
+
 - **Supabase** - Backend-as-a-Service
   - PostgreSQL database
   - Authentication & Authorization
@@ -193,6 +206,7 @@ FreightX/
 - **FMCSA API** - Carrier verification
 
 ### Infrastructure
+
 - **Vercel** - Frontend hosting
 - **Supabase Edge Functions** - Serverless functions
 - **GitHub Actions** - CI/CD pipeline
@@ -202,12 +216,14 @@ FreightX/
 ## 🧪 Testing
 
 ### Test Coverage
+
 - **Unit Tests:** Vitest for shared utilities and schemas
 - **Component Tests:** React Testing Library for UI components
 - **E2E Tests:** Playwright for full user workflows
 - **Integration Tests:** Supabase RLS policy verification
 
 ### Running Tests
+
 ```bash
 # Unit and component tests
 pnpm test
@@ -220,6 +236,7 @@ pnpm test --coverage
 ```
 
 ### Test Structure
+
 ```
 test/
 ├── test-features/         # Feature-level tests
@@ -237,6 +254,7 @@ test/
 ## 📊 Performance & Monitoring
 
 ### Performance Optimizations
+
 - **Code Splitting:** Lazy-loaded route components
 - **Bundle Optimization:** All chunks < 250KB
 - **Database Indexes:** Optimized queries < 100ms
@@ -244,6 +262,7 @@ test/
 - **Lighthouse Score:** > 85 on all pages
 
 ### Monitoring Setup
+
 - **Sentry:** Error tracking and performance monitoring
 - **Vercel Analytics:** Frontend performance metrics
 - **Supabase Dashboard:** Database performance and query analysis
@@ -254,6 +273,7 @@ test/
 ## 🔒 Security
 
 ### Security Features
+
 - **Row-Level Security (RLS):** Database-level access control
 - **Authentication:** Supabase Auth with JWT tokens
 - **Input Validation:** Zod schemas for all data
@@ -262,6 +282,7 @@ test/
 - **CORS:** Proper cross-origin resource sharing
 
 ### Security Audit
+
 - OWASP Top 10 compliance
 - SQL injection prevention
 - XSS protection
@@ -273,6 +294,7 @@ test/
 ## 📋 Production Checklist
 
 ### Before Launch
+
 - [ ] Deploy to production environment
 - [ ] Configure custom domain with SSL
 - [ ] Set up monitoring and alerting
@@ -287,6 +309,7 @@ test/
 - [ ] Configure pg_cron jobs (location-cleanup hourly, notification-worker every 30s)
 
 ### Post-Launch
+
 - [ ] Monitor error rates and performance
 - [ ] Collect user feedback
 - [ ] Track key metrics (DAU, MAU, conversion rates)
@@ -302,17 +325,20 @@ test/
 All 13 phases are complete. Recommended post-launch priorities:
 
 ### Immediate (Month 1)
+
 - Onboard first paying customers and gather feedback
 - Set up production monitoring dashboards (Sentry + Vercel Analytics)
 - Configure pg_cron jobs for notification-worker and location-cleanup
 - Load test with realistic concurrency targets
 
 ### Near-Term (Months 2–3)
+
 - Mobile app (React Native) leveraging existing API layer
 - TMS/ERP integrations via the built-in webhook system
 - Advanced BI analytics dashboard for broker/shipper accounts
 
 ### Growth Phase
+
 - Marketplace features (public load board, carrier discovery)
 - AI rate negotiation and automated counter-offers
 - White-label offering for enterprise brokerages
@@ -322,18 +348,21 @@ All 13 phases are complete. Recommended post-launch priorities:
 ## 📞 Support & Maintenance
 
 ### Documentation
+
 - **Implementation Status:** `docs/IMPLEMENTATION_STATUS.md`
 - **Development Roadmap:** `docs/DEVELOPMENT_ROADMAP.md`
 - **Feature Catalog:** `docs/FEATURE_CATALOG.md`
 - **Product Brief:** `docs/PRODUCT_BRIEF.md`
 
 ### Code References
+
 - **Database Schema:** `database/migrations/001-initial-schema.sql`
 - **API Services:** `apps/web/src/services/`
 - **Component Library:** `apps/web/src/shared/components/`
 - **Type Definitions:** `packages/shared/src/types/`
 
 ### Contact Information
+
 - Development team contact
 - Technical documentation
 - Support channels
@@ -343,6 +372,7 @@ All 13 phases are complete. Recommended post-launch priorities:
 ## ✅ Quality Assurance
 
 ### Code Quality
+
 - **TypeScript strict mode** enabled
 - **ESLint** and **Prettier** configured
 - **Commitlint** for conventional commits
@@ -350,12 +380,14 @@ All 13 phases are complete. Recommended post-launch priorities:
 - **Turborepo** monorepo management
 
 ### Testing Quality
+
 - **Test coverage** > 70% on critical paths
 - **E2E tests** for all user workflows
 - **Performance tests** with realistic data
 - **Security tests** for authentication and authorization
 
 ### Deployment Quality
+
 - **CI/CD pipeline** with automated testing
 - **Environment separation** (dev/staging/prod)
 - **Rollback procedures** in place

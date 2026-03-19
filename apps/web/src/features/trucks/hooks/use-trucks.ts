@@ -32,7 +32,7 @@ export function useTrucks(filters: TruckFilters = {}): UseTrucksResult {
       setError(null);
 
       try {
-        const data = await getTrucks({ ...JSON.parse(filterKey) as TruckFilters, page });
+        const data = await getTrucks({ ...(JSON.parse(filterKey) as TruckFilters), page });
         setTrucks((prev) => (append ? [...prev, ...data] : data));
         setHasMore(data.length === PAGE_SIZE);
         pageRef.current = page;
@@ -71,7 +71,9 @@ export function useTrucks(filters: TruckFilters = {}): UseTrucksResult {
         if (pageRef.current === 0) fetchPage(0, false);
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchPage]);
 
   return { trucks, loading, loadingMore, error, hasMore, refresh, loadMore };

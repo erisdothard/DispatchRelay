@@ -9,7 +9,7 @@ export interface TruckFilters {
   equipment?: EquipmentType | 'all';
   status?: TruckStatus | 'all';
   postedBy?: string;
-  page?: number;  // 0-indexed
+  page?: number; // 0-indexed
 }
 
 export async function getTrucks(filters: TruckFilters = {}): Promise<Truck[]> {
@@ -38,9 +38,7 @@ export async function getTrucks(filters: TruckFilters = {}): Promise<Truck[]> {
   return (data ?? []).map(rowToTruck);
 }
 
-export async function createTruck(
-  truck: Omit<TruckRow, 'id' | 'created_at'>,
-): Promise<Truck> {
+export async function createTruck(truck: Omit<TruckRow, 'id' | 'created_at'>): Promise<Truck> {
   const { data, error } = await supabase.from('trucks').insert(truck).select().single();
   if (error) throw error;
   return rowToTruck(data);

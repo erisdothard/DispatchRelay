@@ -59,7 +59,7 @@ freightx/
 | ------------ | -------------------------------------- |
 | Framework    | React 19 + Vite 6                      |
 | Language     | TypeScript 5.6 (strict)                |
-| Styling      | Tailwind CSS v3 (custom fx-* tokens)   |
+| Styling      | Tailwind CSS v3 (custom fx-\* tokens)  |
 | Routing      | React Router v6                        |
 | Database     | Supabase (PostgreSQL + RLS)            |
 | Auth         | Supabase Auth (JWT + OAuth)            |
@@ -147,18 +147,18 @@ Copy `.env.example` to `apps/web/.env.local` and fill in your values.
 cp .env.example apps/web/.env.local
 ```
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `VITE_SUPABASE_URL` | ✅ | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | ✅ | Supabase anon/public key |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | ✅ | Stripe publishable key |
-| `VITE_FMCSA_API_KEY` | ✅ | FMCSA SAFER API key |
-| `VITE_UPSTASH_REDIS_REST_URL` | ✅ | Upstash Redis REST URL |
-| `VITE_UPSTASH_REDIS_REST_TOKEN` | ✅ | Upstash Redis token |
-| `ANTHROPIC_API_KEY` | ✅ | Claude API key for AI load search (edge function) |
-| `VITE_SENTRY_DSN` | optional | Sentry error tracking |
-| `VITE_APP_URL` | optional | App base URL (default: http://localhost:5173) |
-| `VITE_GOOGLE_MAPS_API_KEY` | optional | Google Maps (fallback geocoding) |
+| Variable                        | Required | Description                                       |
+| ------------------------------- | -------- | ------------------------------------------------- |
+| `VITE_SUPABASE_URL`             | ✅       | Supabase project URL                              |
+| `VITE_SUPABASE_ANON_KEY`        | ✅       | Supabase anon/public key                          |
+| `VITE_STRIPE_PUBLISHABLE_KEY`   | ✅       | Stripe publishable key                            |
+| `VITE_FMCSA_API_KEY`            | ✅       | FMCSA SAFER API key                               |
+| `VITE_UPSTASH_REDIS_REST_URL`   | ✅       | Upstash Redis REST URL                            |
+| `VITE_UPSTASH_REDIS_REST_TOKEN` | ✅       | Upstash Redis token                               |
+| `ANTHROPIC_API_KEY`             | ✅       | Claude API key for AI load search (edge function) |
+| `VITE_SENTRY_DSN`               | optional | Sentry error tracking                             |
+| `VITE_APP_URL`                  | optional | App base URL (default: http://localhost:5173)     |
+| `VITE_GOOGLE_MAPS_API_KEY`      | optional | Google Maps (fallback geocoding)                  |
 
 ---
 
@@ -166,35 +166,35 @@ cp .env.example apps/web/.env.local
 
 Migrations live in `database/migrations/`. Run them **in order** in the Supabase SQL editor:
 
-| File | Contents |
-|------|----------|
-| `001-initial-schema.sql` | profiles, companies, loads, trucks, conversations, messages |
-| `002-notifications.sql` | notifications table |
-| `003-bids.sql` | bids table + `accept_bid()` RPC |
-| `004-documents.sql` | documents table + storage buckets |
-| `005-book-now.sql` | bookings table |
-| `006-carrier-verifications.sql` | carrier_verifications + FMCSA |
-| `007-ratings.sql` | ratings + `update_company_rating()` trigger |
-| `008-subscriptions.sql` | subscriptions, invoices + `auto_create_invoice()` trigger |
-| `009-webhooks.sql` | webhooks, webhook_deliveries + `trigger_webhook_event()` RPC |
-| `010-missing-features.sql` | tracking_milestones |
-| ~~011~~ | *(not present — sequence skipped)* |
-| `012-location-pings.sql` | location_pings table for real-time GPS tracking |
+| File                            | Contents                                                     |
+| ------------------------------- | ------------------------------------------------------------ |
+| `001-initial-schema.sql`        | profiles, companies, loads, trucks, conversations, messages  |
+| `002-notifications.sql`         | notifications table                                          |
+| `003-bids.sql`                  | bids table + `accept_bid()` RPC                              |
+| `004-documents.sql`             | documents table + storage buckets                            |
+| `005-book-now.sql`              | bookings table                                               |
+| `006-carrier-verifications.sql` | carrier_verifications + FMCSA                                |
+| `007-ratings.sql`               | ratings + `update_company_rating()` trigger                  |
+| `008-subscriptions.sql`         | subscriptions, invoices + `auto_create_invoice()` trigger    |
+| `009-webhooks.sql`              | webhooks, webhook_deliveries + `trigger_webhook_event()` RPC |
+| `010-missing-features.sql`      | tracking_milestones                                          |
+| ~~011~~                         | _(not present — sequence skipped)_                           |
+| `012-location-pings.sql`        | location_pings table for real-time GPS tracking              |
 
 ---
 
 ## Edge Functions (Supabase Deno)
 
-| Function | Trigger | Description |
-|----------|---------|-------------|
-| `health` | GET request | DB ping + uptime check |
-| `create-checkout-session` | Client call | Creates Stripe checkout URL |
-| `stripe-webhook` | Stripe event | Syncs subscription + invoice state |
-| `auto-expiry-check` | Cron (daily) | Expires stale bids + insurance certs |
-| `load-expiry` | Cron (hourly) | Auto-expires posted loads |
-| `webhook-delivery` | Queue | Retries failed webhook deliveries |
-| `ai-load-search` | Client call | Claude Haiku natural-language load search |
-| `location-cleanup` | Cron (daily) | Deletes location_pings older than 24h |
+| Function                  | Trigger       | Description                               |
+| ------------------------- | ------------- | ----------------------------------------- |
+| `health`                  | GET request   | DB ping + uptime check                    |
+| `create-checkout-session` | Client call   | Creates Stripe checkout URL               |
+| `stripe-webhook`          | Stripe event  | Syncs subscription + invoice state        |
+| `auto-expiry-check`       | Cron (daily)  | Expires stale bids + insurance certs      |
+| `load-expiry`             | Cron (hourly) | Auto-expires posted loads                 |
+| `webhook-delivery`        | Queue         | Retries failed webhook deliveries         |
+| `ai-load-search`          | Client call   | Claude Haiku natural-language load search |
+| `location-cleanup`        | Cron (daily)  | Deletes location_pings older than 24h     |
 
 ---
 
@@ -232,24 +232,24 @@ docs(db): add migration notes for phase 3
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [PRODUCT_BRIEF.md](./docs/PRODUCT_BRIEF.md) | Vision, users, market opportunity, competitive analysis |
-| [FEATURE_CATALOG.md](./docs/FEATURE_CATALOG.md) | Full feature list with priorities |
-| [IMPLEMENTATION_STATUS.md](./docs/IMPLEMENTATION_STATUS.md) | Phase-by-phase completion checklist |
-| [DEVELOPMENT_ROADMAP.md](./docs/DEVELOPMENT_ROADMAP.md) | 10-phase plan, timeline, decisions |
-| [DEPLOYMENT_GUIDE.md](./docs/DEPLOYMENT_GUIDE.md) | Vercel + Supabase production setup |
-| [CLIENT_HANDOFF_GUIDE.md](./docs/CLIENT_HANDOFF_GUIDE.md) | Handoff documentation |
-| [TESTING.md](./docs/TESTING.md) | Test suite guide + E2E instructions |
-| [PHASE0_GUIDE.md](./docs/PHASE0_GUIDE.md) | Repo setup, CI/CD, tooling |
-| [PHASE1_GUIDE.md](./docs/PHASE1_GUIDE.md) | Database, auth, environment |
-| [PHASE2_GUIDE.md](./docs/PHASE2_GUIDE.md) | Core CRUD data layer |
-| [PHASE3_GUIDE.md](./docs/PHASE3_GUIDE.md) | Real-time, messaging, notifications |
-| [PHASE4_GUIDE.md](./docs/PHASE4_GUIDE.md) | Booking workflow, bidding, documents |
-| [PHASE5_GUIDE.md](./docs/PHASE5_GUIDE.md) | Verification, payments, ratings |
-| [PHASE6_GUIDE.md](./docs/PHASE6_GUIDE.md) | Testing, optimization, launch prep |
-| [PHASE6.5_GUIDE.md](./docs/PHASE6.5_GUIDE.md) | Production hardening (webhooks, queues) |
-| [PHASE7_GUIDE.md](./docs/PHASE7_GUIDE.md) | Automation scripts + health checks |
-| [PHASE8_GUIDE.md](./docs/PHASE8_GUIDE.md) | Academy + study guide |
-| [PHASE9_GUIDE.md](./docs/PHASE9_GUIDE.md) | Live maps, AI search, GPS tracking, match scoring |
-| [PHASE10_GUIDE.md](./docs/PHASE10_GUIDE.md) | Profile enhancements, messaging FAB, rate limiter |
+| Document                                                    | Description                                             |
+| ----------------------------------------------------------- | ------------------------------------------------------- |
+| [PRODUCT_BRIEF.md](./docs/PRODUCT_BRIEF.md)                 | Vision, users, market opportunity, competitive analysis |
+| [FEATURE_CATALOG.md](./docs/FEATURE_CATALOG.md)             | Full feature list with priorities                       |
+| [IMPLEMENTATION_STATUS.md](./docs/IMPLEMENTATION_STATUS.md) | Phase-by-phase completion checklist                     |
+| [DEVELOPMENT_ROADMAP.md](./docs/DEVELOPMENT_ROADMAP.md)     | 10-phase plan, timeline, decisions                      |
+| [DEPLOYMENT_GUIDE.md](./docs/DEPLOYMENT_GUIDE.md)           | Vercel + Supabase production setup                      |
+| [CLIENT_HANDOFF_GUIDE.md](./docs/CLIENT_HANDOFF_GUIDE.md)   | Handoff documentation                                   |
+| [TESTING.md](./docs/TESTING.md)                             | Test suite guide + E2E instructions                     |
+| [PHASE0_GUIDE.md](./docs/PHASE0_GUIDE.md)                   | Repo setup, CI/CD, tooling                              |
+| [PHASE1_GUIDE.md](./docs/PHASE1_GUIDE.md)                   | Database, auth, environment                             |
+| [PHASE2_GUIDE.md](./docs/PHASE2_GUIDE.md)                   | Core CRUD data layer                                    |
+| [PHASE3_GUIDE.md](./docs/PHASE3_GUIDE.md)                   | Real-time, messaging, notifications                     |
+| [PHASE4_GUIDE.md](./docs/PHASE4_GUIDE.md)                   | Booking workflow, bidding, documents                    |
+| [PHASE5_GUIDE.md](./docs/PHASE5_GUIDE.md)                   | Verification, payments, ratings                         |
+| [PHASE6_GUIDE.md](./docs/PHASE6_GUIDE.md)                   | Testing, optimization, launch prep                      |
+| [PHASE6.5_GUIDE.md](./docs/PHASE6.5_GUIDE.md)               | Production hardening (webhooks, queues)                 |
+| [PHASE7_GUIDE.md](./docs/PHASE7_GUIDE.md)                   | Automation scripts + health checks                      |
+| [PHASE8_GUIDE.md](./docs/PHASE8_GUIDE.md)                   | Academy + study guide                                   |
+| [PHASE9_GUIDE.md](./docs/PHASE9_GUIDE.md)                   | Live maps, AI search, GPS tracking, match scoring       |
+| [PHASE10_GUIDE.md](./docs/PHASE10_GUIDE.md)                 | Profile enhancements, messaging FAB, rate limiter       |

@@ -3,7 +3,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
 // Haiku — fast, cheap, deterministic. Used for query parsing.
-const MODEL_HAIKU  = 'claude-haiku-4-5-20251001';
+const MODEL_HAIKU = 'claude-haiku-4-5-20251001';
 // Sonnet — complex reasoning. Used for rate suggestions.
 const MODEL_SONNET = 'claude-sonnet-4-6';
 
@@ -53,12 +53,29 @@ function keywordParse(query: string): ParsedFilters {
   else if (q.includes('this week')) filters.pickup_within_days = 7;
 
   const stateMap: Record<string, string> = {
-    'texas': 'TX', 'california': 'CA', 'florida': 'FL', 'new york': 'NY',
-    'illinois': 'IL', 'ohio': 'OH', 'georgia': 'GA', 'michigan': 'MI',
-    'pennsylvania': 'PA', 'north carolina': 'NC', 'tennessee': 'TN',
-    'arizona': 'AZ', 'indiana': 'IN', 'missouri': 'MO', 'wisconsin': 'WI',
-    'colorado': 'CO', 'washington': 'WA', 'oregon': 'OR', 'nevada': 'NV',
-    'oklahoma': 'OK', 'louisiana': 'LA', 'alabama': 'AL', 'kentucky': 'KY',
+    texas: 'TX',
+    california: 'CA',
+    florida: 'FL',
+    'new york': 'NY',
+    illinois: 'IL',
+    ohio: 'OH',
+    georgia: 'GA',
+    michigan: 'MI',
+    pennsylvania: 'PA',
+    'north carolina': 'NC',
+    tennessee: 'TN',
+    arizona: 'AZ',
+    indiana: 'IN',
+    missouri: 'MO',
+    wisconsin: 'WI',
+    colorado: 'CO',
+    washington: 'WA',
+    oregon: 'OR',
+    nevada: 'NV',
+    oklahoma: 'OK',
+    louisiana: 'LA',
+    alabama: 'AL',
+    kentucky: 'KY',
   };
   for (const [name, code] of Object.entries(stateMap)) {
     if (q.includes(name) || q.includes(code.toLowerCase())) {
@@ -111,10 +128,14 @@ For low sample counts (<5): widen the range and lower confidence.`;
   const userMessage = `Lane: ${originState} → ${destState}
 Equipment: ${equipment}
 Distance: ${totalMiles} miles
-${hasData ? `Historical data (last 90 days):
+${
+  hasData
+    ? `Historical data (last 90 days):
   - Avg rate/mile: $${laneStats.avg_rate_per_mile}
   - Min: $${laneStats.min_rate_per_mile}, Max: $${laneStats.max_rate_per_mile}
-  - Sample count: ${laneStats.sample_count}` : 'No historical data for this lane yet.'}
+  - Sample count: ${laneStats.sample_count}`
+    : 'No historical data for this lane yet.'
+}
 
 Suggest a competitive rate range for this load.`;
 
@@ -158,12 +179,12 @@ function fallbackRateSuggestion(params: {
 }): RateSuggestion {
   const { equipment, laneStats } = params;
 
-  let base = 2.20; // national avg dry van
+  let base = 2.2; // national avg dry van
   if (equipment === 'reefer') base = 2.55;
   else if (equipment === 'flatbed') base = 2.45;
-  else if (equipment === 'step_deck') base = 2.60;
-  else if (equipment === 'lowboy') base = 3.00;
-  else if (equipment === 'tanker') base = 2.80;
+  else if (equipment === 'step_deck') base = 2.6;
+  else if (equipment === 'lowboy') base = 3.0;
+  else if (equipment === 'tanker') base = 2.8;
 
   // Use historical data if available
   if (laneStats.sample_count > 0 && laneStats.avg_rate_per_mile != null) {
@@ -174,10 +195,12 @@ function fallbackRateSuggestion(params: {
     suggested_low: +(base * 0.92).toFixed(2),
     suggested_mid: +base.toFixed(2),
     suggested_high: +(base * 1.12).toFixed(2),
-    confidence: laneStats.sample_count >= 10 ? 'high' : laneStats.sample_count >= 3 ? 'medium' : 'low',
-    reasoning: laneStats.sample_count > 0
-      ? `Based on ${laneStats.sample_count} recent transactions on this lane.`
-      : 'Based on national averages for this equipment type. No lane-specific data yet.',
+    confidence:
+      laneStats.sample_count >= 10 ? 'high' : laneStats.sample_count >= 3 ? 'medium' : 'low',
+    reasoning:
+      laneStats.sample_count > 0
+        ? `Based on ${laneStats.sample_count} recent transactions on this lane.`
+        : 'Based on national averages for this equipment type. No lane-specific data yet.',
     sample_count: laneStats.sample_count,
   };
 }
@@ -188,7 +211,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const body = await req.json() as {
+    const body = (await req.json()) as {
       action?: string;
       query?: string;
       // Rate suggestion inputs
@@ -206,16 +229,28 @@ Deno.serve(async (req) => {
       const { origin_state, dest_state, equipment, total_miles, lane_stats } = body;
 
       if (!origin_state || !dest_state || !equipment || !total_miles) {
-        return new Response(JSON.stringify({ error: 'origin_state, dest_state, equipment, total_miles required' }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({ error: 'origin_state, dest_state, equipment, total_miles required' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          },
+        );
       }
 
-      const stats: LaneStats = lane_stats ?? { avg_rate_per_mile: null, min_rate_per_mile: null, max_rate_per_mile: null, sample_count: 0 };
+      const stats: LaneStats = lane_stats ?? {
+        avg_rate_per_mile: null,
+        min_rate_per_mile: null,
+        max_rate_per_mile: null,
+        sample_count: 0,
+      };
 
       if (!apiKey) {
-        const suggestion = fallbackRateSuggestion({ equipment, totalMiles: total_miles, laneStats: stats });
+        const suggestion = fallbackRateSuggestion({
+          equipment,
+          totalMiles: total_miles,
+          laneStats: stats,
+        });
         return new Response(JSON.stringify(suggestion), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -236,7 +271,11 @@ Deno.serve(async (req) => {
       } catch (err) {
         // Fallback on Sonnet failure
         console.error('[ai-load-search] Sonnet rate suggestion failed:', err);
-        const suggestion = fallbackRateSuggestion({ equipment, totalMiles: total_miles, laneStats: stats });
+        const suggestion = fallbackRateSuggestion({
+          equipment,
+          totalMiles: total_miles,
+          laneStats: stats,
+        });
         return new Response(JSON.stringify(suggestion), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });

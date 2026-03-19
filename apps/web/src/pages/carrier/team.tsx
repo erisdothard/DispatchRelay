@@ -1,7 +1,18 @@
 import { useState, useEffect } from 'react';
 import {
-  Users, MapPin, Navigation, Radio, Loader2,
-  Plus, Trash2, Crown, Shield, Truck, Calculator, Eye, Mail,
+  Users,
+  MapPin,
+  Navigation,
+  Radio,
+  Loader2,
+  Plus,
+  Trash2,
+  Crown,
+  Shield,
+  Truck,
+  Calculator,
+  Eye,
+  Mail,
 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -36,11 +47,11 @@ interface DriverProfile {
 /* ── Constants ─────────────────────────────────────────────────── */
 
 const ROLE_META: Record<MemberRole, { label: string; icon: React.ElementType; color: string }> = {
-  owner:      { label: 'Owner',      icon: Crown,      color: 'text-yellow-400' },
-  admin:      { label: 'Admin',      icon: Shield,     color: 'text-blue-400'   },
-  dispatcher: { label: 'Dispatcher', icon: Truck,      color: 'text-fx-orange'  },
-  accounting: { label: 'Accounting', icon: Calculator, color: 'text-green-400'  },
-  viewer:     { label: 'Viewer',     icon: Eye,        color: 'text-fx-text-dim'},
+  owner: { label: 'Owner', icon: Crown, color: 'text-yellow-400' },
+  admin: { label: 'Admin', icon: Shield, color: 'text-blue-400' },
+  dispatcher: { label: 'Dispatcher', icon: Truck, color: 'text-fx-orange' },
+  accounting: { label: 'Accounting', icon: Calculator, color: 'text-green-400' },
+  viewer: { label: 'Viewer', icon: Eye, color: 'text-fx-text-dim' },
 };
 
 const INVITE_ROLES: MemberRole[] = ['admin', 'dispatcher', 'accounting', 'viewer'];
@@ -59,7 +70,11 @@ function DriverCard({ driver, loads }: { driver: DriverProfile; loads: Load[] })
       <div className="flex items-center gap-3 mb-3">
         <div className="w-11 h-11 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center shrink-0">
           <span className="text-sm font-extrabold text-fx-orange">
-            {name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+            {name
+              .split(' ')
+              .map((n) => n[0])
+              .join('')
+              .slice(0, 2)}
           </span>
         </div>
         <div className="flex-1 min-w-0">
@@ -151,7 +166,9 @@ export default function CarrierTeamPage() {
   const companyId = company?.id;
   const myRole = members.find((m) => m.user_id === profile?.id)?.role;
   const canManage = myRole === 'owner' || myRole === 'admin';
-  const inTransitCount = loads.filter((l) => l.status === 'in_transit' && l.assignedDriverId).length;
+  const inTransitCount = loads.filter(
+    (l) => l.status === 'in_transit' && l.assignedDriverId,
+  ).length;
 
   useEffect(() => {
     if (!companyId || !user?.id) {
@@ -170,9 +187,9 @@ export default function CarrierTeamPage() {
         setInvites(i);
 
         // Get unique driver IDs from loads
-        const driverIds = [...new Set(
-          l.map((load) => load.assignedDriverId).filter(Boolean) as string[]
-        )];
+        const driverIds = [
+          ...new Set(l.map((load) => load.assignedDriverId).filter(Boolean) as string[]),
+        ];
 
         if (driverIds.length > 0) {
           const { data: profiles } = await supabase
@@ -237,9 +254,7 @@ export default function CarrierTeamPage() {
               key={t}
               onClick={() => switchTab(t)}
               className={`flex-1 h-9 rounded-lg text-sm font-semibold transition-colors ${
-                tab === t
-                  ? 'bg-fx-orange text-white'
-                  : 'text-fx-text-muted hover:text-fx-text'
+                tab === t ? 'bg-fx-orange text-white' : 'text-fx-text-muted hover:text-fx-text'
               }`}
             >
               {t === 'drivers' ? 'Drivers' : 'Manage'}
@@ -259,11 +274,15 @@ export default function CarrierTeamPage() {
             <div className="bg-fx-surface border border-fx-border rounded-2xl p-4 grid grid-cols-2 gap-4">
               <div className="text-center">
                 <p className="text-2xl font-extrabold text-fx-orange">{driverProfiles.length}</p>
-                <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mt-0.5">Drivers</p>
+                <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mt-0.5">
+                  Drivers
+                </p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-extrabold text-fx-orange">{inTransitCount}</p>
-                <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mt-0.5">In Transit</p>
+                <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mt-0.5">
+                  In Transit
+                </p>
               </div>
             </div>
 
@@ -327,7 +346,11 @@ export default function CarrierTeamPage() {
                       disabled={inviting}
                       className="px-4 h-10 rounded-xl text-sm font-bold bg-fx-orange text-white disabled:opacity-50 flex items-center gap-1.5"
                     >
-                      {inviting ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                      {inviting ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Plus size={14} />
+                      )}
                       Invite
                     </button>
                   </div>
@@ -339,7 +362,9 @@ export default function CarrierTeamPage() {
 
             {/* Members List */}
             <div>
-              <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3">Members</p>
+              <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+                Members
+              </p>
               <div className="space-y-2">
                 {members.map((member) => {
                   const meta = ROLE_META[member.role];
@@ -347,14 +372,19 @@ export default function CarrierTeamPage() {
                   const isMe = member.user_id === profile?.id;
                   const isOwner = member.role === 'owner';
                   return (
-                    <div key={member.id} className="bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3">
+                    <div
+                      key={member.id}
+                      className="bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3"
+                    >
                       <div className="w-10 h-10 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
                         <Icon size={16} className={meta?.color ?? 'text-fx-text-dim'} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-fx-text truncate">
                           {member.full_name ?? member.email ?? 'Unknown'}
-                          {isMe && <span className="ml-1.5 text-[10px] text-fx-text-dim">(you)</span>}
+                          {isMe && (
+                            <span className="ml-1.5 text-[10px] text-fx-text-dim">(you)</span>
+                          )}
                         </p>
                         <p className="text-[11px] text-fx-text-dim">{member.email ?? ''}</p>
                       </div>
@@ -362,7 +392,9 @@ export default function CarrierTeamPage() {
                         <div className="flex items-center gap-1.5">
                           <select
                             value={member.role}
-                            onChange={(e) => handleRoleChange(member.id, e.target.value as MemberRole)}
+                            onChange={(e) =>
+                              handleRoleChange(member.id, e.target.value as MemberRole)
+                            }
                             className="h-8 bg-fx-surface-2 border border-fx-border rounded-lg text-fx-text text-xs px-2 focus:border-fx-orange outline-none"
                             style={{ colorScheme: 'dark' }}
                           >
@@ -380,7 +412,9 @@ export default function CarrierTeamPage() {
                           </button>
                         </div>
                       ) : (
-                        <span className={`text-[11px] font-bold ${meta?.color ?? 'text-fx-text-dim'}`}>
+                        <span
+                          className={`text-[11px] font-bold ${meta?.color ?? 'text-fx-text-dim'}`}
+                        >
                           {meta?.label ?? member.role}
                         </span>
                       )}
@@ -393,15 +427,22 @@ export default function CarrierTeamPage() {
             {/* Pending Invites */}
             {invites.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3">Pending Invites</p>
+                <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+                  Pending Invites
+                </p>
                 <div className="space-y-2">
                   {invites.map((invite) => (
-                    <div key={invite.id} className="bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3">
+                    <div
+                      key={invite.id}
+                      className="bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3"
+                    >
                       <div className="w-10 h-10 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
                         <Mail size={16} className="text-fx-text-dim" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-fx-text truncate">{invite.email}</p>
+                        <p className="text-sm font-semibold text-fx-text truncate">
+                          {invite.email}
+                        </p>
                         <p className="text-[11px] text-fx-text-dim">
                           {ROLE_META[invite.role]?.label ?? invite.role} · Expires{' '}
                           {new Date(invite.expires_at).toLocaleDateString()}

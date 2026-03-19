@@ -17,10 +17,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Rate limit rules: [path prefix, max requests per window, window seconds]
 const RULES: [string, number, number][] = [
-  ['/api/loads/post',  10, 60],
-  ['/api/bids',        30, 60],
-  ['/api/ai-search',   20, 60],
-  ['/api/messages',    60, 60],
+  ['/api/loads/post', 10, 60],
+  ['/api/bids', 30, 60],
+  ['/api/ai-search', 20, 60],
+  ['/api/messages', 60, 60],
 ];
 
 export const config = {
@@ -28,9 +28,10 @@ export const config = {
 };
 
 export default async function middleware(req: NextRequest) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    ?? req.headers.get('x-real-ip')
-    ?? 'unknown';
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown';
 
   const path = req.nextUrl.pathname;
 
@@ -42,7 +43,7 @@ export default async function middleware(req: NextRequest) {
 
   try {
     // Use Vercel KV if available (set KV_REST_API_URL env in Vercel dashboard)
-    const kvUrl   = process.env.KV_REST_API_URL;
+    const kvUrl = process.env.KV_REST_API_URL;
     const kvToken = process.env.KV_REST_API_TOKEN;
 
     if (kvUrl && kvToken) {
@@ -70,7 +71,7 @@ export default async function middleware(req: NextRequest) {
       });
 
       if (resp.ok) {
-        const results = await resp.json() as { result: number }[];
+        const results = (await resp.json()) as { result: number }[];
         const count = results[2]?.result ?? 0;
 
         if (count > maxRequests) {

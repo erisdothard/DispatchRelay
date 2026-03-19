@@ -36,7 +36,13 @@ export async function getLaneStats(params: {
   });
 
   if (error) {
-    return { avg_rate_per_mile: null, min_rate_per_mile: null, max_rate_per_mile: null, sample_count: 0, last_recorded_at: null };
+    return {
+      avg_rate_per_mile: null,
+      min_rate_per_mile: null,
+      max_rate_per_mile: null,
+      sample_count: 0,
+      last_recorded_at: null,
+    };
   }
 
   const row = Array.isArray(data) ? data[0] : data;

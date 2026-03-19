@@ -32,9 +32,7 @@ export const DEFAULT_PREFS: Omit<CarrierPreferences, 'userId'> = {
   homeState: '',
 };
 
-export async function getCarrierPreferences(
-  userId: string,
-): Promise<CarrierPreferences> {
+export async function getCarrierPreferences(userId: string): Promise<CarrierPreferences> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('carrier_preferences')
@@ -50,9 +48,7 @@ export async function getCarrierPreferences(
   return rowToPrefs(data as PreferencesRow);
 }
 
-export async function saveCarrierPreferences(
-  prefs: CarrierPreferences,
-): Promise<void> {
+export async function saveCarrierPreferences(prefs: CarrierPreferences): Promise<void> {
   const row: PreferencesRow = {
     user_id: prefs.userId,
     preferred_equipment: prefs.preferredEquipment,

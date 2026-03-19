@@ -24,6 +24,8 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'warn',
       // setLoading(true) before an async call inside an effect is a valid pattern
       'react-hooks/set-state-in-effect': 'off',
+      // Not using React Compiler — manual useCallback is fine
+      'react-hooks/preserve-manual-memoization': 'off',
     },
   },
 );

@@ -43,9 +43,7 @@ export function CarrierPreferencesSheet({
   function toggleState(field: 'preferredOriginStates' | 'preferredDestStates', st: string) {
     setPrefs((p) => ({
       ...p,
-      [field]: p[field].includes(st)
-        ? p[field].filter((s) => s !== st)
-        : [...p[field], st],
+      [field]: p[field].includes(st) ? p[field].filter((s) => s !== st) : [...p[field], st],
     }));
   }
 
@@ -66,7 +64,6 @@ export function CarrierPreferencesSheet({
   return (
     <BottomSheet open={open} onClose={onClose} title="Load Preferences">
       <div className="space-y-6 pb-4">
-
         {/* Home base */}
         <section>
           <label className="text-[11px] font-bold text-fx-text-muted uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -87,7 +84,9 @@ export function CarrierPreferencesSheet({
             >
               <option value="">ST</option>
               {US_STATES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
           </div>
@@ -182,7 +181,9 @@ export function CarrierPreferencesSheet({
             Minimum Rate per Mile
           </label>
           <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim text-sm">$</span>
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim text-sm">
+              $
+            </span>
             <input
               type="number"
               min={0}
@@ -194,7 +195,9 @@ export function CarrierPreferencesSheet({
               placeholder="0.00"
               className="w-full h-11 bg-fx-surface border border-fx-border rounded-ios-xs pl-7 pr-12 text-sm text-white placeholder:text-fx-text-dim focus:border-fx-orange outline-none"
             />
-            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim text-xs">/mi</span>
+            <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim text-xs">
+              /mi
+            </span>
           </div>
         </section>
 

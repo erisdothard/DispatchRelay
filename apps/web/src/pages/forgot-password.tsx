@@ -5,10 +5,10 @@ import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { supabase } from '@/lib/supabase';
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail]     = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sent, setSent]       = useState(false);
-  const [error, setError]     = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const resetUrl = `${window.location.origin}/reset-password`;
@@ -21,7 +21,10 @@ export default function ForgotPasswordPage() {
       redirectTo: resetUrl,
     });
     setLoading(false);
-    if (error) { setError(error.message); return; }
+    if (error) {
+      setError(error.message);
+      return;
+    }
     setSent(true);
   }
 
@@ -56,8 +59,8 @@ export default function ForgotPasswordPage() {
             <p className="text-lg font-bold text-fx-text">Check your inbox</p>
             <p className="text-sm text-fx-text-muted mt-2 leading-relaxed">
               We sent a password reset link to{' '}
-              <span className="text-fx-orange font-semibold">{email}</span>.
-              Click the link in the email to set a new password.
+              <span className="text-fx-orange font-semibold">{email}</span>. Click the link in the
+              email to set a new password.
             </p>
           </div>
           <button
@@ -75,7 +78,10 @@ export default function ForgotPasswordPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="relative">
-              <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim" />
+              <Mail
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
+              />
               <input
                 type="email"
                 placeholder="Email address"
@@ -88,7 +94,9 @@ export default function ForgotPasswordPage() {
             </div>
 
             {error && (
-              <p className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3">{error}</p>
+              <p className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3">
+                {error}
+              </p>
             )}
 
             <button

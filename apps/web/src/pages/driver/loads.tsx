@@ -122,9 +122,7 @@ export default function DriverLoadsPage() {
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="text-5xl mb-4">🚛</div>
             <p className="font-bold text-fx-text">No loads assigned</p>
-            <p className="text-sm text-fx-text-muted mt-1">
-              Your carrier will assign loads to you
-            </p>
+            <p className="text-sm text-fx-text-muted mt-1">Your carrier will assign loads to you</p>
           </div>
         ) : (
           filtered.map((load) => (

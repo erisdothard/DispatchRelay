@@ -215,13 +215,13 @@ export function MapView({
 
   // Prefer real GPS position; fall back to milestone-based interpolation
   const truckPos: [number, number] | null = inTransit
-    ? livePosition ??
+    ? (livePosition ??
       (destPos
         ? [
             originPos[0] + (destPos[0] - originPos[0]) * (progress / 100),
             originPos[1] + (destPos[1] - originPos[1]) * (progress / 100),
           ]
-        : null)
+        : null))
     : null;
 
   return (

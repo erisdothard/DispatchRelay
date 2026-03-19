@@ -93,10 +93,7 @@ export async function revokeInvite(inviteId: string): Promise<void> {
 }
 
 export async function updateMemberRole(memberId: string, role: MemberRole): Promise<void> {
-  const { error } = await db
-    .from('company_members')
-    .update({ role })
-    .eq('id', memberId);
+  const { error } = await db.from('company_members').update({ role }).eq('id', memberId);
   if (error) throw new Error(error.message);
 }
 

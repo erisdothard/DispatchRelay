@@ -15,7 +15,7 @@ export interface LoadFilters {
   originState?: string;
   destState?: string;
   minRatePerMile?: number;
-  page?: number;  // 0-indexed
+  page?: number; // 0-indexed
 }
 
 export interface LoadsPage {
@@ -127,8 +127,6 @@ export async function createLoad(load: Omit<LoadRow, 'id' | 'created_at'>): Prom
   const { data, error } = await supabase.from('loads').insert(load).select().single();
   if (error) throw error;
 
-
-
   // Notify carriers of new load
   await notifyCarriersOfNewLoad(data);
 
@@ -174,8 +172,6 @@ export async function updateLoad(id: string, updates: Partial<LoadRow>): Promise
     .single();
   if (error) throw error;
 
-
-
   // Email on status change — get poster email
   if (updates.status && before?.status !== updates.status && data.posted_by) {
     const { data: poster } = await supabase
@@ -191,7 +187,10 @@ export async function updateLoad(id: string, updates: Partial<LoadRow>): Promise
         origin: `${data.origin_city}, ${data.origin_state}`,
         dest: `${data.dest_city}, ${data.dest_state}`,
         status: updates.status,
-      }).then(() => undefined, () => undefined);
+      }).then(
+        () => undefined,
+        () => undefined,
+      );
     }
   }
 
@@ -253,7 +252,9 @@ export async function assignDriver(loadId: string, driverId: string): Promise<Lo
     .single();
   if (error) {
     if (error.code === 'PGRST116') {
-      throw new Error('Unable to assign driver — you may not have permission to update this load. Ensure you have an accepted bid on this load.');
+      throw new Error(
+        'Unable to assign driver — you may not have permission to update this load. Ensure you have an accepted bid on this load.',
+      );
     }
     throw error;
   }
@@ -292,7 +293,9 @@ export async function getDriverLoads(driverId: string, status?: string): Promise
 /**
  * Get company drivers (profiles that are company_members with role 'driver' or profiles with role 'driver' in the same company).
  */
-export async function getCompanyDrivers(companyId: string): Promise<Array<{ id: string; fullName: string; email: string }>> {
+export async function getCompanyDrivers(
+  companyId: string,
+): Promise<Array<{ id: string; fullName: string; email: string }>> {
   const { data, error } = await (supabase as any)
     .from('company_members')
     .select('user_id, profiles!inner(id, full_name, email, role)')

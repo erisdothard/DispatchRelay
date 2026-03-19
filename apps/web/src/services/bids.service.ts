@@ -59,8 +59,6 @@ export async function submitBid(params: {
     () => undefined,
   );
 
-
-
   // Email load poster about new bid (non-fatal)
   const { data: load } = await supabase
     .from('loads')
@@ -83,7 +81,10 @@ export async function submitBid(params: {
         dest: `${load.dest_city}, ${load.dest_state}`,
         amount: params.amountUsd,
         carrierName: params.companyName,
-      }).then(() => undefined, () => undefined);
+      }).then(
+        () => undefined,
+        () => undefined,
+      );
     }
   }
 
@@ -94,7 +95,9 @@ export async function acceptBid(bidId: string): Promise<void> {
   // Get bid + load info before accepting for notifications
   const { data: bid } = await supabase
     .from('bids')
-    .select('*, loads(load_number, origin_city, origin_state, dest_city, dest_state, pickup_date, rate_usd, total_miles, id)')
+    .select(
+      '*, loads(load_number, origin_city, origin_state, dest_city, dest_state, pickup_date, rate_usd, total_miles, id)',
+    )
     .eq('id', bidId)
     .single();
 
@@ -104,10 +107,11 @@ export async function acceptBid(bidId: string): Promise<void> {
   // Record rate history snapshot
   const rawLoad = bid?.loads as any;
   if (rawLoad?.id) {
-    recordBookingRateHistory(rawLoad.id).then(() => undefined, () => undefined);
+    recordBookingRateHistory(rawLoad.id).then(
+      () => undefined,
+      () => undefined,
+    );
   }
-
-
 
   // Email carrier — bid accepted
   if (bid) {
@@ -125,7 +129,10 @@ export async function acceptBid(bidId: string): Promise<void> {
         origin: `${load.origin_city}, ${load.origin_state}`,
         dest: `${load.dest_city}, ${load.dest_state}`,
         pickupDate: load.pickup_date ?? '',
-      }).then(() => undefined, () => undefined);
+      }).then(
+        () => undefined,
+        () => undefined,
+      );
     }
   }
 }
@@ -134,7 +141,9 @@ export async function bookNow(loadId: string): Promise<void> {
   // Get load info before booking
   const { data: load } = await supabase
     .from('loads')
-    .select('load_number, origin_city, origin_state, dest_city, dest_state, pickup_date, rate_usd, posted_by')
+    .select(
+      'load_number, origin_city, origin_state, dest_city, dest_state, pickup_date, rate_usd, posted_by',
+    )
     .eq('id', loadId)
     .single();
 
@@ -142,9 +151,10 @@ export async function bookNow(loadId: string): Promise<void> {
   if (error) throw new Error(error.message);
 
   // Record rate history
-  recordBookingRateHistory(loadId).then(() => undefined, () => undefined);
-
-
+  recordBookingRateHistory(loadId).then(
+    () => undefined,
+    () => undefined,
+  );
 
   // Email both poster and carrier
   if (load) {
@@ -173,18 +183,25 @@ export async function bookNow(loadId: string): Promise<void> {
           dest: `${load.dest_city}, ${load.dest_state}`,
           pickupDate: load.pickup_date ?? '',
           amount: load.rate_usd ?? 0,
-        }).then(() => undefined, () => undefined);
+        }).then(
+          () => undefined,
+          () => undefined,
+        );
       }
 
       // SMS if opted in for bid_updates
-      const smsEnabled = (notifPrefs?.settings as Record<string, { sms: boolean }>)?.bid_updates?.sms;
+      const smsEnabled = (notifPrefs?.settings as Record<string, { sms: boolean }>)?.bid_updates
+        ?.sms;
       if (smsEnabled && notifPrefs?.phone_number) {
         smsBookingConfirmed({
           to: notifPrefs.phone_number,
           loadNumber: load.load_number,
           origin: `${load.origin_city}, ${load.origin_state}`,
           dest: `${load.dest_city}, ${load.dest_state}`,
-        }).then(() => undefined, () => undefined);
+        }).then(
+          () => undefined,
+          () => undefined,
+        );
       }
     }
 
@@ -204,7 +221,10 @@ export async function bookNow(loadId: string): Promise<void> {
           dest: `${load.dest_city}, ${load.dest_state}`,
           pickupDate: load.pickup_date ?? '',
           amount: load.rate_usd ?? 0,
-        }).then(() => undefined, () => undefined);
+        }).then(
+          () => undefined,
+          () => undefined,
+        );
       }
     }
   }
@@ -224,8 +244,6 @@ export async function declineBid(bidId: string): Promise<void> {
     .eq('id', bidId);
   if (error) throw new Error(error.message);
 
-
-
   // Email carrier — bid declined
   if (bid) {
     const { data: carrier } = await supabase
@@ -239,7 +257,10 @@ export async function declineBid(bidId: string): Promise<void> {
       notifyBidDeclined({
         carrierEmail: carrier.email as string,
         loadNumber: (load as { load_number: string }).load_number,
-      }).then(() => undefined, () => undefined);
+      }).then(
+        () => undefined,
+        () => undefined,
+      );
     }
   }
 }

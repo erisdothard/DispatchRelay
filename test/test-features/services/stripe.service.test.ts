@@ -29,16 +29,21 @@ vi.mock('@/lib/supabase', () => ({
 function makeBuilder(result: unknown) {
   const self: Record<string, unknown> = {};
   for (const m of [
-    'select', 'insert', 'update', 'delete',
-    'eq', 'neq', 'order', 'limit',
-    'single', 'maybeSingle',
+    'select',
+    'insert',
+    'update',
+    'delete',
+    'eq',
+    'neq',
+    'order',
+    'limit',
+    'single',
+    'maybeSingle',
   ]) {
     self[m] = vi.fn().mockReturnValue(self);
   }
-  self.then = (
-    onfulfilled: (v: unknown) => unknown,
-    onrejected: (v: unknown) => unknown,
-  ) => Promise.resolve(result).then(onfulfilled, onrejected);
+  self.then = (onfulfilled: (v: unknown) => unknown, onrejected: (v: unknown) => unknown) =>
+    Promise.resolve(result).then(onfulfilled, onrejected);
   return self;
 }
 
@@ -87,9 +92,7 @@ beforeEach(() => {
 
 describe('getSubscription', () => {
   it('returns the subscription row', async () => {
-    mockFrom.mockReturnValue(
-      makeBuilder({ data: RAW_SUBSCRIPTION, error: null }) as never,
-    );
+    mockFrom.mockReturnValue(makeBuilder({ data: RAW_SUBSCRIPTION, error: null }) as never);
     const sub = await getSubscription('co-1');
     expect(sub).not.toBeNull();
     expect(sub!.tier).toBe('carrier_pro');
@@ -102,9 +105,7 @@ describe('getSubscription', () => {
   });
 
   it('throws when Supabase returns an error', async () => {
-    mockFrom.mockReturnValue(
-      makeBuilder({ data: null, error: { message: 'db error' } }) as never,
-    );
+    mockFrom.mockReturnValue(makeBuilder({ data: null, error: { message: 'db error' } }) as never);
     await expect(getSubscription('co-1')).rejects.toThrow('db error');
   });
 });
@@ -154,9 +155,7 @@ describe('approveInvoice', () => {
   });
 
   it('throws when the update fails', async () => {
-    mockFrom.mockReturnValue(
-      makeBuilder({ error: { message: 'invoice locked' } }) as never,
-    );
+    mockFrom.mockReturnValue(makeBuilder({ error: { message: 'invoice locked' } }) as never);
     await expect(approveInvoice('inv-1')).rejects.toThrow('invoice locked');
   });
 });
@@ -237,9 +236,7 @@ describe('selectPaymentMethod', () => {
   it('throws when the update fails', async () => {
     mockFrom
       .mockReturnValueOnce(makeBuilder({ data: { amount_usd: 5000 }, error: null }) as never)
-      .mockReturnValueOnce(
-        makeBuilder({ error: { message: 'update failed' } }) as never,
-      );
+      .mockReturnValueOnce(makeBuilder({ error: { message: 'update failed' } }) as never);
     await expect(selectPaymentMethod('inv-1', 'standard_net30')).rejects.toThrow('update failed');
   });
 });

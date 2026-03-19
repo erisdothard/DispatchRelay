@@ -70,7 +70,7 @@ async function checkAPI() {
     const start = Date.now();
     const response = await fetch(`${supabaseUrl}/rest/v1/`, {
       headers: {
-        'apikey': supabaseAnonKey,
+        apikey: supabaseAnonKey,
       },
     });
     const duration = Date.now() - start;
@@ -108,16 +108,16 @@ async function checkRLSPolicies() {
         results.push({
           table,
           rls_enabled: data?.[0]?.row_security === true,
-          error: null
+          error: null,
         });
       }
     }
 
-    const failedTables = results.filter(r => !r.rls_enabled);
+    const failedTables = results.filter((r) => !r.rls_enabled);
 
     return {
       status: failedTables.length === 0 ? 'pass' : 'fail',
-      tablesWithoutRLS: failedTables.map(r => r.table),
+      tablesWithoutRLS: failedTables.map((r) => r.table),
       details: results,
     };
   } catch (e) {
@@ -144,9 +144,8 @@ async function checkWebhookDelivery() {
       };
     }
 
-    const successRate = data?.length > 0
-      ? data.filter(d => d.status === 'delivered').length / data.length
-      : 1;
+    const successRate =
+      data?.length > 0 ? data.filter((d) => d.status === 'delivered').length / data.length : 1;
 
     return {
       status: successRate >= 0.9 ? 'pass' : 'fail',
@@ -258,13 +257,15 @@ async function runHealthCheck() {
   }
 
   const allPassed = Object.values(checks).every((c) => c.status === 'pass');
-  const passedCount = Object.values(checks).filter(c => c.status === 'pass').length;
+  const passedCount = Object.values(checks).filter((c) => c.status === 'pass').length;
   const totalCount = Object.values(checks).length;
 
   console.log(
     allPassed
       ? chalk.green.bold(`✅ All checks passed! (${passedCount}/${totalCount})`)
-      : chalk.red.bold(`❌ ${totalCount - passedCount} checks failed! (${passedCount}/${totalCount})`),
+      : chalk.red.bold(
+          `❌ ${totalCount - passedCount} checks failed! (${passedCount}/${totalCount})`,
+        ),
   );
 
   // Save report

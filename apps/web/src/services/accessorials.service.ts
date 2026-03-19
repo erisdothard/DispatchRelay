@@ -1,6 +1,12 @@
 import { supabase } from '@/lib/supabase';
 
-export type AccessorialType = 'detention' | 'lumper' | 'layover' | 'tonu' | 'fuel_surcharge' | 'other';
+export type AccessorialType =
+  | 'detention'
+  | 'lumper'
+  | 'layover'
+  | 'tonu'
+  | 'fuel_surcharge'
+  | 'other';
 export type AccessorialStatus = 'pending' | 'approved' | 'denied';
 
 export interface AccessorialCharge {
@@ -85,10 +91,7 @@ export async function approveAccessorial(id: string): Promise<void> {
 }
 
 export async function denyAccessorial(id: string): Promise<void> {
-  const { error } = await db
-    .from('accessorial_charges')
-    .update({ status: 'denied' })
-    .eq('id', id);
+  const { error } = await db.from('accessorial_charges').update({ status: 'denied' }).eq('id', id);
 
   if (error) throw new Error(error.message);
 }

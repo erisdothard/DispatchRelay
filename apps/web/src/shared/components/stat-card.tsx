@@ -24,9 +24,7 @@ export function StatCard({
     <div
       className={cn(
         'rounded-2xl p-4 flex flex-col gap-2 border',
-        highlight
-          ? 'bg-fx-orange/10 border-fx-orange/30'
-          : 'bg-fx-surface border-fx-border',
+        highlight ? 'bg-fx-orange/10 border-fx-orange/30' : 'bg-fx-surface border-fx-border',
         className,
       )}
     >
@@ -34,15 +32,12 @@ export function StatCard({
         <span className="text-xs font-semibold text-fx-text-muted uppercase tracking-wider">
           {label}
         </span>
-        {icon && <div className={cn('', highlight ? 'text-fx-orange' : 'text-fx-text-dim')}>{icon}</div>}
+        {icon && (
+          <div className={cn('', highlight ? 'text-fx-orange' : 'text-fx-text-dim')}>{icon}</div>
+        )}
       </div>
 
-      <p
-        className={cn(
-          'text-2xl font-bold',
-          highlight ? 'text-fx-orange' : 'text-fx-text',
-        )}
-      >
+      <p className={cn('text-2xl font-bold', highlight ? 'text-fx-orange' : 'text-fx-text')}>
         {value}
       </p>
 

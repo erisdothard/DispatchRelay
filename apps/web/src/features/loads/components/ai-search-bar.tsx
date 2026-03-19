@@ -17,21 +17,68 @@ const EXAMPLES = [
 ];
 
 const STATE_MAP: Record<string, string> = {
-  'alabama': 'AL', 'arizona': 'AZ', 'arkansas': 'AR', 'california': 'CA',
-  'colorado': 'CO', 'florida': 'FL', 'georgia': 'GA', 'illinois': 'IL',
-  'indiana': 'IN', 'iowa': 'IA', 'kansas': 'KS', 'kentucky': 'KY',
-  'louisiana': 'LA', 'michigan': 'MI', 'minnesota': 'MN', 'mississippi': 'MS',
-  'missouri': 'MO', 'nebraska': 'NE', 'nevada': 'NV', 'new jersey': 'NJ',
-  'new mexico': 'NM', 'new york': 'NY', 'north carolina': 'NC', 'ohio': 'OH',
-  'oklahoma': 'OK', 'oregon': 'OR', 'pennsylvania': 'PA', 'tennessee': 'TN',
-  'texas': 'TX', 'utah': 'UT', 'virginia': 'VA', 'washington': 'WA',
-  'wisconsin': 'WI',
+  alabama: 'AL',
+  arizona: 'AZ',
+  arkansas: 'AR',
+  california: 'CA',
+  colorado: 'CO',
+  florida: 'FL',
+  georgia: 'GA',
+  illinois: 'IL',
+  indiana: 'IN',
+  iowa: 'IA',
+  kansas: 'KS',
+  kentucky: 'KY',
+  louisiana: 'LA',
+  michigan: 'MI',
+  minnesota: 'MN',
+  mississippi: 'MS',
+  missouri: 'MO',
+  nebraska: 'NE',
+  nevada: 'NV',
+  'new jersey': 'NJ',
+  'new mexico': 'NM',
+  'new york': 'NY',
+  'north carolina': 'NC',
+  ohio: 'OH',
+  oklahoma: 'OK',
+  oregon: 'OR',
+  pennsylvania: 'PA',
+  tennessee: 'TN',
+  texas: 'TX',
+  utah: 'UT',
+  virginia: 'VA',
+  washington: 'WA',
+  wisconsin: 'WI',
   // abbreviations
-  'al': 'AL', 'az': 'AZ', 'ca': 'CA', 'co': 'CO', 'fl': 'FL', 'ga': 'GA',
-  'il': 'IL', 'in': 'IN', 'ky': 'KY', 'la': 'LA', 'mi': 'MI', 'mn': 'MN',
-  'mo': 'MO', 'ms': 'MS', 'nc': 'NC', 'ne': 'NE', 'nv': 'NV', 'ny': 'NY',
-  'oh': 'OH', 'ok': 'OK', 'or': 'OR', 'pa': 'PA', 'tn': 'TN', 'tx': 'TX',
-  'ut': 'UT', 'va': 'VA', 'wa': 'WA', 'wi': 'WI',
+  al: 'AL',
+  az: 'AZ',
+  ca: 'CA',
+  co: 'CO',
+  fl: 'FL',
+  ga: 'GA',
+  il: 'IL',
+  in: 'IN',
+  ky: 'KY',
+  la: 'LA',
+  mi: 'MI',
+  mn: 'MN',
+  mo: 'MO',
+  ms: 'MS',
+  nc: 'NC',
+  ne: 'NE',
+  nv: 'NV',
+  ny: 'NY',
+  oh: 'OH',
+  ok: 'OK',
+  or: 'OR',
+  pa: 'PA',
+  tn: 'TN',
+  tx: 'TX',
+  ut: 'UT',
+  va: 'VA',
+  wa: 'WA',
+  wi: 'WI',
 };
 
 function localParse(query: string): LoadFilters {
@@ -46,7 +93,13 @@ function localParse(query: string): LoadFilters {
   else if (q.includes('tanker')) filters.equipment = 'tanker';
   else if (q.includes('box truck') || q.includes('box van')) filters.equipment = 'box_truck';
   else if (q.includes('sprinter')) filters.equipment = 'sprinter';
-  else if (q.includes('dry van') || q.includes('dry freight') || /\bdry\b/.test(q) || q.includes('van')) filters.equipment = 'van';
+  else if (
+    q.includes('dry van') ||
+    q.includes('dry freight') ||
+    /\bdry\b/.test(q) ||
+    q.includes('van')
+  )
+    filters.equipment = 'van';
 
   // Rate per mile — match "$2.50/mi", "$3 a mile", "over $2/mi"
   const rateMatch = q.match(/\$(\d+(?:\.\d+)?)\s*(?:\/mi|per mile|a mile)/);
@@ -56,7 +109,9 @@ function localParse(query: string): LoadFilters {
   for (const [name, code] of Object.entries(STATE_MAP)) {
     if (!q.includes(name)) continue;
     const beforeState = q.slice(0, q.indexOf(name));
-    const isOrigin = /\b(from|out of|leaving|departing|pickup in|picks? up in|based in)\s*$/.test(beforeState);
+    const isOrigin = /\b(from|out of|leaving|departing|pickup in|picks? up in|based in)\s*$/.test(
+      beforeState,
+    );
     const isDest = /\b(to|going to|heading to|delivering to|towards?)\s*$/.test(beforeState);
 
     if (isOrigin && !filters.originState) filters.originState = code;
@@ -121,7 +176,11 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
           size={15}
           className={cn(
             'absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors',
-            loading ? 'text-fx-orange animate-pulse' : active ? 'text-fx-orange' : 'text-fx-text-dim',
+            loading
+              ? 'text-fx-orange animate-pulse'
+              : active
+                ? 'text-fx-orange'
+                : 'text-fx-text-dim',
           )}
         />
         <input
@@ -132,7 +191,9 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
           onKeyDown={handleKeyDown}
           placeholder="Describe the load you're looking for…"
           className="w-full h-12 bg-fx-surface-2 border border-fx-border rounded-2xl pl-10 pr-20 text-sm text-white placeholder:text-fx-text-dim focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all"
-          style={active ? { borderColor: '#E86030', boxShadow: '0 0 0 1px rgba(232,96,48,0.3)' } : {}}
+          style={
+            active ? { borderColor: '#E86030', boxShadow: '0 0 0 1px rgba(232,96,48,0.3)' } : {}
+          }
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {(query || active) && (

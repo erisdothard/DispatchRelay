@@ -51,7 +51,12 @@ export default function CarrierLoadsPage() {
   }, [refreshMyLoads]);
 
   // All loads tab
-  const { loads, loading: loadsLoading, error: loadsError, refresh: refreshLoads } = useLoads({
+  const {
+    loads,
+    loading: loadsLoading,
+    error: loadsError,
+    refresh: refreshLoads,
+  } = useLoads({
     equipment: equipFilter === 'All' ? 'all' : (equipFilter as EquipmentType),
     search: search || undefined,
     ...aiFilters,
@@ -69,7 +74,8 @@ export default function CarrierLoadsPage() {
 
   const loading = tab === 'my_loads' ? myLoadsLoading : tab === 'all' ? loadsLoading : matchLoading;
   const error = tab === 'my_loads' ? myLoadsError : tab === 'all' ? loadsError : matchError;
-  const refresh = tab === 'my_loads' ? refreshMyLoads : tab === 'all' ? refreshLoads : refreshMatches;
+  const refresh =
+    tab === 'my_loads' ? refreshMyLoads : tab === 'all' ? refreshLoads : refreshMatches;
 
   // In "matches" tab, show topMatches if prefs set; fall back to scoredLoads
   const hasPrefs =
@@ -96,16 +102,17 @@ export default function CarrierLoadsPage() {
       />
 
       {/* Tabs */}
-      <div className="px-5 pt-3 pb-1 flex gap-1" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div
+        className="px-5 pt-3 pb-1 flex gap-1"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+      >
         {(['my_loads', 'matches', 'all'] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={cn(
               'flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all',
-              tab === t
-                ? 'bg-fx-orange text-white'
-                : 'text-fx-text-muted hover:text-fx-text',
+              tab === t ? 'bg-fx-orange text-white' : 'text-fx-text-muted hover:text-fx-text',
             )}
           >
             {t === 'my_loads' && <Truck size={12} />}
@@ -146,7 +153,10 @@ export default function CarrierLoadsPage() {
         {tab === 'all' && (
           <>
             <div className="relative">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-orange" />
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-orange"
+              />
               <input
                 type="text"
                 placeholder="Search origin, destination, commodity…"
@@ -189,10 +199,7 @@ export default function CarrierLoadsPage() {
             <Sparkles size={13} className="text-fx-orange shrink-0" />
             <p className="text-[12px] text-fx-text-muted">
               Set your preferences to see your best-matched loads first.{' '}
-              <button
-                onClick={() => setPrefsOpen(true)}
-                className="text-fx-orange font-semibold"
-              >
+              <button onClick={() => setPrefsOpen(true)} className="text-fx-orange font-semibold">
                 Set preferences →
               </button>
             </p>
@@ -205,7 +212,8 @@ export default function CarrierLoadsPage() {
         <div className="px-5 mb-1 flex flex-wrap gap-1.5">
           {aiFilters.equipment && (
             <span className="text-[11px] bg-fx-orange/15 text-fx-orange border border-fx-orange/30 px-2.5 py-1 rounded-full font-semibold">
-              {EQUIPMENT_LABELS[aiFilters.equipment as keyof typeof EQUIPMENT_LABELS] ?? aiFilters.equipment}
+              {EQUIPMENT_LABELS[aiFilters.equipment as keyof typeof EQUIPMENT_LABELS] ??
+                aiFilters.equipment}
             </span>
           )}
           {aiFilters.originState && (
@@ -232,10 +240,10 @@ export default function CarrierLoadsPage() {
           {loading
             ? 'Loading…'
             : tab === 'my_loads'
-            ? `${myLoads.length} active load${myLoads.length !== 1 ? 's' : ''}`
-            : tab === 'matches'
-            ? `${matchList.length} ${hasPrefs ? 'matched' : 'scored'} loads`
-            : `${loads.length} loads available`}
+              ? `${myLoads.length} active load${myLoads.length !== 1 ? 's' : ''}`
+              : tab === 'matches'
+                ? `${matchList.length} ${hasPrefs ? 'matched' : 'scored'} loads`
+                : `${loads.length} loads available`}
         </span>
         {tab === 'all' && (
           <button
@@ -277,7 +285,12 @@ export default function CarrierLoadsPage() {
             </div>
           ) : (
             myLoads.map((load) => (
-              <LoadCard key={load.id} load={load} onPress={setSelectedLoad} onBid={setSelectedLoad} />
+              <LoadCard
+                key={load.id}
+                load={load}
+                onPress={setSelectedLoad}
+                onBid={setSelectedLoad}
+              />
             ))
           )
         ) : tab === 'matches' ? (
@@ -310,7 +323,11 @@ export default function CarrierLoadsPage() {
             </p>
             {Object.keys(aiFilters).length > 0 && (
               <button
-                onClick={() => { setAiFilters({}); setEquipFilter('All'); setSearch(''); }}
+                onClick={() => {
+                  setAiFilters({});
+                  setEquipFilter('All');
+                  setSearch('');
+                }}
                 className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
               >
                 Clear search — show all loads

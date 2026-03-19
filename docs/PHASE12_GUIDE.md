@@ -99,8 +99,8 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { insertLocationPing } from '../lib/location';
 
-const PING_INTERVAL_MS = 30_000;   // 30 seconds
-const MOVEMENT_THRESHOLD_M = 50;   // 50 metres
+const PING_INTERVAL_MS = 30_000; // 30 seconds
+const MOVEMENT_THRESHOLD_M = 50; // 50 metres
 
 function distanceM(lat1: number, lng1: number, lat2: number, lng2: number) {
   const R = 6_371_000;
@@ -108,9 +108,7 @@ function distanceM(lat1: number, lng1: number, lat2: number, lng2: number) {
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -160,7 +158,7 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
 
     watchIdRef.current = navigator.geolocation.watchPosition(
       handlePosition,
-      () => undefined,  // silently ignore denial
+      () => undefined, // silently ignore denial
       { enableHighAccuracy: true, maximumAge: 10_000 },
     );
 
@@ -204,22 +202,30 @@ export function useLiveTracking(loadNumber: string | null | undefined) {
       .order('recorded_at', { ascending: false })
       .limit(1)
       .single()
-      .then(({ data }) => { if (data) setLatestPing(data as LivePing); });
+      .then(({ data }) => {
+        if (data) setLatestPing(data as LivePing);
+      });
 
     // Subscribe to new inserts via Realtime
     const channel = supabase
       .channel(`location_pings:${loadNumber}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'location_pings',
-        filter: `load_number=eq.${loadNumber}`,
-      }, (payload) => {
-        setLatestPing(payload.new as LivePing);
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'location_pings',
+          filter: `load_number=eq.${loadNumber}`,
+        },
+        (payload) => {
+          setLatestPing(payload.new as LivePing);
+        },
+      )
       .subscribe();
 
-    return () => { void supabase.removeChannel(channel); };
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [loadNumber]);
 
   return latestPing;
@@ -359,14 +365,14 @@ Cleanup (hourly)
 
 ## Success Metrics
 
-| Metric                        | Target           |
-| ----------------------------- | ---------------- |
-| Ping write latency            | < 500ms          |
-| Realtime update delivery      | < 2 seconds      |
-| GPS accuracy                  | ≤ 20m (mobile)   |
-| Battery impact (driver)       | Minimal (smart interval) |
-| Table row count (24h window)  | ~2,880 pings/truck/day max |
-| Cleanup success rate          | > 99%            |
+| Metric                       | Target                     |
+| ---------------------------- | -------------------------- |
+| Ping write latency           | < 500ms                    |
+| Realtime update delivery     | < 2 seconds                |
+| GPS accuracy                 | ≤ 20m (mobile)             |
+| Battery impact (driver)      | Minimal (smart interval)   |
+| Table row count (24h window) | ~2,880 pings/truck/day max |
+| Cleanup success rate         | > 99%                      |
 
 ---
 

@@ -1,5 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Plus, Truck, MapPin, Calendar, Pencil, Trash2, WifiOff, Radio, Navigation } from 'lucide-react';
+import {
+  Plus,
+  Truck,
+  MapPin,
+  Calendar,
+  Pencil,
+  Trash2,
+  WifiOff,
+  Radio,
+  Navigation,
+} from 'lucide-react';
 import { FleetMap } from '@/shared/components/fleet-map';
 import type { TruckPin } from '@/shared/components/fleet-map';
 import { TopHeader } from '@/shared/components/top-header';
@@ -59,9 +69,7 @@ function DriverGpsRow({ load }: { load: Load }) {
             {speedKmh} km/h
           </span>
         )}
-        {lastPing && (
-          <span>Last ping: {lastPing}</span>
-        )}
+        {lastPing && <span>Last ping: {lastPing}</span>}
         {ping && (
           <span className="ml-auto text-green-400 font-semibold flex items-center gap-1">
             <Radio size={11} /> GPS
@@ -86,7 +94,9 @@ export default function CarrierFleetPage() {
   useEffect(() => {
     if (user?.id) {
       getMyActiveLoads(user.id)
-        .then((loads) => setActiveLoads(loads.filter((l) => l.status === 'in_transit' && l.assignedDriverId)))
+        .then((loads) =>
+          setActiveLoads(loads.filter((l) => l.status === 'in_transit' && l.assignedDriverId)),
+        )
         .catch(console.error);
     }
   }, [user?.id]);

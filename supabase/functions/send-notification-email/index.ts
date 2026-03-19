@@ -113,7 +113,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
           <p style="color:${mutedColor};margin:0 0 24px;font-size:14px;">Load <strong style="color:#fff;">${data.load_number ?? ''}</strong> status changed.</p>
           <div style="background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:24px;text-align:center;">
             <div style="font-size:13px;color:${mutedColor};margin-bottom:8px;">New Status</div>
-            <div style="font-size:22px;font-weight:900;color:${accentColor};text-transform:uppercase;letter-spacing:1px;">${String(data.status ?? '').replace(/_/g,' ')}</div>
+            <div style="font-size:22px;font-weight:900;color:${accentColor};text-transform:uppercase;letter-spacing:1px;">${String(data.status ?? '').replace(/_/g, ' ')}</div>
             <div style="font-size:12px;color:${mutedColor};margin-top:4px;">${data.load_number ?? ''} · ${data.origin ?? ''} → ${data.dest ?? ''}</div>
           </div>
           <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">Track Load</a>
@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const payload = await req.json() as EmailPayload;
+    const payload = (await req.json()) as EmailPayload;
     const { to, subject, template, data } = payload;
 
     if (!to || !subject || !template) {

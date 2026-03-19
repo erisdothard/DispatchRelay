@@ -55,10 +55,10 @@ export default function CarrierDashboard() {
   }, [user?.id]);
 
   const recentLoads = loads.slice(0, 3);
-  const currentLoad = loads.find((l) =>
-    ['dispatched', 'in_transit', 'awarded'].includes(l.status)
-  ) ?? loads[0] ?? null;
-
+  const currentLoad =
+    loads.find((l) => ['dispatched', 'in_transit', 'awarded'].includes(l.status)) ??
+    loads[0] ??
+    null;
 
   const name = profile?.full_name ?? 'Driver';
   const companyName = company?.name ?? '';
@@ -201,18 +201,19 @@ export default function CarrierDashboard() {
               </div>
 
               {/* Assign Driver button */}
-              {!currentLoad.assignedDriverId && ['awarded', 'dispatched'].includes(currentLoad.status) && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setAssignLoad(currentLoad);
-                  }}
-                  className="mt-4 w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
-                >
-                  <UserCheck size={14} />
-                  Assign Driver
-                </button>
-              )}
+              {!currentLoad.assignedDriverId &&
+                ['awarded', 'dispatched'].includes(currentLoad.status) && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setAssignLoad(currentLoad);
+                    }}
+                    className="mt-4 w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
+                  >
+                    <UserCheck size={14} />
+                    Assign Driver
+                  </button>
+                )}
               {currentLoad.assignedDriverId && (
                 <div className="mt-4 flex items-center gap-2 text-xs text-green-400 font-semibold">
                   <UserCheck size={14} />

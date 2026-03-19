@@ -31,26 +31,30 @@ vi.mock('@/lib/supabase', () => ({
 function makeBuilder(result: unknown) {
   const self: Record<string, unknown> = {};
   for (const m of [
-    'select', 'insert', 'update', 'delete',
-    'eq', 'neq', 'or', 'order', 'limit',
-    'single', 'maybeSingle',
+    'select',
+    'insert',
+    'update',
+    'delete',
+    'eq',
+    'neq',
+    'or',
+    'order',
+    'limit',
+    'single',
+    'maybeSingle',
   ]) {
     self[m] = vi.fn().mockReturnValue(self);
   }
-  self.then = (
-    onfulfilled: (v: unknown) => unknown,
-    onrejected: (v: unknown) => unknown,
-  ) => Promise.resolve(result).then(onfulfilled, onrejected);
+  self.then = (onfulfilled: (v: unknown) => unknown, onrejected: (v: unknown) => unknown) =>
+    Promise.resolve(result).then(onfulfilled, onrejected);
   return self;
 }
 
 /** Creates a thenable that resolves/rejects for supabase.rpc() */
 function makeRpc(result: unknown) {
   return {
-    then: (
-      onfulfilled: (v: unknown) => unknown,
-      onrejected: (v: unknown) => unknown,
-    ) => Promise.resolve(result).then(onfulfilled, onrejected),
+    then: (onfulfilled: (v: unknown) => unknown, onrejected: (v: unknown) => unknown) =>
+      Promise.resolve(result).then(onfulfilled, onrejected),
   };
 }
 
@@ -217,16 +221,12 @@ describe('declineBid', () => {
     const builder = makeBuilder({ error: null });
     mockFrom.mockReturnValue(builder as never);
     await declineBid('bid-1');
-    expect(builder.update).toHaveBeenCalledWith(
-      expect.objectContaining({ status: 'declined' }),
-    );
+    expect(builder.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'declined' }));
     expect(builder.eq).toHaveBeenCalledWith('id', 'bid-1');
   });
 
   it('throws when the update fails', async () => {
-    mockFrom.mockReturnValue(
-      makeBuilder({ error: { message: 'row not found' } }) as never,
-    );
+    mockFrom.mockReturnValue(makeBuilder({ error: { message: 'row not found' } }) as never);
     await expect(declineBid('bid-1')).rejects.toThrow('row not found');
   });
 });

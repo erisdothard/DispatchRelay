@@ -52,12 +52,18 @@ export default function TrackingPage() {
 
   const completedCount = milestones.filter((m) => m.completed).length;
   const progress = milestones.length > 0 ? (completedCount / milestones.length) * 100 : 0;
-  const role = (profile?.role === 'admin' ? 'carrier' : profile?.role === 'driver' || profile?.role === 'shipper' ? 'driver' : profile?.role) ?? 'carrier';
+  const role =
+    (profile?.role === 'admin'
+      ? 'carrier'
+      : profile?.role === 'driver' || profile?.role === 'shipper'
+        ? 'driver'
+        : profile?.role) ?? 'carrier';
 
   // Live GPS tracking — only subscribes when a load is loaded
   const livePing = useLiveTracking(load?.loadNumber ?? null);
-  const livePosition: [number, number] | undefined =
-    livePing ? [livePing.latitude, livePing.longitude] : undefined;
+  const livePosition: [number, number] | undefined = livePing
+    ? [livePing.latitude, livePing.longitude]
+    : undefined;
   const heading = livePing?.heading_deg ?? undefined;
 
   // Shipper GPS — activates when shipper taps "Send Live GPS" on this page
@@ -67,8 +73,7 @@ export default function TrackingPage() {
   });
 
   // Human-readable speed (km/h) and accuracy
-  const speedKmh =
-    livePing?.speed_ms != null ? Math.round(livePing.speed_ms * 3.6) : null;
+  const speedKmh = livePing?.speed_ms != null ? Math.round(livePing.speed_ms * 3.6) : null;
   const accuracyM = livePing?.accuracy_m ?? null;
 
   return (
@@ -209,8 +214,11 @@ export default function TrackingPage() {
               />
 
               {/* GPS buttons — different for shipper vs carrier/admin */}
-              {load.status === 'in_transit' && !livePosition && (
-                user?.id === load.postedBy || profile?.role === 'driver' || profile?.role === 'shipper' ? (
+              {load.status === 'in_transit' &&
+                !livePosition &&
+                (user?.id === load.postedBy ||
+                profile?.role === 'driver' ||
+                profile?.role === 'shipper' ? (
                   /* Driver sees "Send Live GPS" — activates their own GPS sharing */
                   <button
                     disabled={gpsSending}
@@ -252,8 +260,7 @@ export default function TrackingPage() {
                     <Radio size={15} />
                     {gpsRequested ? 'GPS Request Sent' : 'Request Live GPS'}
                   </button>
-                )
-              )}
+                ))}
 
               {/* Distance info */}
               <div className="flex items-center justify-between text-xs">
@@ -261,14 +268,18 @@ export default function TrackingPage() {
                   <MapPin size={12} className="text-green-400" />
                   <span className="text-fx-text-dim">
                     Pickup:{' '}
-                    {load.pickupDate ? new Date(load.pickupDate + 'T12:00:00').toLocaleDateString() : 'TBD'}
+                    {load.pickupDate
+                      ? new Date(load.pickupDate + 'T12:00:00').toLocaleDateString()
+                      : 'TBD'}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Navigation size={12} className="text-fx-orange" />
                   <span className="text-fx-text-dim">
                     Delivery:{' '}
-                    {load.deliveryDate ? new Date(load.deliveryDate + 'T12:00:00').toLocaleDateString() : 'TBD'}
+                    {load.deliveryDate
+                      ? new Date(load.deliveryDate + 'T12:00:00').toLocaleDateString()
+                      : 'TBD'}
                   </span>
                 </div>
               </div>

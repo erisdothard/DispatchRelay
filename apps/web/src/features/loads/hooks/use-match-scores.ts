@@ -6,8 +6,8 @@ import { rankLoads, getTopMatches } from '../lib/match-score';
 import type { ScoredLoad, CarrierPreferences } from '../lib/match-score';
 
 interface UseMatchScoresResult {
-  scoredLoads: ScoredLoad[];      // all posted loads, sorted by score
-  topMatches: ScoredLoad[];       // loads scoring >= 60
+  scoredLoads: ScoredLoad[]; // all posted loads, sorted by score
+  topMatches: ScoredLoad[]; // loads scoring >= 60
   preferences: CarrierPreferences | null;
   loading: boolean;
   error: string | null;

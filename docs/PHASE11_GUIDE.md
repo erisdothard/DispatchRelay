@@ -126,7 +126,11 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
           size={15}
           className={cn(
             'absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors',
-            loading ? 'text-fx-orange animate-pulse' : active ? 'text-fx-orange' : 'text-fx-text-dim',
+            loading
+              ? 'text-fx-orange animate-pulse'
+              : active
+                ? 'text-fx-orange'
+                : 'text-fx-text-dim',
           )}
         />
         <input
@@ -134,18 +138,35 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); if (e.key === 'Escape') { setQuery(''); setActive(false); onClear(); } }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSearch();
+            if (e.key === 'Escape') {
+              setQuery('');
+              setActive(false);
+              onClear();
+            }
+          }}
           placeholder="Describe the load you're looking for…"
           className="w-full h-12 bg-fx-surface-2 border border-fx-border rounded-2xl pl-10 pr-20 text-sm text-white placeholder:text-fx-text-dim focus:border-fx-orange outline-none transition-all"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {(query || active) && (
-            <button onClick={() => { setQuery(''); setActive(false); onClear(); }} className="w-6 h-6 rounded-full flex items-center justify-center text-fx-text-dim hover:text-white">
+            <button
+              onClick={() => {
+                setQuery('');
+                setActive(false);
+                onClear();
+              }}
+              className="w-6 h-6 rounded-full flex items-center justify-center text-fx-text-dim hover:text-white"
+            >
               <X size={12} />
             </button>
           )}
-          <button onClick={handleSearch} disabled={!query.trim() || loading}
-            className="h-8 w-8 rounded-xl bg-fx-orange flex items-center justify-center disabled:opacity-40">
+          <button
+            onClick={handleSearch}
+            disabled={!query.trim() || loading}
+            className="h-8 w-8 rounded-xl bg-fx-orange flex items-center justify-center disabled:opacity-40"
+          >
             <ArrowRight size={14} className="text-white" />
           </button>
         </div>
@@ -154,8 +175,11 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
       {!query && !active && (
         <div className="flex gap-2 overflow-x-auto pb-0.5">
           {EXAMPLES.map((ex) => (
-            <button key={ex} onClick={() => setQuery(ex)}
-              className="shrink-0 text-[11px] text-fx-text-dim bg-fx-surface border border-fx-border px-3 py-1.5 rounded-full hover:border-fx-orange/40 hover:text-fx-text transition-all">
+            <button
+              key={ex}
+              onClick={() => setQuery(ex)}
+              className="shrink-0 text-[11px] text-fx-text-dim bg-fx-surface border border-fx-border px-3 py-1.5 rounded-full hover:border-fx-orange/40 hover:text-fx-text transition-all"
+            >
               {ex}
             </button>
           ))}
@@ -207,7 +231,7 @@ function keywordParse(query: string): ParsedFilters {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  const { query } = await req.json() as { query: string };
+  const { query } = (await req.json()) as { query: string };
   const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
 
   // Fall back to keyword parsing if no API key
@@ -230,7 +254,11 @@ Only include fields clearly mentioned. Return {} if nothing is clear.`;
 
   const response = await fetch(ANTHROPIC_API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 256,
@@ -266,7 +294,7 @@ import type { Load, EquipmentType } from '@freightx/shared';
 export interface CarrierPreferences {
   userId: string;
   preferredEquipment: EquipmentType[];
-  preferredOriginStates: string[];   // e.g. ['TX', 'OK', 'LA']
+  preferredOriginStates: string[]; // e.g. ['TX', 'OK', 'LA']
   preferredDestStates: string[];
   minRatePerMile: number;
   homeCity: string;
@@ -274,31 +302,33 @@ export interface CarrierPreferences {
 }
 
 export interface ScoredLoad extends Load {
-  matchScore: number;        // 0–100
+  matchScore: number; // 0–100
   matchBreakdown: {
-    equipmentPts: number;   // 0 or 40
-    ratePts: number;        // 5 | 12 | 20 | 25
-    lanePts: number;        // 0–20
-    urgencyPts: number;     // 3 | 7 | 10
-    creditPts: number;      // 0 | 1 | 3 | 5
+    equipmentPts: number; // 0 or 40
+    ratePts: number; // 5 | 12 | 20 | 25
+    lanePts: number; // 0–20
+    urgencyPts: number; // 3 | 7 | 10
+    creditPts: number; // 0 | 1 | 3 | 5
   };
 }
 
 export function scoreLoad(load: Load, prefs: CarrierPreferences): ScoredLoad {
   // Equipment match — 40 pts
   const equipmentPts =
-    prefs.preferredEquipment.length === 0 ||
-    prefs.preferredEquipment.includes(load.equipment) ? 40 : 0;
+    prefs.preferredEquipment.length === 0 || prefs.preferredEquipment.includes(load.equipment)
+      ? 40
+      : 0;
 
   // Rate health — 25 pts
   const rateHealth = analyzeRate(load).health;
   const ratePts = ({ hot: 25, good: 20, fair: 12, low: 5 } as const)[rateHealth];
 
   // Lane preference — 20 pts (10 origin + 10 dest)
-  const originMatch = prefs.preferredOriginStates.length === 0 ||
+  const originMatch =
+    prefs.preferredOriginStates.length === 0 ||
     prefs.preferredOriginStates.includes(load.originState);
-  const destMatch = prefs.preferredDestStates.length === 0 ||
-    prefs.preferredDestStates.includes(load.destState);
+  const destMatch =
+    prefs.preferredDestStates.length === 0 || prefs.preferredDestStates.includes(load.destState);
   const lanePts = (originMatch ? 10 : 0) + (destMatch ? 10 : 0);
 
   // Pickup urgency — 10 pts
@@ -310,14 +340,22 @@ export function scoreLoad(load: Load, prefs: CarrierPreferences): ScoredLoad {
   const creditPts = cs >= 85 ? 5 : cs >= 70 ? 3 : cs >= 55 ? 1 : 0;
 
   const matchScore = equipmentPts + ratePts + lanePts + urgencyPts + creditPts;
-  return { ...load, matchScore, matchBreakdown: { equipmentPts, ratePts, lanePts, urgencyPts, creditPts } };
+  return {
+    ...load,
+    matchScore,
+    matchBreakdown: { equipmentPts, ratePts, lanePts, urgencyPts, creditPts },
+  };
 }
 
 export function rankLoads(loads: Load[], prefs: CarrierPreferences): ScoredLoad[] {
   return loads.map((l) => scoreLoad(l, prefs)).sort((a, b) => b.matchScore - a.matchScore);
 }
 
-export function getTopMatches(loads: Load[], prefs: CarrierPreferences, threshold = 60): ScoredLoad[] {
+export function getTopMatches(
+  loads: Load[],
+  prefs: CarrierPreferences,
+  threshold = 60,
+): ScoredLoad[] {
   return rankLoads(loads, prefs).filter((l) => l.matchScore >= threshold);
 }
 ```
@@ -330,13 +368,18 @@ import { cn } from '@/shared/lib/utils';
 
 export function MatchBadge({ score, className }: { score: number; className?: string }) {
   const color =
-    score >= 80 ? '#34D399'   // green
-    : score >= 60 ? '#E86030' // fx-orange
-    : '#6B7280';              // gray
+    score >= 80
+      ? '#34D399' // green
+      : score >= 60
+        ? '#E86030' // fx-orange
+        : '#6B7280'; // gray
 
   return (
     <div
-      className={cn('flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold', className)}
+      className={cn(
+        'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold',
+        className,
+      )}
       style={{ background: `${color}1A`, border: `1px solid ${color}40`, color }}
     >
       <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
@@ -353,8 +396,8 @@ export function MatchBadge({ score, className }: { score: number; className?: st
 | Equipment match | 40      | Full points if equipment matches preferences, 0 otherwise |
 | Rate health     | 25      | hot=25, good=20, fair=12, low=5                           |
 | Lane preference | 20      | 10 for matching origin state + 10 for matching dest state |
-| Pickup urgency  | 10      | ≤2 days=10, ≤5 days=7, otherwise=3                       |
-| Broker credit   | 5       | ≥85=5, ≥70=3, ≥55=1, <55=0                               |
+| Pickup urgency  | 10      | ≤2 days=10, ≤5 days=7, otherwise=3                        |
+| Broker credit   | 5       | ≥85=5, ≥70=3, ≥55=1, <55=0                                |
 | **Total**       | **100** |                                                           |
 
 ---
@@ -385,13 +428,13 @@ ANTHROPIC_API_KEY=sk-ant-...   # Required for Claude Haiku parsing
 
 ## Success Metrics
 
-| Metric                        | Target      |
-| ----------------------------- | ----------- |
-| AI query parse latency        | < 1 second  |
-| Keyword fallback coverage     | > 80% of common queries |
-| Match score accuracy          | Correlates with carrier acceptance rate |
-| Edge function error rate      | < 1%        |
-| Load board search engagement  | > 40% of active carriers |
+| Metric                       | Target                                  |
+| ---------------------------- | --------------------------------------- |
+| AI query parse latency       | < 1 second                              |
+| Keyword fallback coverage    | > 80% of common queries                 |
+| Match score accuracy         | Correlates with carrier acceptance rate |
+| Edge function error rate     | < 1%                                    |
+| Load board search engagement | > 40% of active carriers                |
 
 ---
 

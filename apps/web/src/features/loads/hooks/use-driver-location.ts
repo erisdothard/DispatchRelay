@@ -2,8 +2,8 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { insertLocationPing } from '../lib/location';
 
-const PING_INTERVAL_MS = 30_000;   // 30 seconds
-const MOVEMENT_THRESHOLD_M = 50;   // 50 metres
+const PING_INTERVAL_MS = 30_000; // 30 seconds
+const MOVEMENT_THRESHOLD_M = 50; // 50 metres
 
 /** Haversine distance in metres between two lat/lng pairs. */
 function distanceM(lat1: number, lng1: number, lat2: number, lng2: number) {
@@ -12,9 +12,7 @@ function distanceM(lat1: number, lng1: number, lat2: number, lng2: number) {
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -71,11 +69,10 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
   useEffect(() => {
     if (!active || !('geolocation' in navigator)) return;
 
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      handlePosition,
-      () => undefined,
-      { enableHighAccuracy: true, maximumAge: 10_000 },
-    );
+    watchIdRef.current = navigator.geolocation.watchPosition(handlePosition, () => undefined, {
+      enableHighAccuracy: true,
+      maximumAge: 10_000,
+    });
 
     return () => {
       if (watchIdRef.current != null) {

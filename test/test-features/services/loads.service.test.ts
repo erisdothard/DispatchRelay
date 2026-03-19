@@ -23,17 +23,25 @@ vi.mock('@/lib/supabase', () => ({
 function makeBuilder(result: unknown) {
   const self: Record<string, unknown> = {};
   for (const m of [
-    'select', 'insert', 'update', 'delete',
-    'eq', 'neq', 'or', 'order', 'limit', 'lt',
-    'single', 'maybeSingle',
+    'select',
+    'insert',
+    'update',
+    'delete',
+    'eq',
+    'neq',
+    'or',
+    'order',
+    'limit',
+    'lt',
+    'single',
+    'maybeSingle',
+    'range',
   ]) {
     self[m] = vi.fn().mockReturnValue(self);
   }
   // Make the builder itself awaitable (Supabase PostgREST pattern)
-  self.then = (
-    onfulfilled: (v: unknown) => unknown,
-    onrejected: (v: unknown) => unknown,
-  ) => Promise.resolve(result).then(onfulfilled, onrejected);
+  self.then = (onfulfilled: (v: unknown) => unknown, onrejected: (v: unknown) => unknown) =>
+    Promise.resolve(result).then(onfulfilled, onrejected);
   return self;
 }
 
@@ -156,9 +164,7 @@ describe('getLoadByNumber', () => {
   });
 
   it('returns null when Supabase returns an error (not found)', async () => {
-    mockFrom.mockReturnValue(
-      makeBuilder({ data: null, error: { message: 'no rows' } }) as never,
-    );
+    mockFrom.mockReturnValue(makeBuilder({ data: null, error: { message: 'no rows' } }) as never);
     expect(await getLoadByNumber('FX-MISSING')).toBeNull();
   });
 });
@@ -191,8 +197,8 @@ describe('createLoad', () => {
   it('returns a mapped Load after a successful insert', async () => {
     mockFrom
       .mockReturnValueOnce(makeBuilder({ data: RAW_LOAD, error: null }) as never) // loads.insert
-      .mockReturnValueOnce(makeBuilder({ data: [], error: null }) as never)       // profiles.select (notify carriers)
-      .mockReturnValueOnce(makeBuilder({ data: null, error: null }) as never);    // notifications.insert
+      .mockReturnValueOnce(makeBuilder({ data: [], error: null }) as never) // profiles.select (notify carriers)
+      .mockReturnValueOnce(makeBuilder({ data: null, error: null }) as never); // notifications.insert
 
     const { id: _, created_at: __, ...payload } = RAW_LOAD;
     const load = await createLoad(payload as never);

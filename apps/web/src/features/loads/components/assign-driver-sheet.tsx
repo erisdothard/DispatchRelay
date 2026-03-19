@@ -14,7 +14,9 @@ interface AssignDriverSheetProps {
 
 export function AssignDriverSheet({ open, onClose, load, onAssigned }: AssignDriverSheetProps) {
   const { company } = useAuth();
-  const [drivers, setDrivers] = useState<Array<{ id: string; fullName: string; email: string }>>([]);
+  const [drivers, setDrivers] = useState<Array<{ id: string; fullName: string; email: string }>>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +48,9 @@ export function AssignDriverSheet({ open, onClose, load, onAssigned }: AssignDri
     <BottomSheet open={open} onClose={onClose} title="Assign Driver">
       <div className="space-y-3">
         <div className="bg-fx-surface-2 rounded-2xl p-3 mb-4">
-          <p className="text-xs text-fx-text-muted font-semibold uppercase tracking-widest mb-1">Load</p>
+          <p className="text-xs text-fx-text-muted font-semibold uppercase tracking-widest mb-1">
+            Load
+          </p>
           <p className="text-sm font-bold text-fx-orange">{load.loadNumber}</p>
           <p className="text-xs text-fx-text-muted mt-0.5">
             {load.originCity}, {load.originState} → {load.destCity}, {load.destState}

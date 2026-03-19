@@ -22,12 +22,12 @@ interface NotificationSettings {
 }
 
 const DEFAULTS: NotificationSettings = {
-  new_loads:   { push: true,  email: true,  sms: false },
-  bid_updates: { push: true,  email: true,  sms: true  },
-  load_status: { push: true,  email: false, sms: false },
-  messages:    { push: true,  email: false, sms: false },
-  reminders:   { push: true,  email: true,  sms: false },
-  marketing:   { push: false, email: true,  sms: false },
+  new_loads: { push: true, email: true, sms: false },
+  bid_updates: { push: true, email: true, sms: true },
+  load_status: { push: true, email: false, sms: false },
+  messages: { push: true, email: false, sms: false },
+  reminders: { push: true, email: true, sms: false },
+  marketing: { push: false, email: true, sms: false },
 };
 
 const SETTING_META: Array<{
@@ -36,12 +36,42 @@ const SETTING_META: Array<{
   description: string;
   icon: React.ElementType;
 }> = [
-  { id: 'new_loads',   label: 'New Loads',   description: 'Get notified when new loads match your preferences', icon: Bell },
-  { id: 'bid_updates', label: 'Bid Updates',  description: 'Notifications about your bids (accepted, rejected, new bids)', icon: Bell },
-  { id: 'load_status', label: 'Load Status',  description: 'Status changes on your active loads', icon: Bell },
-  { id: 'messages',    label: 'Messages',     description: 'New messages from other users', icon: MessageSquare },
-  { id: 'reminders',   label: 'Reminders',    description: 'Pickup reminders, delivery deadlines, document expirations', icon: Bell },
-  { id: 'marketing',   label: 'Tips & Updates', description: 'Product updates, tips, and industry news', icon: Mail },
+  {
+    id: 'new_loads',
+    label: 'New Loads',
+    description: 'Get notified when new loads match your preferences',
+    icon: Bell,
+  },
+  {
+    id: 'bid_updates',
+    label: 'Bid Updates',
+    description: 'Notifications about your bids (accepted, rejected, new bids)',
+    icon: Bell,
+  },
+  {
+    id: 'load_status',
+    label: 'Load Status',
+    description: 'Status changes on your active loads',
+    icon: Bell,
+  },
+  {
+    id: 'messages',
+    label: 'Messages',
+    description: 'New messages from other users',
+    icon: MessageSquare,
+  },
+  {
+    id: 'reminders',
+    label: 'Reminders',
+    description: 'Pickup reminders, delivery deadlines, document expirations',
+    icon: Bell,
+  },
+  {
+    id: 'marketing',
+    label: 'Tips & Updates',
+    description: 'Product updates, tips, and industry news',
+    icon: Mail,
+  },
 ];
 
 export default function NotificationsPage() {
@@ -65,13 +95,19 @@ export default function NotificationsPage() {
       .select('settings, phone_number')
       .eq('user_id', profile.id)
       .maybeSingle()
-      .then(({ data }: { data: { settings: NotificationSettings; phone_number: string | null } | null }) => {
-        if (data) {
-          setSettings(data.settings ?? DEFAULTS);
-          setPhoneNumber(data.phone_number ?? '');
-        }
-        setLoadingPrefs(false);
-      });
+      .then(
+        ({
+          data,
+        }: {
+          data: { settings: NotificationSettings; phone_number: string | null } | null;
+        }) => {
+          if (data) {
+            setSettings(data.settings ?? DEFAULTS);
+            setPhoneNumber(data.phone_number ?? '');
+          }
+          setLoadingPrefs(false);
+        },
+      );
   }, [profile?.id]);
 
   const toggleSetting = (id: keyof NotificationSettings, channel: keyof ChannelSettings) => {
@@ -87,14 +123,12 @@ export default function NotificationsPage() {
     setSaving(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('notification_preferences')
-      .upsert({
-        user_id: profile.id,
-        settings,
-        phone_number: phoneNumber.trim() || null,
-        updated_at: new Date().toISOString(),
-      });
+    const { error } = await (supabase as any).from('notification_preferences').upsert({
+      user_id: profile.id,
+      settings,
+      phone_number: phoneNumber.trim() || null,
+      updated_at: new Date().toISOString(),
+    });
 
     setSaving(false);
     if (!error) {
@@ -131,10 +165,15 @@ export default function NotificationsPage() {
             type="tel"
             placeholder="+1 (555) 000-0000"
             value={phoneNumber}
-            onChange={(e) => { setPhoneNumber(e.target.value); setSaved(false); }}
+            onChange={(e) => {
+              setPhoneNumber(e.target.value);
+              setSaved(false);
+            }}
             className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
           />
-          <p className="text-[10px] text-fx-text-dim mt-1.5">E.164 format required for SMS (e.g. +15551234567)</p>
+          <p className="text-[10px] text-fx-text-dim mt-1.5">
+            E.164 format required for SMS (e.g. +15551234567)
+          </p>
         </div>
 
         {/* Channel Headers */}
@@ -195,9 +234,13 @@ export default function NotificationsPage() {
           }`}
         >
           {saving ? (
-            <><Loader2 size={16} className="animate-spin" /> Saving...</>
+            <>
+              <Loader2 size={16} className="animate-spin" /> Saving...
+            </>
           ) : saved ? (
-            <><Check size={16} /> Saved!</>
+            <>
+              <Check size={16} /> Saved!
+            </>
           ) : (
             'Save Changes'
           )}

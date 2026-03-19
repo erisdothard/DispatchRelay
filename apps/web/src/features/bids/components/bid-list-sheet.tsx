@@ -140,96 +140,98 @@ export function BidListSheet({ open, onClose, load, onBidAccepted }: BidListShee
 
   return (
     <>
-    <BottomSheet open={open} onClose={onClose} title="Bids Received">
-      {load && (
-        <div className="bg-fx-surface-2 border border-fx-border rounded-2xl p-3 mb-4 flex items-center justify-between">
-          <div>
-            <p className="text-xs text-fx-text-dim font-semibold">{load.loadNumber}</p>
-            <p className="text-sm font-bold text-fx-text">
-              {load.originCity} → {load.destCity}
+      <BottomSheet open={open} onClose={onClose} title="Bids Received">
+        {load && (
+          <div className="bg-fx-surface-2 border border-fx-border rounded-2xl p-3 mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-fx-text-dim font-semibold">{load.loadNumber}</p>
+              <p className="text-sm font-bold text-fx-text">
+                {load.originCity} → {load.destCity}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-fx-text-dim">Asking</p>
+              <p className="text-sm font-bold text-fx-orange">${load.rateUsd.toLocaleString()}</p>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-4 py-3 mb-3">{error}</p>
+        )}
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
+          </div>
+        ) : bids.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-14 text-center">
+            <Users size={36} className="text-fx-text-dim mb-4" />
+            <p className="font-bold text-fx-text">No bids yet</p>
+            <p className="text-sm text-fx-text-muted mt-1">
+              Carriers will appear here when they bid
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-fx-text-dim">Asking</p>
-            <p className="text-sm font-bold text-fx-orange">${load.rateUsd.toLocaleString()}</p>
+        ) : (
+          <div className="space-y-3">
+            {pendingBids.length > 0 && (
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
+                Pending · {pendingBids.length}
+              </p>
+            )}
+
+            {pendingBids.map((bid) => (
+              <BidCard
+                key={bid.id}
+                bid={bid}
+                askingRate={load?.rateUsd ?? 0}
+                acting={actingId === bid.id}
+                onAccept={() => handleAccept(bid.id)}
+                onDecline={() => handleDecline(bid.id)}
+                onCounter={() => {
+                  setCounterBidId(bid.id);
+                  setCounterAmount('');
+                }}
+                counterOpen={counterBidId === bid.id}
+                counterAmount={counterAmount}
+                onCounterAmountChange={setCounterAmount}
+                onCounterSubmit={() => handleCounter(bid)}
+                onCounterCancel={() => {
+                  setCounterBidId(null);
+                  setCounterAmount('');
+                }}
+              />
+            ))}
+
+            {otherBids.length > 0 && (
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest pt-2">
+                History · {otherBids.length}
+              </p>
+            )}
+
+            {otherBids.map((bid) => (
+              <BidCard
+                key={bid.id}
+                bid={bid}
+                askingRate={load?.rateUsd ?? 0}
+                acting={false}
+                readOnly
+              />
+            ))}
           </div>
-        </div>
-      )}
+        )}
+      </BottomSheet>
 
-      {error && (
-        <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-4 py-3 mb-3">{error}</p>
-      )}
-
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-        </div>
-      ) : bids.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-14 text-center">
-          <Users size={36} className="text-fx-text-dim mb-4" />
-          <p className="font-bold text-fx-text">No bids yet</p>
-          <p className="text-sm text-fx-text-muted mt-1">Carriers will appear here when they bid</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {pendingBids.length > 0 && (
-            <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
-              Pending · {pendingBids.length}
-            </p>
-          )}
-
-          {pendingBids.map((bid) => (
-            <BidCard
-              key={bid.id}
-              bid={bid}
-              askingRate={load?.rateUsd ?? 0}
-              acting={actingId === bid.id}
-              onAccept={() => handleAccept(bid.id)}
-              onDecline={() => handleDecline(bid.id)}
-              onCounter={() => {
-                setCounterBidId(bid.id);
-                setCounterAmount('');
-              }}
-              counterOpen={counterBidId === bid.id}
-              counterAmount={counterAmount}
-              onCounterAmountChange={setCounterAmount}
-              onCounterSubmit={() => handleCounter(bid)}
-              onCounterCancel={() => {
-                setCounterBidId(null);
-                setCounterAmount('');
-              }}
-            />
-          ))}
-
-          {otherBids.length > 0 && (
-            <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest pt-2">
-              History · {otherBids.length}
-            </p>
-          )}
-
-          {otherBids.map((bid) => (
-            <BidCard
-              key={bid.id}
-              bid={bid}
-              askingRate={load?.rateUsd ?? 0}
-              acting={false}
-              readOnly
-            />
-          ))}
-        </div>
-      )}
-    </BottomSheet>
-
-    <SignatureModal
-      open={!!sigModal}
-      onClose={() => setSigModal(null)}
-      bookingId={sigModal?.bookingId ?? ''}
-      loadNumber={sigModal?.loadNumber ?? ''}
-      onSigned={() => {
-        setSigModal(null);
-        onBidAccepted?.();
-      }}
-    />
+      <SignatureModal
+        open={!!sigModal}
+        onClose={() => setSigModal(null)}
+        bookingId={sigModal?.bookingId ?? ''}
+        loadNumber={sigModal?.loadNumber ?? ''}
+        onSigned={() => {
+          setSigModal(null);
+          onBidAccepted?.();
+        }}
+      />
     </>
   );
 }

@@ -9,6 +9,7 @@
 ## Checklist
 
 **Testing:**
+
 - [x] Vitest unit tests — schemas, utils, constants
 - [x] Component tests — login, load post, bid flow
 - [x] RLS policy tests (supabase test runner)
@@ -19,6 +20,7 @@
 - [x] Cross-browser — Chrome, Firefox, Safari, Edge
 
 **Performance:**
+
 - [x] Code splitting — all routes lazy-loaded
 - [x] No bundle chunk > 250KB
 - [x] Lighthouse > 85 on all pages
@@ -26,6 +28,7 @@
 - [x] Images optimized (WebP, lazy load)
 
 **Operations:**
+
 - [x] Sentry configured + alerting
 - [x] Vercel Analytics
 - [x] Uptime monitor
@@ -33,6 +36,7 @@
 - [x] CD pipeline — auto-deploy on main merge
 
 **Launch:**
+
 - [x] Privacy Policy
 - [x] Terms of Service
 - [x] Custom domain + SSL
@@ -81,6 +85,7 @@ pnpm add -D @testing-library/react @testing-library/user-event jsdom
 ```
 
 Test critical forms and interactions:
+
 - Login form submits → redirects to dashboard
 - Load posting form validates required fields
 - Bid form prevents submission under $0
@@ -179,6 +184,7 @@ Run `pnpm build:web` → opens bundle map in browser. Identify and lazy-load any
 ### Database Query Performance
 
 Check Supabase Dashboard → Database → Query Performance:
+
 - Add indexes for any query > 50ms
 - Use `.select('only,needed,columns')` — never `select('*')` in production
 - Paginate all list queries: `.range(from, to)`
@@ -254,6 +260,7 @@ jobs:
 ### Vercel CD
 
 Vercel auto-deploys when CI passes:
+
 1. In Vercel Project Settings → Git → "Require CI to pass before deployment"
 2. Every merge to `main` → auto-deploys to production
 3. Every PR → preview deployment with unique URL
@@ -273,12 +280,13 @@ import * as Sentry from '@sentry/react';
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,
   environment: import.meta.env.MODE,
-  tracesSampleRate: 0.1,          // 10% of transactions
-  replaysOnErrorSampleRate: 1.0,  // 100% of error sessions
+  tracesSampleRate: 0.1, // 10% of transactions
+  replaysOnErrorSampleRate: 1.0, // 100% of error sessions
 });
 ```
 
 Set up alerts:
+
 - Email on any new error
 - Slack alert on error spike (> 10 in 5 min)
 
@@ -287,28 +295,33 @@ Set up alerts:
 ## Launch Checklist
 
 ### Legal
+
 - [ ] Privacy Policy written and reviewed (cover CCPA + GDPR basics)
 - [ ] Terms of Service written and reviewed
 - [ ] Both published at `/privacy` and `/terms`
 
 ### Domain + SSL
+
 - [ ] Custom domain purchased (freightx.io or similar)
 - [ ] DNS pointed to Vercel
 - [ ] SSL certificate issued (Vercel handles this automatically)
 - [ ] `www` redirect to apex domain
 
 ### SEO
+
 - [ ] `<title>` and `<meta description>` on all pages
 - [ ] Open Graph image (`og:image`) for social sharing
 - [ ] `robots.txt` — allow search engines
 - [ ] `sitemap.xml` — landing page + public pages
 
 ### Onboarding
+
 - [ ] Welcome email on registration
 - [ ] In-app checklist: "Complete your profile → Add company → Post your first load"
 - [ ] Sample data or tutorial mode for new users
 
 ### Beta
+
 - [ ] Invite-only mode via invite codes or waitlist
 - [ ] In-app feedback widget (Canny, Typeform, or simple form)
 - [ ] Direct Slack/Discord channel for beta users
@@ -337,7 +350,6 @@ Set up alerts:
 4. Prioritize v2.0 roadmap based on what users actually ask for
 
 See [`DEVELOPMENT_ROADMAP.md`](./DEVELOPMENT_ROADMAP.md) for the post-launch v2.0 backlog.
-
 
 ## Production Hardening
 
@@ -429,8 +441,6 @@ This phase bridges the gap between "launch-ready" and "enterprise-ready." Based 
   - [x] Create webhook delivery queue
   - [x] Migrate email sending to queue
   - [x] Add scheduled jobs (load expiry, insurance alerts)
-
-
 
 ---
 

@@ -103,7 +103,13 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
       const stats = await getLaneStats({ originState, destState, equipment });
       setLaneStats(stats);
 
-      const suggestion = await suggestRate({ originState, destState, equipment, totalMiles: miles, laneStats: stats });
+      const suggestion = await suggestRate({
+        originState,
+        destState,
+        equipment,
+        totalMiles: miles,
+        laneStats: stats,
+      });
       setRateSuggestion(suggestion);
     } catch {
       // Non-fatal
@@ -204,7 +210,6 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
   return (
     <BottomSheet open={open} onClose={onClose} title="Post New Load">
       <form onSubmit={handleSubmit} className="space-y-5">
-
         {/* Templates Bar */}
         {templates.length > 0 && (
           <div>
@@ -215,7 +220,10 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
             >
               <Bookmark size={14} />
               Use Template
-              <ChevronDown size={12} className={`transition-transform ${showTemplates ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                size={12}
+                className={`transition-transform ${showTemplates ? 'rotate-180' : ''}`}
+              />
             </button>
             {showTemplates && (
               <div className="mt-2 space-y-1.5 max-h-40 overflow-y-auto rounded-xl border border-fx-border p-2 bg-fx-surface">
@@ -387,21 +395,36 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
               <div className="flex-1">
                 <p className="text-[10px] font-bold text-fx-orange uppercase tracking-widest mb-1">
                   AI Rate Suggestion
-                  {rateSuggestion.confidence === 'high' && <span className="ml-1 text-green-400">● High Confidence</span>}
-                  {rateSuggestion.confidence === 'medium' && <span className="ml-1 text-yellow-400">● Medium</span>}
-                  {rateSuggestion.confidence === 'low' && <span className="ml-1 text-fx-text-dim">● Low Data</span>}
+                  {rateSuggestion.confidence === 'high' && (
+                    <span className="ml-1 text-green-400">● High Confidence</span>
+                  )}
+                  {rateSuggestion.confidence === 'medium' && (
+                    <span className="ml-1 text-yellow-400">● Medium</span>
+                  )}
+                  {rateSuggestion.confidence === 'low' && (
+                    <span className="ml-1 text-fx-text-dim">● Low Data</span>
+                  )}
                 </p>
                 <p className="text-sm font-bold text-fx-text">
-                  ${rateSuggestion.suggested_low}/mi – ${rateSuggestion.suggested_mid}/mi – ${rateSuggestion.suggested_high}/mi
+                  ${rateSuggestion.suggested_low}/mi – ${rateSuggestion.suggested_mid}/mi – $
+                  {rateSuggestion.suggested_high}/mi
                 </p>
                 <p className="text-[11px] text-fx-text-muted mt-1">{rateSuggestion.reasoning}</p>
                 {laneStats && laneStats.sample_count > 0 && (
                   <p className="text-[10px] text-fx-text-dim mt-1">
-                    Based on {laneStats.sample_count} transaction{laneStats.sample_count !== 1 ? 's' : ''} · avg ${laneStats.avg_rate_per_mile}/mi
+                    Based on {laneStats.sample_count} transaction
+                    {laneStats.sample_count !== 1 ? 's' : ''} · avg ${laneStats.avg_rate_per_mile}
+                    /mi
                   </p>
                 )}
                 <div className="flex gap-2 mt-2">
-                  {([rateSuggestion.suggested_low, rateSuggestion.suggested_mid, rateSuggestion.suggested_high] as number[]).map((rpm, i) => {
+                  {(
+                    [
+                      rateSuggestion.suggested_low,
+                      rateSuggestion.suggested_mid,
+                      rateSuggestion.suggested_high,
+                    ] as number[]
+                  ).map((rpm, i) => {
                     const miles = parseInt(form.totalMiles);
                     const total = Math.round(rpm * miles);
                     const label = i === 0 ? 'Low' : i === 1 ? 'Mid' : 'High';

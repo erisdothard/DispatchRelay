@@ -608,23 +608,27 @@ Phase 13 filled the critical gaps between a working MVP and an enterprise-grade 
 ### What was built:
 
 **Step 0 — Gap Fixes**
+
 - `carrier_preferences` migration (Phase 11 blocker fixed)
 - `location-cleanup` pg_cron documentation (Phase 12 gap fixed)
 - LLM model strategy: Haiku for parsing, Sonnet for reasoning
 
 **13A — Critical Completions**
+
 - Email notifications via Resend (7 templates, wired into all bid/load/booking mutations)
 - SMS notifications via Twilio (critical events, opt-in)
 - Server-side pagination on all list queries (`.range()`, `loadMore()` hooks)
 - Audit log with admin viewer page
 
 **13B — Enterprise Operations**
+
 - Multi-user company teams (invite by email, role management, revoke access)
 - Load templates (save/apply any form state)
 - Digital e-signature on rate confirmations (canvas → Supabase Storage)
 - Accessorial charges (detention, lumper, TONU etc. with broker approval + invoice total)
 
 **13C — Trust & Intelligence**
+
 - Saved searches + lane alerts (email + SMS + in-app on matching loads)
 - Broker credit score display (avg days to pay, on-time %)
 - Preferred carrier lists + carrier blocking (RLS enforced)
@@ -632,12 +636,15 @@ Phase 13 filled the critical gaps between a working MVP and an enterprise-grade 
 - AI rate suggestion chip using Claude Sonnet on post-load form
 
 **13D — Scale Infrastructure**
+
 - Full-text search with GIN indexes + `search_vector` generated column
 - Background notification queue with retry/dead-letter
 - Real edge rate limiting via Vercel KV (replaces in-memory stub)
 
 ### Migrations added: 011–022
+
 ### Edge functions added: send-notification-email, send-sms, lane-alert, notification-worker
+
 ### Services added: email-notifications, company-members, saved-searches, rate-intelligence, accessorials
 
 ---

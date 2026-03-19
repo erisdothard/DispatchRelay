@@ -33,15 +33,20 @@ vi.mock('@/lib/supabase', () => {
 function makeBuilder(result: unknown) {
   const self: Record<string, unknown> = {};
   for (const m of [
-    'select', 'insert', 'update', 'delete',
-    'eq', 'order', 'limit', 'single', 'maybeSingle',
+    'select',
+    'insert',
+    'update',
+    'delete',
+    'eq',
+    'order',
+    'limit',
+    'single',
+    'maybeSingle',
   ]) {
     self[m] = vi.fn().mockReturnValue(self);
   }
-  self.then = (
-    onfulfilled: (v: unknown) => unknown,
-    onrejected: (v: unknown) => unknown,
-  ) => Promise.resolve(result).then(onfulfilled, onrejected);
+  self.then = (onfulfilled: (v: unknown) => unknown, onrejected: (v: unknown) => unknown) =>
+    Promise.resolve(result).then(onfulfilled, onrejected);
   return self;
 }
 
@@ -62,8 +67,9 @@ const mockFrom = vi.mocked(supabase.from);
 const mockStorageFrom = vi.mocked(supabase.storage.from);
 
 function storageOps() {
-  return mockStorageFrom.mock.results[mockStorageFrom.mock.results.length - 1]
-    ?.value as ReturnType<typeof mockStorageFrom>;
+  return mockStorageFrom.mock.results[mockStorageFrom.mock.results.length - 1]?.value as ReturnType<
+    typeof mockStorageFrom
+  >;
 }
 
 beforeEach(() => {

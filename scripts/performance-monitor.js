@@ -6,11 +6,7 @@
  */
 
 const BASE_URL = process.env.API_URL ?? 'http://localhost:3000';
-const ENDPOINTS = [
-  '/api/health',
-  '/api/loads',
-  '/api/trucks',
-];
+const ENDPOINTS = ['/api/health', '/api/loads', '/api/trucks'];
 
 async function measureEndpoint(url) {
   const start = performance.now();
@@ -31,7 +27,9 @@ async function main() {
   for (const endpoint of ENDPOINTS) {
     const result = await measureEndpoint(`${BASE_URL}${endpoint}`);
     const icon = result.ok ? '✅' : '❌';
-    console.log(`${icon}  ${result.url.padEnd(30)} ${String(result.ms).padStart(5)} ms  (HTTP ${result.status})`);
+    console.log(
+      `${icon}  ${result.url.padEnd(30)} ${String(result.ms).padStart(5)} ms  (HTTP ${result.status})`,
+    );
   }
 
   console.log('\nDone.');

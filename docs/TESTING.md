@@ -30,33 +30,34 @@ test/
 
 ---
 
-## test-features/phase-*/
+## test-features/phase-\*/
 
 Pure logic unit tests. Each file tests inline business logic (validation,
 filtering, status transitions, calculations) without importing app code or
 hitting Supabase. Fast — all 252 tests run in ~60ms.
 
 Examples:
+
 - `phase-2/loads/loads.test.ts` — load number formatting, form validation, filtering
 - `phase-4/bids/bids.test.ts` — bid delta math, amount validation, status rules
 - `phase-5/payments/payments.test.ts` — invoice fee calculation, payment method logic
 
 ---
 
-## test-features/services/  ← service integration tests
+## test-features/services/ ← service integration tests
 
 Tests the **real service functions** from `apps/web/src/services/` and
 `apps/web/src/features/*/lib/` by mocking `@/lib/supabase`. These verify
 that functions call the correct Supabase tables, forward the right arguments,
 run rows through the camelCase mapper, and throw/return correctly on errors.
 
-| File | Service tested | Key coverage |
-|------|---------------|--------------|
-| `loads.service.test.ts` | `loads.service.ts` | `getLoads` filter forwarding, mapper output, `createLoad` carrier notifications |
-| `bids.service.test.ts` | `bids.service.ts` | `submitBid` RPC call, non-critical RPC failure tolerance, `acceptBid`/`declineBid`/`bookNow` |
-| `stripe.service.test.ts` | `stripe.service.ts` | `selectPaymentMethod` fee (2% quick-pay vs null net-30), due date strings |
-| `documents.service.test.ts` | `documents.service.ts` | Storage upload → DB insert chain, error propagation order |
-| `location.service.test.ts` | `features/loads/lib/location.ts` | `insertLocationPing` field mapping, heading rounding, silent null on error |
+| File                        | Service tested                   | Key coverage                                                                                 |
+| --------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
+| `loads.service.test.ts`     | `loads.service.ts`               | `getLoads` filter forwarding, mapper output, `createLoad` carrier notifications              |
+| `bids.service.test.ts`      | `bids.service.ts`                | `submitBid` RPC call, non-critical RPC failure tolerance, `acceptBid`/`declineBid`/`bookNow` |
+| `stripe.service.test.ts`    | `stripe.service.ts`              | `selectPaymentMethod` fee (2% quick-pay vs null net-30), due date strings                    |
+| `documents.service.test.ts` | `documents.service.ts`           | Storage upload → DB insert chain, error propagation order                                    |
+| `location.service.test.ts`  | `features/loads/lib/location.ts` | `insertLocationPing` field mapping, heading rounding, silent null on error                   |
 
 Mock pattern used:
 

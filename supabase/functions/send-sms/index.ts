@@ -1,7 +1,7 @@
 import { corsHeaders } from '../_shared/cors.ts';
 
 interface SmsPayload {
-  to: string;      // E.164 format: +15551234567
+  to: string; // E.164 format: +15551234567
   message: string;
 }
 
@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { to, message } = await req.json() as SmsPayload;
+    const { to, message } = (await req.json()) as SmsPayload;
 
     if (!to || !message) {
       return new Response(JSON.stringify({ error: 'to and message are required' }), {
@@ -20,8 +20,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const accountSid   = Deno.env.get('TWILIO_ACCOUNT_SID');
-    const authToken    = Deno.env.get('TWILIO_AUTH_TOKEN');
+    const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+    const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
     const messagingSid = Deno.env.get('TWILIO_MESSAGING_SERVICE_SID');
 
     if (!accountSid || !authToken || !messagingSid) {
