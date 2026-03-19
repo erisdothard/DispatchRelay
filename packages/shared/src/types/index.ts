@@ -127,3 +127,149 @@ export interface TrackingMilestone {
   completed: boolean;
   current?: boolean;
 }
+
+// ── GPS & Tracking Types ──────────────────────────────────────────────────────
+
+export interface BreadcrumbPoint {
+  lat: number;
+  lng: number;
+  ts: number; // Unix ms
+  speed_ms?: number;
+}
+
+export interface BreadcrumbSnapshot {
+  id: string;
+  loadNumber: string;
+  driverId: string;
+  polyline: BreadcrumbPoint[];
+  totalPoints: number;
+  startTime: string;
+  endTime: string;
+}
+
+export interface TrackingToken {
+  id: string;
+  loadNumber: string;
+  token: string;
+  createdBy: string;
+  expiresAt: string;
+  revoked: boolean;
+}
+
+export interface Geofence {
+  id: string;
+  loadNumber: string;
+  stopType: 'pickup' | 'delivery';
+  label: string;
+  lat: number;
+  lng: number;
+  radiusM: number;
+}
+
+export interface GeofenceEvent {
+  id: string;
+  geofenceId: string;
+  loadNumber: string;
+  driverId: string;
+  eventType: 'enter' | 'exit';
+  lat: number;
+  lng: number;
+  recordedAt: string;
+}
+
+export interface DwellRecord {
+  id: string;
+  loadNumber: string;
+  geofenceId: string;
+  stopType: 'pickup' | 'delivery';
+  label: string;
+  enteredAt: string;
+  exitedAt?: string;
+  dwellMinutes?: number;
+  detentionFlagged: boolean;
+}
+
+// ── Driver Portal Types ───────────────────────────────────────────────────────
+
+export type TirePosition =
+  | 'front_left'
+  | 'front_right'
+  | 'rear_outer_left'
+  | 'rear_outer_right'
+  | 'rear_inner_left'
+  | 'rear_inner_right'
+  | 'trailer_left_1'
+  | 'trailer_right_1'
+  | 'trailer_left_2'
+  | 'trailer_right_2';
+
+export type TireSeverity = 'flat' | 'blowout' | 'low_pressure' | 'damage';
+
+export type TireResolution =
+  | 'changed_spare'
+  | 'roadside_service'
+  | 'patched'
+  | 'replaced'
+  | 'other';
+
+export interface TireIncident {
+  id: string;
+  driverId: string;
+  loadNumber?: string;
+  incidentDate: string;
+  locationText: string;
+  lat?: number;
+  lng?: number;
+  tirePosition: TirePosition;
+  severity: TireSeverity;
+  description?: string;
+  resolution?: TireResolution;
+  resolvedAt?: string;
+  photos: string[];
+  createdAt: string;
+}
+
+export type ReceiptCategory =
+  | 'fuel'
+  | 'maintenance'
+  | 'tolls'
+  | 'meals'
+  | 'lodging'
+  | 'parking'
+  | 'supplies'
+  | 'other';
+
+export interface Receipt {
+  id: string;
+  driverId: string;
+  loadNumber?: string;
+  category: ReceiptCategory;
+  amountUsd: number;
+  vendorName: string;
+  receiptDate: string;
+  notes?: string;
+  imageUrl: string;
+  imageThumbnailUrl?: string;
+  fileSizeBytes?: number;
+  createdAt: string;
+}
+
+// ── Scoring & ETA Types ───────────────────────────────────────────────────────
+
+export interface DriverScore {
+  id: string;
+  driverId: string;
+  loadNumber: string;
+  overallScore: number;
+  speedScore: number;
+  routeScore: number;
+  dwellScore: number;
+  details?: Record<string, unknown>;
+}
+
+export interface ETAResult {
+  estimatedArrival: string; // ISO
+  confidencePercent: number;
+  remainingMiles: number;
+  remainingMinutes: number;
+}

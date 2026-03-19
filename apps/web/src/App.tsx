@@ -36,8 +36,12 @@ const DriverDashboard = lazyRetry(() => import('@/pages/driver/dashboard'));
 const DriverLoadsPage = lazyRetry(() => import('@/pages/driver/loads'));
 const DriverDocumentsPage = lazyRetry(() => import('@/pages/driver/documents'));
 const DriverTeamPage = lazyRetry(() => import('@/pages/driver/team'));
+const DriverTireLogPage = lazyRetry(() => import('@/pages/driver/tire-log'));
+const DriverReceiptsPage = lazyRetry(() => import('@/pages/driver/receipts'));
+const DriverExpensesPage = lazyRetry(() => import('@/pages/driver/expenses'));
 
 const TrackingPage = lazyRetry(() => import('@/pages/tracking'));
+const PublicTrackingPage = lazyRetry(() => import('@/pages/public-tracking'));
 const MessagesPage = lazyRetry(() => import('@/pages/messages'));
 const ProfilePage = lazyRetry(() => import('@/pages/profile'));
 const HelpCenterPage = lazyRetry(() => import('@/pages/profile/help-center'));
@@ -63,6 +67,7 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/t/:token" element={<PublicTrackingPage />} />
 
           {/* Carrier */}
           <Route
@@ -159,6 +164,30 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="driver">
                 <DriverTeamPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/driver/tire-log"
+            element={
+              <ProtectedRoute requiredRole="driver">
+                <DriverTireLogPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/driver/receipts"
+            element={
+              <ProtectedRoute requiredRole="driver">
+                <DriverReceiptsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/driver/expenses"
+            element={
+              <ProtectedRoute requiredRole="driver">
+                <DriverExpensesPage />
               </ProtectedRoute>
             }
           />

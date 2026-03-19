@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, MessageSquare, User, Users, Package, BarChart2, FileText } from 'lucide-react';
+import { Home, Search, MessageSquare, User, Users, Package, BarChart2, FileText, DollarSign } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 type NavRole = 'carrier' | 'broker' | 'driver';
@@ -30,6 +30,7 @@ const driverNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/driver' },
   { label: 'My Loads', icon: <Package size={22} />, path: '/driver/loads' },
   { label: 'Documents', icon: <FileText size={22} />, path: '/driver/documents' },
+  { label: 'Expenses', icon: <DollarSign size={22} />, path: '/driver/expenses' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
 

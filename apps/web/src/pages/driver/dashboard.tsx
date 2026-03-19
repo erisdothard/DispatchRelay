@@ -11,6 +11,8 @@ import { getDriverLoads } from '@/services/loads.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
+import { useGpsConsent } from '@/features/loads/hooks/use-gps-consent';
+import { GpsConsentModal } from '@/features/loads/components/gps-consent-modal';
 import type { Load } from '@freightx/shared';
 
 /** Renders nothing — just activates GPS pinging for a single load */
@@ -47,6 +49,8 @@ export default function DriverDashboard() {
     }
   });
   const { notifications, unreadCount, markAllRead } = useNotifications();
+  const { hasConsented, grantConsent } = useGpsConsent();
+  const [consentModalOpen, setConsentModalOpen] = useState(false);
 
   // Persist GPS sharing toggle across sessions
   useEffect(() => {
@@ -117,7 +121,13 @@ export default function DriverDashboard() {
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
         {/* Share Location banner */}
         <button
-          onClick={() => setSharingLocation((v) => !v)}
+          onClick={() => {
+            if (!sharingLocation && !hasConsented) {
+              setConsentModalOpen(true);
+              return;
+            }
+            setSharingLocation((v) => !v);
+          }}
           className="w-full flex items-center justify-between rounded-2xl p-4 active-scale"
           style={{
             background: sharingLocation
@@ -263,11 +273,16 @@ export default function DriverDashboard() {
           <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
             Quick Actions
           </h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {[
               { label: 'My Loads', icon: '📦', action: () => navigate('/driver/loads') },
-              { label: 'Send Live GPS', icon: '📍', action: () => setSharingLocation(true) },
+              { label: 'Send GPS', icon: '📍', action: () => {
+                if (!hasConsented) { setConsentModalOpen(true); return; }
+                setSharingLocation(true);
+              }},
               { label: 'Documents', icon: '📄', action: () => navigate('/driver/documents') },
+              { label: 'Scan Receipt', icon: '🧾', action: () => navigate('/driver/receipts') },
+              { label: 'Tire Log', icon: '🛞', action: () => navigate('/driver/tire-log') },
               { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
             ].map((item) => (
               <button
@@ -291,6 +306,16 @@ export default function DriverDashboard() {
         notifications={notifications}
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
+      />
+
+      <GpsConsentModal
+        open={consentModalOpen}
+        onAllow={() => {
+          grantConsent();
+          setConsentModalOpen(false);
+          setSharingLocation(true);
+        }}
+        onDismiss={() => setConsentModalOpen(false)}
       />
     </div>
   );

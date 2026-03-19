@@ -39,12 +39,24 @@ if (typeof window !== 'undefined') {
   window.addEventListener('online', () => void flushQueue());
 }
 
+/* ── Client-side rate limiting ──────────────────────────── */
+const MIN_PING_INTERVAL_MS = 5_000; // 5 seconds minimum between pings per driver
+const lastPingByDriver = new Map<string, number>();
+
 /**
  * Write a single GPS ping to the location_pings table.
+ * Rate-limited to 1 ping per 5 seconds per driver.
  * If the insert fails (e.g. offline), the ping is queued and retried
  * automatically when the browser fires the 'online' event.
  */
 export async function insertLocationPing(ping: LocationPing) {
+  // Enforce minimum interval per driver
+  const lastTime = lastPingByDriver.get(ping.driver_id) ?? 0;
+  const now = Date.now();
+  if (now - lastTime < MIN_PING_INTERVAL_MS) {
+    return null; // Rate limited — skip this ping
+  }
+  lastPingByDriver.set(ping.driver_id, now);
   const row = {
     load_number: ping.load_number,
     driver_id: ping.driver_id,

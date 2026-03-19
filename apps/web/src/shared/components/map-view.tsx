@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, Circle, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { geocodeCity } from '@/lib/geocoding';
@@ -124,6 +124,13 @@ function ZoomControl() {
 
 // ── MapView ───────────────────────────────────────────────────────────────────
 
+interface GeofenceCircle {
+  lat: number;
+  lng: number;
+  radiusM: number;
+  label?: string;
+}
+
 interface MapViewProps {
   origin: { city: string; state: string };
   destination?: { city: string; state: string };
@@ -134,6 +141,12 @@ interface MapViewProps {
   livePosition?: [number, number];
   /** Direction of travel in degrees (0–360). Renders an arrow on the truck icon. */
   heading?: number | null;
+  /** Breadcrumb trail polyline for route replay */
+  breadcrumbTrail?: [number, number][];
+  /** Current index into breadcrumb trail for replay snap */
+  replayIndex?: number;
+  /** Geofence circles to render on the map */
+  geofences?: GeofenceCircle[];
 }
 
 export function MapView({
@@ -144,6 +157,9 @@ export function MapView({
   className = 'h-40',
   livePosition,
   heading,
+  breadcrumbTrail,
+  replayIndex,
+  geofences,
 }: MapViewProps) {
   const [originPos, setOriginPos] = useState<[number, number] | null>(null);
   const [destPos, setDestPos] = useState<[number, number] | null>(null);
@@ -274,6 +290,44 @@ export function MapView({
         {originPos && <Marker position={originPos} icon={originIcon} />}
         {destPos && <Marker position={destPos} icon={destIcon} />}
         {truckPos && <Marker position={truckPos} icon={truckIconRef.current} />}
+
+        {/* Breadcrumb trail polyline */}
+        {breadcrumbTrail && breadcrumbTrail.length > 1 && (
+          <Polyline
+            positions={breadcrumbTrail}
+            pathOptions={{
+              color: '#e86030',
+              weight: 2.5,
+              opacity: 0.7,
+              dashArray: '6 4',
+              lineCap: 'round',
+            }}
+          />
+        )}
+
+        {/* Replay snap position */}
+        {breadcrumbTrail && replayIndex != null && breadcrumbTrail[replayIndex] && (
+          <Marker
+            position={breadcrumbTrail[replayIndex]}
+            icon={makeTruckIcon(true)}
+          />
+        )}
+
+        {/* Geofence circles */}
+        {geofences?.map((gf, i) => (
+          <Circle
+            key={i}
+            center={[gf.lat, gf.lng]}
+            radius={gf.radiusM}
+            pathOptions={{
+              color: '#e86030',
+              fillColor: '#e86030',
+              fillOpacity: 0.1,
+              weight: 1.5,
+              opacity: 0.5,
+            }}
+          />
+        ))}
       </MapContainer>
 
       {/* Live badge */}
