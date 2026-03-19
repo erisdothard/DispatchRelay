@@ -4,6 +4,7 @@
  */
 import type { Load, Truck, TrackingMilestone } from '@freightx/shared';
 import type { LoadRow, TruckRow, TrackingMilestoneRow } from './database.types';
+import { titleCase } from './utils';
 
 export function rowToLoad(row: LoadRow): Load {
   return {
@@ -11,18 +12,18 @@ export function rowToLoad(row: LoadRow): Load {
     loadNumber: row.load_number,
     postedBy: row.posted_by ?? '',
     companyName: row.company_name,
-    originCity: row.origin_city,
-    originState: row.origin_state,
+    originCity: titleCase(row.origin_city),
+    originState: row.origin_state?.toUpperCase(),
     originAddress: row.origin_address ?? undefined,
     originZip: row.origin_zip ?? undefined,
-    destCity: row.dest_city,
-    destState: row.dest_state,
+    destCity: titleCase(row.dest_city),
+    destState: row.dest_state?.toUpperCase(),
     destAddress: row.dest_address ?? undefined,
     destZip: row.dest_zip ?? undefined,
     pickupDate: row.pickup_date,
     deliveryDate: row.delivery_date,
     equipment: row.equipment,
-    commodity: row.commodity,
+    commodity: titleCase(row.commodity),
     weightLbs: row.weight_lbs,
     rateUsd: row.rate_usd,
     ratePerMile: row.rate_per_mile ?? 0,
@@ -42,10 +43,10 @@ export function rowToTruck(row: TruckRow): Truck {
     id: row.id,
     postedBy: row.posted_by ?? '',
     companyName: row.company_name,
-    originCity: row.origin_city,
-    originState: row.origin_state,
-    destCity: row.dest_city ?? undefined,
-    destState: row.dest_state ?? undefined,
+    originCity: titleCase(row.origin_city),
+    originState: row.origin_state?.toUpperCase(),
+    destCity: row.dest_city ? titleCase(row.dest_city) : undefined,
+    destState: row.dest_state?.toUpperCase() ?? undefined,
     availableDate: row.available_date,
     equipment: row.equipment,
     lengthFt: row.length_ft ?? undefined,

@@ -10,6 +10,7 @@ import type { EquipmentType } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 import { getLaneStats, suggestRate } from '@/services/rate-intelligence.service';
 import type { RateSuggestion, LaneStats } from '@/services/rate-intelligence.service';
+import { titleCase } from '@/lib/utils';
 
 const EQUIPMENT_OPTIONS: EquipmentType[] = [
   'van',
@@ -26,10 +27,6 @@ function genLoadNumber(): string {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const seq = String(Math.floor(Math.random() * 9000) + 1000);
   return `FX-${date}-${seq}`;
-}
-
-function titleCase(s: string): string {
-  return s.trim().toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 const EMPTY_FORM = {
