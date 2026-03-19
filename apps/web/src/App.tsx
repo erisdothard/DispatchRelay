@@ -15,6 +15,7 @@ import OnboardingPage from '@/pages/onboarding';
 const CarrierDashboard = lazy(() => import('@/pages/carrier/dashboard'));
 const CarrierLoadsPage = lazy(() => import('@/pages/carrier/loads'));
 const CarrierFleetPage = lazy(() => import('@/pages/carrier/fleet'));
+const CarrierTeamPage = lazy(() => import('@/pages/carrier/team'));
 
 const BrokerDashboard = lazy(() => import('@/pages/broker/dashboard'));
 const BrokerLoadsPage = lazy(() => import('@/pages/broker/loads'));
@@ -72,6 +73,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="carrier">
                 <CarrierFleetPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/carrier/team"
+            element={
+              <ProtectedRoute requiredRole="carrier">
+                <CarrierTeamPage />
               </ProtectedRoute>
             }
           />

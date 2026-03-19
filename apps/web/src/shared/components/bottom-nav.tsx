@@ -13,7 +13,7 @@ interface NavItem {
 const carrierNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/carrier' },
   { label: 'Loads', icon: <Search size={22} />, path: '/carrier/loads' },
-  { label: 'Team', icon: <Users size={22} />, path: '/profile/team' },
+  { label: 'Team', icon: <Users size={22} />, path: '/carrier/team' },
   { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
