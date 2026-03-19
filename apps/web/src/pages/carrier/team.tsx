@@ -8,6 +8,7 @@ import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { Badge } from '@/shared/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import {
   getCompanyMembers,
   getCompanyInvites,
@@ -23,6 +24,15 @@ import { getMyActiveLoads } from '@/services/loads.service';
 import { useLiveTracking } from '@/features/loads/hooks/use-live-tracking';
 import type { Load } from '@freightx/shared';
 
+/* ── Types ─────────────────────────────────────────────────────── */
+
+interface DriverProfile {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  avatar_url: string | null;
+}
+
 /* ── Constants ─────────────────────────────────────────────────── */
 
 const ROLE_META: Record<MemberRole, { label: string; icon: React.ElementType; color: string }> = {
@@ -37,36 +47,32 @@ const INVITE_ROLES: MemberRole[] = ['admin', 'dispatcher', 'accounting', 'viewer
 
 type Tab = 'drivers' | 'manage';
 
-/* ── Driver cards (Drivers tab) ────────────────────────────────── */
+/* ── Driver cards (Drivers tab) — powered by loads, not company_members ── */
 
-function DriverCard({ member, loads }: { member: CompanyMember; loads: Load[] }) {
-  const driverLoads = loads.filter((l) => l.assignedDriverId === member.user_id);
+function DriverCard({ driver, loads }: { driver: DriverProfile; loads: Load[] }) {
+  const driverLoads = loads.filter((l) => l.assignedDriverId === driver.id);
   const activeLoad = driverLoads.find((l) => l.status === 'in_transit');
+  const name = driver.full_name ?? driver.email ?? 'Unknown';
 
   return (
     <div className="bg-fx-surface border border-fx-border rounded-2xl p-4">
       <div className="flex items-center gap-3 mb-3">
         <div className="w-11 h-11 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center shrink-0">
           <span className="text-sm font-extrabold text-fx-orange">
-            {(member.full_name ?? 'U').split(' ').map((n) => n[0]).join('').slice(0, 2)}
+            {name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
           </span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-fx-text truncate">
-            {member.full_name ?? member.email ?? 'Unknown'}
+          <p className="text-sm font-bold text-fx-text truncate">{name}</p>
+          <p className="text-[11px] text-fx-text-dim">
+            {driverLoads.length} load{driverLoads.length !== 1 ? 's' : ''} assigned
           </p>
-          <p className="text-[11px] text-fx-text-dim">{ROLE_META[member.role]?.label ?? member.role}</p>
         </div>
         <Badge variant={activeLoad ? 'orange' : 'green'}>
           {activeLoad ? 'In Transit' : 'Available'}
         </Badge>
       </div>
       {activeLoad && <ActiveLoadRow load={activeLoad} />}
-      {!activeLoad && driverLoads.length > 0 && (
-        <p className="text-xs text-fx-text-muted">
-          {driverLoads.length} load{driverLoads.length !== 1 ? 's' : ''} assigned
-        </p>
-      )}
     </div>
   );
 }
@@ -126,12 +132,16 @@ export default function CarrierTeamPage() {
   const [tab, setTab] = useState<Tab>(initialTab);
 
   const { profile, company, user } = useAuth();
+
+  // Drivers tab state — from loads
+  const [loads, setLoads] = useState<Load[]>([]);
+  const [driverProfiles, setDriverProfiles] = useState<DriverProfile[]>([]);
+
+  // Manage tab state — from company_members
   const [members, setMembers] = useState<CompanyMember[]>([]);
   const [invites, setInvites] = useState<CompanyInvite[]>([]);
-  const [loads, setLoads] = useState<Load[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Manage tab state
+  const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<MemberRole>('dispatcher');
   const [inviting, setInviting] = useState(false);
@@ -141,7 +151,6 @@ export default function CarrierTeamPage() {
   const companyId = company?.id;
   const myRole = members.find((m) => m.user_id === profile?.id)?.role;
   const canManage = myRole === 'owner' || myRole === 'admin';
-  const drivers = members.filter((m) => m.role !== 'owner');
   const inTransitCount = loads.filter((l) => l.status === 'in_transit' && l.assignedDriverId).length;
 
   useEffect(() => {
@@ -149,15 +158,29 @@ export default function CarrierTeamPage() {
       setLoading(false);
       return;
     }
+
     Promise.all([
+      getMyActiveLoads(user.id),
       getCompanyMembers(companyId),
       getCompanyInvites(companyId),
-      getMyActiveLoads(user.id),
     ])
-      .then(([m, i, l]) => {
+      .then(async ([l, m, i]) => {
+        setLoads(l);
         setMembers(m);
         setInvites(i);
-        setLoads(l);
+
+        // Get unique driver IDs from loads
+        const driverIds = [...new Set(
+          l.map((load) => load.assignedDriverId).filter(Boolean) as string[]
+        )];
+
+        if (driverIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, full_name, email, avatar_url')
+            .in('id', driverIds);
+          setDriverProfiles((profiles as DriverProfile[]) ?? []);
+        }
       })
       .catch((err) => console.error('Failed to load team:', err))
       .finally(() => setLoading(false));
@@ -231,11 +254,11 @@ export default function CarrierTeamPage() {
             <Loader2 size={24} className="text-fx-orange animate-spin" />
           </div>
         ) : tab === 'drivers' ? (
-          /* ── Drivers tab ──────────────────────────────── */
+          /* ── Drivers tab — real drivers from loads ──── */
           <>
             <div className="bg-fx-surface border border-fx-border rounded-2xl p-4 grid grid-cols-2 gap-4">
               <div className="text-center">
-                <p className="text-2xl font-extrabold text-fx-orange">{drivers.length}</p>
+                <p className="text-2xl font-extrabold text-fx-orange">{driverProfiles.length}</p>
                 <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mt-0.5">Drivers</p>
               </div>
               <div className="text-center">
@@ -244,24 +267,18 @@ export default function CarrierTeamPage() {
               </div>
             </div>
 
-            {drivers.length === 0 ? (
+            {driverProfiles.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <Users size={40} className="text-fx-text-dim mb-3" />
-                <p className="font-bold text-fx-text">No team members yet</p>
-                <p className="text-sm text-fx-text-muted mt-1 mb-4">
-                  Invite drivers to get started
+                <p className="font-bold text-fx-text">No drivers assigned yet</p>
+                <p className="text-sm text-fx-text-muted mt-1">
+                  Assign a driver to a load to see them here
                 </p>
-                <button
-                  onClick={() => switchTab('manage')}
-                  className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
-                >
-                  + Invite Driver
-                </button>
               </div>
             ) : (
               <div className="space-y-3">
-                {drivers.map((member) => (
-                  <DriverCard key={member.id} member={member} loads={loads} />
+                {driverProfiles.map((driver) => (
+                  <DriverCard key={driver.id} driver={driver} loads={loads} />
                 ))}
               </div>
             )}
