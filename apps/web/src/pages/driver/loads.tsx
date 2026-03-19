@@ -47,19 +47,23 @@ export default function DriverLoadsPage() {
     fetchLoads();
   }, [fetchLoads]);
 
-  const filtered = loads.filter((l) => {
-    if (statusFilter !== 'All' && l.status !== statusFilter) return false;
-    if (search) {
-      const s = search.toLowerCase();
-      return (
-        l.loadNumber.toLowerCase().includes(s) ||
-        l.originCity.toLowerCase().includes(s) ||
-        l.destCity.toLowerCase().includes(s) ||
-        l.commodity?.toLowerCase().includes(s)
-      );
-    }
-    return true;
-  });
+  const STATUS_ORDER: Record<string, number> = { in_transit: 0, dispatched: 1, awarded: 2, delivered: 3 };
+
+  const filtered = loads
+    .filter((l) => {
+      if (statusFilter !== 'All' && l.status !== statusFilter) return false;
+      if (search) {
+        const s = search.toLowerCase();
+        return (
+          l.loadNumber.toLowerCase().includes(s) ||
+          l.originCity.toLowerCase().includes(s) ||
+          l.destCity.toLowerCase().includes(s) ||
+          l.commodity?.toLowerCase().includes(s)
+        );
+      }
+      return true;
+    })
+    .sort((a, b) => (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9));
 
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">
