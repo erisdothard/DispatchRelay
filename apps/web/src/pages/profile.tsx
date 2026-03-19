@@ -81,7 +81,7 @@ export default function ProfilePage() {
           icon: Users,
           label: 'Team Members',
           description: 'Invite & manage team',
-          onPress: () => navigate('/profile/team'),
+          onPress: () => navigate('/carrier/team?tab=manage'),
         },
       ],
     },

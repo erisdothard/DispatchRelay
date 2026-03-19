@@ -33,7 +33,6 @@ const PrivacyPage = lazy(() => import('@/pages/legal/privacy'));
 const TermsPage = lazy(() => import('@/pages/legal/terms'));
 const AdminDashboard = lazy(() => import('@/pages/admin/dashboard'));
 const AuditLogPage = lazy(() => import('@/pages/admin/audit-log'));
-const TeamPage = lazy(() => import('@/pages/profile/team'));
 const NotFound = lazy(() => import('@/pages/not-found'));
 
 export default function App() {
@@ -195,14 +194,6 @@ export default function App() {
           />
 
           {/* Profile sub-pages */}
-          <Route
-            path="/profile/team"
-            element={
-              <ProtectedRoute>
-                <TeamPage />
-              </ProtectedRoute>
-            }
-          />
 
           {/* Fallback */}
           <Route path="/404" element={<NotFound />} />

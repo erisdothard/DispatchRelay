@@ -23,7 +23,7 @@ const QUICK_ACTIONS = [
     label: 'My Team',
     sub: 'Manage drivers',
     icon: <Users size={20} className="text-fx-orange" />,
-    path: '/profile/team',
+    path: '/carrier/team',
   },
   {
     label: 'Your Location',
