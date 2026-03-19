@@ -251,7 +251,12 @@ export async function assignDriver(loadId: string, driverId: string): Promise<Lo
     .eq('id', loadId)
     .select()
     .single();
-  if (error) throw error;
+  if (error) {
+    if (error.code === 'PGRST116') {
+      throw new Error('Unable to assign driver — you may not have permission to update this load. Ensure you have an accepted bid on this load.');
+    }
+    throw error;
+  }
 
   // Notify driver of assignment
   await supabase.from('notifications').insert({

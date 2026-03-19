@@ -111,6 +111,21 @@ export async function acceptInvite(token: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+export async function getPendingInviteByEmail(email: string): Promise<CompanyInvite | null> {
+  const { data, error } = await db
+    .from('company_invites')
+    .select('*')
+    .eq('email', email.toLowerCase())
+    .is('accepted_at', null)
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as CompanyInvite;
+}
+
 export async function getMyCompanyRole(companyId: string): Promise<MemberRole | null> {
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) return null;
