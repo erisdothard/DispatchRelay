@@ -37,6 +37,7 @@ interface LoadStatusStepperProps {
   role: UserRole;
   hasDriverAssigned?: boolean;
   onStatusAdvanced?: (newStatus: LoadStatus) => void;
+  onDispatched?: () => void;
 }
 
 export function LoadStatusStepper({
@@ -45,6 +46,7 @@ export function LoadStatusStepper({
   role,
   hasDriverAssigned = false,
   onStatusAdvanced,
+  onDispatched,
 }: LoadStatusStepperProps) {
   const [advancing, setAdvancing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +68,7 @@ export function LoadStatusStepper({
     try {
       await updateLoad(loadId, { status: nextStatus });
       onStatusAdvanced?.(nextStatus);
+      if (nextStatus === 'dispatched') onDispatched?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to update status');
     } finally {

@@ -244,6 +244,7 @@ export function LoadDetailSheet({
               role={role}
               hasDriverAssigned={!!load.assignedDriverId}
               onStatusAdvanced={(s) => setCurrentStatus(s)}
+              onDispatched={() => setDocsOpen(true)}
             />
           </div>
         )}

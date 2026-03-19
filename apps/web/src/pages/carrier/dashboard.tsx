@@ -5,6 +5,8 @@ import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyActiveLoads } from '@/services/loads.service';
+import { getBolStatusForLoads } from '@/services/documents.service';
+import type { BolStatus } from '@/services/documents.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { AssignDriverSheet } from '@/features/loads/components/assign-driver-sheet';
@@ -43,6 +45,7 @@ export default function CarrierDashboard() {
   const navigate = useNavigate();
   const { profile, company, user } = useAuth();
   const [loads, setLoads] = useState<Load[]>([]);
+  const [bolStatuses, setBolStatuses] = useState<BolStatus[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
   const [assignLoad, setAssignLoad] = useState<Load | null>(null);
 
@@ -50,11 +53,28 @@ export default function CarrierDashboard() {
 
   useEffect(() => {
     if (user?.id) {
-      getMyActiveLoads(user.id).then(setLoads).catch(console.error);
+      getMyActiveLoads(user.id)
+        .then((all) => {
+          setLoads(all);
+          const ids = all.map((l) => l.id);
+          if (ids.length > 0) {
+            getBolStatusForLoads(ids).then(setBolStatuses).catch(console.error);
+          }
+        })
+        .catch(console.error);
     }
   }, [user?.id]);
 
-  const recentLoads = loads.slice(0, 3);
+  const statusPriority: Record<string, number> = {
+    in_transit: 0,
+    dispatched: 1,
+    awarded: 2,
+    delivered: 3,
+    completed: 4,
+  };
+  const recentLoads = [...loads]
+    .sort((a, b) => (statusPriority[a.status] ?? 5) - (statusPriority[b.status] ?? 5))
+    .slice(0, 3);
   const currentLoad =
     loads.find((l) => ['dispatched', 'in_transit', 'awarded'].includes(l.status)) ??
     loads[0] ??
@@ -238,38 +258,58 @@ export default function CarrierDashboard() {
             </div>
 
             <div className="space-y-3">
-              {recentLoads.map((load, i) => (
-                <button
-                  key={load.id}
-                  onClick={() => navigate(`/track/${load.loadNumber}`)}
-                  className="relative w-full bg-orange-gradient rounded-ios p-5 card-orange-highlight text-left active-scale overflow-hidden grain"
-                  style={{
-                    filter: i === 1 ? 'brightness(0.91)' : i === 2 ? 'brightness(0.82)' : 'none',
-                  }}
-                >
-                  <p
-                    className="text-[32px] font-extrabold text-white leading-none mb-1"
-                    style={{ letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}
+              {recentLoads.map((load, i) => {
+                const bol = bolStatuses.find((b) => b.loadId === load.id);
+                const showBolBadge = ['dispatched', 'in_transit'].includes(load.status);
+
+                return (
+                  <button
+                    key={load.id}
+                    onClick={() => navigate(`/track/${load.loadNumber}`)}
+                    className="relative w-full bg-orange-gradient rounded-ios p-5 card-orange-highlight text-left active-scale overflow-hidden grain"
+                    style={{
+                      filter: i === 1 ? 'brightness(0.91)' : i === 2 ? 'brightness(0.82)' : 'none',
+                    }}
                   >
-                    {load.loadNumber}
-                  </p>
-                  <p className="text-[11px] text-white/50 font-medium mb-3 tracking-wide uppercase">
-                    {load.commodity} · {load.totalMiles ? `${load.totalMiles} mi` : '—'}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-[13px] text-white/80 font-semibold">
-                      {load.originCity} → {load.destCity}
+                    <p
+                      className="text-[32px] font-extrabold text-white leading-none mb-1"
+                      style={{ letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}
+                    >
+                      {load.loadNumber}
                     </p>
-                    <span className="text-[11px] font-bold text-white bg-black/25 px-2.5 py-1 rounded-full">
-                      {load.status === 'delivered'
-                        ? 'Delivered'
-                        : load.status === 'in_transit'
-                          ? 'In Transit'
-                          : 'Posted'}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    <p className="text-[11px] text-white/50 font-medium mb-3 tracking-wide uppercase">
+                      {load.commodity} · {load.totalMiles ? `${load.totalMiles} mi` : '—'}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[13px] text-white/80 font-semibold">
+                        {load.originCity} → {load.destCity}
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        {showBolBadge && bol && (
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              bol.signed
+                                ? 'bg-green-500/30 text-green-200'
+                                : bol.hasBol
+                                  ? 'bg-orange-400/30 text-orange-200'
+                                  : 'bg-white/15 text-white/60'
+                            }`}
+                          >
+                            {bol.signed ? 'BOL Signed' : bol.hasBol ? 'BOL Pending' : 'No BOL'}
+                          </span>
+                        )}
+                        <span className="text-[11px] font-bold text-white bg-black/25 px-2.5 py-1 rounded-full">
+                          {load.status === 'delivered'
+                            ? 'Delivered'
+                            : load.status === 'in_transit'
+                              ? 'In Transit'
+                              : 'Posted'}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}

@@ -51,6 +51,37 @@ export async function uploadDocument(params: {
   return data as DocumentRow;
 }
 
+export interface BolStatus {
+  loadId: string;
+  hasBol: boolean;
+  signed: boolean;
+}
+
+export async function getBolStatusForLoads(loadIds: string[]): Promise<BolStatus[]> {
+  if (loadIds.length === 0) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('documents')
+    .select('load_id, signed_at')
+    .in('load_id', loadIds)
+    .eq('type', 'bill_of_lading');
+  if (error) return loadIds.map((id) => ({ loadId: id, hasBol: false, signed: false }));
+
+  const bolByLoad = new Map<string, { hasBol: boolean; signed: boolean }>();
+  for (const row of data ?? []) {
+    const existing = bolByLoad.get(row.load_id);
+    bolByLoad.set(row.load_id, {
+      hasBol: true,
+      signed: existing?.signed || !!row.signed_at,
+    });
+  }
+  return loadIds.map((id) => ({
+    loadId: id,
+    hasBol: bolByLoad.get(id)?.hasBol ?? false,
+    signed: bolByLoad.get(id)?.signed ?? false,
+  }));
+}
+
 export async function getSignedUrl(filePath: string): Promise<string> {
   const { data, error } = await supabase.storage.from('documents').createSignedUrl(filePath, 3600); // 1 hour
   if (error) throw new Error(error.message);

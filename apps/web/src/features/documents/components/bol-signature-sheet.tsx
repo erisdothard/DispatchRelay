@@ -156,6 +156,29 @@ export function BolSignatureSheet({
         }).catch(console.warn);
       }
 
+      // In-app notification to carrier (non-blocking)
+      (async () => {
+        const { data: loadRow } = await supabase
+          .from('loads')
+          .select('company_id')
+          .eq('id', loadId)
+          .single();
+        if (!loadRow?.company_id) return;
+        const { data: co } = await supabase
+          .from('companies')
+          .select('owner_id')
+          .eq('id', loadRow.company_id)
+          .single();
+        if (!co?.owner_id) return;
+        await supabase.from('notifications').insert({
+          user_id: co.owner_id,
+          type: 'bol_signed',
+          title: 'BOL Signed',
+          body: `Driver ${signatoryName.trim()} signed BOL for load ${loadNumber}`,
+          load_id: loadId,
+        });
+      })().catch(console.warn);
+
       onSigned(signatureUrl);
       onClose();
     } catch (err) {
