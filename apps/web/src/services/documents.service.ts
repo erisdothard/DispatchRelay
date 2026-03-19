@@ -2,6 +2,9 @@ import { supabase } from '@/lib/supabase';
 import type { DocumentRow, DocumentType } from '@/lib/database.types';
 import { notifyBolSigned } from '@/services/email-notifications.service';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any;
+
 export type { DocumentRow };
 
 export async function getDocumentsForLoad(loadId: string): Promise<DocumentRow[]> {
@@ -150,7 +153,7 @@ export async function notifyBolSignedParties(params: {
         tasks.push(notifyBolSigned({ email, ...emailData }).catch(console.warn));
       }
       tasks.push(
-        supabase.from('notifications').insert({
+        db.from('notifications').insert({
           user_id: userId,
           type: 'bol_signed',
           title: 'BOL Signed',

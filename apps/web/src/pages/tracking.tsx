@@ -8,7 +8,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getLoadByNumber, getTrackingMilestones } from '@/services/loads.service';
 import { useLiveTracking } from '@/features/loads/hooks/use-live-tracking';
 import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
+import { useBreadcrumbTrail } from '@/features/loads/hooks/use-breadcrumb-trail';
+import { RouteReplaySlider } from '@/features/loads/components/route-replay-slider';
+import { usePredictiveETA } from '@/features/loads/hooks/use-predictive-eta';
 import { supabase } from '@/lib/supabase';
+import { createTrackingToken } from '@/services/tracking-tokens.service';
 import type { Load, TrackingMilestone } from '@freightx/shared';
 
 export default function TrackingPage() {
@@ -77,12 +81,24 @@ export default function TrackingPage() {
     active: gpsSending && !!load,
   });
 
+  // Breadcrumb trail + replay
+  const breadcrumb = useBreadcrumbTrail(load?.loadNumber ?? null);
+  const breadcrumbPositions: [number, number][] = breadcrumb.trail.map((p) => [p.lat, p.lng]);
+
+  // Predictive ETA
+  const { eta } = usePredictiveETA({
+    loadNumber: load?.loadNumber ?? null,
+    destCity: load?.destCity ?? '',
+    destState: load?.destState ?? '',
+    active: gpsEligible && !!livePosition,
+  });
+
   // Human-readable speed (km/h) and accuracy
   const speedKmh = livePing?.speed_ms != null ? Math.round(livePing.speed_ms * 3.6) : null;
   const accuracyM = livePing?.accuracy_m ?? null;
 
   // Staleness tracking — re-renders every 15 s to keep "X min ago" fresh
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 15_000);
     return () => clearInterval(timer);
@@ -243,6 +259,8 @@ export default function TrackingPage() {
                 inTransit={gpsEligible}
                 livePosition={livePosition}
                 heading={heading}
+                breadcrumbTrail={breadcrumbPositions.length > 1 ? breadcrumbPositions : undefined}
+                replayIndex={breadcrumb.playing || breadcrumb.replayIndex > 0 ? breadcrumb.replayIndex : undefined}
                 className="h-44 mb-3"
               />
 
@@ -333,7 +351,42 @@ export default function TrackingPage() {
                   <span className="ml-auto text-green-400 font-semibold">GPS</span>
                 </div>
               )}
+
+              {/* Predictive ETA */}
+              {eta && (
+                <div className="flex items-center gap-3 mt-2 pt-2 border-t border-white/5">
+                  <div className="flex-1">
+                    <p className="text-[11px] text-fx-text-dim uppercase tracking-wide font-medium">
+                      ETA
+                    </p>
+                    <p className="text-sm font-bold text-white">
+                      {new Date(eta.estimatedArrival).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
+                      <span className="text-fx-text-dim font-normal text-xs ml-1">
+                        ({eta.confidencePercent}% confidence, {eta.remainingMiles} mi remaining)
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* Route Replay Slider */}
+            {breadcrumb.trail.length > 1 && (
+              <RouteReplaySlider
+                totalPoints={breadcrumb.trail.length}
+                currentIndex={breadcrumb.replayIndex}
+                onIndexChange={breadcrumb.setReplayIndex}
+                playing={breadcrumb.playing}
+                onPlay={breadcrumb.play}
+                onPause={breadcrumb.pause}
+                speed={breadcrumb.speed}
+                onSpeedChange={breadcrumb.setSpeed}
+                timestamp={breadcrumb.replayTimestamp}
+              />
+            )}
 
             {/* Contact card */}
             <div className="bg-fx-surface rounded-ios p-4 flex items-center gap-3 card-highlight">
@@ -488,19 +541,26 @@ export default function TrackingPage() {
                 >
                   {copied ? 'Copied!' : 'Copy Load #'}
                 </button>
-                {/* Share */}
+                {/* Share — creates public tracking token */}
                 <button
                   className="w-full h-14 flex items-center justify-center text-[16px] font-medium text-white active-scale"
                   style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
                   onClick={async () => {
-                    const shareData = {
-                      title: `FreightX — ${load.loadNumber}`,
-                      text: `Track load ${load.loadNumber}: ${load.originCity}, ${load.originState} → ${load.destCity}, ${load.destState}`,
-                      url: window.location.href,
-                    };
-                    if (navigator.share) {
-                      await navigator.share(shareData).catch(() => null);
-                    } else {
+                    try {
+                      const token = await createTrackingToken(load.loadNumber, user!.id);
+                      const publicUrl = `${window.location.origin}/t/${token}`;
+                      const shareData = {
+                        title: `FreightX — ${load.loadNumber}`,
+                        text: `Track load ${load.loadNumber}: ${load.originCity}, ${load.originState} → ${load.destCity}, ${load.destState}`,
+                        url: publicUrl,
+                      };
+                      if (navigator.share) {
+                        await navigator.share(shareData).catch(() => null);
+                      } else {
+                        await navigator.clipboard.writeText(publicUrl);
+                      }
+                    } catch {
+                      // Fallback to current URL
                       await navigator.clipboard.writeText(window.location.href);
                     }
                     setMenuOpen(false);
