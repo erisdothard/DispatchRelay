@@ -11,7 +11,6 @@ import {
   User,
   Building2,
   UserCheck,
-  Users,
 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils';
@@ -129,8 +128,15 @@ export default function OnboardingPage() {
           return;
         }
       } catch {
-        // No invite or acceptance failed — continue to step 3
+        // No invite or acceptance failed
       }
+
+      // Drivers MUST have an invite — block signup if none found
+      setLoading(false);
+      setError(
+        'No invite found for this email. Ask your carrier to invite you from their Team → Manage page first.',
+      );
+      return;
     }
 
     setLoading(false);
@@ -343,47 +349,11 @@ export default function OnboardingPage() {
       {/* ── Step 3: Company details ── */}
       {step === 3 && (
         <div className="flex flex-col gap-4 flex-1">
-          {/* Driver-specific: suggest asking carrier for invite */}
-          {selected === 'driver' && (
-            <div className="bg-fx-orange/10 border border-fx-orange/20 rounded-2xl p-5 mb-2">
-              <div className="flex items-center gap-3 mb-2">
-                <Users size={20} className="text-fx-orange shrink-0" />
-                <p className="text-[15px] font-bold text-white">Join your carrier's team</p>
-              </div>
-              <p className="text-sm text-fx-text-muted leading-relaxed">
-                Ask your carrier to invite you from their{' '}
-                <span className="text-fx-orange font-semibold">Team</span> page. Once invited,
-                you'll automatically join their company and appear in their driver list.
-              </p>
-              <Button
-                size="lg"
-                fullWidth
-                onClick={() => navigate('/driver')}
-                className="rounded-2xl font-bold mt-4"
-              >
-                Go to Dashboard <ArrowRight size={18} />
-              </Button>
-            </div>
-          )}
-
-          {/* Divider for drivers */}
-          {selected === 'driver' && (
-            <div className="flex items-center gap-3 my-1">
-              <div className="flex-1 h-px bg-fx-border" />
-              <span className="text-xs text-fx-text-dim font-medium">
-                or create your own company
-              </span>
-              <div className="flex-1 h-px bg-fx-border" />
-            </div>
-          )}
-
-          {selected !== 'driver' && (
-            <p className="text-fx-text-muted text-sm -mt-2 mb-2">
-              Tell us about your{' '}
-              <span className="text-fx-orange font-semibold">{selectedRole?.label}</span> company.
-              This builds your public profile.
-            </p>
-          )}
+          <p className="text-fx-text-muted text-sm -mt-2 mb-2">
+            Tell us about your{' '}
+            <span className="text-fx-orange font-semibold">{selectedRole?.label}</span> company.
+            This builds your public profile.
+          </p>
 
           {/* Company name — required */}
           <div className="relative">
