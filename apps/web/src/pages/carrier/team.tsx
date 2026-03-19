@@ -72,27 +72,50 @@ function DriverCard({
   );
 }
 
+const STATUS_BADGE: Record<string, { label: string; variant: 'orange' | 'blue' | 'green' | 'gray' }> = {
+  in_transit: { label: 'In Transit', variant: 'orange' },
+  dispatched: { label: 'Dispatched', variant: 'blue' },
+  awarded: { label: 'Awarded', variant: 'blue' },
+  delivered: { label: 'Delivered', variant: 'green' },
+  completed: { label: 'Completed', variant: 'gray' },
+};
+
+const DONE_STATUSES = new Set(['delivered', 'completed']);
+
 function ActiveLoadRow({ load }: { load: Load }) {
-  const ping = useLiveTracking(load.loadNumber);
+  const isDone = DONE_STATUSES.has(load.status);
+  // Skip realtime subscription for completed loads
+  const ping = useLiveTracking(isDone ? null : load.loadNumber);
   const speedMph = ping?.speed_ms != null ? Math.round(ping.speed_ms * 2.237) : null;
   const lastPing = ping?.recorded_at
     ? new Date(ping.recorded_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     : null;
 
+  const badge = STATUS_BADGE[load.status];
+
   return (
-    <div className="bg-fx-surface-2 border border-fx-border rounded-xl p-3 space-y-2">
+    <div className={`bg-fx-surface-2 border border-fx-border rounded-xl p-3 space-y-2${isDone ? ' opacity-50' : ''}`}>
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
-        {ping ? (
-          <span className="text-[10px] text-green-400 font-semibold flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-            Live GPS
-          </span>
-        ) : (
-          <span className="text-[10px] text-fx-text-dim flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-fx-text-dim rounded-full" />
-            No GPS
-          </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
+          {badge && (
+            <Badge variant={badge.variant} className="text-[9px] px-1.5 py-0">
+              {badge.label}
+            </Badge>
+          )}
+        </div>
+        {!isDone && (
+          ping ? (
+            <span className="text-[10px] text-green-400 font-semibold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+              Live GPS
+            </span>
+          ) : (
+            <span className="text-[10px] text-fx-text-dim flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-fx-text-dim rounded-full" />
+              No GPS
+            </span>
+          )
         )}
       </div>
       <div className="flex items-center gap-1.5">
@@ -101,7 +124,7 @@ function ActiveLoadRow({ load }: { load: Load }) {
           {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
         </p>
       </div>
-      {ping && (
+      {!isDone && ping && (
         <div className="flex items-center gap-3 text-[11px] text-fx-text-dim">
           {speedMph != null && (
             <span className="flex items-center gap-1">
@@ -173,7 +196,10 @@ function DriverDetailSheet({
               Assigned Loads ({driverLoads.length})
             </p>
             <div className="space-y-2">
-              {driverLoads.map((load) => (
+              {[...driverLoads].sort((a, b) => {
+                const p: Record<string, number> = { in_transit: 0, dispatched: 1, awarded: 2, delivered: 3, completed: 4 };
+                return (p[a.status] ?? 5) - (p[b.status] ?? 5);
+              }).map((load) => (
                 <ActiveLoadRow key={load.id} load={load} />
               ))}
             </div>
