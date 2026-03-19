@@ -298,7 +298,7 @@ export async function getCompanyDrivers(
 ): Promise<Array<{ id: string; fullName: string; email: string }>> {
   const { data, error } = await (supabase as any)
     .from('company_members')
-    .select('user_id, profiles!inner(id, full_name, email, role)')
+    .select('user_id, profiles!company_members_user_id_fkey(id, full_name, email, role)')
     .eq('company_id', companyId);
 
   if (error) throw error;

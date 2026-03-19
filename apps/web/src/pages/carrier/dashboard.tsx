@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, ArrowUpRight, MapPin, Navigation, Package, Users, UserCheck } from 'lucide-react';
+import { Bell, ArrowUpRight, MapPin, Navigation, Package, UserCheck } from 'lucide-react';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,12 +18,6 @@ const QUICK_ACTIONS = [
     sub: 'Tracking ID',
     icon: <Navigation size={20} className="text-fx-orange" />,
     path: '/track',
-  },
-  {
-    label: 'My Team',
-    sub: 'Manage drivers',
-    icon: <Users size={20} className="text-fx-orange" />,
-    path: '/carrier/team',
   },
   {
     label: 'Your Location',
