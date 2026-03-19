@@ -189,6 +189,17 @@ export default function DriverDocumentsPage() {
                   <p className="text-sm font-semibold text-fx-text">
                     {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
                   </p>
+                  {(load.originAddress || load.destAddress) && (
+                    <p className="text-[11px] text-fx-text-dim mt-0.5">
+                      {load.originAddress && (
+                        <span>{load.originAddress}{load.originZip ? ` ${load.originZip}` : ''}</span>
+                      )}
+                      {load.originAddress && load.destAddress && ' → '}
+                      {load.destAddress && (
+                        <span>{load.destAddress}{load.destZip ? ` ${load.destZip}` : ''}</span>
+                      )}
+                    </p>
+                  )}
                 </div>
 
                 {/* Documents list */}

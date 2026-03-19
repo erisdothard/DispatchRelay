@@ -143,6 +143,17 @@ export default function DriverLoadsPage() {
               <p className="text-sm font-bold text-fx-text mb-1">
                 {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
               </p>
+              {(load.originAddress || load.destAddress) && (
+                <p className="text-[11px] text-fx-text-dim mb-1">
+                  {load.originAddress && (
+                    <span>{load.originAddress}{load.originZip ? ` ${load.originZip}` : ''}</span>
+                  )}
+                  {load.originAddress && load.destAddress && ' → '}
+                  {load.destAddress && (
+                    <span>{load.destAddress}{load.destZip ? ` ${load.destZip}` : ''}</span>
+                  )}
+                </p>
+              )}
 
               {/* Meta row */}
               <div className="flex items-center gap-3 text-xs text-fx-text-muted">

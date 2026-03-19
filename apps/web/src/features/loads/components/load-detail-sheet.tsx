@@ -147,25 +147,45 @@ export function LoadDetailSheet({
             border: '1px solid rgba(240,112,64,0.2)',
           }}
         >
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
-                Origin
-              </p>
-              <p className="text-[17px] font-extrabold text-white tracking-tight">
-                {load.originCity}, {load.originState}
-              </p>
-            </div>
-            <ArrowRight size={20} className="text-fx-orange shrink-0" strokeWidth={2.5} />
-            <div className="flex-1 text-right">
-              <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
-                Destination
-              </p>
-              <p className="text-[17px] font-extrabold text-white tracking-tight">
-                {load.destCity}, {load.destState}
-              </p>
-            </div>
-          </div>
+          {(() => {
+            const showFullAddress =
+              ACTIVE_STATUSES.includes(liveStatus) || role === 'driver';
+            return (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
+                      Origin
+                    </p>
+                    <p className="text-[17px] font-extrabold text-white tracking-tight">
+                      {load.originCity}, {load.originState}
+                    </p>
+                    {showFullAddress && load.originAddress && (
+                      <p className="text-[12px] text-fx-text-muted mt-0.5">
+                        {load.originAddress}
+                        {load.originZip ? ` ${load.originZip}` : ''}
+                      </p>
+                    )}
+                  </div>
+                  <ArrowRight size={20} className="text-fx-orange shrink-0" strokeWidth={2.5} />
+                  <div className="flex-1 text-right">
+                    <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
+                      Destination
+                    </p>
+                    <p className="text-[17px] font-extrabold text-white tracking-tight">
+                      {load.destCity}, {load.destState}
+                    </p>
+                    {showFullAddress && load.destAddress && (
+                      <p className="text-[12px] text-fx-text-muted mt-0.5">
+                        {load.destAddress}
+                        {load.destZip ? ` ${load.destZip}` : ''}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
           {load.totalMiles && (
             <div className="flex items-center justify-center">
               <span className="text-[11px] font-semibold text-fx-text-dim bg-fx-surface/60 px-3 py-1 rounded-full">

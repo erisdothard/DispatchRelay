@@ -156,8 +156,12 @@ export type Database = {
           company_name: string;
           origin_city: string;
           origin_state: string;
+          origin_address: string | null;
+          origin_zip: string | null;
           dest_city: string;
           dest_state: string;
+          dest_address: string | null;
+          dest_zip: string | null;
           pickup_date: string;
           delivery_date: string;
           equipment: EquipmentType;
@@ -183,8 +187,12 @@ export type Database = {
           company_name: string;
           origin_city: string;
           origin_state: string;
+          origin_address?: string | null;
+          origin_zip?: string | null;
           dest_city: string;
           dest_state: string;
+          dest_address?: string | null;
+          dest_zip?: string | null;
           pickup_date: string;
           delivery_date: string;
           equipment: EquipmentType;
@@ -210,8 +218,12 @@ export type Database = {
           company_name?: string;
           origin_city?: string;
           origin_state?: string;
+          origin_address?: string | null;
+          origin_zip?: string | null;
           dest_city?: string;
           dest_state?: string;
+          dest_address?: string | null;
+          dest_zip?: string | null;
           pickup_date?: string;
           delivery_date?: string;
           equipment?: EquipmentType;

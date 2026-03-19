@@ -28,11 +28,19 @@ function genLoadNumber(): string {
   return `FX-${date}-${seq}`;
 }
 
+function titleCase(s: string): string {
+  return s.trim().toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 const EMPTY_FORM = {
+  originAddress: '',
   originCity: '',
   originState: '',
+  originZip: '',
+  destAddress: '',
   destCity: '',
   destState: '',
+  destZip: '',
   pickupDate: '',
   deliveryDate: '',
   equipment: 'van' as EquipmentType,
@@ -171,14 +179,18 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         posted_by: user.id,
         company_id: company.id,
         company_name: company.name,
-        origin_city: form.originCity.trim(),
+        origin_city: titleCase(form.originCity),
         origin_state: form.originState.trim().toUpperCase().slice(0, 2),
-        dest_city: form.destCity.trim(),
+        origin_address: form.originAddress.trim() || null,
+        origin_zip: form.originZip.trim() || null,
+        dest_city: titleCase(form.destCity),
         dest_state: form.destState.trim().toUpperCase().slice(0, 2),
+        dest_address: form.destAddress.trim() || null,
+        dest_zip: form.destZip.trim() || null,
         pickup_date: form.pickupDate,
         delivery_date: form.deliveryDate,
         equipment: form.equipment,
-        commodity: form.commodity.trim(),
+        commodity: titleCase(form.commodity),
         weight_lbs: parseInt(form.weightLbs),
         rate_usd: rateUsd,
         rate_per_mile: ratePerMile,
@@ -247,22 +259,37 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
           <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
             Origin
           </p>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="col-span-2">
+          <div className="space-y-2">
+            <Input
+              placeholder="Street Address"
+              value={form.originAddress}
+              onChange={(e) => set('originAddress', e.target.value)}
+            />
+            <div className="grid grid-cols-6 gap-2">
+              <div className="col-span-3">
+                <Input
+                  placeholder="City"
+                  value={form.originCity}
+                  onChange={(e) => set('originCity', e.target.value)}
+                  required
+                />
+              </div>
               <Input
-                placeholder="City"
-                value={form.originCity}
-                onChange={(e) => set('originCity', e.target.value)}
+                placeholder="ST"
+                maxLength={2}
+                value={form.originState}
+                onChange={(e) => set('originState', e.target.value)}
                 required
               />
+              <div className="col-span-2">
+                <Input
+                  placeholder="ZIP"
+                  maxLength={10}
+                  value={form.originZip}
+                  onChange={(e) => set('originZip', e.target.value)}
+                />
+              </div>
             </div>
-            <Input
-              placeholder="ST"
-              maxLength={2}
-              value={form.originState}
-              onChange={(e) => set('originState', e.target.value)}
-              required
-            />
           </div>
         </div>
 
@@ -271,22 +298,37 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
           <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
             Destination
           </p>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="col-span-2">
+          <div className="space-y-2">
+            <Input
+              placeholder="Street Address"
+              value={form.destAddress}
+              onChange={(e) => set('destAddress', e.target.value)}
+            />
+            <div className="grid grid-cols-6 gap-2">
+              <div className="col-span-3">
+                <Input
+                  placeholder="City"
+                  value={form.destCity}
+                  onChange={(e) => set('destCity', e.target.value)}
+                  required
+                />
+              </div>
               <Input
-                placeholder="City"
-                value={form.destCity}
-                onChange={(e) => set('destCity', e.target.value)}
+                placeholder="ST"
+                maxLength={2}
+                value={form.destState}
+                onChange={(e) => set('destState', e.target.value)}
                 required
               />
+              <div className="col-span-2">
+                <Input
+                  placeholder="ZIP"
+                  maxLength={10}
+                  value={form.destZip}
+                  onChange={(e) => set('destZip', e.target.value)}
+                />
+              </div>
             </div>
-            <Input
-              placeholder="ST"
-              maxLength={2}
-              value={form.destState}
-              onChange={(e) => set('destState', e.target.value)}
-              required
-            />
           </div>
         </div>
 

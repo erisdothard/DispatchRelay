@@ -52,8 +52,12 @@ export interface Load {
   companyName: string;
   originCity: string;
   originState: string;
+  originAddress?: string;
+  originZip?: string;
   destCity: string;
   destState: string;
+  destAddress?: string;
+  destZip?: string;
   pickupDate: string;
   deliveryDate: string;
   equipment: EquipmentType;
