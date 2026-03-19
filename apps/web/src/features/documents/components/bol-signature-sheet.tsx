@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Loader2, RotateCcw, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { notifyBolSigned } from '@/services/email-notifications.service';
+import { markBolSigned, notifyBolSignedParties } from '@/services/documents.service';
 
 interface BolSignatureSheetProps {
   open: boolean;
@@ -11,13 +11,12 @@ interface BolSignatureSheetProps {
   loadNumber: string;
   origin: string;
   dest: string;
-  brokerEmail?: string;
   onSigned: (signatureUrl: string) => void;
 }
 
 /**
- * BOL signature sheet — reuses the same canvas signature pattern
- * from the booking SignatureModal but writes to the documents table.
+ * Loader/dock-worker BOL signature capture.
+ * Driver hands phone to the loader at pickup — they sign on the canvas.
  */
 export function BolSignatureSheet({
   open,
@@ -27,7 +26,6 @@ export function BolSignatureSheet({
   loadNumber,
   origin,
   dest,
-  brokerEmail,
   onSigned,
 }: BolSignatureSheetProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -133,51 +131,21 @@ export function BolSignatureSheet({
       const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
       const signatureUrl = urlData.publicUrl;
 
-      // Update the document record with signature info
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: updateError } = await (supabase as any)
-        .from('documents')
-        .update({
-          signed_at: new Date().toISOString(),
-          signature_url: signatureUrl,
-          signatory_name: signatoryName.trim(),
-        })
-        .eq('id', documentId);
-      if (updateError) throw updateError;
+      // Mark document as signed
+      await markBolSigned({
+        documentId,
+        signatoryName: signatoryName.trim(),
+        signatureUrl,
+      });
 
-      // Notify broker via email (non-blocking)
-      if (brokerEmail) {
-        notifyBolSigned({
-          email: brokerEmail,
-          loadNumber,
-          origin,
-          dest,
-          signedBy: signatoryName.trim(),
-        }).catch(console.warn);
-      }
-
-      // In-app notification to carrier (non-blocking)
-      (async () => {
-        const { data: loadRow } = await supabase
-          .from('loads')
-          .select('company_id')
-          .eq('id', loadId)
-          .single();
-        if (!loadRow?.company_id) return;
-        const { data: co } = await supabase
-          .from('companies')
-          .select('owner_id')
-          .eq('id', loadRow.company_id)
-          .single();
-        if (!co?.owner_id) return;
-        await supabase.from('notifications').insert({
-          user_id: co.owner_id,
-          type: 'bol_signed',
-          title: 'BOL Signed',
-          body: `Driver ${signatoryName.trim()} signed BOL for load ${loadNumber}`,
-          load_id: loadId,
-        });
-      })().catch(console.warn);
+      // Notify broker + carrier (non-blocking)
+      notifyBolSignedParties({
+        loadId,
+        loadNumber,
+        origin,
+        dest,
+        signerName: signatoryName.trim(),
+      }).catch(console.warn);
 
       onSigned(signatureUrl);
       onClose();
@@ -198,10 +166,11 @@ export function BolSignatureSheet({
         style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.08)' }}
       >
         <div>
-          <h2 className="text-lg font-bold text-fx-text">Sign Bill of Lading</h2>
+          <h2 className="text-lg font-bold text-fx-text">Loader Signature — Bill of Lading</h2>
           <p className="text-sm text-fx-text-muted mt-0.5">
             Load {loadNumber} · {origin} → {dest}
           </p>
+          <p className="text-xs text-fx-text-dim mt-1">Have the loader/dock worker sign below</p>
         </div>
 
         {/* Signature pad */}
@@ -239,11 +208,11 @@ export function BolSignatureSheet({
         {/* Printed name */}
         <div>
           <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
-            Print Name
+            Loader Name
           </p>
           <input
             type="text"
-            placeholder="Your full name"
+            placeholder="Loader's full name"
             value={signatoryName}
             onChange={(e) => setSignatoryName(e.target.value)}
             className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
@@ -270,7 +239,7 @@ export function BolSignatureSheet({
               </>
             ) : (
               <>
-                <Check size={16} /> Sign BOL
+                <Check size={16} /> Confirm Signature
               </>
             )}
           </button>

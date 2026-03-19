@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { DocumentRow, DocumentType } from '@/lib/database.types';
+import { notifyBolSigned } from '@/services/email-notifications.service';
 
 export type { DocumentRow };
 
@@ -80,6 +81,89 @@ export async function getBolStatusForLoads(loadIds: string[]): Promise<BolStatus
     hasBol: bolByLoad.get(id)?.hasBol ?? false,
     signed: bolByLoad.get(id)?.signed ?? false,
   }));
+}
+
+/**
+ * Mark a BOL document as signed and notify broker + carrier.
+ */
+export async function markBolSigned(params: {
+  documentId: string;
+  signatoryName: string;
+  signatureUrl?: string;
+}): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('documents')
+    .update({
+      signed_at: new Date().toISOString(),
+      signature_url: params.signatureUrl ?? null,
+      signatory_name: params.signatoryName,
+    })
+    .eq('id', params.documentId);
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * After a BOL is signed, notify both the broker (load poster)
+ * and the carrier (accepted bidder) via email + in-app notification.
+ * Non-blocking — failures are logged but never thrown.
+ */
+export async function notifyBolSignedParties(params: {
+  loadId: string;
+  loadNumber: string;
+  origin: string;
+  dest: string;
+  signerName: string;
+}): Promise<void> {
+  const { loadId, loadNumber, origin, dest, signerName } = params;
+  const body = `${signerName} signed BOL for load ${loadNumber}`;
+  const emailData = { loadNumber, origin, dest, signedBy: signerName };
+
+  try {
+    // Parallel: resolve broker (load poster) + carrier (accepted bid)
+    const [loadRes, bidRes] = await Promise.all([
+      supabase.from('loads').select('posted_by').eq('id', loadId).single(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).from('bids').select('carrier_id').eq('load_id', loadId).eq('status', 'accepted').limit(1).single(),
+    ]);
+
+    const brokerUserId: string | null = loadRes.data?.posted_by ?? null;
+    const carrierUserId: string | null = bidRes.data?.carrier_id ?? null;
+
+    // Resolve both emails in parallel
+    const userIds = [brokerUserId, carrierUserId].filter(Boolean) as string[];
+    if (userIds.length === 0) return;
+
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, email')
+      .in('id', userIds);
+
+    const emailMap = new Map((profiles ?? []).map((p) => [p.id, p.email]));
+
+    // Fire all emails + in-app notifications in parallel (non-blocking)
+    const tasks: Promise<unknown>[] = [];
+
+    for (const userId of userIds) {
+      const email = emailMap.get(userId);
+      if (email) {
+        tasks.push(notifyBolSigned({ email, ...emailData }).catch(console.warn));
+      }
+      tasks.push(
+        supabase.from('notifications').insert({
+          user_id: userId,
+          type: 'bol_signed',
+          title: 'BOL Signed',
+          body,
+          load_id: loadId,
+        }).then(undefined, console.warn),
+      );
+    }
+
+    await Promise.all(tasks);
+  } catch (err) {
+    console.warn('[notifyBolSignedParties] Non-fatal error:', err);
+  }
 }
 
 export async function getSignedUrl(filePath: string): Promise<string> {
