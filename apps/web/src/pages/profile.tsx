@@ -80,8 +80,8 @@ export default function ProfilePage() {
         {
           icon: Users,
           label: 'Team Members',
-          description: 'Invite & manage team',
-          onPress: () => navigate('/carrier/team-settings'),
+          description: role === 'driver' ? 'View your team' : 'Invite & manage team',
+          onPress: () => navigate(role === 'driver' ? '/driver/team' : '/carrier/team-settings'),
         },
       ],
     },
