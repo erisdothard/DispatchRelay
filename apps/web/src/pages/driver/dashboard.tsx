@@ -285,9 +285,8 @@ export default function DriverDashboard() {
           <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
             Quick Actions
           </h2>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'My Loads', icon: '📦', action: () => navigate('/driver/loads') },
               {
                 label: 'Send GPS',
                 icon: '📍',
@@ -299,7 +298,6 @@ export default function DriverDashboard() {
                   setSharingLocation(true);
                 },
               },
-              { label: 'Documents', icon: '📄', action: () => navigate('/driver/documents') },
               { label: 'Scan Receipt', icon: '🧾', action: () => navigate('/driver/receipts') },
               { label: 'Tire Log', icon: '🛞', action: () => navigate('/driver/tire-log') },
               { label: 'Messages', icon: '💬', action: () => navigate('/messages') },

@@ -19,25 +19,40 @@ interface RelRow {
   status: RelationshipStatus;
   notes: string | null;
   created_at: string;
-  companies: { name: string } | null;
 }
 
 export async function getRelationships(): Promise<CarrierRelationship[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('carrier_relationships')
-    .select(
-      'id, broker_company_id, carrier_company_id, status, notes, created_at, companies:carrier_company_id(name)',
-    )
+    .select('id, broker_company_id, carrier_company_id, status, notes, created_at')
     .order('created_at', { ascending: false });
 
   if (error) throw new Error((error as { message: string }).message);
 
-  return ((data as RelRow[]) ?? []).map((row) => ({
+  const rows = (data as RelRow[]) ?? [];
+
+  // Batch-fetch company names separately (avoids broken FK join)
+  const carrierIds = [...new Set(rows.map((r) => r.carrier_company_id).filter(Boolean))];
+  const nameMap = new Map<string, string>();
+
+  if (carrierIds.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: companies } = await (supabase as any)
+      .from('companies')
+      .select('id, name')
+      .in('id', carrierIds);
+
+    for (const c of (companies as { id: string; name: string }[]) ?? []) {
+      nameMap.set(c.id, c.name);
+    }
+  }
+
+  return rows.map((row) => ({
     id: row.id,
     broker_company_id: row.broker_company_id,
     carrier_company_id: row.carrier_company_id,
-    carrier_company_name: row.companies?.name ?? null,
+    carrier_company_name: nameMap.get(row.carrier_company_id) ?? null,
     status: row.status,
     notes: row.notes,
     created_at: row.created_at,
