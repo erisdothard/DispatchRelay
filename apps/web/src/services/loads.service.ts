@@ -297,13 +297,13 @@ export async function assignCoDriver(loadId: string, driverId: string | null): P
 }
 
 /**
- * Get loads assigned to a specific driver.
+ * Get loads assigned to a specific driver (primary or co-driver).
  */
 export async function getDriverLoads(driverId: string, status?: string): Promise<Load[]> {
   let query = supabase
     .from('loads')
     .select('*')
-    .eq('assigned_driver_id', driverId)
+    .or(`assigned_driver_id.eq.${driverId},second_driver_id.eq.${driverId}`)
     .order('pickup_date', { ascending: true });
 
   if (status) {
