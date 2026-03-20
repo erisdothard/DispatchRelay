@@ -81,9 +81,7 @@ export function RouteReplaySlider({
               key={s}
               onClick={() => onSpeedChange(s)}
               className={`h-7 px-2.5 rounded-lg text-[11px] font-bold transition-all ${
-                speed === s
-                  ? 'bg-fx-orange text-white'
-                  : 'bg-white/5 text-fx-text-dim'
+                speed === s ? 'bg-fx-orange text-white' : 'bg-white/5 text-fx-text-dim'
               }`}
             >
               {s}x

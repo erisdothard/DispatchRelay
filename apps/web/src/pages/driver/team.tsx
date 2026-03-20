@@ -1,13 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Users,
-  Loader2,
-  Crown,
-  Shield,
-  Truck,
-  Calculator,
-  Eye,
-} from 'lucide-react';
+import { Users, Loader2, Crown, Shield, Truck, Calculator, Eye } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';

@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase';
 
-const EDGE_FN_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
 
 interface EmailTrigger {
   template: string;

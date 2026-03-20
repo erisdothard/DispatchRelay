@@ -28,9 +28,11 @@ export function usePredictiveETA({
   // Geocode destination once
   useEffect(() => {
     if (!active || !destCity || !destState) return;
-    geocodeCity(destCity, destState).then((coords) => {
-      destCoordsRef.current = coords;
-    }).catch(() => undefined);
+    geocodeCity(destCity, destState)
+      .then((coords) => {
+        destCoordsRef.current = coords;
+      })
+      .catch(() => undefined);
   }, [active, destCity, destState]);
 
   // Calculate ETA periodically (every 30s aligning with ping frequency)

@@ -58,7 +58,14 @@ export default function TrackingPage() {
   const progress = milestones.length > 0 ? (completedCount / milestones.length) * 100 : 0;
 
   // GPS stays active for any non-terminal status (i.e. until delivered)
-  const GPS_TERMINAL = new Set(['delivered', 'cancelled', 'tonu', 'rejected', 'draft', 'pending_approval']);
+  const GPS_TERMINAL = new Set([
+    'delivered',
+    'cancelled',
+    'tonu',
+    'rejected',
+    'draft',
+    'pending_approval',
+  ]);
   const gpsEligible = !!load && !GPS_TERMINAL.has(load.status);
 
   const role =
@@ -205,7 +212,9 @@ export default function TrackingPage() {
                             ? 'Dispatched'
                             : load.status === 'awarded'
                               ? 'Awarded'
-                              : load.status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+                              : load.status
+                                  .replace(/_/g, ' ')
+                                  .replace(/\b\w/g, (c) => c.toUpperCase()),
                     accent: true,
                   },
                   {
@@ -260,7 +269,11 @@ export default function TrackingPage() {
                 livePosition={livePosition}
                 heading={heading}
                 breadcrumbTrail={breadcrumbPositions.length > 1 ? breadcrumbPositions : undefined}
-                replayIndex={breadcrumb.playing || breadcrumb.replayIndex > 0 ? breadcrumb.replayIndex : undefined}
+                replayIndex={
+                  breadcrumb.playing || breadcrumb.replayIndex > 0
+                    ? breadcrumb.replayIndex
+                    : undefined
+                }
                 className="h-44 mb-3"
               />
 

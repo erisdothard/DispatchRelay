@@ -37,10 +37,7 @@ export async function createGeofenceForLoad(params: {
 }
 
 export async function getGeofencesForLoad(loadNumber: string): Promise<Geofence[]> {
-  const { data, error } = await db
-    .from('geofences')
-    .select('*')
-    .eq('load_number', loadNumber);
+  const { data, error } = await db.from('geofences').select('*').eq('load_number', loadNumber);
   if (error) return [];
   return (data ?? []).map((row: Record<string, unknown>) => ({
     id: row.id,

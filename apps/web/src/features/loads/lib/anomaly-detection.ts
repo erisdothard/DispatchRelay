@@ -20,10 +20,7 @@ interface Ping {
  * Detect GPS anomalies by comparing current ping to previous.
  * Returns detected anomalies (can be multiple).
  */
-export function detectAnomalies(
-  current: Ping,
-  previous: Ping | null,
-): AnomalyResult[] {
+export function detectAnomalies(current: Ping, previous: Ping | null): AnomalyResult[] {
   if (!previous) return [];
 
   const anomalies: AnomalyResult[] = [];

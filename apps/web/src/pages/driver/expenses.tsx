@@ -60,12 +60,16 @@ export default function ExpensesPage() {
   const { start, end } = useMemo(() => getMonthRange(year, month), [year, month]);
 
   function prevMonth() {
-    if (month === 0) { setMonth(11); setYear(year - 1); }
-    else setMonth(month - 1);
+    if (month === 0) {
+      setMonth(11);
+      setYear(year - 1);
+    } else setMonth(month - 1);
   }
   function nextMonth() {
-    if (month === 11) { setMonth(0); setYear(year + 1); }
-    else setMonth(month + 1);
+    if (month === 11) {
+      setMonth(0);
+      setYear(year + 1);
+    } else setMonth(month + 1);
   }
 
   useEffect(() => {
@@ -129,11 +133,17 @@ export default function ExpensesPage() {
       {/* Month selector */}
       <div className="px-5 pb-4">
         <div className="flex items-center justify-between bg-fx-surface border border-fx-border rounded-2xl p-3">
-          <button onClick={prevMonth} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+          <button
+            onClick={prevMonth}
+            className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center"
+          >
             <ChevronLeft size={16} className="text-fx-text-dim" />
           </button>
           <p className="text-sm font-semibold text-white">{monthLabel}</p>
-          <button onClick={nextMonth} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+          <button
+            onClick={nextMonth}
+            className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center"
+          >
             <ChevronRight size={16} className="text-fx-text-dim" />
           </button>
         </div>

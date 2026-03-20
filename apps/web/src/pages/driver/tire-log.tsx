@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Plus, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -7,7 +7,7 @@ import { Badge } from '@/shared/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTireIncidents } from '@/services/tire-incidents.service';
 import { TireIncidentForm } from '@/features/driver/components/tire-incident-form';
-import { TIRE_POSITION_LABELS } from '@/features/driver/components/tire-position-selector';
+import { TIRE_POSITION_LABELS } from '@/features/driver/lib/tire-constants';
 import type { TireIncident } from '@freightx/shared';
 
 const SEVERITY_COLORS: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
@@ -31,18 +31,18 @@ export default function TireLogPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  function fetchIncidents() {
+  const fetchIncidents = useCallback(() => {
     if (!user?.id) return;
     setLoading(true);
     getTireIncidents(user.id)
       .then(setIncidents)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }
+  }, [user?.id]);
 
   useEffect(() => {
     fetchIncidents();
-  }, [user?.id]);
+  }, [fetchIncidents]);
 
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">

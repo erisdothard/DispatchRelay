@@ -101,10 +101,7 @@ export async function getExpenseSummary(
   startDate?: string,
   endDate?: string,
 ): Promise<ExpenseSummary> {
-  let query = db
-    .from('receipts')
-    .select('category, amount_usd')
-    .eq('driver_id', driverId);
+  let query = db.from('receipts').select('category, amount_usd').eq('driver_id', driverId);
 
   if (startDate) query = query.gte('receipt_date', startDate);
   if (endDate) query = query.lte('receipt_date', endDate);

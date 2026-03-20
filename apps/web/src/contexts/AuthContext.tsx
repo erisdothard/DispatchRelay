@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // 2. Fallback: find company via company_members
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: membership } = await (supabase as any)
       .from('company_members')
       .select('company_id')

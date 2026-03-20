@@ -16,10 +16,7 @@ function generateHexToken(length = 32): string {
  * Create a shareable tracking token for a load.
  * Returns the token string (not the full record).
  */
-export async function createTrackingToken(
-  loadNumber: string,
-  createdBy: string,
-): Promise<string> {
+export async function createTrackingToken(loadNumber: string, createdBy: string): Promise<string> {
   const token = generateHexToken();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -88,9 +85,6 @@ export async function getLoadByToken(token: string): Promise<{
 }
 
 export async function revokeToken(token: string): Promise<void> {
-  const { error } = await db
-    .from('tracking_tokens')
-    .update({ revoked: true })
-    .eq('token', token);
+  const { error } = await db.from('tracking_tokens').update({ revoked: true }).eq('token', token);
   if (error) throw new Error(error.message);
 }

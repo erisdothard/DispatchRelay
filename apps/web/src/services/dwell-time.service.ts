@@ -59,10 +59,7 @@ export async function endDwell(dwellId: string): Promise<DwellRecord> {
 }
 
 export async function flagDetention(dwellId: string): Promise<void> {
-  await db
-    .from('dwell_records')
-    .update({ detention_flagged: true })
-    .eq('id', dwellId);
+  await db.from('dwell_records').update({ detention_flagged: true }).eq('id', dwellId);
 }
 
 export async function getDwellRecords(loadNumber: string): Promise<DwellRecord[]> {

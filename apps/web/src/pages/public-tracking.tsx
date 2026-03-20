@@ -38,7 +38,14 @@ export default function PublicTrackingPage() {
   const completedCount = milestones.filter((m) => m.completed).length;
   const progress = milestones.length > 0 ? (completedCount / milestones.length) * 100 : 0;
 
-  const GPS_TERMINAL = new Set(['delivered', 'cancelled', 'tonu', 'rejected', 'draft', 'pending_approval']);
+  const GPS_TERMINAL = new Set([
+    'delivered',
+    'cancelled',
+    'tonu',
+    'rejected',
+    'draft',
+    'pending_approval',
+  ]);
   const gpsEligible = !!load && !GPS_TERMINAL.has(load.status);
 
   const livePing = useLiveTracking(loadNumber);
@@ -108,23 +115,42 @@ export default function PublicTrackingPage() {
               </div>
               <div className="grid grid-cols-2 gap-y-4">
                 <div>
-                  <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">From</p>
-                  <p className="text-[14px] font-semibold text-white">{load.originCity}, {load.originState}</p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">To</p>
-                  <p className="text-[14px] font-semibold text-white">{load.destCity}, {load.destState}</p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">Status</p>
-                  <p className="text-[14px] font-semibold text-fx-orange">
-                    {load.status === 'in_transit' ? 'In Transit' : load.status === 'delivered' ? 'Delivered' : load.status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                  <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">
+                    From
+                  </p>
+                  <p className="text-[14px] font-semibold text-white">
+                    {load.originCity}, {load.originState}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">Delivery</p>
+                  <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">
+                    To
+                  </p>
                   <p className="text-[14px] font-semibold text-white">
-                    {new Date(load.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {load.destCity}, {load.destState}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">
+                    Status
+                  </p>
+                  <p className="text-[14px] font-semibold text-fx-orange">
+                    {load.status === 'in_transit'
+                      ? 'In Transit'
+                      : load.status === 'delivered'
+                        ? 'Delivered'
+                        : load.status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">
+                    Delivery
+                  </p>
+                  <p className="text-[14px] font-semibold text-white">
+                    {new Date(load.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                   </p>
                 </div>
               </div>
@@ -178,23 +204,34 @@ export default function PublicTrackingPage() {
             {/* Milestones */}
             {milestones.length > 0 && (
               <div className="bg-fx-surface rounded-ios overflow-hidden card-highlight">
-                <div className="px-5 py-3.5 text-center" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div
+                  className="px-5 py-3.5 text-center"
+                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                >
                   <p className="text-[14px] font-semibold text-white">Shipment Progress</p>
                 </div>
                 {milestones.map((m, i) => (
                   <div
                     key={i}
                     className="flex items-start justify-between px-5 py-4"
-                    style={i < milestones.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.05)' } : {}}
+                    style={
+                      i < milestones.length - 1
+                        ? { borderBottom: '1px solid rgba(255,255,255,0.05)' }
+                        : {}
+                    }
                   >
                     <div className="flex-1">
-                      <p className={`text-[14px] font-semibold ${m.current ? 'text-fx-orange' : m.completed ? 'text-white' : 'text-fx-text-dim'}`}>
+                      <p
+                        className={`text-[14px] font-semibold ${m.current ? 'text-fx-orange' : m.completed ? 'text-white' : 'text-fx-text-dim'}`}
+                      >
                         {m.label}
                       </p>
                       <p className="text-[12px] text-fx-text-dim mt-0.5">{m.location}</p>
                     </div>
                     <div className="text-right ml-4 shrink-0">
-                      <p className={`text-[14px] font-bold ${m.current || m.completed ? 'text-fx-orange' : 'text-fx-text-dim'}`}>
+                      <p
+                        className={`text-[14px] font-bold ${m.current || m.completed ? 'text-fx-orange' : 'text-fx-text-dim'}`}
+                      >
                         {m.timestamp?.split('·')[1]?.trim() ?? '—'}
                       </p>
                       <p className="text-[11px] text-fx-text-dim mt-0.5">

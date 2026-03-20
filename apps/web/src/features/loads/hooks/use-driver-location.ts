@@ -64,9 +64,11 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
   // Load geofences when the hook activates
   useEffect(() => {
     if (active && loadNumber) {
-      getGeofencesForLoad(loadNumber).then((fences) => {
-        geofencesRef.current = fences;
-      }).catch(() => undefined);
+      getGeofencesForLoad(loadNumber)
+        .then((fences) => {
+          geofencesRef.current = fences;
+        })
+        .catch(() => undefined);
     }
   }, [active, loadNumber]);
 
@@ -81,13 +83,16 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
         .eq('load_number', loadNumber)
         .single();
       if (!load?.posted_by) return;
-      await supabase.from('notifications').insert({
-        user_id: load.posted_by,
-        type,
-        title,
-        body,
-        load_id: load.id,
-      }).then(undefined, () => undefined);
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: load.posted_by,
+          type,
+          title,
+          body,
+          load_id: load.id,
+        })
+        .then(undefined, () => undefined);
     },
     [loadNumber],
   );
@@ -193,28 +198,27 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
           ).catch(() => undefined);
 
           // End dwell tracking — may auto-flag detention
-          findOpenDwell(fence.id).then(async (dwell) => {
-            if (dwell) {
-              const ended = await endDwell(dwell.id);
-              if (ended.detentionFlagged) {
-                notifyDispatcher(
-                  'detention_flagged',
-                  'Detention Flagged',
-                  `Driver spent ${ended.dwellMinutes}+ min at ${fence.label} — detention flagged (Load ${loadNumber})`,
-                ).catch(() => undefined);
+          findOpenDwell(fence.id)
+            .then(async (dwell) => {
+              if (dwell) {
+                const ended = await endDwell(dwell.id);
+                if (ended.detentionFlagged) {
+                  notifyDispatcher(
+                    'detention_flagged',
+                    'Detention Flagged',
+                    `Driver spent ${ended.dwellMinutes}+ min at ${fence.label} — detention flagged (Load ${loadNumber})`,
+                  ).catch(() => undefined);
+                }
               }
-            }
-          }).catch(() => undefined);
+            })
+            .catch(() => undefined);
         }
       }
     },
     [loadNumber, profile?.id, notifyDispatcher],
   );
 
-  const handlePosition = useCallback(
-    (pos: GeolocationPosition) => void sendPing(pos),
-    [sendPing],
-  );
+  const handlePosition = useCallback((pos: GeolocationPosition) => void sendPing(pos), [sendPing]);
 
   /** Start (or restart) the geolocation watch + heartbeat. */
   const startWatch = useCallback(() => {

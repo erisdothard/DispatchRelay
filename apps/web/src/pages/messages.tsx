@@ -22,8 +22,8 @@ function NewMessageContent({
   type,
   onSelectType,
   userId,
-  userName,
-  userRole,
+  userName: _userName,
+  userRole: _userRole,
   onConversationCreated,
 }: {
   type: 'load' | 'user' | null;
@@ -99,12 +99,7 @@ function NewMessageContent({
     if (creating) return;
     setCreating(true);
     try {
-      const convo = await getOrCreateConversation(
-        userId,
-        u.id,
-        u.full_name ?? u.email,
-        u.role,
-      );
+      const convo = await getOrCreateConversation(userId, u.id, u.full_name ?? u.email, u.role);
       onConversationCreated(convo);
     } catch (e) {
       console.error('Failed to create conversation:', e);
@@ -142,9 +137,7 @@ function NewMessageContent({
           </div>
           <div className="text-left">
             <p className="text-sm font-semibold text-fx-text">Message a User</p>
-            <p className="text-xs text-fx-text-muted">
-              Browse and message any user directly
-            </p>
+            <p className="text-xs text-fx-text-muted">Browse and message any user directly</p>
           </div>
         </button>
       </div>
@@ -186,7 +179,11 @@ function NewMessageContent({
                   </p>
                 </div>
                 <span className="text-[10px] font-bold text-fx-text-dim bg-fx-surface-2 px-2 py-0.5 rounded-full">
-                  {load.status === 'in_transit' ? 'In Transit' : load.status === 'dispatched' ? 'Dispatched' : 'Active'}
+                  {load.status === 'in_transit'
+                    ? 'In Transit'
+                    : load.status === 'dispatched'
+                      ? 'Dispatched'
+                      : 'Active'}
                 </span>
               </button>
             ))}

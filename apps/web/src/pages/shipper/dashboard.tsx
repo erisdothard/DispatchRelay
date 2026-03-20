@@ -64,7 +64,14 @@ export default function ShipperDashboard() {
   useEffect(() => {
     if (user?.id) {
       // Fetch all loads, filter to GPS-eligible (everything before delivered)
-      const terminal = new Set(['delivered', 'cancelled', 'tonu', 'rejected', 'draft', 'pending_approval']);
+      const terminal = new Set([
+        'delivered',
+        'cancelled',
+        'tonu',
+        'rejected',
+        'draft',
+        'pending_approval',
+      ]);
       getLoads()
         .then((all) => setActiveLoads(all.filter((l) => !terminal.has(l.status))))
         .catch(console.error);

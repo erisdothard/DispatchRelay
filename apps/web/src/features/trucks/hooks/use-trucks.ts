@@ -22,7 +22,8 @@ export function useTrucks(filters: TruckFilters = {}): UseTrucksResult {
   const [hasMore, setHasMore] = useState(false);
   const pageRef = useRef(0);
 
-  const { page: _page, ...filtersWithoutPage } = filters;
+  const { page: _unusedPage, ...filtersWithoutPage } = filters;
+  void _unusedPage;
   const filterKey = JSON.stringify(filtersWithoutPage);
 
   const fetchPage = useCallback(

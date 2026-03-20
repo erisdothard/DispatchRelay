@@ -127,7 +127,13 @@ export async function notifyBolSignedParties(params: {
     const [loadRes, bidRes] = await Promise.all([
       supabase.from('loads').select('posted_by').eq('id', loadId).single(),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (supabase as any).from('bids').select('carrier_id').eq('load_id', loadId).eq('status', 'accepted').limit(1).single(),
+      (supabase as any)
+        .from('bids')
+        .select('carrier_id')
+        .eq('load_id', loadId)
+        .eq('status', 'accepted')
+        .limit(1)
+        .single(),
     ]);
 
     const brokerUserId: string | null = loadRes.data?.posted_by ?? null;
@@ -153,13 +159,16 @@ export async function notifyBolSignedParties(params: {
         tasks.push(notifyBolSigned({ email, ...emailData }).catch(console.warn));
       }
       tasks.push(
-        db.from('notifications').insert({
-          user_id: userId,
-          type: 'bol_signed',
-          title: 'BOL Signed',
-          body,
-          load_id: loadId,
-        }).then(undefined, console.warn),
+        db
+          .from('notifications')
+          .insert({
+            user_id: userId,
+            type: 'bol_signed',
+            title: 'BOL Signed',
+            body,
+            load_id: loadId,
+          })
+          .then(undefined, console.warn),
       );
     }
 

@@ -25,23 +25,54 @@ export function TirePositionSelector({ selected, onSelect }: TirePositionSelecto
     <div className="relative" style={{ width: 220, height: 270 }}>
       <svg width="220" height="270" viewBox="0 0 220 270" fill="none">
         {/* Tractor body */}
-        <rect x="55" y="20" width="110" height="140" rx="12" fill="#1a1a2e" stroke="#333" strokeWidth="1.5" />
+        <rect
+          x="55"
+          y="20"
+          width="110"
+          height="140"
+          rx="12"
+          fill="#1a1a2e"
+          stroke="#333"
+          strokeWidth="1.5"
+        />
         {/* Cab */}
-        <rect x="65" y="25" width="90" height="40" rx="8" fill="#222240" stroke="#444" strokeWidth="1" />
+        <rect
+          x="65"
+          y="25"
+          width="90"
+          height="40"
+          rx="8"
+          fill="#222240"
+          stroke="#444"
+          strokeWidth="1"
+        />
         {/* Hitch */}
-        <line x1="110" y1="160" x2="110" y2="180" stroke="#555" strokeWidth="3" strokeLinecap="round" />
+        <line
+          x1="110"
+          y1="160"
+          x2="110"
+          y2="180"
+          stroke="#555"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
         {/* Trailer body */}
-        <rect x="55" y="180" width="110" height="75" rx="8" fill="#1a1a2e" stroke="#333" strokeWidth="1.5" />
+        <rect
+          x="55"
+          y="180"
+          width="110"
+          height="75"
+          rx="8"
+          fill="#1a1a2e"
+          stroke="#333"
+          strokeWidth="1.5"
+        />
 
         {/* Tire slots */}
         {POSITIONS.map((pos) => {
           const isSelected = selected === pos.id;
           return (
-            <g
-              key={pos.id}
-              onClick={() => onSelect(pos.id)}
-              style={{ cursor: 'pointer' }}
-            >
+            <g key={pos.id} onClick={() => onSelect(pos.id)} style={{ cursor: 'pointer' }}>
               <rect
                 x={pos.x}
                 y={pos.y}
@@ -69,16 +100,3 @@ export function TirePositionSelector({ selected, onSelect }: TirePositionSelecto
     </div>
   );
 }
-
-export const TIRE_POSITION_LABELS: Record<TirePosition, string> = {
-  front_left: 'Front Left',
-  front_right: 'Front Right',
-  rear_inner_left: 'Rear Inner Left',
-  rear_inner_right: 'Rear Inner Right',
-  rear_outer_left: 'Rear Outer Left',
-  rear_outer_right: 'Rear Outer Right',
-  trailer_left_1: 'Trailer Left 1',
-  trailer_right_1: 'Trailer Right 1',
-  trailer_left_2: 'Trailer Left 2',
-  trailer_right_2: 'Trailer Right 2',
-};

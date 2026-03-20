@@ -41,7 +41,9 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
 
   useEffect(() => {
     if (open && user?.id) {
-      getDriverLoads(user.id).then(setActiveLoads).catch(() => undefined);
+      getDriverLoads(user.id)
+        .then(setActiveLoads)
+        .catch(() => undefined);
     }
   }, [open, user?.id]);
 
@@ -111,7 +113,10 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
           </div>
           <div className="flex items-center justify-between px-5 pb-3 shrink-0">
             <h2 className="text-lg font-bold text-white">Scan Receipt</h2>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center"
+            >
               <X size={16} className="text-fx-text-dim" />
             </button>
           </div>
@@ -121,9 +126,16 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
             <div>
               {imagePreview ? (
                 <div className="relative">
-                  <img src={imagePreview} alt="Receipt" className="w-full h-40 object-contain rounded-xl bg-black/40" />
+                  <img
+                    src={imagePreview}
+                    alt="Receipt"
+                    className="w-full h-40 object-contain rounded-xl bg-black/40"
+                  />
                   <button
-                    onClick={() => { setImagePreview(null); setImageUrl(''); }}
+                    onClick={() => {
+                      setImagePreview(null);
+                      setImageUrl('');
+                    }}
                     className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center"
                   >
                     <X size={14} className="text-white" />
@@ -155,13 +167,28 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
                   </button>
                 </div>
               )}
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleImage(e.target.files?.[0] ?? null)} />
-              <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handleImage(e.target.files?.[0] ?? null)} />
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImage(e.target.files?.[0] ?? null)}
+              />
+              <input
+                ref={cameraRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => handleImage(e.target.files?.[0] ?? null)}
+              />
             </div>
 
             {/* Category grid */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Category</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Category
+              </p>
               <div className="grid grid-cols-4 gap-2">
                 {CATEGORIES.map((c) => (
                   <button
@@ -182,9 +209,13 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
 
             {/* Amount */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Amount</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Amount
+              </p>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-fx-text-dim text-sm">$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-fx-text-dim text-sm">
+                  $
+                </span>
                 <input
                   type="number"
                   step="0.01"
@@ -198,7 +229,9 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
 
             {/* Vendor */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Vendor Name</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Vendor Name
+              </p>
               <input
                 type="text"
                 value={vendorName}
@@ -210,7 +243,9 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
 
             {/* Date */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Date</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Date
+              </p>
               <input
                 type="date"
                 value={receiptDate}
@@ -221,7 +256,9 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
 
             {/* Load # */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Load # (Optional)</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Load # (Optional)
+              </p>
               <select
                 value={loadNumber}
                 onChange={(e) => setLoadNumber(e.target.value)}
@@ -229,14 +266,18 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
               >
                 <option value="">None</option>
                 {activeLoads.map((l) => (
-                  <option key={l.loadNumber} value={l.loadNumber}>{l.loadNumber}</option>
+                  <option key={l.loadNumber} value={l.loadNumber}>
+                    {l.loadNumber}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Notes */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Notes (Optional)</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Notes (Optional)
+              </p>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

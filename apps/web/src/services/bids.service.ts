@@ -105,7 +105,7 @@ export async function acceptBid(bidId: string): Promise<void> {
   if (error) throw new Error(error.message);
 
   // Record rate history snapshot
-  const rawLoad = bid?.loads as any;
+  const rawLoad = bid?.loads as unknown as { id?: string };
   if (rawLoad?.id) {
     recordBookingRateHistory(rawLoad.id).then(
       () => undefined,

@@ -66,9 +66,7 @@ export function AssignDriverSheet({ open, onClose, load, onAssigned }: AssignDri
 
   // Filter out already-assigned driver from the co-driver list
   const availableDrivers =
-    mode === 'co-driver'
-      ? drivers.filter((d) => d.id !== load.assignedDriverId)
-      : drivers;
+    mode === 'co-driver' ? drivers.filter((d) => d.id !== load.assignedDriverId) : drivers;
 
   return (
     <BottomSheet
@@ -165,12 +163,8 @@ export function AssignDriverSheet({ open, onClose, load, onAssigned }: AssignDri
                 {assigning === driver.id && (
                   <Loader2 size={18} className="text-fx-orange animate-spin" />
                 )}
-                {isPrimary && (
-                  <span className="text-xs font-bold text-green-400">Primary</span>
-                )}
-                {isCoDriver && (
-                  <span className="text-xs font-bold text-blue-400">Co-Driver</span>
-                )}
+                {isPrimary && <span className="text-xs font-bold text-green-400">Primary</span>}
+                {isCoDriver && <span className="text-xs font-bold text-blue-400">Co-Driver</span>}
               </button>
             );
           })

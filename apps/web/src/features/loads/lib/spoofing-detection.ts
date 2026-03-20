@@ -17,10 +17,7 @@ interface PingData {
  * 2. Suspiciously consistent speed (same value ±0.1 for 5+ pings)
  * 3. Coordinate precision anomalies (too few decimals = fake)
  */
-export function isSpoofed(
-  current: PingData,
-  recentSpeeds?: number[],
-): SpoofingResult {
+export function isSpoofed(current: PingData, recentSpeeds?: number[]): SpoofingResult {
   const reasons: string[] = [];
 
   // Check accuracy
@@ -30,9 +27,7 @@ export function isSpoofed(
 
   // Suspiciously consistent speed
   if (recentSpeeds && recentSpeeds.length >= 5 && current.speed_ms != null) {
-    const allSimilar = recentSpeeds.every(
-      (s) => Math.abs(s - current.speed_ms!) < 0.1,
-    );
+    const allSimilar = recentSpeeds.every((s) => Math.abs(s - current.speed_ms!) < 0.1);
     if (allSimilar) {
       reasons.push('Suspiciously consistent speed across multiple pings');
     }
@@ -45,7 +40,9 @@ export function isSpoofed(
   const lngDecimals = lngStr.includes('.') ? lngStr.split('.')[1].length : 0;
 
   if (latDecimals < 4 || lngDecimals < 4) {
-    reasons.push(`Suspiciously low coordinate precision: lat=${latDecimals} lng=${lngDecimals} decimals`);
+    reasons.push(
+      `Suspiciously low coordinate precision: lat=${latDecimals} lng=${lngDecimals} decimals`,
+    );
   }
 
   return {

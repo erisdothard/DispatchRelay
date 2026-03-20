@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Camera, Upload } from 'lucide-react';
-import { TirePositionSelector, TIRE_POSITION_LABELS } from './tire-position-selector';
+import { TirePositionSelector } from './tire-position-selector';
+import { TIRE_POSITION_LABELS } from '../lib/tire-constants';
 import { createTireIncident, uploadTirePhoto } from '@/services/tire-incidents.service';
 import { getDriverLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
@@ -46,16 +47,18 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
 
-  // Auto-fill GPS location
+  // Auto-fill GPS location on open (locationText intentionally excluded to avoid re-triggering)
   useEffect(() => {
     if (open && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setLat(pos.coords.latitude);
           setLng(pos.coords.longitude);
-          if (!locationText) {
-            setLocationText(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`);
-          }
+          setLocationText((prev) =>
+            prev
+              ? prev
+              : `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
+          );
         },
         () => undefined,
         { enableHighAccuracy: false, timeout: 5000 },
@@ -66,7 +69,9 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
   // Fetch active loads for dropdown
   useEffect(() => {
     if (open && user?.id) {
-      getDriverLoads(user.id).then(setActiveLoads).catch(() => undefined);
+      getDriverLoads(user.id)
+        .then(setActiveLoads)
+        .catch(() => undefined);
     }
   }, [open, user?.id]);
 
@@ -134,7 +139,10 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
           </div>
           <div className="flex items-center justify-between px-5 pb-3 shrink-0">
             <h2 className="text-lg font-bold text-white">Log Tire Incident</h2>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center"
+            >
               <X size={16} className="text-fx-text-dim" />
             </button>
           </div>
@@ -157,7 +165,9 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
 
             {/* Severity */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Severity</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Severity
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 {SEVERITIES.map((s) => (
                   <button
@@ -177,7 +187,9 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
 
             {/* Date */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Date</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Date
+              </p>
               <input
                 type="date"
                 value={incidentDate}
@@ -188,7 +200,9 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
 
             {/* Location */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Location</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Location
+              </p>
               <input
                 type="text"
                 value={locationText}
@@ -219,7 +233,9 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
 
             {/* Description */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Description</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Description
+              </p>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -253,7 +269,9 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
 
             {/* Photos */}
             <div>
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">Photos</p>
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+                Photos
+              </p>
               {photos.length > 0 && (
                 <div className="flex gap-2 mb-2 overflow-x-auto">
                   {photos.map((url, i) => (
@@ -288,8 +306,21 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
                   <Camera size={16} />
                 </button>
               </div>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => handlePhoto(e.target.files?.[0] ?? null)} />
-              <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handlePhoto(e.target.files?.[0] ?? null)} />
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handlePhoto(e.target.files?.[0] ?? null)}
+              />
+              <input
+                ref={cameraRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => handlePhoto(e.target.files?.[0] ?? null)}
+              />
             </div>
 
             {error && (

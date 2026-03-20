@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Shield, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -38,7 +38,7 @@ export default function AuditLogPage() {
   const [hasMore, setHasMore] = useState(false);
   const [filter, setFilter] = useState('');
 
-  async function fetchEntries(p: number, append: boolean) {
+  const fetchEntries = useCallback(async (p: number, append: boolean) => {
     setLoading(true);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase as any)
@@ -57,12 +57,12 @@ export default function AuditLogPage() {
     setEntries((prev) => (append ? [...prev, ...rows] : rows));
     setHasMore(rows.length === PAGE_SIZE);
     setLoading(false);
-  }
+  }, [filter]);
 
   useEffect(() => {
     setPage(0);
     fetchEntries(0, false);
-  }, [filter]);
+  }, [fetchEntries]);
 
   function loadMore() {
     const next = page + 1;

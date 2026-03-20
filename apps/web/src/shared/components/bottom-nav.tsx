@@ -1,5 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, MessageSquare, User, Users, Package, BarChart2, FileText, DollarSign } from 'lucide-react';
+import {
+  Home,
+  Search,
+  MessageSquare,
+  User,
+  Users,
+  Package,
+  BarChart2,
+  FileText,
+  DollarSign,
+} from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 type NavRole = 'carrier' | 'broker' | 'driver';

@@ -47,7 +47,12 @@ export default function DriverLoadsPage() {
     fetchLoads();
   }, [fetchLoads]);
 
-  const STATUS_ORDER: Record<string, number> = { in_transit: 0, dispatched: 1, awarded: 2, delivered: 3 };
+  const STATUS_ORDER: Record<string, number> = {
+    in_transit: 0,
+    dispatched: 1,
+    awarded: 2,
+    delivered: 3,
+  };
 
   const filtered = loads
     .filter((l) => {
@@ -150,11 +155,17 @@ export default function DriverLoadsPage() {
               {(load.originAddress || load.destAddress) && (
                 <p className="text-[11px] text-fx-text-dim mb-1">
                   {load.originAddress && (
-                    <span>{load.originAddress}{load.originZip ? ` ${load.originZip}` : ''}</span>
+                    <span>
+                      {load.originAddress}
+                      {load.originZip ? ` ${load.originZip}` : ''}
+                    </span>
                   )}
                   {load.originAddress && load.destAddress && ' → '}
                   {load.destAddress && (
-                    <span>{load.destAddress}{load.destZip ? ` ${load.destZip}` : ''}</span>
+                    <span>
+                      {load.destAddress}
+                      {load.destZip ? ` ${load.destZip}` : ''}
+                    </span>
                   )}
                 </p>
               )}

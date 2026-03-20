@@ -45,10 +45,7 @@ export async function getBreadcrumbsForLoad(loadNumber: string): Promise<Breadcr
  * Snapshot breadcrumbs for a delivered load.
  * Called when a load transitions to 'delivered'.
  */
-export async function snapshotBreadcrumbs(
-  loadNumber: string,
-  driverId: string,
-): Promise<void> {
+export async function snapshotBreadcrumbs(loadNumber: string, driverId: string): Promise<void> {
   const { data: pings } = await supabase
     .from('location_pings')
     .select('latitude, longitude, speed_ms, recorded_at')

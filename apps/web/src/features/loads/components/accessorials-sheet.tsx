@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Plus, Check, X, Loader2 } from 'lucide-react';
+import { Plus, Check, X, Loader2 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import {
   getAccessorials,

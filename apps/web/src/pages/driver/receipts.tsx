@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Plus, Receipt as ReceiptIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -32,7 +32,14 @@ const CATEGORY_ICONS: Record<ReceiptCategory, string> = {
 };
 
 const ALL_CATEGORIES: ReceiptCategory[] = [
-  'fuel', 'maintenance', 'tolls', 'meals', 'lodging', 'parking', 'supplies', 'other',
+  'fuel',
+  'maintenance',
+  'tolls',
+  'meals',
+  'lodging',
+  'parking',
+  'supplies',
+  'other',
 ];
 
 export default function ReceiptsPage() {
@@ -43,18 +50,18 @@ export default function ReceiptsPage() {
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<ReceiptCategory | null>(null);
 
-  function fetchReceipts() {
+  const fetchReceipts = useCallback(() => {
     if (!user?.id) return;
     setLoading(true);
     getReceipts(user.id, filterCategory ? { category: filterCategory } : undefined)
       .then(setReceipts)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }
+  }, [user?.id, filterCategory]);
 
   useEffect(() => {
     fetchReceipts();
-  }, [user?.id, filterCategory]);
+  }, [fetchReceipts]);
 
   const totalAmount = receipts.reduce((sum, r) => sum + r.amountUsd, 0);
 
@@ -110,7 +117,9 @@ export default function ReceiptsPage() {
               </p>
               <p className="text-xl font-bold text-white mt-0.5">${totalAmount.toFixed(2)}</p>
             </div>
-            <p className="text-xs text-fx-text-dim">{receipts.length} receipt{receipts.length !== 1 ? 's' : ''}</p>
+            <p className="text-xs text-fx-text-dim">
+              {receipts.length} receipt{receipts.length !== 1 ? 's' : ''}
+            </p>
           </div>
         </div>
       )}

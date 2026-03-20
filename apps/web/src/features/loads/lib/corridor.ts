@@ -39,11 +39,7 @@ export function isInsideCorridor(
 /**
  * Get the minimum deviation distance in km from the corridor.
  */
-export function getDeviationKm(
-  lat: number,
-  lng: number,
-  corridor: [number, number][],
-): number {
+export function getDeviationKm(lat: number, lng: number, corridor: [number, number][]): number {
   let minDist = Infinity;
   for (const [cLat, cLng] of corridor) {
     const dist = haversineM(lat, lng, cLat, cLng);

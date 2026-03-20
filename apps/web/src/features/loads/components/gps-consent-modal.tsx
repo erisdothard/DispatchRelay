@@ -43,8 +43,8 @@ export function GpsConsentModal({ open, onAllow, onDismiss }: GpsConsentModalPro
             </div>
 
             <p className="text-sm text-fx-text-dim mb-5 leading-relaxed">
-              FreightX needs your permission to share your live GPS location with your carrier
-              and dispatcher while you're on active loads.
+              FreightX needs your permission to share your live GPS location with your carrier and
+              dispatcher while you're on active loads.
             </p>
 
             {/* What's collected */}
@@ -70,8 +70,8 @@ export function GpsConsentModal({ open, onAllow, onDismiss }: GpsConsentModalPro
             </div>
 
             <p className="text-xs text-fx-text-dim mb-5 leading-relaxed">
-              GPS is only active while you have location sharing enabled. You can revoke access
-              at any time by toggling off "Share Location" on your dashboard.
+              GPS is only active while you have location sharing enabled. You can revoke access at
+              any time by toggling off "Share Location" on your dashboard.
             </p>
 
             {/* Buttons */}

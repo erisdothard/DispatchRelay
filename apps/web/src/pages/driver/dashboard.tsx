@@ -5,7 +5,6 @@ import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { StatCard } from '@/shared/components/stat-card';
 import { Badge } from '@/shared/components/ui/badge';
-import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { getDriverLoads } from '@/services/loads.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
@@ -85,7 +84,14 @@ export default function DriverDashboard() {
   useEffect(() => {
     if (user?.id) {
       // Fetch all assigned loads, filter to GPS-eligible (everything before delivered)
-      const terminal = new Set(['delivered', 'cancelled', 'tonu', 'rejected', 'draft', 'pending_approval']);
+      const terminal = new Set([
+        'delivered',
+        'cancelled',
+        'tonu',
+        'rejected',
+        'draft',
+        'pending_approval',
+      ]);
       getDriverLoads(user.id)
         .then((all) => setActiveLoads(all.filter((l) => !terminal.has(l.status))))
         .catch(console.error);
@@ -246,11 +252,17 @@ export default function DriverDashboard() {
                     {(load.originAddress || load.destAddress) && (
                       <p className="text-[11px] text-fx-text-dim mt-0.5">
                         {load.originAddress && (
-                          <span>{load.originAddress}{load.originZip ? ` ${load.originZip}` : ''}</span>
+                          <span>
+                            {load.originAddress}
+                            {load.originZip ? ` ${load.originZip}` : ''}
+                          </span>
                         )}
                         {load.originAddress && load.destAddress && ' → '}
                         {load.destAddress && (
-                          <span>{load.destAddress}{load.destZip ? ` ${load.destZip}` : ''}</span>
+                          <span>
+                            {load.destAddress}
+                            {load.destZip ? ` ${load.destZip}` : ''}
+                          </span>
                         )}
                       </p>
                     )}
@@ -276,10 +288,17 @@ export default function DriverDashboard() {
           <div className="grid grid-cols-3 gap-3">
             {[
               { label: 'My Loads', icon: '📦', action: () => navigate('/driver/loads') },
-              { label: 'Send GPS', icon: '📍', action: () => {
-                if (!hasConsented) { setConsentModalOpen(true); return; }
-                setSharingLocation(true);
-              }},
+              {
+                label: 'Send GPS',
+                icon: '📍',
+                action: () => {
+                  if (!hasConsented) {
+                    setConsentModalOpen(true);
+                    return;
+                  }
+                  setSharingLocation(true);
+                },
+              },
               { label: 'Documents', icon: '📄', action: () => navigate('/driver/documents') },
               { label: 'Scan Receipt', icon: '🧾', action: () => navigate('/driver/receipts') },
               { label: 'Tire Log', icon: '🛞', action: () => navigate('/driver/tire-log') },

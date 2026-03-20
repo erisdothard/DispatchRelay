@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { getLoadsPage, PAGE_SIZE } from '@/services/loads.service';
+import { getLoadsPage } from '@/services/loads.service';
 import type { LoadFilters } from '@/services/loads.service';
 import type { Load } from '@freightx/shared';
 
@@ -25,7 +25,8 @@ export function useLoads(filters: LoadFilters = {}): UseLoadsResult {
   const pageRef = useRef(0);
 
   // Stable filter key (exclude page — we manage that ourselves)
-  const { page: _page, ...filtersWithoutPage } = filters;
+  const { page: _unusedPage, ...filtersWithoutPage } = filters;
+  void _unusedPage;
   const filterKey = JSON.stringify(filtersWithoutPage);
 
   const fetchPage = useCallback(

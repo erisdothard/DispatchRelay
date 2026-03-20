@@ -55,12 +55,16 @@ export function LoadStatusStepper({
   const nextStatus = NEXT_STATUS[currentStatus];
   const canAdvance =
     nextStatus !== undefined && (ROLE_CAN_ADVANCE[role] ?? []).includes(nextStatus);
-  const needsDriver = nextStatus !== undefined && REQUIRES_DRIVER.includes(nextStatus) && !hasDriverAssigned;
+  const needsDriver =
+    nextStatus !== undefined && REQUIRES_DRIVER.includes(nextStatus) && !hasDriverAssigned;
 
   async function handleAdvance() {
     if (!nextStatus) return;
     if (needsDriver) {
-      setError('Assign a driver before advancing to ' + (STEPS.find((s) => s.status === nextStatus)?.label ?? nextStatus));
+      setError(
+        'Assign a driver before advancing to ' +
+          (STEPS.find((s) => s.status === nextStatus)?.label ?? nextStatus),
+      );
       return;
     }
     setAdvancing(true);

@@ -148,8 +148,7 @@ export function LoadDetailSheet({
           }}
         >
           {(() => {
-            const showFullAddress =
-              ACTIVE_STATUSES.includes(liveStatus) || role === 'driver';
+            const showFullAddress = ACTIVE_STATUSES.includes(liveStatus) || role === 'driver';
             return (
               <>
                 <div className="flex items-center gap-2">

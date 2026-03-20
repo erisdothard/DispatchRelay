@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Circle, useMap, useMapEvents } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Polyline,
+  Circle,
+  useMap,
+  useMapEvents,
+} from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { geocodeCity } from '@/lib/geocoding';
@@ -307,10 +315,7 @@ export function MapView({
 
         {/* Replay snap position */}
         {breadcrumbTrail && replayIndex != null && breadcrumbTrail[replayIndex] && (
-          <Marker
-            position={breadcrumbTrail[replayIndex]}
-            icon={makeTruckIcon(true)}
-          />
+          <Marker position={breadcrumbTrail[replayIndex]} icon={makeTruckIcon(true)} />
         )}
 
         {/* Geofence circles */}

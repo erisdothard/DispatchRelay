@@ -55,7 +55,9 @@ export async function calculateDriverScore(params: {
     .from('dwell_records')
     .select('detention_flagged, dwell_minutes')
     .eq('load_number', loadNumber);
-  const detentionCount = (dwells ?? []).filter((d: Record<string, unknown>) => d.detention_flagged).length;
+  const detentionCount = (dwells ?? []).filter(
+    (d: Record<string, unknown>) => d.detention_flagged,
+  ).length;
   const dwellScore = Math.max(0, 100 - detentionCount * 25);
 
   // Overall: weighted average
@@ -96,7 +98,5 @@ export async function getDriverScores(driverId: string): Promise<DriverScore[]> 
 export async function getAverageScore(driverId: string): Promise<number | null> {
   const scores = await getDriverScores(driverId);
   if (scores.length === 0) return null;
-  return Math.round(
-    scores.reduce((sum, s) => sum + s.overallScore, 0) / scores.length,
-  );
+  return Math.round(scores.reduce((sum, s) => sum + s.overallScore, 0) / scores.length);
 }

@@ -126,7 +126,8 @@ function BolUploadSheet({
         <div>
           <h2 className="text-lg font-bold text-fx-text">Upload Bill of Lading</h2>
           <p className="text-sm text-fx-text-muted mt-0.5">
-            Load {load.loadNumber} · {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
+            Load {load.loadNumber} · {load.originCity}, {load.originState} → {load.destCity},{' '}
+            {load.destState}
           </p>
         </div>
 
@@ -232,11 +233,17 @@ function BolUploadSheet({
             className="flex-1 h-12 rounded-2xl font-bold text-sm bg-fx-orange text-white disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {uploading ? (
-              <><Loader2 size={16} className="animate-spin" /> Uploading…</>
+              <>
+                <Loader2 size={16} className="animate-spin" /> Uploading…
+              </>
             ) : alreadySigned ? (
-              <><Check size={16} /> Upload Signed BOL</>
+              <>
+                <Check size={16} /> Upload Signed BOL
+              </>
             ) : (
-              <><Upload size={16} /> Upload BOL</>
+              <>
+                <Upload size={16} /> Upload BOL
+              </>
             )}
           </button>
         </div>
@@ -393,11 +400,17 @@ export default function DriverDocumentsPage() {
                   {(load.originAddress || load.destAddress) && (
                     <p className="text-[11px] text-fx-text-dim mt-0.5">
                       {load.originAddress && (
-                        <span>{load.originAddress}{load.originZip ? ` ${load.originZip}` : ''}</span>
+                        <span>
+                          {load.originAddress}
+                          {load.originZip ? ` ${load.originZip}` : ''}
+                        </span>
                       )}
                       {load.originAddress && load.destAddress && ' → '}
                       {load.destAddress && (
-                        <span>{load.destAddress}{load.destZip ? ` ${load.destZip}` : ''}</span>
+                        <span>
+                          {load.destAddress}
+                          {load.destZip ? ` ${load.destZip}` : ''}
+                        </span>
                       )}
                     </p>
                   )}
@@ -406,20 +419,14 @@ export default function DriverDocumentsPage() {
                 {/* Documents list */}
                 <div className="divide-y divide-fx-border">
                   {docs.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-fx-text-dim">
-                      No documents yet
-                    </div>
+                    <div className="p-4 text-center text-xs text-fx-text-dim">No documents yet</div>
                   ) : (
                     docs.map((doc) => {
                       const status = docStatusBadge(doc);
-                      const isBolUnsigned =
-                        doc.type === 'bill_of_lading' && !doc.signed_at;
+                      const isBolUnsigned = doc.type === 'bill_of_lading' && !doc.signed_at;
 
                       return (
-                        <div
-                          key={doc.id}
-                          className="p-3 flex items-center gap-3"
-                        >
+                        <div key={doc.id} className="p-3 flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center shrink-0">
                             <FileText size={16} className="text-fx-orange" />
                           </div>
