@@ -134,6 +134,7 @@ export default function BrokerDashboard() {
               { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
               { label: 'Analytics', icon: '📊', action: () => {} },
               { label: 'Carrier Network', icon: '🤝', action: () => setCarrierNetworkOpen(true) },
+              { label: 'Track Loads', icon: '📍', action: () => navigate('/track') },
             ].map((item) => (
               <button
                 key={item.label}
