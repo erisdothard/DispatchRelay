@@ -30,12 +30,18 @@ function makeBuilder(result: unknown) {
   return self;
 }
 
-const BASE_PING = {
-  load_number: 'FX-20260301-0001',
-  driver_id: 'driver-1',
-  latitude: 32.7767,
-  longitude: -96.797,
-};
+// Use a unique driver_id per test so the 5-second rate limiter never fires
+let testIndex = 0;
+function makePing(overrides?: Partial<Parameters<typeof insertLocationPing>[0]>) {
+  testIndex += 1;
+  return {
+    load_number: 'FX-20260301-0001',
+    driver_id: `driver-${testIndex}`,
+    latitude: 32.7767,
+    longitude: -96.797,
+    ...overrides,
+  };
+}
 
 const mockFrom = vi.mocked(supabase.from);
 
@@ -51,14 +57,15 @@ describe('insertLocationPing', () => {
   it('inserts a row with the correct required fields', async () => {
     const builder = makeBuilder({ data: null, error: null });
     mockFrom.mockReturnValue(builder as never);
+    const ping = makePing();
 
-    await insertLocationPing(BASE_PING);
+    await insertLocationPing(ping);
 
     expect(mockFrom).toHaveBeenCalledWith('location_pings');
     expect(builder.insert).toHaveBeenCalledWith(
       expect.objectContaining({
-        load_number: 'FX-20260301-0001',
-        driver_id: 'driver-1',
+        load_number: ping.load_number,
+        driver_id: ping.driver_id,
         latitude: 32.7767,
         longitude: -96.797,
       }),
@@ -68,8 +75,9 @@ describe('insertLocationPing', () => {
   it('passes null for missing optional fields', async () => {
     const builder = makeBuilder({ data: null, error: null });
     mockFrom.mockReturnValue(builder as never);
+    const ping = makePing();
 
-    await insertLocationPing(BASE_PING);
+    await insertLocationPing(ping);
 
     expect(builder.insert).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -83,13 +91,9 @@ describe('insertLocationPing', () => {
   it('includes optional fields when provided', async () => {
     const builder = makeBuilder({ data: null, error: null });
     mockFrom.mockReturnValue(builder as never);
+    const ping = makePing({ accuracy_m: 8, heading_deg: 270, speed_ms: 22.5 });
 
-    await insertLocationPing({
-      ...BASE_PING,
-      accuracy_m: 8,
-      heading_deg: 270,
-      speed_ms: 22.5,
-    });
+    await insertLocationPing(ping);
 
     expect(builder.insert).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -103,8 +107,9 @@ describe('insertLocationPing', () => {
   it('rounds heading_deg to the nearest integer', async () => {
     const builder = makeBuilder({ data: null, error: null });
     mockFrom.mockReturnValue(builder as never);
+    const ping = makePing({ heading_deg: 179.7 });
 
-    await insertLocationPing({ ...BASE_PING, heading_deg: 179.7 });
+    await insertLocationPing(ping);
 
     const insertArg = (builder.insert as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(insertArg.heading_deg).toBe(180);
@@ -113,8 +118,9 @@ describe('insertLocationPing', () => {
   it('rounds heading_deg down correctly', async () => {
     const builder = makeBuilder({ data: null, error: null });
     mockFrom.mockReturnValue(builder as never);
+    const ping = makePing({ heading_deg: 45.3 });
 
-    await insertLocationPing({ ...BASE_PING, heading_deg: 45.3 });
+    await insertLocationPing(ping);
 
     const insertArg = (builder.insert as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(insertArg.heading_deg).toBe(45);
@@ -125,7 +131,7 @@ describe('insertLocationPing', () => {
       makeBuilder({ data: null, error: { message: 'table does not exist' } }) as never,
     );
 
-    await expect(insertLocationPing(BASE_PING)).resolves.toBeNull();
+    await expect(insertLocationPing(makePing())).resolves.toBeNull();
   });
 
   it('does not throw on any Supabase error', async () => {
@@ -133,6 +139,6 @@ describe('insertLocationPing', () => {
       makeBuilder({ data: null, error: { message: 'network error' } }) as never,
     );
 
-    await expect(insertLocationPing(BASE_PING)).resolves.not.toThrow();
+    await expect(insertLocationPing(makePing())).resolves.not.toThrow();
   });
 });
