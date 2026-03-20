@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, ArrowUpRight, MapPin, Navigation, Package, Users, UserCheck } from 'lucide-react';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
@@ -16,14 +16,14 @@ import type { Load } from '@freightx/shared';
 
 const QUICK_ACTIONS = [
   {
-    label: 'New Tracking',
-    sub: 'Tracking ID',
+    label: 'Track Load',
+    sub: 'Search by load #',
     icon: <Navigation size={20} className="text-fx-orange" />,
     path: '/track',
   },
   {
-    label: 'Your Location',
-    sub: 'View map',
+    label: 'My Fleet',
+    sub: 'Trucks & GPS',
     icon: <MapPin size={20} className="text-fx-orange" />,
     path: '/carrier/fleet',
   },
@@ -37,7 +37,7 @@ const QUICK_ACTIONS = [
     label: 'My Team',
     sub: 'Invite & manage',
     icon: <Users size={20} className="text-fx-orange" />,
-    path: '/carrier/team-settings',
+    path: '/carrier/team',
   },
 ];
 
@@ -75,10 +75,21 @@ export default function CarrierDashboard() {
   const recentLoads = [...loads]
     .sort((a, b) => (statusPriority[a.status] ?? 5) - (statusPriority[b.status] ?? 5))
     .slice(0, 3);
-  const currentLoad =
-    loads.find((l) => ['dispatched', 'in_transit', 'awarded'].includes(l.status)) ??
-    loads[0] ??
-    null;
+  const activeLoads = loads.filter((l) =>
+    ['dispatched', 'in_transit', 'awarded'].includes(l.status),
+  );
+
+  // Carousel dot tracking
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  const handleScroll = useCallback(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const scrollLeft = el.scrollLeft;
+    const cardWidth = el.scrollWidth / activeLoads.length;
+    setActiveSlide(Math.round(scrollLeft / cardWidth));
+  }, [activeLoads.length]);
 
   const name = profile?.full_name ?? 'Driver';
   const companyName = company?.name ?? '';
@@ -147,100 +158,127 @@ export default function CarrierDashboard() {
           ))}
         </div>
 
-        {/* Current Shipping */}
-        {currentLoad && (
+        {/* Current Shipping — Carousel */}
+        {activeLoads.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3">
               <p className="text-[17px] font-bold text-white tracking-[-0.01em]">
                 Current Shipping
               </p>
               <span className="text-[11px] font-semibold text-white bg-fx-orange px-2.5 py-1 rounded-full">
-                Transit
+                {activeLoads.length} Active
               </span>
             </div>
 
-            <div className="bg-fx-surface rounded-ios p-5 card-highlight">
-              <p className="text-[13px] font-medium text-fx-text-dim">
-                ID {currentLoad.loadNumber}
-              </p>
-              <div className="flex items-center gap-2 mt-1 mb-4">
-                <span className="text-[11px] font-bold text-fx-orange bg-fx-orange/15 px-2 py-0.5 rounded-full">
-                  {EQUIPMENT_LABELS[currentLoad.equipment] ?? currentLoad.equipment}
-                </span>
-                {currentLoad.weightLbs > 0 && (
-                  <span className="text-[11px] text-fx-text-dim">
-                    {currentLoad.weightLbs.toLocaleString()} lbs
-                  </span>
-                )}
-                <span className="text-[11px] text-fx-text-dim">
-                  ${currentLoad.rateUsd.toLocaleString()}
-                </span>
-              </div>
+            <div
+              ref={carouselRef}
+              onScroll={handleScroll}
+              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3 -mx-5 px-5"
+            >
+              {activeLoads.map((currentLoad) => (
+                <button
+                  key={currentLoad.id}
+                  onClick={() => navigate(`/track/${currentLoad.loadNumber}`)}
+                  className="min-w-[85%] snap-center bg-fx-surface rounded-ios p-5 card-highlight text-left shrink-0 active-scale transition-colors"
+                >
+                  <p className="text-[13px] font-medium text-fx-text-dim">
+                    ID {currentLoad.loadNumber}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1 mb-4">
+                    <span className="text-[11px] font-bold text-fx-orange bg-fx-orange/15 px-2 py-0.5 rounded-full">
+                      {EQUIPMENT_LABELS[currentLoad.equipment] ?? currentLoad.equipment}
+                    </span>
+                    {currentLoad.weightLbs > 0 && (
+                      <span className="text-[11px] text-fx-text-dim">
+                        {currentLoad.weightLbs.toLocaleString()} lbs
+                      </span>
+                    )}
+                    <span className="text-[11px] text-fx-text-dim">
+                      ${currentLoad.rateUsd.toLocaleString()}
+                    </span>
+                  </div>
 
-              {/* Progress track */}
-              <div className="relative mb-4">
-                <div className="w-full h-[3px] bg-fx-border rounded-full" />
-                <div
-                  className="absolute left-0 top-0 h-[3px] rounded-full bg-orange-gradient"
-                  style={{ width: '58%' }}
-                />
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-orange-gradient ring-2 ring-fx-bg" />
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-orange-gradient ring-2 ring-fx-bg shadow-orange-glow-sm"
-                  style={{ left: '58%' }}
-                />
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 rounded-full bg-fx-border ring-2 ring-fx-bg" />
-              </div>
+                  {/* Progress track */}
+                  <div className="relative mb-4">
+                    <div className="w-full h-[3px] bg-fx-border rounded-full" />
+                    <div
+                      className="absolute left-0 top-0 h-[3px] rounded-full bg-orange-gradient"
+                      style={{ width: currentLoad.status === 'in_transit' ? '58%' : '20%' }}
+                    />
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-orange-gradient ring-2 ring-fx-bg" />
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-orange-gradient ring-2 ring-fx-bg shadow-orange-glow-sm"
+                      style={{ left: currentLoad.status === 'in_transit' ? '58%' : '20%' }}
+                    />
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 rounded-full bg-fx-border ring-2 ring-fx-bg" />
+                  </div>
 
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-[11px] text-fx-text-dim">
-                    {new Date(currentLoad.pickupDate + 'T12:00:00').toLocaleDateString('en-US', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </p>
-                  <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
-                    {currentLoad.originCity}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[11px] text-fx-text-dim">
-                    Estimated{' '}
-                    {new Date(currentLoad.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </p>
-                  <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
-                    {currentLoad.destCity}
-                  </p>
-                </div>
-              </div>
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-[11px] text-fx-text-dim">
+                        {new Date(currentLoad.pickupDate + 'T12:00:00').toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </p>
+                      <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
+                        {currentLoad.originCity}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[11px] text-fx-text-dim">
+                        Estimated{' '}
+                        {new Date(currentLoad.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </p>
+                      <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
+                        {currentLoad.destCity}
+                      </p>
+                    </div>
+                  </div>
 
-              {/* Assign Driver button */}
-              {!currentLoad.assignedDriverId &&
-                ['awarded', 'dispatched'].includes(currentLoad.status) && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setAssignLoad(currentLoad);
-                    }}
-                    className="mt-4 w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
-                  >
-                    <UserCheck size={14} />
-                    Assign Driver
-                  </button>
-                )}
-              {currentLoad.assignedDriverId && (
-                <div className="mt-4 flex items-center gap-2 text-xs text-green-400 font-semibold">
-                  <UserCheck size={14} />
-                  Driver Assigned
-                </div>
-              )}
+                  {/* Assign Driver button */}
+                  {!currentLoad.assignedDriverId &&
+                    ['awarded', 'dispatched'].includes(currentLoad.status) && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          setAssignLoad(currentLoad);
+                        }}
+                        className="mt-4 w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
+                      >
+                        <UserCheck size={14} />
+                        Assign Driver
+                      </button>
+                    )}
+                  {currentLoad.assignedDriverId && (
+                    <div className="mt-4 flex items-center gap-2 text-xs text-green-400 font-semibold">
+                      <UserCheck size={14} />
+                      Driver Assigned
+                    </div>
+                  )}
+                </button>
+              ))}
             </div>
+
+            {/* Dot indicators */}
+            {activeLoads.length > 1 && (
+              <div className="flex items-center justify-center gap-1.5 mt-3">
+                {activeLoads.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === activeSlide ? 'w-4 bg-fx-orange' : 'w-1.5 bg-fx-border'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 

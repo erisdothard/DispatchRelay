@@ -272,6 +272,31 @@ export async function assignDriver(loadId: string, driverId: string): Promise<Lo
 }
 
 /**
+ * Assign a co-driver (second driver) to a load.
+ */
+export async function assignCoDriver(loadId: string, driverId: string | null): Promise<Load> {
+  const { data, error } = await supabase
+    .from('loads')
+    .update({ second_driver_id: driverId })
+    .eq('id', loadId)
+    .select()
+    .single();
+  if (error) throw error;
+
+  if (driverId) {
+    await supabase.from('notifications').insert({
+      user_id: driverId,
+      type: 'load_assigned',
+      title: 'Co-Driver Assignment',
+      body: `You have been assigned as co-driver on load ${data.load_number}: ${data.origin_city}, ${data.origin_state} → ${data.dest_city}, ${data.dest_state}`,
+      load_id: data.id,
+    });
+  }
+
+  return rowToLoad(data);
+}
+
+/**
  * Get loads assigned to a specific driver.
  */
 export async function getDriverLoads(driverId: string, status?: string): Promise<Load[]> {

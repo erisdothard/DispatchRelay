@@ -73,6 +73,7 @@ export interface Load {
   postedAt?: string; // ISO timestamp for load age
   brokerCreditScore?: number; // 0-100
   assignedDriverId?: string;
+  secondDriverId?: string;
 }
 
 export interface Truck {

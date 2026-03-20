@@ -1,12 +1,255 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Send, ArrowLeft, Plus, X, Package, User } from 'lucide-react';
+import { Search, Send, ArrowLeft, Plus, X, Package, User, Loader2 } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { cn, getInitials } from '@/shared/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { getConversations, getMessages, sendMessage } from '@/services/messages.service';
+import {
+  getConversations,
+  getMessages,
+  sendMessage,
+  getOrCreateConversation,
+  searchUsers,
+} from '@/services/messages.service';
+import { getMyActiveLoads } from '@/services/loads.service';
 import type { ConversationRow, MessageRow } from '@/lib/database.types';
+import type { Load } from '@freightx/shared';
+
+/* ── New Message Sub-Component ─────────────────────────────────── */
+
+function NewMessageContent({
+  type,
+  onSelectType,
+  userId,
+  userName,
+  userRole,
+  onConversationCreated,
+}: {
+  type: 'load' | 'user' | null;
+  onSelectType: (t: 'load' | 'user' | null) => void;
+  userId: string;
+  userName: string;
+  userRole: string;
+  onConversationCreated: (convo: ConversationRow) => void;
+}) {
+  const [myLoads, setMyLoads] = useState<Load[]>([]);
+  const [loadingLoads, setLoadingLoads] = useState(false);
+  const [userResults, setUserResults] = useState<
+    Array<{ id: string; full_name: string | null; email: string; role: string }>
+  >([]);
+  const [userQuery, setUserQuery] = useState('');
+  const [searchingUsers, setSearchingUsers] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Fetch loads when load tab is opened
+  useEffect(() => {
+    if (type !== 'load' || !userId) return;
+    setLoadingLoads(true);
+    getMyActiveLoads(userId)
+      .then(setMyLoads)
+      .catch(console.error)
+      .finally(() => setLoadingLoads(false));
+  }, [type, userId]);
+
+  // Debounced user search
+  useEffect(() => {
+    if (type !== 'user') return;
+    if (!userQuery.trim()) {
+      setUserResults([]);
+      return;
+    }
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setSearchingUsers(true);
+      searchUsers(userQuery.trim(), userId)
+        .then(setUserResults)
+        .catch(console.error)
+        .finally(() => setSearchingUsers(false));
+    }, 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [userQuery, type, userId]);
+
+  async function handleSelectLoad(load: Load) {
+    if (creating) return;
+    setCreating(true);
+    try {
+      const convo = await getOrCreateConversation(
+        userId,
+        load.postedBy || userId,
+        load.companyName,
+        'broker',
+        load.loadNumber,
+      );
+      onConversationCreated(convo);
+    } catch (e) {
+      console.error('Failed to create conversation:', e);
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  async function handleSelectUser(u: {
+    id: string;
+    full_name: string | null;
+    email: string;
+    role: string;
+  }) {
+    if (creating) return;
+    setCreating(true);
+    try {
+      const convo = await getOrCreateConversation(
+        userId,
+        u.id,
+        u.full_name ?? u.email,
+        u.role,
+      );
+      onConversationCreated(convo);
+    } catch (e) {
+      console.error('Failed to create conversation:', e);
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  if (!type) {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-fx-text-muted mb-4">
+          Choose how you want to start a conversation:
+        </p>
+        <button
+          onClick={() => onSelectType('load')}
+          className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors"
+        >
+          <div className="w-12 h-12 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center">
+            <Package size={22} className="text-fx-orange" />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-fx-text">Message about a Load</p>
+            <p className="text-xs text-fx-text-muted">
+              Start a conversation tied to a specific load
+            </p>
+          </div>
+        </button>
+        <button
+          onClick={() => onSelectType('user')}
+          className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors"
+        >
+          <div className="w-12 h-12 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center">
+            <User size={22} className="text-fx-orange" />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-fx-text">Message a User</p>
+            <p className="text-xs text-fx-text-muted">
+              Browse and message any user directly
+            </p>
+          </div>
+        </button>
+      </div>
+    );
+  }
+
+  if (type === 'load') {
+    return (
+      <div className="space-y-4">
+        <button onClick={() => onSelectType(null)} className="text-sm text-fx-orange font-medium">
+          ← Back
+        </button>
+        <p className="text-sm text-fx-text-muted">Select a load to start a conversation about:</p>
+        {loadingLoads ? (
+          <div className="flex justify-center py-10">
+            <Loader2 size={22} className="text-fx-orange animate-spin" />
+          </div>
+        ) : myLoads.length === 0 ? (
+          <div className="bg-fx-surface border border-fx-border rounded-2xl p-6 text-center">
+            <Package size={28} className="text-fx-text-dim mx-auto mb-2" />
+            <p className="text-sm text-fx-text-muted">No active loads found</p>
+          </div>
+        ) : (
+          <div className="max-h-64 overflow-y-auto space-y-2 scrollbar-hide">
+            {myLoads.map((load) => (
+              <button
+                key={load.id}
+                onClick={() => handleSelectLoad(load)}
+                disabled={creating}
+                className="w-full text-left bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3 hover:border-fx-orange/40 transition-colors disabled:opacity-50"
+              >
+                <div className="w-10 h-10 rounded-xl bg-fx-orange/10 flex items-center justify-center shrink-0">
+                  <Package size={16} className="text-fx-orange" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-fx-orange">{load.loadNumber}</p>
+                  <p className="text-xs text-fx-text-muted truncate">
+                    {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
+                  </p>
+                </div>
+                <span className="text-[10px] font-bold text-fx-text-dim bg-fx-surface-2 px-2 py-0.5 rounded-full">
+                  {load.status === 'in_transit' ? 'In Transit' : load.status === 'dispatched' ? 'Dispatched' : 'Active'}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // type === 'user'
+  return (
+    <div className="space-y-4">
+      <button onClick={() => onSelectType(null)} className="text-sm text-fx-orange font-medium">
+        ← Back
+      </button>
+      <p className="text-sm text-fx-text-muted">Search for a user to message:</p>
+      <div className="relative">
+        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-orange" />
+        <input
+          type="text"
+          placeholder="Search by name or email…"
+          value={userQuery}
+          onChange={(e) => setUserQuery(e.target.value)}
+          className="w-full h-10 bg-fx-surface border border-fx-border rounded-xl pl-10 pr-4 text-sm text-fx-text placeholder:text-fx-text-dim focus:border-fx-orange outline-none"
+        />
+      </div>
+      {searchingUsers ? (
+        <div className="flex justify-center py-6">
+          <Loader2 size={22} className="text-fx-orange animate-spin" />
+        </div>
+      ) : userResults.length > 0 ? (
+        <div className="max-h-64 overflow-y-auto space-y-2 scrollbar-hide">
+          {userResults.map((u) => (
+            <button
+              key={u.id}
+              onClick={() => handleSelectUser(u)}
+              disabled={creating}
+              className="w-full text-left bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3 hover:border-fx-orange/40 transition-colors disabled:opacity-50"
+            >
+              <div className="w-10 h-10 rounded-xl bg-fx-orange/10 flex items-center justify-center shrink-0">
+                <User size={16} className="text-fx-orange" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-fx-text truncate">
+                  {u.full_name ?? u.email}
+                </p>
+                <p className="text-xs text-fx-text-dim truncate">{u.email}</p>
+              </div>
+              <span className="text-[10px] font-bold text-fx-text-dim bg-fx-surface-2 px-2 py-0.5 rounded-full capitalize">
+                {u.role}
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : userQuery.trim() ? (
+        <div className="bg-fx-surface border border-fx-border rounded-2xl p-6 text-center">
+          <User size={28} className="text-fx-text-dim mx-auto mb-2" />
+          <p className="text-sm text-fx-text-muted">No users found</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export default function MessagesPage() {
   const { user, profile } = useAuth();
@@ -282,68 +525,20 @@ export default function MessagesPage() {
               </button>
             </div>
 
-            {!newMessageType ? (
-              <div className="space-y-3">
-                <p className="text-sm text-fx-text-muted mb-4">
-                  Choose how you want to start a conversation:
-                </p>
-                <button
-                  onClick={() => setNewMessageType('load')}
-                  className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center">
-                    <Package size={22} className="text-fx-orange" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-fx-text">Message about a Load</p>
-                    <p className="text-xs text-fx-text-muted">
-                      Start a conversation tied to a specific load
-                    </p>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setNewMessageType('user')}
-                  className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center">
-                    <User size={22} className="text-fx-orange" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-fx-text">Message a User</p>
-                    <p className="text-xs text-fx-text-muted">
-                      Browse and message any user directly
-                    </p>
-                  </div>
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <button
-                  onClick={() => setNewMessageType(null)}
-                  className="text-sm text-fx-orange font-medium"
-                >
-                  ← Back
-                </button>
-                <p className="text-sm text-fx-text-muted">
-                  {newMessageType === 'load'
-                    ? 'Select a load to start a conversation about:'
-                    : 'Search for a user to message:'}
-                </p>
-                <div className="bg-fx-surface border border-fx-border rounded-2xl p-4 text-center">
-                  <p className="text-sm text-fx-text-dim">
-                    {newMessageType === 'load'
-                      ? 'Your loads will appear here for selection'
-                      : 'Search users by name or company'}
-                  </p>
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-full h-10 bg-fx-bg border border-fx-border rounded-xl px-4 text-sm text-fx-text mt-3"
-                  />
-                </div>
-              </div>
-            )}
+            <NewMessageContent
+              type={newMessageType}
+              onSelectType={setNewMessageType}
+              userId={user?.id ?? ''}
+              userName={profile?.full_name ?? profile?.email ?? ''}
+              userRole={profile?.role ?? 'carrier'}
+              onConversationCreated={(convo) => {
+                setShowNewMessage(false);
+                setNewMessageType(null);
+                // Refresh conversations and open the new one
+                if (user) getConversations(user.id).then(setConversations).catch(console.error);
+                setSelected(convo);
+              }}
+            />
           </div>
         </div>
       )}
