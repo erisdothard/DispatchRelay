@@ -216,11 +216,14 @@ export default function CarrierDashboard() {
                   <div className="flex items-end justify-between">
                     <div>
                       <p className="text-[11px] text-fx-text-dim">
-                        {new Date(currentLoad.pickupDate + 'T12:00:00').toLocaleDateString('en-US', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
+                        {new Date(currentLoad.pickupDate + 'T12:00:00').toLocaleDateString(
+                          'en-US',
+                          {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          },
+                        )}
                       </p>
                       <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
                         {currentLoad.originCity}
@@ -229,11 +232,14 @@ export default function CarrierDashboard() {
                     <div className="text-right">
                       <p className="text-[11px] text-fx-text-dim">
                         Estimated{' '}
-                        {new Date(currentLoad.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
+                        {new Date(currentLoad.deliveryDate + 'T12:00:00').toLocaleDateString(
+                          'en-US',
+                          {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          },
+                        )}
                       </p>
                       <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
                         {currentLoad.destCity}
@@ -339,9 +345,17 @@ export default function CarrierDashboard() {
                         <span className="text-[11px] font-bold text-white bg-black/25 px-2.5 py-1 rounded-full">
                           {load.status === 'delivered'
                             ? 'Delivered'
-                            : load.status === 'in_transit'
-                              ? 'In Transit'
-                              : 'Posted'}
+                            : load.status === 'completed'
+                              ? 'Completed'
+                              : load.status === 'in_transit'
+                                ? 'In Transit'
+                                : load.status === 'dispatched'
+                                  ? 'Dispatched'
+                                  : load.status === 'awarded'
+                                    ? 'Awarded'
+                                    : load.status === 'bid_received'
+                                      ? 'Bid Received'
+                                      : 'Posted'}
                         </span>
                       </div>
                     </div>

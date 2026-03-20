@@ -321,6 +321,7 @@ export async function getDriverLoads(driverId: string, status?: string): Promise
 export async function getCompanyDrivers(
   companyId: string,
 ): Promise<Array<{ id: string; fullName: string; email: string }>> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('company_members')
     .select('user_id, profiles!company_members_user_id_fkey(id, full_name, email, role)')
@@ -328,9 +329,13 @@ export async function getCompanyDrivers(
 
   if (error) throw error;
 
-  return (data ?? [])
-    .filter((m: any) => m.profiles?.role === 'driver')
-    .map((m: any) => ({
+  interface MemberRow {
+    profiles?: { id: string; full_name?: string; email: string; role: string };
+  }
+
+  return ((data ?? []) as MemberRow[])
+    .filter((m): m is MemberRow & { profiles: NonNullable<MemberRow['profiles']> } => m.profiles?.role === 'driver')
+    .map((m) => ({
       id: m.profiles.id,
       fullName: m.profiles.full_name ?? m.profiles.email,
       email: m.profiles.email,

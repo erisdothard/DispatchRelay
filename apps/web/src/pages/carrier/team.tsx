@@ -93,7 +93,10 @@ function DriverCard({
   );
 }
 
-const STATUS_BADGE: Record<string, { label: string; variant: 'orange' | 'blue' | 'green' | 'gray' }> = {
+const STATUS_BADGE: Record<
+  string,
+  { label: string; variant: 'orange' | 'blue' | 'green' | 'gray' }
+> = {
   in_transit: { label: 'In Transit', variant: 'orange' },
   dispatched: { label: 'Dispatched', variant: 'blue' },
   awarded: { label: 'Awarded', variant: 'blue' },
@@ -115,7 +118,9 @@ function ActiveLoadRow({ load }: { load: Load }) {
   const badge = STATUS_BADGE[load.status];
 
   return (
-    <div className={`bg-fx-surface-2 border border-fx-border rounded-xl p-3 space-y-2${isDone ? ' opacity-50' : ''}`}>
+    <div
+      className={`bg-fx-surface-2 border border-fx-border rounded-xl p-3 space-y-2${isDone ? ' opacity-50' : ''}`}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
@@ -125,8 +130,8 @@ function ActiveLoadRow({ load }: { load: Load }) {
             </Badge>
           )}
         </div>
-        {!isDone && (
-          ping ? (
+        {!isDone &&
+          (ping ? (
             <span className="text-[10px] text-green-400 font-semibold flex items-center gap-1">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
               Live GPS
@@ -136,8 +141,7 @@ function ActiveLoadRow({ load }: { load: Load }) {
               <span className="w-1.5 h-1.5 bg-fx-text-dim rounded-full" />
               No GPS
             </span>
-          )
-        )}
+          ))}
       </div>
       <div className="flex items-center gap-1.5">
         <MapPin size={12} className="text-fx-orange shrink-0" />
@@ -200,9 +204,7 @@ function DriverDetailSheet({
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-base font-bold text-fx-text">{name}</p>
-            {driver.email && (
-              <p className="text-xs text-fx-text-dim">{driver.email}</p>
-            )}
+            {driver.email && <p className="text-xs text-fx-text-dim">{driver.email}</p>}
           </div>
           <Badge variant={activeLoad ? 'orange' : 'green'}>
             {activeLoad ? 'In Transit' : 'Available'}
@@ -219,12 +221,20 @@ function DriverDetailSheet({
               Assigned Loads ({driverLoads.length})
             </p>
             <div className="space-y-2">
-              {[...driverLoads].sort((a, b) => {
-                const p: Record<string, number> = { in_transit: 0, dispatched: 1, awarded: 2, delivered: 3, completed: 4 };
-                return (p[a.status] ?? 5) - (p[b.status] ?? 5);
-              }).map((load) => (
-                <ActiveLoadRow key={load.id} load={load} />
-              ))}
+              {[...driverLoads]
+                .sort((a, b) => {
+                  const p: Record<string, number> = {
+                    in_transit: 0,
+                    dispatched: 1,
+                    awarded: 2,
+                    delivered: 3,
+                    completed: 4,
+                  };
+                  return (p[a.status] ?? 5) - (p[b.status] ?? 5);
+                })
+                .map((load) => (
+                  <ActiveLoadRow key={load.id} load={load} />
+                ))}
             </div>
           </div>
         ) : (
@@ -244,8 +254,7 @@ function DriverGpsMap({ load }: { load: Load }) {
   const lastPing = ping?.recorded_at
     ? new Date(ping.recorded_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     : null;
-  const livePos: [number, number] | undefined =
-    ping ? [ping.latitude, ping.longitude] : undefined;
+  const livePos: [number, number] | undefined = ping ? [ping.latitude, ping.longitude] : undefined;
 
   return (
     <div className="space-y-2">
@@ -280,12 +289,40 @@ function DriverGpsMap({ load }: { load: Load }) {
 
 /* ── Members tab role constants ──────────────────────────────── */
 
-const ROLE_META: Record<MemberRole, { label: string; desc: string; icon: React.ElementType; color: string }> = {
-  owner: { label: 'Owner', desc: 'Full control, billing, and member management', icon: Crown, color: 'text-yellow-400' },
-  admin: { label: 'Admin', desc: 'Manage team, loads, and settings', icon: Shield, color: 'text-blue-400' },
-  dispatcher: { label: 'Dispatcher', desc: 'Assign drivers, dispatch loads, update status', icon: Truck, color: 'text-fx-orange' },
-  accounting: { label: 'Accounting', desc: 'View rates, invoices, and financials', icon: Calculator, color: 'text-green-400' },
-  viewer: { label: 'Viewer', desc: 'Read-only access to loads and team', icon: Eye, color: 'text-fx-text-dim' },
+const ROLE_META: Record<
+  MemberRole,
+  { label: string; desc: string; icon: React.ElementType; color: string }
+> = {
+  owner: {
+    label: 'Owner',
+    desc: 'Full control, billing, and member management',
+    icon: Crown,
+    color: 'text-yellow-400',
+  },
+  admin: {
+    label: 'Admin',
+    desc: 'Manage team, loads, and settings',
+    icon: Shield,
+    color: 'text-blue-400',
+  },
+  dispatcher: {
+    label: 'Dispatcher',
+    desc: 'Assign drivers, dispatch loads, update status',
+    icon: Truck,
+    color: 'text-fx-orange',
+  },
+  accounting: {
+    label: 'Accounting',
+    desc: 'View rates, invoices, and financials',
+    icon: Calculator,
+    color: 'text-green-400',
+  },
+  viewer: {
+    label: 'Viewer',
+    desc: 'Read-only access to loads and team',
+    icon: Eye,
+    color: 'text-fx-text-dim',
+  },
 };
 
 const INVITE_ROLES: MemberRole[] = ['admin', 'dispatcher', 'accounting', 'viewer'];
@@ -314,7 +351,10 @@ function MembersTabContent() {
       return;
     }
     Promise.all([getCompanyMembers(companyId), getCompanyInvites(companyId)])
-      .then(([m, i]) => { setMembers(m); setInvites(i); })
+      .then(([m, i]) => {
+        setMembers(m);
+        setInvites(i);
+      })
       .catch((err) => console.error('Failed to load team settings:', err))
       .finally(() => setLoading(false));
   }, [companyId]);
@@ -391,24 +431,27 @@ function MembersTabContent() {
               <select
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value as MemberRole)}
-                className="flex-1 h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
+                className="min-w-0 flex-1 h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
                 style={{ colorScheme: 'dark' }}
               >
                 {INVITE_ROLES.map((r) => (
                   <option key={r} value={r} style={{ background: '#141414' }}>
-                    {ROLE_META[r].label} — {ROLE_META[r].desc}
+                    {ROLE_META[r].label}
                   </option>
                 ))}
               </select>
               <button
                 type="submit"
                 disabled={inviting}
-                className="px-4 h-10 rounded-xl text-sm font-bold bg-fx-orange text-white disabled:opacity-50 flex items-center gap-1.5"
+                className="shrink-0 px-4 h-10 rounded-xl text-sm font-bold bg-fx-orange text-white disabled:opacity-50 flex items-center gap-1.5"
               >
                 {inviting ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                 Invite
               </button>
             </div>
+            <p className="text-[11px] text-fx-text-dim">
+              {ROLE_META[inviteRole].desc}
+            </p>
             {inviteError && <p className="text-xs text-red-400">{inviteError}</p>}
             {inviteSuccess && <p className="text-xs text-green-400">{inviteSuccess}</p>}
           </form>
@@ -417,7 +460,9 @@ function MembersTabContent() {
 
       {/* Members List */}
       <div>
-        <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3">Members</p>
+        <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+          Members
+        </p>
         <div className="space-y-2">
           {members.map((member) => {
             const meta = ROLE_META[member.role];
@@ -425,7 +470,10 @@ function MembersTabContent() {
             const isMe = member.user_id === profile?.id;
             const isOwner = member.role === 'owner';
             return (
-              <div key={member.id} className="bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3">
+              <div
+                key={member.id}
+                className="bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3"
+              >
                 <div className="w-10 h-10 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
                   <Icon size={16} className={meta?.color ?? 'text-fx-text-dim'} />
                 </div>
@@ -445,7 +493,9 @@ function MembersTabContent() {
                       style={{ colorScheme: 'dark' }}
                     >
                       {INVITE_ROLES.map((r) => (
-                        <option key={r} value={r} style={{ background: '#141414' }}>{ROLE_META[r].label}</option>
+                        <option key={r} value={r} style={{ background: '#141414' }}>
+                          {ROLE_META[r].label}
+                        </option>
                       ))}
                     </select>
                     <button
@@ -469,10 +519,15 @@ function MembersTabContent() {
       {/* Pending Invites */}
       {invites.length > 0 && (
         <div>
-          <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3">Pending Invites</p>
+          <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+            Pending Invites
+          </p>
           <div className="space-y-2">
             {invites.map((invite) => (
-              <div key={invite.id} className="bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3">
+              <div
+                key={invite.id}
+                className="bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3"
+              >
                 <div className="w-10 h-10 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
                   <Mail size={16} className="text-fx-text-dim" />
                 </div>
@@ -545,14 +600,19 @@ export default function CarrierTeamPage() {
 
         const driverMap = new Map<string, DriverProfile>();
         for (const d of companyDrivers) {
-          driverMap.set(d.id, { id: d.id, full_name: d.fullName, email: d.email, avatar_url: null });
+          driverMap.set(d.id, {
+            id: d.id,
+            full_name: d.fullName,
+            email: d.email,
+            avatar_url: null,
+          });
         }
 
         // Also include drivers from load assignments (assigned_driver_id + second_driver_id)
         const assignedIds = [
           ...new Set([
-            ...l.map((load) => load.assignedDriverId).filter(Boolean) as string[],
-            ...l.map((load) => load.secondDriverId).filter(Boolean) as string[],
+            ...(l.map((load) => load.assignedDriverId).filter(Boolean) as string[]),
+            ...(l.map((load) => load.secondDriverId).filter(Boolean) as string[]),
           ]),
         ].filter((id) => !driverMap.has(id));
 
@@ -624,7 +684,8 @@ export default function CarrierTeamPage() {
                 <Truck size={18} className="text-fx-orange shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-fx-orange">
-                    {loads.filter((l) => l.status === 'in_transit' && !l.assignedDriverId).length} load(s) in transit without a driver assigned
+                    {loads.filter((l) => l.status === 'in_transit' && !l.assignedDriverId).length}{' '}
+                    load(s) in transit without a driver assigned
                   </p>
                   <p className="text-[11px] text-fx-text-dim mt-0.5">
                     Assign a driver from load details to enable GPS tracking
