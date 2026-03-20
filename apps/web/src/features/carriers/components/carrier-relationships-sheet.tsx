@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Star, Ban, Minus, Trash2, Plus, Search, Loader2, ChevronDown } from 'lucide-react';
+import { Star, Ban, Trash2, Plus, Search, Loader2, ChevronDown } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import {
   getRelationships,
@@ -30,12 +30,6 @@ const STATUS_CONFIG: Record<
     color: 'text-red-400',
     bg: 'bg-red-400/10 border-red-400/20',
     icon: Ban,
-  },
-  neutral: {
-    label: 'Neutral',
-    color: 'text-fx-text-muted',
-    bg: 'bg-fx-surface-2 border-fx-border',
-    icon: Minus,
   },
 };
 
@@ -102,7 +96,7 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
   async function handleSaveEdit(rel: CarrierRelationship) {
     setSaving(true);
     try {
-      await upsertRelationship(rel.carrier_company_id, editStatus, editNotes);
+      await upsertRelationship(rel.carrier_id, editStatus, editNotes);
       const updated = await getRelationships();
       setRelationships(updated);
       setEditId(null);
@@ -200,7 +194,7 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-fx-text truncate">
-                      {rel.carrier_company_name ?? rel.carrier_company_id}
+                      {rel.carrier_name ?? rel.carrier_id}
                     </p>
                     {rel.notes && !isEditing && (
                       <p className="text-xs text-fx-text-dim mt-0.5 truncate">{rel.notes}</p>
@@ -237,7 +231,7 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
                   <div className="mt-3 space-y-2 pt-3 border-t border-fx-border">
                     {/* Status selector */}
                     <div className="flex gap-1.5">
-                      {(['preferred', 'neutral', 'blocked'] as RelationshipStatus[]).map((s) => {
+                      {(['preferred', 'blocked'] as RelationshipStatus[]).map((s) => {
                         const sc = STATUS_CONFIG[s];
                         return (
                           <button

@@ -31,7 +31,7 @@ const carrierNav: NavItem[] = [
 const brokerNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/broker' },
   { label: 'Loads', icon: <Package size={22} />, path: '/broker/loads' },
-  { label: 'Track', icon: <BarChart2 size={22} />, path: '/tracking' },
+  { label: 'Track', icon: <BarChart2 size={22} />, path: '/track' },
   { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
