@@ -38,26 +38,29 @@ export default function AuditLogPage() {
   const [hasMore, setHasMore] = useState(false);
   const [filter, setFilter] = useState('');
 
-  const fetchEntries = useCallback(async (p: number, append: boolean) => {
-    setLoading(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase as any)
-      .from('audit_log')
-      .select('*, profiles!audit_log_user_id_fkey(full_name, email)')
-      .order('created_at', { ascending: false })
-      .range(p * PAGE_SIZE, p * PAGE_SIZE + PAGE_SIZE - 1);
+  const fetchEntries = useCallback(
+    async (p: number, append: boolean) => {
+      setLoading(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase as any)
+        .from('audit_log')
+        .select('*, profiles!audit_log_user_id_fkey(full_name, email)')
+        .order('created_at', { ascending: false })
+        .range(p * PAGE_SIZE, p * PAGE_SIZE + PAGE_SIZE - 1);
 
-    if (filter) {
-      query = query.or(`entity_type.eq.${filter},action.eq.${filter}`);
-    }
+      if (filter) {
+        query = query.or(`entity_type.eq.${filter},action.eq.${filter}`);
+      }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (query as any);
-    const rows = (data ?? []) as AuditEntry[];
-    setEntries((prev) => (append ? [...prev, ...rows] : rows));
-    setHasMore(rows.length === PAGE_SIZE);
-    setLoading(false);
-  }, [filter]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (query as any);
+      const rows = (data ?? []) as AuditEntry[];
+      setEntries((prev) => (append ? [...prev, ...rows] : rows));
+      setHasMore(rows.length === PAGE_SIZE);
+      setLoading(false);
+    },
+    [filter],
+  );
 
   useEffect(() => {
     setPage(0);

@@ -55,9 +55,7 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
           setLat(pos.coords.latitude);
           setLng(pos.coords.longitude);
           setLocationText((prev) =>
-            prev
-              ? prev
-              : `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
+            prev ? prev : `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
           );
         },
         () => undefined,

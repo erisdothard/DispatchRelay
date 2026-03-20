@@ -122,29 +122,20 @@ export default function BrokerDashboard() {
           </div>
         </div>
 
-        {/* Quick actions */}
-        <div>
-          <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: 'Post a Load', icon: '📦', action: () => navigate('/broker/loads') },
-              { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
-              { label: 'Carrier Network', icon: '🤝', action: () => setCarrierNetworkOpen(true) },
-              { label: 'Track Loads', icon: '📍', action: () => navigate('/track') },
-            ].map((item) => (
-              <button
-                key={item.label}
-                onClick={item.action}
-                className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200"
-              >
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-xs font-semibold text-fx-text-muted">{item.label}</span>
-              </button>
-            ))}
+        {/* Carrier Network */}
+        <button
+          onClick={() => setCarrierNetworkOpen(true)}
+          className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-4 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200 text-left"
+        >
+          <div className="w-12 h-12 rounded-xl bg-fx-orange/15 flex items-center justify-center shrink-0">
+            <span className="text-2xl">🤝</span>
           </div>
-        </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-white">Carrier Network</p>
+            <p className="text-[11px] text-fx-text-dim mt-0.5">Manage preferred carriers</p>
+          </div>
+          <span className="text-fx-text-dim text-xs">→</span>
+        </button>
       </div>
 
       <BottomNav role="broker" />

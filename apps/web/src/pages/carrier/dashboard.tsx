@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, ArrowUpRight, MapPin, Navigation, Package, Users, UserCheck } from 'lucide-react';
+import { Bell, ArrowUpRight, MapPin, Navigation, UserCheck } from 'lucide-react';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,18 +26,6 @@ const QUICK_ACTIONS = [
     sub: 'Trucks & GPS',
     icon: <MapPin size={20} className="text-fx-orange" />,
     path: '/carrier/fleet',
-  },
-  {
-    label: 'Browse Loads',
-    sub: 'Load board',
-    icon: <Package size={20} className="text-fx-orange" />,
-    path: '/carrier/loads',
-  },
-  {
-    label: 'My Team',
-    sub: 'Invite & manage',
-    icon: <Users size={20} className="text-fx-orange" />,
-    path: '/carrier/team',
   },
 ];
 
@@ -139,7 +127,7 @@ export default function CarrierDashboard() {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto scrollbar-hide px-5 space-y-6 pb-2">
-        {/* Quick actions 2×2 */}
+        {/* Quick actions */}
         <div className="grid grid-cols-2 gap-3">
           {QUICK_ACTIONS.map((item) => (
             <button

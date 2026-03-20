@@ -450,7 +450,9 @@ function MembersTabContent() {
               </button>
             </div>
             <p className="text-[11px] text-fx-text-dim mt-1 leading-snug">
-              <span className="font-semibold text-fx-text-muted">{ROLE_META[inviteRole].label}:</span>{' '}
+              <span className="font-semibold text-fx-text-muted">
+                {ROLE_META[inviteRole].label}:
+              </span>{' '}
               {ROLE_META[inviteRole].desc}
             </p>
             {inviteError && <p className="text-xs text-red-400">{inviteError}</p>}

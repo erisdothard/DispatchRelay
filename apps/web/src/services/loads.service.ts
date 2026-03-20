@@ -334,7 +334,10 @@ export async function getCompanyDrivers(
   }
 
   return ((data ?? []) as MemberRow[])
-    .filter((m): m is MemberRow & { profiles: NonNullable<MemberRow['profiles']> } => m.profiles?.role === 'driver')
+    .filter(
+      (m): m is MemberRow & { profiles: NonNullable<MemberRow['profiles']> } =>
+        m.profiles?.role === 'driver',
+    )
     .map((m) => ({
       id: m.profiles.id,
       fullName: m.profiles.full_name ?? m.profiles.email,

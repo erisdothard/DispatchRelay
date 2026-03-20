@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase';
 
-
 interface EmailTrigger {
   template: string;
   to: string;
