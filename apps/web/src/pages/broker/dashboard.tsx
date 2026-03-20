@@ -130,9 +130,7 @@ export default function BrokerDashboard() {
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Post a Load', icon: '📦', action: () => navigate('/broker/loads') },
-              { label: 'Find Carriers', icon: '🔍', action: () => navigate('/broker/loads') },
               { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
-              { label: 'Analytics', icon: '📊', action: () => {} },
               { label: 'Carrier Network', icon: '🤝', action: () => setCarrierNetworkOpen(true) },
               { label: 'Track Loads', icon: '📍', action: () => navigate('/track') },
             ].map((item) => (
