@@ -1,343 +1,276 @@
 # FreightX — Implementation Status
 
-**Last Updated:** March 15, 2026
-**Status:** All 13 Phases Complete — Enterprise Ready
+**Last Updated:** 2026-03-30
+**Audit basis:** Source code in `apps/web/src/`, `database/migrations/`, `supabase/functions/`, `apps/web/package.json`, `apps/web/tailwind.config.ts`
 
-This document provides a comprehensive overview of what has been implemented in FreightX and what remains to be completed.
-
-## 🟢 COMPLETED FEATURES
-
-### Phase 0 — Repo, CI/CD, Tooling ✅
-
-- [x] pnpm + Turborepo monorepo initialized
-- [x] `apps/web` scaffolded (React 19 + Vite 6 + TypeScript strict)
-- [x] `packages/shared` scaffolded (types, schemas, constants)
-- [x] `packages/typescript-config` shared tsconfig presets
-- [x] Tailwind CSS v3 + shadcn/ui configured (orange + dark grey theme)
-- [x] GitHub Actions CI pipeline (`ci.yml`)
-- [x] Husky pre-commit hook — needs `husky init` to activate
-- [x] Husky commit-msg hook (commitlint conventional commits)
-- [x] `.env.example` with all required variables documented
-- [x] `supabase/migrations/` directory — using `database/migrations/` instead
-- [x] All phase guide docs in `docs/`
-- [x] README complete with setup instructions
-
-### Phase 1 — Database, Auth, Infra ✅
-
-- [x] Supabase project created (dev & production)
-- [x] Complete database schema with 6 tables (profiles, companies, loads, trucks, conversations, messages, tracking_milestones)
-- [x] RLS policies on all tables
-- [x] Supabase Auth: email/password + Google OAuth
-- [x] Multi-step registration: email → role → company info (3 steps complete)
-- [x] Real AuthContext with JWT management and session persistence
-- [x] Protected routes with role-based enforcement
-- [x] Password reset flow (`/forgot-password` + `/reset-password`)
-- [x] All hardcoded credentials removed
-- [x] Vercel project linked to `main` branch
-- [x] Staging environment linked to `develop` branch
-- [x] Full data service layer (loads, trucks, messages)
-- [x] All dashboards pulling from Supabase (carrier, broker, shipper)
-- [x] TypeScript database types + camelCase mappers
-- [x] Seed data in migration (6 loads, 3 trucks, tracking milestones)
-
-### Phase 2 — Core Data Layer & CRUD ✅
-
-- [x] Migration 003: `loads` — full schema with status lifecycle
-- [x] Migration 004: `trucks` — equipment postings
-- [x] Migration 005: `bookings` — load-carrier assignments (stub)
-- [x] RLS policies: users can only see/edit their own data + public listings
-- [x] Supabase client utility in `packages/shared`
-- [x] TanStack Query setup with proper error handling
-- [x] `useLoads` hook — paginated list with filters, create, update, delete
-- [x] `useTrucks` hook — same pattern
-- [x] `useCompany` hook — profile management
-- [x] Carrier dashboard — real data: posted trucks, available loads board
-- [x] Broker dashboard — real data: posted loads, truck search
-- [x] Shipper dashboard — real data: shipments, truck search
-- [x] Load posting form — all fields, validation, Supabase write
-- [x] Truck posting form — all fields, validation, Supabase write
-- [x] Settings pages — editable profile, company info, save to DB
-- [x] Loading states (skeleton screens) on all data fetches
-- [x] Empty states with helpful messaging
-- [x] Error states with user-facing error messages
-- [x] `mockData.ts` file completely deleted
-- [ ] Server-side pagination on all list views
-
-### Phase 3 — Real-Time & Messaging ✅
-
-- [x] Migration 006: `messages` — conversation threads per booking
-- [x] Migration 007: `message_items` — individual messages
-- [x] Migration 008: `notifications` — system notifications
-- [x] Supabase Realtime subscriptions on `loads` and `trucks` tables
-- [x] New loads/trucks appear on the board without page refresh (< 2 seconds)
-- [x] Load status changes propagate in real time
-- [x] Real-time per-load chat (Supabase Realtime on `message_items`)
-- [x] Conversation list in sidebar with unread count badges
-- [ ] File sharing within message threads (Supabase Storage)
-- [x] In-app notification bell — real-time unread count
-- [x] Notification dropdown — list of recent notifications with links
-- [ ] Email notifications via Supabase Edge Functions
-- [ ] Notification preferences per user
-
-## 🟢 COMPLETED FEATURES
-
-### Phase 4 — Booking Workflow & Documents ✅
-
-- [x] Migration 009: `bids` — carrier bids with amount, status, expiry
-- [x] Migration 010: `documents` — BOL, POD, rate confirmations
-- [x] Supabase Storage buckets: `documents`, `profile-photos`
-- [x] Bid submission UI — carrier submits rate on available load
-- [x] Bid management UI — broker views all bids, accept / counter / decline
-- [x] Counter-offer flow — multi-round negotiation
-- [x] Book-It-Now — instant booking at posted rate
-- [x] Bid expiration — stale bids auto-expire (Supabase cron/edge function)
-- [x] Booking confirmation — accept bid → create booking → notify all parties
-- [x] Rate confirmation PDF — auto-generated on booking, downloadable
-- [x] Load status lifecycle UI — dispatched → in-transit → delivered
-- [x] Cancellation flow — request, confirmation, policy enforcement
-- [x] Document upload — BOL, POD, rate confirmation per load
-- [x] Document viewer — in-app preview of uploaded files
-- [x] POD capture — photo upload from mobile browser (camera API)
-- [x] Load completion — finalize with actual miles, weights, accessorials
-
-### Phase 5 — Verification, Payments & Ratings ✅
-
-- [x] Migration 011: `carrier_verifications` — MC/DOT/insurance records
-- [x] Migration 012: `ratings` — post-load ratings both directions
-- [x] Migration 013: `subscriptions` — Stripe billing records
-- [x] FMCSA SAFER API integration — MC/DOT auto-verified on signup
-- [x] Insurance certificate upload + expiry tracking
-- [x] CSA safety score display on carrier profiles
-- [x] Verified badge shown on carrier/broker cards
-- [x] Auto-alert when insurance is expiring (60 days, 30 days, 7 days)
-- [x] Stripe integration — subscription billing (monthly/annual)
-- [x] Subscription tier enforcement — feature gating by plan
-- [x] Invoice auto-generation on load completion
-- [x] In-platform payment (ACH via Stripe) — carrier gets paid
-- [x] Quick Pay option — 2% fee for 2-day payment
-- [x] Payment status tracking — Invoiced → Approved → Paid
-- [x] Post-load rating prompt — both parties rate after completion
-- [x] 5-star rating display on carrier/broker profiles
-- [x] Performance metrics — on-time %, load count, avg rating
-
-### Phase 6 — Testing, Hardening & Launch ✅
-
-- [x] Vitest unit tests — all shared utility functions and schemas
-- [x] Component tests — critical UI flows (login, load post, bid flow)
-- [x] Service integration tests — loads, bids, stripe, documents, location (mocked Supabase, `test/test-features/services/`)
-- [x] Playwright E2E — happy path for each role (register → post → book → deliver)
-- [x] Security audit — OWASP Top 10 review
-- [x] Load testing — 1,000 concurrent users on load board
-- [x] Mobile responsiveness — tested on iOS Safari, Android Chrome
-- [x] Cross-browser — Chrome, Firefox, Safari, Edge
-- [x] Code splitting — lazy-load all route components
-- [x] Bundle analysis — no single chunk > 250KB
-- [x] Lighthouse score > 85 on all pages
-- [x] Image optimization — WebP, lazy loading
-- [x] Database indexes reviewed — all search queries < 100ms
-- [x] Sentry error monitoring configured + alerting
-- [x] Vercel Analytics enabled
-- [x] Uptime monitor configured (BetterStack or similar)
-- [x] Supabase PITR (Point-in-Time Recovery) enabled
-- [x] GitHub Actions CD pipeline — auto-deploy to Vercel on main merge
-- [x] Privacy Policy published
-- [x] Terms of Service published
-- [x] Custom domain configured with SSL
-- [x] SEO meta tags, Open Graph images
-- [x] Beta invite flow — waitlist or invite codes
-- [x] Onboarding checklist for new users
-- [x] Support channel established (Discord, email, or Intercom)
-
-### Phase 6 (Part 2) — Production Hardening ✅
-
-- [x] Redis setup (Upstash or self-hosted)
-- [x] Rate limiting implementation
-- [x] Webhook system with retry logic
-- [x] Job queue system (BullMQ)
-- [x] Health check endpoint
-- [x] Comprehensive monitoring (Sentry + uptime)
-- [x] Load testing (100k concurrent users)
-- [x] Security audit (OWASP Top 10)
-- [x] Database optimization
-
-### Phase 7 — Elite Automation Scripts ✅
-
-- [x] Health check script
-- [x] Security audit script
-- [x] Load testing suite
-- [x] Deployment automation script
-- [x] Database maintenance script
-- [x] Developer SDK (`@freightx/sdk`)
-- [x] Data seeding script
-
-### Phase 8 — Study Guide & Learning Platform ✅
-
-- [x] FreightX Academy Next.js app
-- [x] Interactive architecture diagrams
-- [x] Database schema visualizer
-- [x] Feature catalog with videos
-- [x] Interactive API explorer
-- [x] CEO presentation mode
-- [x] Developer onboarding guide
-- [x] Interactive tutorials
-
-### Phase 9 — Apple Maps-Style Live Maps ✅
-
-- [x] Map Tile System with Stadia Alidade Smooth Dark tiles
-- [x] SVG teardrop pins for loads with dual-layer route glow
-- [x] Animated truck markers with direction indicators
-- [x] Frosted glass UI elements for modern design
-- [x] Live tracking map with route visualization
-- [x] Fleet-Map Component with pulsing pins
-- [x] Leaflet Global Overrides for glass styling
-- [x] Load Board Fixes including Bid Now button restoration
-- [x] Independent carrier truck posting enabled
-
-### Phase 10 — Interactive Maps & Profiles ✅
-
-- [x] Help Center page with FAQ accordion
-- [x] Notifications Settings page with push/email/SMS toggles
-- [x] Documents page for upload/verification status
-- [x] Avatar upload functionality with Supabase Storage
-- [x] Profile image display and management
-- [x] New Message FAB with modal interface
-- [x] Search UI for selecting loads or users
-- [x] Free-form messaging between users
-- [x] Booked loads messaging functionality
-- [x] Automatic load notifications for carriers
-- [x] Enhanced live tracking map with progress indicators
-- [x] All interactive map features working
-- [x] Rate limiting implemented for API endpoints
-- [x] Health check script functional
-- [x] All documentation updated and complete
-
-## 📊 CURRENT STATUS SUMMARY
-
-**Overall Progress:** 100% Complete
-**Current Phase:** All 10 Phases Complete
-**Next Major Milestone:** Production Launch
-
-**Key Achievements:**
-
-- ✅ Complete authentication and user management system
-- ✅ Full database schema with RLS policies
-- ✅ Real-time load board with live updates
-- ✅ Multi-role dashboards (Carrier, Broker, Shipper)
-- ✅ Real-time messaging system
-- ✅ Notification system with real-time updates
-- ✅ Complete CRUD operations for loads and trucks
-- ✅ Professional CI/CD pipeline
-- ✅ Complete booking workflow with bidding system
-- ✅ Document management (BOL, POD, rate confirmations)
-- ✅ Carrier verification and payment processing
-- ✅ Comprehensive testing and production hardening
-- ✅ Interactive mapping with Apple Maps-style design
-- ✅ Enhanced user profiles with Help Center and messaging
-- ✅ Complete documentation and learning platform
-
-**Ready for Production?** Yes - All phases complete with full functionality
-
-## 🎯 CRITICAL PATH TO MVP
-
-**MVP Status:** Complete ✅
-
-All critical components are implemented:
-
-1. **Phase 4 Complete** ✅ - Bidding and booking system
-2. **Phase 5 Complete** ✅ - Carrier verification and payments
-3. **Phase 6 Complete** ✅ - Testing and polish
-4. **Phase 7 Complete** ✅ - Production hardening
-5. **Phase 8 Complete** ✅ - Learning platform
-6. **Phase 9 Complete** ✅ - Interactive maps
-7. **Phase 10 Complete** ✅ - Enhanced profiles
-
-**Production Ready:** Yes - All systems implemented and documented
-
-## 📈 FEATURE COMPLETION BY CATEGORY
-
-### Core Platform Infrastructure: 100% Complete
-
-- Database, Auth, Real-time, CRUD operations, RLS policies
-
-### User Experience: 100% Complete
-
-- Multi-role dashboards, messaging, notifications, real-time updates
-
-### Business Logic: 100% Complete
-
-- Load posting, truck posting, bidding, booking, payments, verification
-
-### Production Readiness: 100% Complete
-
-- Testing, monitoring, deployment automation, security, performance
+This document records what is actually built. Do not use it as a roadmap. For unbuilt items, see `DEVELOPMENT_ROADMAP.md`. For the full feature inventory, see `FEATURE_CATALOG.md`.
 
 ---
 
-## **Note:** This document is updated regularly as features are completed. Check the individual phase guides for detailed implementation steps.
+## Tech Stack (Actual)
 
-### Phase 11 — AI Load Seeking ✅
+| Layer            | What is used                                                                                                               | Notes                                                                                                                              |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Framework        | React 19 + Vite 6 (TypeScript strict)                                                                                      | SPA, not Next.js                                                                                                                   |
+| Routing          | react-router-dom v6                                                                                                        | File-based pages in `apps/web/src/pages/`                                                                                          |
+| Styling          | Tailwind CSS v3                                                                                                            | Custom `fx-*` token namespace (orange, bg, surface, border, text) defined in `tailwind.config.ts` — NOT shadcn/ui, NOT Tailwind v4 |
+| Design tokens    | `fx-orange`, `fx-bg`, `fx-surface`, `fx-surface-2`, `fx-surface-3`, `fx-border`, `fx-text`, `fx-text-muted`, `fx-text-dim` | iOS-inspired dark theme                                                                                                            |
+| UI components    | Custom components in `apps/web/src/shared/components/ui/` — Badge, Button, BottomSheet, etc.                               | No shadcn/ui installed                                                                                                             |
+| State management | React state + Supabase subscriptions                                                                                       | No TanStack Query / React Query installed                                                                                          |
+| Database         | Supabase (PostgreSQL) — direct `@supabase/supabase-js` client                                                              | No ORM layer in web app                                                                                                            |
+| Auth             | Supabase Auth (email/password + Google OAuth)                                                                              | JWT managed in `AuthContext.tsx`                                                                                                   |
+| Real-time        | Supabase Realtime (postgres_changes + broadcast channels)                                                                  | Used for load board, notifications, live tracking                                                                                  |
+| File storage     | Supabase Storage                                                                                                           | Documents, avatars, signatures                                                                                                     |
+| Maps             | Leaflet + react-leaflet v5                                                                                                 | Stadia Alidade Smooth Dark tiles, custom SVG markers                                                                               |
+| Payments         | Stripe (subscriptions via Checkout, invoicing)                                                                             | `@stripe/stripe-js`, `create-checkout-session` edge function                                                                       |
+| Email            | Resend (via `send-notification-email` edge function)                                                                       | Queued through `notification_queue` table                                                                                          |
+| SMS              | Twilio (via `send-sms` edge function)                                                                                      | Critical events only, opt-in                                                                                                       |
+| AI               | Anthropic Claude (Haiku for load parsing, Sonnet for rate suggestion)                                                      | Via `ai-load-search` edge function                                                                                                 |
+| PDF generation   | jsPDF                                                                                                                      | Rate confirmation PDF                                                                                                              |
+| Rate limiting    | Upstash Redis + `@upstash/ratelimit` (Vercel KV sliding window)                                                            | Edge Middleware                                                                                                                    |
+| Monitoring       | Sentry (`@sentry/react`) + Vercel Speed Insights                                                                           |                                                                                                                                    |
+| Monorepo         | pnpm + Turborepo                                                                                                           | `apps/web`, `packages/shared`, `packages/typescript-config`                                                                        |
+| CI/CD            | GitHub Actions → Vercel                                                                                                    | Auto-deploy on main merge                                                                                                          |
 
-- [x] AI-powered natural language load search (Claude Haiku)
-- [x] `ai-load-search` edge function with keyword fallback
-- [x] Carrier preferences UI
-- [x] Migration 011: `carrier_preferences` table (gap fix in Phase 13)
+---
 
-### Phase 12 — GPS Real-Time Tracking ✅
+## Implemented Features by Domain
 
-- [x] `location_pings` table (Migration 012)
-- [x] `useDriverLocation` hook — smart interval GPS writes
-- [x] `useLiveTracking` hook — Supabase Realtime map updates
-- [x] `location-cleanup` edge function
-- [x] pg_cron schedule (gap fix documented in Phase 13)
+### Authentication and User Management
 
-### Phase 13 — Enterprise Completion ✅
+- Email/password and Google OAuth sign-in and sign-up
+- Password reset flow (`/forgot-password`, `/reset-password`)
+- Multi-step onboarding: email → role selection → company info
+- Onboarding checklist component (profile, company, first action)
+- Roles: carrier, broker, shipper, driver, admin
+- Protected routes with role enforcement
+- User profile editing (name, avatar, phone)
+- Company creation and editing
+- Multi-user company teams: invite by email, assign role, revoke access
+- Company member roles: owner, admin, dispatcher, accounting, viewer
+- Driver role linked to carrier company (separate from owner/admin)
+- Avatar upload to Supabase Storage
 
-**13A — Critical Completions**
+### Load Board
 
-- [x] Email notifications — Resend, 7 role-aware HTML templates
-- [x] SMS notifications — Twilio, critical events only
-- [x] Server-side pagination — `.range()` on all list queries, `loadMore()` hooks
-- [x] Audit log — Migration 020, `write_audit_log()` RPC, admin viewer page
-- [x] Notification preferences — persisted to DB with phone number for SMS
+- Post a load form (multi-field: equipment, origin/dest, rates, dates, commodity)
+- Load templates (save and apply any form state as a named template)
+- Load status lifecycle: posted → awarded → dispatched → in_transit → delivered
+- Load expiration (auto-expire edge functions: `load-expiry`, `auto-expiry-check`)
+- Load cancellation
+- Full pickup and delivery address fields on loads
+- Server-side paginated load list (25 rows/page using `.range()`)
+- Filters: equipment type, status, origin state, destination state, min rate/mile
+- Full-text search with GIN indexes and `search_vector` generated column
+- Load detail sheet (bottom drawer with full load info, bid actions, docs)
+- Load status stepper component
+- Role-specific load pages: carrier (`/carrier/loads`), broker (`/broker/loads`), shipper (`/shipper/loads`), driver (`/driver/loads`)
+- Carrier load board tabs: My Loads / All Loads / Matches
+- Co-driver assignment (`040-co-driver.sql`)
 
-**13B — Enterprise Operations**
+### AI-Powered Load Search
 
-- [x] Multi-user company accounts — Migration 013, invite/role/revoke UI
-- [x] Load templates — Migration 014, save/apply in post-load sheet
-- [x] Digital e-signature — Canvas → Supabase Storage → signed_at on bids
-- [x] Accessorial charges — Migration 015, submit/approve/deny, live invoice total
+- AI search bar with example prompt chips on carrier load board
+- `ai-load-search` Supabase Edge Function using Claude Haiku with keyword fallback
+- Structured filter extraction from natural language (equipment, states, dates, min rate/mile)
+- Load match scoring: 0–100 score across 5 weighted categories
+- `MatchBadge` component (color-coded pill: green ≥80, orange 60–79, gray <60)
+- `useMatchScores` hook re-ranks on load list changes
+- AI rate suggestion chip on post-load form using Claude Sonnet
 
-**13C — Trust & Intelligence**
+### Truck / Fleet Management
 
-- [x] Saved searches + lane alerts — Migration 016, `lane-alert` edge function
-- [x] Broker credit score — Migration 017, inline "Pays ~18d · 94% on-time" badge
-- [x] Preferred carrier lists + blocking — Migration 018, RLS enforced
-- [x] Lane rate history — Migration 019, `get_lane_stats()` + `get_lane_trend()` RPCs
-- [x] Rate intelligence service — records on booking, auto-populates history
-- [x] AI rate suggestion — Claude Sonnet via `suggest_rate` mode in ai-load-search
+- Post a truck form (type, availability, specs)
+- Truck list and CRUD (carrier fleet page)
+- Delete truck
+- Fleet map with live GPS pins (Leaflet, dark tiles, animated markers)
+- Carrier team and team settings pages
 
-**13D — Scale Infrastructure**
+### Bidding and Booking
 
-- [x] Full-text search — Migration 022, GIN indexes, `search_vector` generated column
-- [x] Background notification queue — Migration 021, `notification-worker` edge function
-- [x] Real rate limiting — Vercel Edge Middleware, sliding window via Vercel KV
+- Carrier bid submission with amount, notes
+- Broker bid management: accept / counter / decline
+- Counter-offer multi-round negotiation
+- Book-It-Now (instant booking at posted rate)
+- Bid list sheet showing all bids on a load
+- Bid expiration (stale bids auto-expire)
+- Booking confirmation email and SMS to all parties
+- Digital e-signature via canvas pad — stored as PNG in Supabase Storage
+- Signature timestamp and signatory name written to bid record
+- BOL e-signature sheet
+- Rate confirmation PDF generation (jsPDF)
 
-## 📈 FEATURE COMPLETION BY CATEGORY (Updated)
+### GPS Tracking and Maps
 
-### Core Platform Infrastructure: 100% ✅
+- Driver GPS location pinging via Web Geolocation API
+- Smart ping interval: every 30 seconds or every 50 meters of movement
+- `useLiveTracking` hook: Supabase Realtime channel updates on INSERT to `location_pings`
+- Breadcrumb trail: historical route replay with slider
+- Predictive ETA: speed average from last 10 pings × road factor × time-of-day adjustment
+- Geofencing: create radius zones for pickup/delivery stops, alert on entry/exit
+- Dwell time tracking: enter/exit timestamps, detention flag on long dwell
+- GPS consent modal before activating driver location
+- Public shareable tracking link (token-based, no login required, 7-day expiry)
+- `location-cleanup` edge function (deletes pings >24 hours old, runs hourly via pg_cron)
+- Stadia Alidade Smooth Dark tile theme
+- SVG teardrop load pins with route glow
+- Animated truck markers with direction indicator
+- `DwellTimeCard` component showing dwell status on tracking page
 
-### User Experience: 100% ✅
+### Documents
 
-### Business Logic: 100% ✅
+- Upload and store: BOL, POD, rate confirmation, insurance certificate, W-9
+- Document viewer
+- Documents page for driver and carrier/broker verification
 
-### Enterprise Features: 100% ✅ (NEW)
+### Carrier Verification
 
-- Multi-user teams, templates, e-signatures, accessorials, audit trail
+- FMCSA SAFER lookup via MC number or DOT number
+- Insurance certificate upload with expiry date tracking
+- W-9 upload
+- CSA safety score stored on verification record
+- Verified badge component shown on carrier/broker cards
+- Stepped verification panel (FMCSA → insurance → W-9 → done)
+- Auto-alert on insurance expiry (unconfirmed — service scaffolding exists, dedicated edge function not confirmed)
 
-### Trust & Intelligence: 100% ✅ (NEW)
+### Payments, Invoicing, and Subscriptions
 
-- Lane rate data, broker credit scores, preferred carriers, AI rate suggestions
+- Stripe subscription plans: free, carrier_pro, broker_starter, broker_growth, shipper
+- Stripe Checkout redirect via `create-checkout-session` edge function
+- Stripe webhook processing via `stripe-webhook` edge function
+- Subscription gate component (feature gating by plan tier)
+- Invoice auto-generated on load completion
+- Invoice status workflow: invoiced → approved → processing → paid → overdue
+- Quick Pay option (2% fee for expedited payment)
+- Accessorial charges: detention, lumper, layover, TONU, fuel_surcharge
+- Carrier submits accessorials; broker approves or denies each
+- Invoice total reflects approved accessorials
 
-### Scale Infrastructure: 100% ✅ (NEW)
+### Ratings
 
-- Paginated queries, full-text search, background queue, edge rate limiting
+- Post-load rating prompt banner shown after load delivery
+- Rating modal with 5-star overall + sub-ratings (communication, reliability, professionalism)
+- Rating submitted for both carrier and broker after each load
+- Broker credit badge: displays avg days-to-pay and on-time payment percentage
+
+### Notifications
+
+- In-app notification bell with real-time unread count (all dashboards)
+- Notification sheet (list, mark all read)
+- Email notifications via Resend for: new bid, bid accepted, bid declined, booking confirmed, load status change
+- SMS notifications via Twilio for critical events (opt-in)
+- Background notification queue with exponential backoff retry and dead-letter
+- Notification preferences page with per-channel toggles (push/email/SMS)
+- Lane alerts: in-app + email + SMS when a matching load is posted
+
+### Messaging
+
+- Per-load conversation threads
+- Direct messaging between any two users
+- Real-time message delivery (Supabase Realtime)
+- Conversation list with unread count badges
+- New Message flow: select "about a load" or "message a user"
+- User search for starting conversations
+
+### Rate Intelligence
+
+- Lane rate history auto-recorded on every booking
+- `get_lane_stats()` RPC: avg/min/max rate per mile for any origin-dest-equipment window
+- `get_lane_trend()` RPC: daily data points for sparkline chart
+- Market rate displayed on load posting form before publishing
+
+### Saved Searches and Lane Alerts
+
+- Save any filter combination with a user-defined name
+- Toggle email and SMS alert per saved search
+- `lane-alert` edge function fires when a new load matches a saved search
+
+### Preferred Carriers and Relationships
+
+- Mark carrier companies as preferred or blocked
+- Carrier relationships sheet for managing list
+- Blocked carriers excluded from seeing or bidding on company loads (enforced at RLS level)
+
+### Audit Trail
+
+- `audit_log` table records every load, bid, booking, and payment action
+- Stores user, action type, entity, before/after diff, IP address
+- DB triggers auto-populate audit log on key table changes
+- Admin audit trail page with search and filters
+
+### Admin and Dashboards
+
+- Admin dashboard
+- Admin audit log page
+- Carrier dashboard
+- Broker dashboard
+- Shipper dashboard
+- Driver dashboard
+
+### Driver-Specific Tools
+
+- Driver dashboard (active loads, GPS consent and pinging)
+- Receipt capture (photo or manual, categorized: fuel, maintenance, tolls, meals, lodging, parking, supplies, other)
+- Expense summary (monthly totals by category, combined with tire incidents)
+- Tire incident log (flat, blowout, low_pressure, damage) with position selector
+- Driver score calculation (speed compliance, route adherence, dwell time)
+- Driver load page (assigned loads, status filters)
+- Driver team page (visible to carriers)
+- Driver documents page
+
+### Webhooks
+
+- Webhook event delivery to external URLs (load status, bookings, bids)
+- Retry logic on failed delivery
+
+### Infrastructure and Platform
+
+- Edge rate limiting via Upstash Redis on Vercel KV (sliding window)
+- Sentry error monitoring
+- Vercel Speed Insights
+- Health check edge function
+- GPS location pings RLS tightened
+- Company members RLS fixed and visibility corrected
+- Profile company visibility migration
+- Help Center page (FAQ accordion)
+
+---
+
+## Known Gaps and Unconfirmed Items
+
+The following items appear in older phase guides or service scaffolding but cannot be confirmed as complete from source inspection:
+
+| Item                                                      | Status                                                                                              |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Auto-alert emails for insurance expiry (60/30/7 day)      | Unconfirmed — verification service records expiry dates; no dedicated alert edge function confirmed |
+| Invoice total UI auto-updating with accessorial approvals | Unconfirmed — service layer exists; UI linkage end-to-end not verified                              |
+| File sharing within message threads                       | No file attachment UI found in `pages/messages.tsx`                                                 |
+| Vitest unit tests and Playwright E2E tests                | `vitest` and `@playwright/test` are devDependencies; test file coverage unconfirmed                 |
+| Redis / BullMQ job queue                                  | Upstash client in package.json; BullMQ not found — queue is the Supabase `notification_queue` table |
+| Sentry configuration                                      | Package installed; active DSN configuration unconfirmed                                             |
+| FMCSA SAFER API key                                       | Placeholder guard exists in `VerificationPanel.tsx` — live API key may not be configured            |
+| Stripe price IDs                                          | Placeholder values in `stripe.service.ts` — live price IDs may not be configured                    |
+| ACH carrier payout via Stripe Connect                     | Stripe Checkout exists for subscriptions; direct ACH payout to carriers not confirmed               |
+
+---
+
+## What is NOT Built
+
+These features are referenced in older documentation but have no source code:
+
+- Native iOS/Android app (no React Native / Expo)
+- ELD / telematics integration (Samsara, Motive, Macropoint)
+- Factoring partner integration
+- QuickBooks / accounting software integration
+- DAT / Truckstop cross-posting
+- Multi-language / i18n support
+- Open REST API for external partners
+- FreightX Academy / learning platform (no academy app in monorepo)
+- Automated IFTA mileage / quarterly tax export
+- Payment escrow / Guaranteed Pay
+- HOS (Hours of Service) compliance tracking
+- HAZMAT certification tracking
+- Market heatmap / capacity forecasting
+- Custom report builder
+- Referral program
+- Redis-backed BullMQ job queues (queue is Supabase-native)
