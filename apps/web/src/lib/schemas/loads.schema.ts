@@ -16,7 +16,7 @@ export const LoadFiltersSchema = z.object({
     .optional(),
   status: z.string().optional(),
   search: z.string().optional(),
-  postedBy: z.string().uuid().optional(),
+  postedBy: z.string().optional(),
   originState: z.string().length(2).optional(),
   destState: z.string().length(2).optional(),
   minRatePerMile: z.number().positive().optional(),
@@ -24,8 +24,8 @@ export const LoadFiltersSchema = z.object({
 });
 
 export const CreateLoadInputSchema = z.object({
-  posted_by: z.string().uuid(),
-  company_id: z.string().uuid().nullable().optional(),
+  posted_by: z.string().min(1),
+  company_id: z.string().nullable().optional(),
   equipment: z.string().min(1),
   origin_city: z.string().min(1),
   origin_state: z.string().length(2),
