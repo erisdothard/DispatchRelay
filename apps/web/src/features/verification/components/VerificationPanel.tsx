@@ -99,7 +99,22 @@ export function VerificationPanel({ companyId, initial }: Props) {
             Carrier Verification
           </h3>
         </div>
-        {verification && <VerifiedBadge status={verification.status} size="md" />}
+        <div className="flex items-center gap-2">
+          {verification && <VerifiedBadge status={verification.status} size="md" />}
+          {verification && (verification as Record<string, unknown>).risk_score != null && (
+            <span
+              className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
+                ((verification as Record<string, unknown>).risk_score as number) <= 30
+                  ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
+                  : ((verification as Record<string, unknown>).risk_score as number) <= 60
+                    ? 'text-amber-400 bg-amber-400/10 border-amber-400/20'
+                    : 'text-red-400 bg-red-400/10 border-red-400/20'
+              }`}
+            >
+              Risk {(verification as Record<string, unknown>).risk_score as number}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Step nav */}

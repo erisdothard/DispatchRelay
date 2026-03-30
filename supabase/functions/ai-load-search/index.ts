@@ -1,4 +1,5 @@
 import { corsHeaders } from '../_shared/cors.ts';
+import { z } from 'npm:zod@3';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
@@ -211,16 +212,31 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const body = (await req.json()) as {
-      action?: string;
-      query?: string;
-      // Rate suggestion inputs
-      origin_state?: string;
-      dest_state?: string;
-      equipment?: string;
-      total_miles?: number;
-      lane_stats?: LaneStats;
-    };
+    const RequestBodySchema = z.object({
+      action: z.string().optional(),
+      query: z.string().optional(),
+      origin_state: z.string().optional(),
+      dest_state: z.string().optional(),
+      equipment: z.string().optional(),
+      total_miles: z.number().positive().optional(),
+      lane_stats: z
+        .object({
+          avg_rate_per_mile: z.number().nullable(),
+          min_rate_per_mile: z.number().nullable(),
+          max_rate_per_mile: z.number().nullable(),
+          sample_count: z.number(),
+        })
+        .optional(),
+    });
+
+    const parseResult = RequestBodySchema.safeParse(await req.json());
+    if (!parseResult.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body', details: parseResult.error.flatten() }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+    const body = parseResult.data;
 
     const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
 

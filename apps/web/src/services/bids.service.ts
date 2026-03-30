@@ -8,6 +8,7 @@ import {
   smsBookingConfirmed,
 } from './email-notifications.service';
 import { recordBookingRateHistory } from './loads.service';
+import { SubmitBidInputSchema } from '@/lib/schemas/bids.schema';
 
 export type { BidRow };
 
@@ -39,6 +40,7 @@ export async function submitBid(params: {
   amountUsd: number;
   notes?: string;
 }): Promise<BidRow> {
+  SubmitBidInputSchema.parse(params);
   const { data, error } = await supabase
     .from('bids')
     .insert({

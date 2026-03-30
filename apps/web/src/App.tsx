@@ -51,6 +51,9 @@ const PrivacyPage = lazyRetry(() => import('@/pages/legal/privacy'));
 const TermsPage = lazyRetry(() => import('@/pages/legal/terms'));
 const AdminDashboard = lazyRetry(() => import('@/pages/admin/dashboard'));
 const AuditLogPage = lazyRetry(() => import('@/pages/admin/audit-log'));
+const LaneIntelligencePage = lazyRetry(() => import('@/pages/lane-intelligence'));
+const CarrierPaymentsPage = lazyRetry(() => import('@/pages/carrier-payments'));
+const NotificationHealthPage = lazyRetry(() => import('@/pages/admin/notification-health'));
 const NotFound = lazyRetry(() => import('@/pages/not-found'));
 
 export default function App() {
@@ -242,6 +245,26 @@ export default function App() {
             }
           />
 
+          {/* Lane Intelligence — carrier + broker */}
+          <Route
+            path="/lane-intelligence"
+            element={
+              <ProtectedRoute>
+                <LaneIntelligencePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Carrier Payments */}
+          <Route
+            path="/carrier/payments"
+            element={
+              <ProtectedRoute requiredRole="carrier">
+                <CarrierPaymentsPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Admin */}
           <Route
             path="/admin"
@@ -256,6 +279,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AuditLogPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/notifications"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <NotificationHealthPage />
               </ProtectedRoute>
             }
           />

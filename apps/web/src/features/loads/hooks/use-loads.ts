@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getLoadsPage } from '@/services/loads.service';
 import type { LoadFilters } from '@/services/loads.service';
 import type { Load } from '@freightx/shared';
+import { realtimeSubscribe } from '@/lib/realtime-manager';
 
 interface UseLoadsResult {
   loads: Load[];
@@ -16,75 +17,90 @@ interface UseLoadsResult {
 }
 
 export function useLoads(filters: LoadFilters = {}): UseLoadsResult {
-  const [loads, setLoads] = useState<Load[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const [pageNum, setPageNum] = useState(0);
+  const [allLoads, setAllLoads] = useState<Load[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState<number | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const pageRef = useRef(0);
 
-  // Stable filter key (exclude page — we manage that ourselves)
+  // Stable filter key (exclude page)
   const { page: _unusedPage, ...filtersWithoutPage } = filters;
   void _unusedPage;
   const filterKey = JSON.stringify(filtersWithoutPage);
 
-  const fetchPage = useCallback(
-    async (page: number, append: boolean) => {
-      if (!append) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
-      setError(null);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['loads', filterKey],
+    queryFn: () => getLoadsPage({ ...(JSON.parse(filterKey) as LoadFilters), page: 0 }),
+    staleTime: 30_000,
+  });
 
-      try {
-        const result = await getLoadsPage({ ...JSON.parse(filterKey), page });
-        setLoads((prev) => (append ? [...prev, ...result.loads] : result.loads));
-        setHasMore(result.hasMore);
-        setTotal(result.total);
-        pageRef.current = page;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load data');
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    },
-    [filterKey],
-  );
+  // Sync first-page results into local accumulator state
+  useEffect(() => {
+    if (data) {
+      setAllLoads(data.loads);
+      setHasMore(data.hasMore);
+      setTotal(data.total);
+      setPageNum(0);
+      pageRef.current = 0;
+    }
+  }, [data]);
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loadingMore) return;
+    const nextPage = pageRef.current + 1;
+    setLoadingMore(true);
+    try {
+      const result = await getLoadsPage({
+        ...(JSON.parse(filterKey) as LoadFilters),
+        page: nextPage,
+      });
+      setAllLoads((prev) => [...prev, ...result.loads]);
+      setHasMore(result.hasMore);
+      setTotal(result.total);
+      setPageNum(nextPage);
+      pageRef.current = nextPage;
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasMore, loadingMore, filterKey]);
 
   const refresh = useCallback(() => {
     pageRef.current = 0;
-    fetchPage(0, false);
-  }, [fetchPage]);
+    setPageNum(0);
+    void queryClient.invalidateQueries({ queryKey: ['loads', filterKey] });
+  }, [queryClient, filterKey]);
 
-  const loadMore = useCallback(() => {
-    if (!hasMore || loadingMore) return;
-    fetchPage(pageRef.current + 1, true);
-  }, [fetchPage, hasMore, loadingMore]);
-
+  // Realtime — deduplicated via realtimeManager, triggers React Query invalidation
   useEffect(() => {
-    pageRef.current = 0;
-    fetchPage(0, false);
-  }, [fetchPage]);
-
-  // Supabase Realtime — new/updated loads refresh page 0
-  useEffect(() => {
-    const channel = supabase
-      .channel('loads-realtime')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'loads' }, () => {
-        // Only auto-refresh if on first page
-        if (pageRef.current === 0) fetchPage(0, false);
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'loads' }, () => {
-        if (pageRef.current === 0) fetchPage(0, false);
-      })
-      .subscribe();
+    const unsub1 = realtimeSubscribe({ table: 'loads', event: 'INSERT' }, () => {
+      if (pageRef.current === 0) {
+        void queryClient.invalidateQueries({ queryKey: ['loads', filterKey] });
+      }
+    });
+    const unsub2 = realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, () => {
+      if (pageRef.current === 0) {
+        void queryClient.invalidateQueries({ queryKey: ['loads', filterKey] });
+      }
+    });
     return () => {
-      supabase.removeChannel(channel);
+      unsub1();
+      unsub2();
     };
-  }, [fetchPage]);
+  }, [filterKey, queryClient]);
 
-  return { loads, loading, loadingMore, error, hasMore, total, refresh, loadMore };
+  // Suppress unused variable warnings
+  void pageNum;
+
+  return {
+    loads: allLoads,
+    loading: isLoading,
+    loadingMore,
+    error: error ? (error instanceof Error ? error.message : 'Failed to load data') : null,
+    hasMore,
+    total,
+    refresh,
+    loadMore,
+  };
 }

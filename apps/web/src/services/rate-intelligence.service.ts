@@ -143,3 +143,32 @@ export async function suggestRate(params: {
     return null;
   }
 }
+
+export interface PopularLane {
+  origin_state: string;
+  dest_state: string;
+  equipment: string;
+  load_count: number;
+  avg_rate_per_mile: number | null;
+  last_seen_at: string | null;
+}
+
+export async function getPopularLanes(limit = 10): Promise<PopularLane[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('popular_lanes')
+    .select('origin_state, dest_state, equipment, load_count, avg_rate_per_mile, last_seen_at')
+    .order('load_count', { ascending: false })
+    .limit(limit);
+
+  if (error || !data) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any[]).map((row) => ({
+    origin_state: row.origin_state as string,
+    dest_state: row.dest_state as string,
+    equipment: row.equipment as string,
+    load_count: Number(row.load_count),
+    avg_rate_per_mile: row.avg_rate_per_mile != null ? Number(row.avg_rate_per_mile) : null,
+    last_seen_at: row.last_seen_at as string | null,
+  }));
+}

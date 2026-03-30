@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { rowToTruck } from '@/lib/mappers';
 import type { TruckRow, EquipmentType, TruckStatus } from '@/lib/database.types';
 import type { Truck } from '@freightx/shared';
+import { PostTruckInputSchema } from '@/lib/schemas/trucks.schema';
 
 export const PAGE_SIZE = 25;
 
@@ -39,6 +40,7 @@ export async function getTrucks(filters: TruckFilters = {}): Promise<Truck[]> {
 }
 
 export async function createTruck(truck: Omit<TruckRow, 'id' | 'created_at'>): Promise<Truck> {
+  PostTruckInputSchema.parse(truck);
   const { data, error } = await supabase.from('trucks').insert(truck).select().single();
   if (error) throw error;
   return rowToTruck(data);

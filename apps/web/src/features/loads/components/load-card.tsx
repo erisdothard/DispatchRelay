@@ -1,4 +1,5 @@
 import { ArrowRight, Scale, Calendar, Zap, Clock, Shield } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
 import {
   analyzeRate,
@@ -8,6 +9,40 @@ import {
 } from '@/shared/lib/freight';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
+import { getLaneStats } from '@/services/rate-intelligence.service';
+
+/** Inline market badge — fetches lane avg via React Query (cached, deduplicated) */
+function MarketBadge({ load }: { load: Load }) {
+  const { data: stats } = useQuery({
+    queryKey: ['lane-stats', load.originState, load.destState, load.equipment, 90],
+    queryFn: () =>
+      getLaneStats({
+        originState: load.originState,
+        destState: load.destState,
+        equipment: load.equipment,
+      }),
+    staleTime: 5 * 60_000,
+    enabled: load.ratePerMile > 0,
+  });
+
+  if (!stats || stats.sample_count < 3 || !stats.avg_rate_per_mile) return null;
+  const delta = (load.ratePerMile - stats.avg_rate_per_mile) / stats.avg_rate_per_mile;
+  if (Math.abs(delta) < 0.1) return null;
+
+  const above = delta > 0;
+  return (
+    <span
+      className={cn(
+        'text-[10px] font-bold px-2 py-0.5 rounded-full border',
+        above
+          ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
+          : 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+      )}
+    >
+      {above ? 'Above Market' : 'Below Market'}
+    </span>
+  );
+}
 
 interface LoadCardProps {
   load: Load;
@@ -140,7 +175,7 @@ export function LoadCard({ load, onBid, onPress, showBidButton = true, className
             </span>
           </div>
 
-          {/* Sub row: company + credit + age */}
+          {/* Sub row: company + credit + age + market badge */}
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <span className="text-[11px] text-fx-text-dim truncate max-w-[110px]">
               {load.companyName}
@@ -155,6 +190,7 @@ export function LoadCard({ load, onBid, onPress, showBidButton = true, className
               </span>
             )}
             {profit && <span className="text-[10px] font-semibold text-fx-text-dim">{profit}</span>}
+            <MarketBadge load={load} />
           </div>
         </div>
 

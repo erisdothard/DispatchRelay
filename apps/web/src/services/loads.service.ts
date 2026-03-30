@@ -4,6 +4,7 @@ import type { LoadRow, EquipmentType, LoadStatus } from '@/lib/database.types';
 import type { Load, TrackingMilestone } from '@freightx/shared';
 import { recordLaneRate } from './rate-intelligence.service';
 import { notifyLoadStatusChange } from './email-notifications.service';
+import { LoadFiltersSchema, CreateLoadInputSchema } from '@/lib/schemas/loads.schema';
 
 export const PAGE_SIZE = 25;
 
@@ -25,6 +26,7 @@ export interface LoadsPage {
 }
 
 export async function getLoads(filters: LoadFilters = {}): Promise<Load[]> {
+  LoadFiltersSchema.parse(filters);
   const page = filters.page ?? 0;
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
@@ -124,6 +126,7 @@ export async function getLoadByNumber(loadNumber: string): Promise<Load | null> 
 }
 
 export async function createLoad(load: Omit<LoadRow, 'id' | 'created_at'>): Promise<Load> {
+  CreateLoadInputSchema.parse(load);
   const { data, error } = await supabase.from('loads').insert(load).select().single();
   if (error) throw error;
 

@@ -1,6 +1,6 @@
 # FreightX — Feature Catalog
 
-**Last audited:** 2026-03-30
+**Last audited:** 2026-03-30 (updated Phase 15–18)
 **Audit basis:** Source code in `apps/web/src/features/`, `apps/web/src/services/`, `apps/web/src/pages/`, `database/migrations/`, and `supabase/functions/`
 
 This catalog reflects only what exists in code. It is not a wishlist.
@@ -369,15 +369,32 @@ This catalog reflects only what exists in code. It is not a wishlist.
 
 **Domain:** CI/CD, Monitoring, Rate Limiting
 
-| Feature                                       | Status | Roles | Priority | Phase | Source                                                       |
-| --------------------------------------------- | ------ | ----- | -------- | ----- | ------------------------------------------------------------ |
-| Edge rate limiting (Vercel KV sliding window) | ✅     | Admin | P1       | 13    | `@upstash/ratelimit` and `@upstash/redis` in `package.json`  |
-| Sentry error monitoring                       | ✅     | Admin | P1       | 6     | `@sentry/react` in `package.json`                            |
-| Vercel Speed Insights                         | ✅     | Admin | P1       | 6     | `@vercel/speed-insights` in `package.json`                   |
-| Health check edge function                    | ✅     | Admin | P1       | 6     | `supabase/functions/health/`                                 |
-| GPS location pings RLS tightening             | ✅     | Admin | P1       | 14    | `database/migrations/042-location-pings-rls-tighten.sql`     |
-| Company members visibility fix (RLS)          | ✅     | Admin | P1       | 14    | `database/migrations/045-fix-company-members-visibility.sql` |
-| Help Center page (FAQ)                        | ✅     | All   | P2       | 10    | `pages/profile/help-center.tsx`                              |
+| Feature                                       | Status | Roles          | Priority | Phase | Source                                                                      |
+| --------------------------------------------- | ------ | -------------- | -------- | ----- | --------------------------------------------------------------------------- |
+| Edge rate limiting (Vercel KV sliding window) | ✅     | Admin          | P1       | 13    | `@upstash/ratelimit` and `@upstash/redis` in `package.json`                 |
+| Sentry error monitoring                       | ✅     | Admin          | P1       | 6     | `@sentry/react` in `package.json`                                           |
+| Vercel Speed Insights                         | ✅     | Admin          | P1       | 6     | `@vercel/speed-insights` in `package.json`                                  |
+| Health check edge function                    | ✅     | Admin          | P1       | 6     | `supabase/functions/health/`                                                |
+| GPS location pings RLS tightening             | ✅     | Admin          | P1       | 14    | `database/migrations/042-location-pings-rls-tighten.sql`                    |
+| Company members visibility fix (RLS)          | ✅     | Admin          | P1       | 14    | `database/migrations/045-fix-company-members-visibility.sql`                |
+| Help Center page (FAQ)                        | ✅     | All            | P2       | 10    | `pages/profile/help-center.tsx`                                             |
+| Zod validation at service boundaries          | ✅     | All            | P1       | 15    | `lib/schemas/` (loads, bids, trucks, profiles)                              |
+| React Query (TanStack Query) integration      | ✅     | All            | P1       | 15    | `main.tsx` QueryClientProvider, `use-loads.ts` migrated                     |
+| Realtime subscription deduplication           | ✅     | All            | P1       | 15    | `lib/realtime-manager.ts`                                                   |
+| Lane Intelligence page                        | ✅     | Broker/Carrier | P1       | 16    | `pages/lane-intelligence.tsx`                                               |
+| Lane trend sparkline chart                    | ✅     | Broker/Carrier | P2       | 16    | `features/loads/components/lane-trend-chart.tsx`                            |
+| Popular Lanes widget                          | ✅     | Broker/Carrier | P2       | 16    | `features/loads/components/popular-lanes-card.tsx`                          |
+| Load card market rate badge                   | ✅     | Carrier        | P2       | 16    | `features/loads/components/load-card.tsx` (MarketBadge)                     |
+| Lane benchmarks migration                     | ✅     | Admin          | P1       | 16    | `database/migrations/046-lane-benchmarks.sql`                               |
+| Carrier risk score                            | ✅     | Admin          | P1       | 17    | `supabase/functions/carrier-health-check/` + `048-insurance-monitoring.sql` |
+| Insurance expiry monitoring                   | ✅     | Admin/Carrier  | P1       | 17    | `carrier-health-check` Edge Function                                        |
+| FMCSA periodic re-verification                | ✅     | Admin          | P1       | 17    | `carrier-health-check` Edge Function + `verification_schedule` table        |
+| Factoring request flow (QuickPay)             | ✅     | Carrier        | P1       | 17    | `features/payments/components/factoring-sheet.tsx`                          |
+| Carrier Payments hub page                     | ✅     | Carrier        | P1       | 17    | `pages/carrier-payments.tsx`                                                |
+| Web Push notifications (PWA)                  | ✅     | All            | P1       | 18    | `lib/push-notifications.ts`, `public/sw.js`, `send-push` Edge Function      |
+| SMS template system                           | ✅     | All            | P2       | 18    | `lib/sms-templates.ts`                                                      |
+| Notification health dashboard                 | ✅     | Admin          | P1       | 18    | `pages/admin/notification-health.tsx`                                       |
+| CSV load import (EDI basics)                  | ✅     | Broker         | P2       | 18    | `features/loads/components/csv-import-sheet.tsx`                            |
 
 ---
 
@@ -389,7 +406,7 @@ These features appear in older documentation but have no corresponding source co
 | ---------------------------------------------- | -------------------------------------------------------------------------- |
 | Native iOS/Android app                         | No React Native / Expo code found                                          |
 | ELD / telematics integration (Samsara, Motive) | No integration code found                                                  |
-| Factoring partner integration                  | No code found                                                              |
+| Factoring partner API integration              | QuickPay flow exists; no real factor partner API wired yet                 |
 | QuickBooks / accounting software integration   | No code found                                                              |
 | DAT / Truckstop cross-posting                  | No code found                                                              |
 | Multi-language support                         | No i18n setup found                                                        |

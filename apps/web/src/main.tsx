@@ -2,10 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import App from './App';
 import './index.css';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      gcTime: 5 * 60_000,
+    },
+  },
+});
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN as string | undefined,
@@ -27,13 +37,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </div>
       }
     >
-      <BrowserRouter>
-        <AuthProvider>
-          <NotificationProvider>
-            <App />
-          </NotificationProvider>
-        </AuthProvider>
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <NotificationProvider>
+              <App />
+            </NotificationProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
     </Sentry.ErrorBoundary>
   </React.StrictMode>,
 );
