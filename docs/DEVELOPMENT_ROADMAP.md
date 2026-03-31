@@ -9,7 +9,7 @@
 
 ## Build Phase History
 
-Phases 0 through 13 are complete. Historical step-by-step guides are archived in `docs/phases/`. This document now tracks only what remains to be built.
+Phases 0 through 19 are complete. Historical step-by-step guides are archived in `docs/phases/`. This document now tracks only what remains to be built.
 
 ---
 
