@@ -67,7 +67,7 @@ export default function ProfilePage() {
           description: 'MC, DOT, insurance',
           onPress: () => navigate('/profile/documents'),
         },
-        ...(role !== 'driver'
+        ...(role !== 'driver' && role !== 'broker'
           ? [
               {
                 icon: Truck,

@@ -563,7 +563,7 @@ function MembersTabContent() {
 type TeamTab = 'drivers' | 'members';
 
 export default function CarrierTeamPage() {
-  const { company, user } = useAuth();
+  const { company, user, profile } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') === 'members' ? 'members' : 'drivers';
   const [activeTab, setActiveTab] = useState<TeamTab>(initialTab);
@@ -729,7 +729,7 @@ export default function CarrierTeamPage() {
         )}
       </div>
 
-      <BottomNav role="carrier" />
+      <BottomNav role={profile?.role === 'broker' ? 'broker' : 'carrier'} />
     </div>
   );
 }
