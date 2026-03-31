@@ -5,36 +5,61 @@ import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { Badge } from '@/shared/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTireIncidents } from '@/services/tire-incidents.service';
-import { TireIncidentForm } from '@/features/driver/components/tire-incident-form';
-import { TIRE_POSITION_LABELS } from '@/features/driver/lib/tire-constants';
-import type { TireIncident } from '@freightx/shared';
+import { getDriverIncidents } from '@/services/driver-incidents.service';
+import type { DriverIncident } from '@/services/driver-incidents.service';
+import { IncidentForm } from '@/features/driver/components/incident-form';
 
 const SEVERITY_COLORS: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
-  flat: 'orange',
-  blowout: 'orange',
-  low_pressure: 'blue',
-  damage: 'gray',
+  minor: 'green',
+  moderate: 'blue',
+  severe: 'orange',
+  critical: 'orange',
 };
 
 const SEVERITY_LABELS: Record<string, string> = {
-  flat: 'Flat',
-  blowout: 'Blowout',
-  low_pressure: 'Low Pressure',
-  damage: 'Damage',
+  minor: 'Minor',
+  moderate: 'Moderate',
+  severe: 'Severe',
+  critical: 'Critical',
+};
+
+const TYPE_LABELS: Record<string, string> = {
+  tire: 'Tire Issue',
+  engine: 'Engine / Mechanical',
+  brake: 'Brakes',
+  lights: 'Lights / Electrical',
+  body_damage: 'Body Damage',
+  accident: 'Accident',
+  driver_illness: 'Driver Illness',
+  cargo: 'Cargo Issue',
+  fuel: 'Fuel / DEF',
+  other: 'Other',
+};
+
+const TYPE_EMOJI: Record<string, string> = {
+  tire: '🛞',
+  engine: '⚙️',
+  brake: '🛑',
+  lights: '💡',
+  body_damage: '🚛',
+  accident: '⚠️',
+  driver_illness: '🏥',
+  cargo: '📦',
+  fuel: '⛽',
+  other: '📝',
 };
 
 export default function TireLogPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [incidents, setIncidents] = useState<TireIncident[]>([]);
+  const [incidents, setIncidents] = useState<DriverIncident[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchIncidents = useCallback(() => {
     if (!user?.id) return;
     setLoading(true);
-    getTireIncidents(user.id)
+    getDriverIncidents(user.id)
       .then(setIncidents)
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -46,7 +71,7 @@ export default function TireLogPage() {
 
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">
-      <TopHeader greeting={false} name="Tire Log" />
+      <TopHeader greeting={false} name="Incident Log" />
 
       {/* Back button */}
       <div className="px-5 pb-3">
@@ -68,7 +93,7 @@ export default function TireLogPage() {
             <div className="w-16 h-16 rounded-full bg-fx-orange/10 flex items-center justify-center mb-4">
               <AlertTriangle size={28} className="text-fx-orange" />
             </div>
-            <p className="font-bold text-fx-text">No tire incidents logged</p>
+            <p className="font-bold text-fx-text">No incidents logged</p>
             <p className="text-sm text-fx-text-muted mt-1">
               Tap the + button to log your first incident
             </p>
@@ -82,20 +107,21 @@ export default function TireLogPage() {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
+                    <span className="text-base">{TYPE_EMOJI[incident.incidentType] ?? '📝'}</span>
+                    <span className="text-sm font-semibold text-white">
+                      {TYPE_LABELS[incident.incidentType] ?? incident.incidentType}
+                    </span>
                     <Badge variant={SEVERITY_COLORS[incident.severity] ?? 'gray'} size="sm">
                       {SEVERITY_LABELS[incident.severity] ?? incident.severity}
                     </Badge>
-                    {incident.resolution && (
+                    {incident.resolvedAt && (
                       <Badge variant="green" size="sm">
                         Resolved
                       </Badge>
                     )}
                   </div>
-                  <p className="text-sm font-semibold text-white">
-                    {TIRE_POSITION_LABELS[incident.tirePosition]}
-                  </p>
                 </div>
-                <p className="text-xs text-fx-text-dim">
+                <p className="text-xs text-fx-text-dim shrink-0">
                   {new Date(incident.incidentDate + 'T12:00:00').toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -142,11 +168,7 @@ export default function TireLogPage() {
 
       <BottomNav role="driver" />
 
-      <TireIncidentForm
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        onCreated={fetchIncidents}
-      />
+      <IncidentForm open={formOpen} onClose={() => setFormOpen(false)} onCreated={fetchIncidents} />
     </div>
   );
 }

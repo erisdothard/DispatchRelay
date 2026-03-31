@@ -47,12 +47,19 @@ const EMPTY_FORM = {
   totalMiles: '',
   hazmat: false,
   tempControlled: false,
+  assigneeId: null as string | null,
 };
 
 interface LoadTemplate {
   id: string;
   name: string;
   template_data: typeof EMPTY_FORM;
+}
+
+interface CompanyMember {
+  user_id: string;
+  full_name: string | null;
+  email: string;
 }
 
 interface PostLoadSheetProps {
@@ -74,6 +81,9 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
   const [templateName, setTemplateName] = useState('');
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
 
+  // Team members
+  const [members, setMembers] = useState<CompanyMember[]>([]);
+
   // Rate suggestion
   const [rateSuggestion, setRateSuggestion] = useState<RateSuggestion | null>(null);
   const [laneStats, setLaneStats] = useState<LaneStats | null>(null);
@@ -94,6 +104,35 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
       .order('created_at', { ascending: false })
       .then(({ data }: { data: LoadTemplate[] | null }) => setTemplates(data ?? []));
   }, [open, user?.id]);
+
+  // Fetch company members for assignee picker
+  useEffect(() => {
+    if (!open || !company?.id) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('company_members')
+      .select('user_id, profiles!company_members_user_id_fkey(full_name, email)')
+      .eq('company_id', company.id)
+      .then(
+        ({
+          data,
+        }: {
+          data: Array<{
+            user_id: string;
+            profiles?: { full_name: string | null; email: string };
+          }> | null;
+        }) => {
+          if (!data) return;
+          setMembers(
+            data.map((m) => ({
+              user_id: m.user_id,
+              full_name: m.profiles?.full_name ?? null,
+              email: m.profiles?.email ?? '',
+            })),
+          );
+        },
+      );
+  }, [open, company?.id]);
 
   // Fetch lane stats + rate suggestion when origin/dest/equipment/miles are filled
   const fetchRateSuggestion = useCallback(async () => {
@@ -200,6 +239,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         broker_credit_score: null,
         assigned_driver_id: null,
         second_driver_id: null,
+        assignee_id: form.assigneeId ?? null,
       });
 
       setForm(EMPTY_FORM);
@@ -365,18 +405,34 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
           <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
             Equipment
           </p>
-          <select
-            value={form.equipment}
-            onChange={(e) => set('equipment', e.target.value as EquipmentType)}
-            className={fieldClass}
-            style={{ colorScheme: 'dark' }}
-          >
-            {EQUIPMENT_OPTIONS.map((eq) => (
-              <option key={eq} value={eq} style={{ background: '#111' }}>
-                {EQUIPMENT_LABELS[eq] ?? eq}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-wrap gap-2">
+            {EQUIPMENT_OPTIONS.map((eq) => {
+              const selected = form.equipment === eq;
+              return (
+                <button
+                  key={eq}
+                  type="button"
+                  onClick={() => set('equipment', eq)}
+                  className="px-3 py-2 rounded-xl text-[12px] font-semibold transition-all"
+                  style={
+                    selected
+                      ? {
+                          background: 'rgba(232,96,48,0.18)',
+                          border: '1px solid rgba(232,96,48,0.6)',
+                          color: '#E86030',
+                        }
+                      : {
+                          background: '#111',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          color: 'rgba(255,255,255,0.5)',
+                        }
+                  }
+                >
+                  {EQUIPMENT_LABELS[eq] ?? eq}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Commodity */}
@@ -536,6 +592,44 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
             <span className="text-sm font-semibold text-fx-text-muted">Temp Controlled</span>
           </label>
         </div>
+
+        {/* Assignee (team member) */}
+        {members.length > 0 && (
+          <div>
+            <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+              Assign To (Optional)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {members.map((m) => {
+                const selected = form.assigneeId === m.user_id;
+                const label = m.full_name ?? m.email;
+                return (
+                  <button
+                    key={m.user_id}
+                    type="button"
+                    onClick={() => set('assigneeId', selected ? null : m.user_id)}
+                    className="px-3 py-2 rounded-xl text-[12px] font-semibold transition-all"
+                    style={
+                      selected
+                        ? {
+                            background: 'rgba(232,96,48,0.18)',
+                            border: '1px solid rgba(232,96,48,0.6)',
+                            color: '#E86030',
+                          }
+                        : {
+                            background: '#111',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: 'rgba(255,255,255,0.5)',
+                          }
+                    }
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Save as Template */}
         <div>

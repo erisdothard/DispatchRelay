@@ -178,6 +178,7 @@ export type Database = {
           broker_credit_score: number | null;
           assigned_driver_id: string | null;
           second_driver_id: string | null;
+          assignee_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -210,6 +211,7 @@ export type Database = {
           broker_credit_score?: number | null;
           assigned_driver_id?: string | null;
           second_driver_id?: string | null;
+          assignee_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -242,6 +244,7 @@ export type Database = {
           broker_credit_score?: number | null;
           assigned_driver_id?: string | null;
           second_driver_id?: string | null;
+          assignee_id?: string | null;
           created_at?: string;
         };
         Relationships: [];

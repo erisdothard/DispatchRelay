@@ -10,7 +10,7 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { geocodeCity } from '@/lib/geocoding';
+import { geocodeCity, geocodeAddress } from '@/lib/geocoding';
 
 // ── Apple-style SVG teardrop pins ────────────────────────────────────────────
 
@@ -142,6 +142,10 @@ interface GeofenceCircle {
 interface MapViewProps {
   origin: { city: string; state: string };
   destination?: { city: string; state: string };
+  /** Full street address for origin pin (geocodes to street level when provided) */
+  originAddress?: string;
+  /** Full street address for destination pin (geocodes to street level when provided) */
+  destAddress?: string;
   progress?: number;
   inTransit?: boolean;
   className?: string;
@@ -160,6 +164,8 @@ interface MapViewProps {
 export function MapView({
   origin,
   destination,
+  originAddress,
+  destAddress,
   progress = 0,
   inTransit = false,
   className = 'h-40',
@@ -183,8 +189,14 @@ export function MapView({
     setLoading(true);
     void (async () => {
       const [o, d] = await Promise.all([
-        geocodeCity(origin.city, origin.state),
-        destination ? geocodeCity(destination.city, destination.state) : Promise.resolve(null),
+        originAddress
+          ? geocodeAddress(originAddress, origin.city, origin.state)
+          : geocodeCity(origin.city, origin.state),
+        destination
+          ? destAddress
+            ? geocodeAddress(destAddress, destination.city, destination.state)
+            : geocodeCity(destination.city, destination.state)
+          : Promise.resolve(null),
       ]);
       if (!cancelled) {
         setOriginPos(o);
@@ -196,7 +208,14 @@ export function MapView({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin.city, origin.state, destination?.city, destination?.state]);
+  }, [
+    origin.city,
+    origin.state,
+    originAddress,
+    destination?.city,
+    destination?.state,
+    destAddress,
+  ]);
 
   // Shimmer loading skeleton
   if (loading) {

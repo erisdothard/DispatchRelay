@@ -25,6 +25,9 @@ import { LoadStatusStepper } from './load-status-stepper';
 import { BidSheet } from '@/features/bids/components/bid-sheet';
 import { BidListSheet } from '@/features/bids/components/bid-list-sheet';
 import { DocumentUpload } from '@/features/documents/components/document-upload';
+import { SignedBolViewer } from '@/features/documents/components/signed-bol-viewer';
+import { getDocumentsForLoad } from '@/services/documents.service';
+import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
 import { bookNow } from '@/services/bids.service';
 import { updateLoad } from '@/services/loads.service';
@@ -73,12 +76,28 @@ export function LoadDetailSheet({
   const [bidOpen, setBidOpen] = useState(false);
   const [bidListOpen, setBidListOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
+  const [signedBolDoc, setSignedBolDoc] = useState<DocumentRow | null>(null);
+  const [loadingBol, setLoadingBol] = useState(false);
   const [accessorialsOpen, setAccessorialsOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<LoadStatus | null>(null);
   const [booking, setBooking] = useState(false);
   const [bookError, setBookError] = useState<string | null>(null);
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+
+  async function handleViewSignedBol() {
+    if (!load) return;
+    setLoadingBol(true);
+    try {
+      const docs = await getDocumentsForLoad(load.id);
+      const signed = docs.find((d) => d.type === 'bill_of_lading' && d.signed_at);
+      if (signed) setSignedBolDoc(signed);
+    } catch {
+      // silently ignore
+    } finally {
+      setLoadingBol(false);
+    }
+  }
 
   async function handleCancel() {
     if (!load) return;
@@ -326,6 +345,22 @@ export function LoadDetailSheet({
               <FileUp size={14} className="text-fx-orange" />
             </button>
             {docsOpen && <DocumentUpload loadId={load.id} role={role!} />}
+            <button
+              onClick={handleViewSignedBol}
+              disabled={loadingBol}
+              className="mt-2 w-full h-10 rounded-xl border text-[12px] font-semibold flex items-center justify-center gap-2 transition-colors"
+              style={{
+                borderColor: 'rgba(34,197,94,0.3)',
+                color: '#4ade80',
+                background: 'rgba(34,197,94,0.06)',
+              }}
+            >
+              {loadingBol ? (
+                <span className="w-4 h-4 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
+              ) : (
+                '✓ View Signed BOL'
+              )}
+            </button>
           </div>
         )}
 
@@ -466,6 +501,10 @@ export function LoadDetailSheet({
         baseRate={load.rateUsd}
         role={role ?? 'carrier'}
       />
+
+      {signedBolDoc && (
+        <SignedBolViewer doc={signedBolDoc} load={load} onClose={() => setSignedBolDoc(null)} />
+      )}
     </>
   );
 }

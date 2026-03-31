@@ -36,6 +36,7 @@ export const CreateLoadInputSchema = z.object({
   commodity: z.string().optional().nullable(),
   weight_lbs: z.number().positive().optional().nullable(),
   total_miles: z.number().positive().optional().nullable(),
+  assignee_id: z.string().uuid().optional().nullable(),
 });
 
 export type LoadFiltersInput = z.infer<typeof LoadFiltersSchema>;

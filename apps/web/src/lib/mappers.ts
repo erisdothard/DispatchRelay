@@ -36,6 +36,7 @@ export function rowToLoad(row: LoadRow): Load {
     brokerCreditScore: row.broker_credit_score ?? undefined,
     assignedDriverId: row.assigned_driver_id ?? undefined,
     secondDriverId: row.second_driver_id ?? undefined,
+    assigneeId: row.assignee_id ?? null,
   };
 }
 

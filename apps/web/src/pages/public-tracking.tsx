@@ -179,6 +179,8 @@ export default function PublicTrackingPage() {
               <MapView
                 origin={{ city: load.originCity, state: load.originState }}
                 destination={{ city: load.destCity, state: load.destState }}
+                originAddress={gpsEligible ? (load.originAddress ?? undefined) : undefined}
+                destAddress={gpsEligible ? (load.destAddress ?? undefined) : undefined}
                 progress={progress}
                 inTransit={gpsEligible}
                 livePosition={livePosition}

@@ -74,6 +74,7 @@ export interface Load {
   brokerCreditScore?: number; // 0-100
   assignedDriverId?: string;
   secondDriverId?: string;
+  assigneeId?: string | null;
 }
 
 export interface Truck {

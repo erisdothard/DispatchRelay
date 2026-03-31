@@ -23,6 +23,7 @@ import {
   notifyBolSignedParties,
 } from '@/services/documents.service';
 import { BolSignatureSheet } from '@/features/documents/components/bol-signature-sheet';
+import { SignedBolViewer } from '@/features/documents/components/signed-bol-viewer';
 import type { Load } from '@freightx/shared';
 import type { DocumentRow, DocumentType } from '@/lib/database.types';
 
@@ -272,6 +273,12 @@ export default function DriverDocumentsPage() {
   // BOL upload sheet state
   const [bolUploadLoad, setBolUploadLoad] = useState<Load | null>(null);
 
+  // Signed BOL viewer state
+  const [viewingSignedBol, setViewingSignedBol] = useState<{
+    doc: DocumentRow;
+    load: Load;
+  } | null>(null);
+
   // POD file inputs (BOL now uses the sheet)
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -459,6 +466,13 @@ export default function DriverDocumentsPage() {
                             >
                               <PenLine size={12} /> Get Signature
                             </button>
+                          ) : doc.type === 'bill_of_lading' && doc.signed_at ? (
+                            <button
+                              onClick={() => setViewingSignedBol({ doc, load })}
+                              className="h-8 px-3 rounded-xl bg-green-500/15 border border-green-500/30 text-green-400 text-[11px] font-bold flex items-center gap-1.5 shrink-0"
+                            >
+                              <CheckCircle2 size={12} /> View Signed BOL
+                            </button>
                           ) : (
                             <a
                               href={doc.file_url}
@@ -552,6 +566,15 @@ export default function DriverDocumentsPage() {
             fetchAll();
           }}
           onClose={() => setBolUploadLoad(null)}
+        />
+      )}
+
+      {/* Signed BOL Viewer */}
+      {viewingSignedBol && (
+        <SignedBolViewer
+          doc={viewingSignedBol.doc}
+          load={viewingSignedBol.load}
+          onClose={() => setViewingSignedBol(null)}
         />
       )}
 
