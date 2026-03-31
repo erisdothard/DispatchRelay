@@ -33,7 +33,7 @@ export async function getLoads(filters: LoadFilters = {}): Promise<Load[]> {
 
   let query = supabase
     .from('loads')
-    .select('*', { count: 'estimated' })
+    .select('*, assignee_profile:assignee_id(full_name)', { count: 'estimated' })
     .order('posted_at', { ascending: false })
     .range(from, to);
 
@@ -75,7 +75,7 @@ export async function getLoadsPage(filters: LoadFilters = {}): Promise<LoadsPage
 
   let query = supabase
     .from('loads')
-    .select('*', { count: 'exact' })
+    .select('*, assignee_profile:assignee_id(full_name)', { count: 'exact' })
     .order('posted_at', { ascending: false })
     .range(from, to);
 

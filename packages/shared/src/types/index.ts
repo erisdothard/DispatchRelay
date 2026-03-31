@@ -75,6 +75,7 @@ export interface Load {
   assignedDriverId?: string;
   secondDriverId?: string;
   assigneeId?: string | null;
+  assigneeName?: string | null;
 }
 
 export interface Truck {

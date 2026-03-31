@@ -37,6 +37,8 @@ export function rowToLoad(row: LoadRow): Load {
     assignedDriverId: row.assigned_driver_id ?? undefined,
     secondDriverId: row.second_driver_id ?? undefined,
     assigneeId: row.assignee_id ?? null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    assigneeName: (row as any).assignee_profile?.full_name ?? null,
   };
 }
 
