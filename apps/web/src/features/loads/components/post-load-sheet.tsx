@@ -255,6 +255,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         packaging_type: form.packagingType || null,
         po_number: form.poNumber.trim() || null,
         shipper_reference: form.shipperReference.trim() || null,
+        preferred_carriers_only: false,
       });
 
       setForm(EMPTY_FORM);
