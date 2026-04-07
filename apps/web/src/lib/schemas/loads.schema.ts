@@ -58,12 +58,14 @@ export const CreateLoadInputSchema = z.object({
       '400',
       '500',
     ])
+    .nullable()
     .optional(),
   packaging_type: z
     .enum(['pallets', 'crates', 'boxes', 'drums', 'bags', 'rolls', 'loose', 'other'])
+    .nullable()
     .optional(),
-  po_number: z.string().max(50).optional(),
-  shipper_reference: z.string().max(100).optional(),
+  po_number: z.string().max(50).nullable().optional(),
+  shipper_reference: z.string().max(100).nullable().optional(),
 });
 
 export type LoadFiltersInput = z.infer<typeof LoadFiltersSchema>;
