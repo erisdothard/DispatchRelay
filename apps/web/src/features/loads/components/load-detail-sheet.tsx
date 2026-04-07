@@ -13,6 +13,7 @@ import {
   TrendingUp,
   Users,
   FileUp,
+  Pencil,
 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import {
@@ -27,6 +28,7 @@ import { BidListSheet } from '@/features/bids/components/bid-list-sheet';
 import { DocumentUpload } from '@/features/documents/components/document-upload';
 import { SignedBolViewer } from '@/features/documents/components/signed-bol-viewer';
 import { BrokerCreditBadge } from './broker-credit-badge';
+import { EditLoadSheet } from './edit-load-sheet';
 import { getDocumentsForLoad } from '@/services/documents.service';
 import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
@@ -36,6 +38,7 @@ import { generateRateCon } from '@/features/bookings/lib/generate-rate-con';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
 import type { LoadStatus, UserRole } from '@/lib/database.types';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoadDetailSheetProps {
   load: Load | null;
@@ -74,8 +77,10 @@ export function LoadDetailSheet({
   showBidButton = true,
   role,
 }: LoadDetailSheetProps) {
+  const { user } = useAuth();
   const [bidOpen, setBidOpen] = useState(false);
   const [bidListOpen, setBidListOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
   const [signedBolDoc, setSignedBolDoc] = useState<DocumentRow | null>(null);
   const [loadingBol, setLoadingBol] = useState(false);
@@ -154,6 +159,8 @@ export function LoadDetailSheet({
   const showDocs = ACTIVE_STATUSES.includes(liveStatus) && !!role;
   const isBroker = role === 'broker' || role === 'admin';
   const isCarrier = role === 'carrier';
+  const canEdit =
+    user && load && (load.postedBy === user.id || user.role === 'admin') && liveStatus === 'posted';
 
   return (
     <>
@@ -418,6 +425,16 @@ export function LoadDetailSheet({
                 {load.bidCount && load.bidCount > 0 ? ` · ${load.bidCount}` : ''}
               </button>
 
+              {canEdit && (
+                <button
+                  onClick={() => setEditOpen(true)}
+                  className="w-full h-11 rounded-2xl border border-fx-orange/40 text-sm font-semibold text-fx-orange flex items-center justify-center gap-2 hover:bg-fx-orange/5 transition-colors"
+                >
+                  <Pencil size={14} />
+                  Edit Load
+                </button>
+              )}
+
               {liveStatus !== 'cancelled' &&
                 liveStatus !== 'completed' &&
                 liveStatus !== 'delivered' &&
@@ -503,6 +520,15 @@ export function LoadDetailSheet({
         onClose={() => setBidListOpen(false)}
         load={load}
         onBidAccepted={() => setBidListOpen(false)}
+      />
+
+      <EditLoadSheet
+        load={editOpen ? load : null}
+        onClose={() => setEditOpen(false)}
+        onUpdated={() => {
+          setEditOpen(false);
+          onClose(); // Close detail sheet so parent can refresh
+        }}
       />
 
       <AccessorialsSheet
