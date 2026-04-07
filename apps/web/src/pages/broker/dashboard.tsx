@@ -43,8 +43,12 @@ export default function BrokerDashboard() {
         name={name}
         notificationCount={unreadCount}
         onNotificationClick={() => setNotifsOpen(true)}
-        right={<ViewSwitcher />}
       />
+
+      {/* View Switcher */}
+      <div className="px-5 pb-3 flex justify-center">
+        <ViewSwitcher />
+      </div>
 
       {/* Search */}
       <div className="px-5 py-3">
