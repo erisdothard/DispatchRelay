@@ -11,6 +11,7 @@ import type { BolStatus } from '@/services/documents.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { AssignDriverSheet } from '@/features/loads/components/assign-driver-sheet';
+import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
 
 import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
@@ -37,6 +38,7 @@ export default function CarrierDashboard() {
   const [bolStatuses, setBolStatuses] = useState<BolStatus[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
   const [assignLoad, setAssignLoad] = useState<Load | null>(null);
+  const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
 
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
@@ -303,7 +305,7 @@ export default function CarrierDashboard() {
                 return (
                   <button
                     key={load.id}
-                    onClick={() => navigate(`/track/${load.loadNumber}`)}
+                    onClick={() => setSelectedLoad(load)}
                     className="relative w-full bg-orange-gradient rounded-ios p-5 card-orange-highlight text-left active-scale overflow-hidden grain"
                     style={{
                       filter: i === 1 ? 'brightness(0.91)' : i === 2 ? 'brightness(0.82)' : 'none',
@@ -378,6 +380,13 @@ export default function CarrierDashboard() {
         notifications={notifications}
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
+      />
+
+      <LoadDetailSheet
+        load={selectedLoad}
+        onClose={() => setSelectedLoad(null)}
+        showBidButton={false}
+        role={profile?.role as 'broker' | 'carrier' | 'driver' | undefined}
       />
 
       {assignLoad && (

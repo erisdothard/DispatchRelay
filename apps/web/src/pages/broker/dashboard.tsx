@@ -11,6 +11,7 @@ import { getLoads } from '@/services/loads.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { CarrierRelationshipsSheet } from '@/features/carriers/components/carrier-relationships-sheet';
+import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
 import type { Load } from '@freightx/shared';
 
 export default function BrokerDashboard() {
@@ -19,6 +20,7 @@ export default function BrokerDashboard() {
   const [loads, setLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
   const [carrierNetworkOpen, setCarrierNetworkOpen] = useState(false);
+  const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
   useEffect(() => {
@@ -122,7 +124,12 @@ export default function BrokerDashboard() {
               </div>
             ) : (
               recentLoads.map((load) => (
-                <LoadCard key={load.id} load={load} showBidButton={false} />
+                <LoadCard
+                  key={load.id}
+                  load={load}
+                  showBidButton={false}
+                  onPress={setSelectedLoad}
+                />
               ))
             )}
           </div>
@@ -172,6 +179,13 @@ export default function BrokerDashboard() {
       <CarrierRelationshipsSheet
         open={carrierNetworkOpen}
         onClose={() => setCarrierNetworkOpen(false)}
+      />
+
+      <LoadDetailSheet
+        load={selectedLoad}
+        onClose={() => setSelectedLoad(null)}
+        showBidButton={false}
+        role={profile?.role as 'broker' | 'carrier' | 'driver' | undefined}
       />
     </div>
   );
