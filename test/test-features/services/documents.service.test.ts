@@ -185,7 +185,7 @@ describe('uploadDocument', () => {
         company_id: 'co-1',
         type: 'proof_of_delivery',
         file_name: 'pod.pdf',
-        file_size_bytes: 512000,
+        file_size: 512000,
       }),
     );
   });
