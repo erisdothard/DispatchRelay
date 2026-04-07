@@ -125,7 +125,9 @@ export async function getLoadByNumber(loadNumber: string): Promise<Load | null> 
   return rowToLoad(data);
 }
 
-export async function createLoad(load: Omit<LoadRow, 'id' | 'created_at'>): Promise<Load> {
+export async function createLoad(
+  load: Omit<LoadRow, 'id' | 'created_at' | 'search_vector'>,
+): Promise<Load> {
   CreateLoadInputSchema.parse(load);
   const { data, error } = await supabase.from('loads').insert(load).select().single();
   if (error) throw error;

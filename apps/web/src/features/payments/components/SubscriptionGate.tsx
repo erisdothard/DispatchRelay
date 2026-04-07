@@ -8,6 +8,7 @@ export const TIER_LIMITS: Record<
   { maxTruckPostings: number | null; canPostLoads: boolean; maxLoads: number | null }
 > = {
   free: { maxTruckPostings: 2, canPostLoads: false, maxLoads: null },
+  pro: { maxTruckPostings: 10, canPostLoads: true, maxLoads: 100 },
   carrier_pro: { maxTruckPostings: null, canPostLoads: false, maxLoads: null },
   broker_starter: { maxTruckPostings: null, canPostLoads: true, maxLoads: 50 },
   broker_growth: { maxTruckPostings: null, canPostLoads: true, maxLoads: null },

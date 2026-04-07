@@ -675,38 +675,60 @@ export type Database = {
       documents: {
         Row: {
           bol_number: string | null;
+          company_id: string | null;
           created_at: string;
           file_name: string;
           file_size: number | null;
           file_url: string;
           id: string;
           load_id: string | null;
+          mime_type: string | null;
+          signatory_name: string | null;
+          signature_url: string | null;
+          signed_at: string | null;
           type: string;
           uploaded_by: string | null;
         };
         Insert: {
           bol_number?: string | null;
+          company_id?: string | null;
           created_at?: string;
           file_name: string;
           file_size?: number | null;
           file_url: string;
           id?: string;
           load_id?: string | null;
+          mime_type?: string | null;
+          signatory_name?: string | null;
+          signature_url?: string | null;
+          signed_at?: string | null;
           type: string;
           uploaded_by?: string | null;
         };
         Update: {
           bol_number?: string | null;
+          company_id?: string | null;
           created_at?: string;
           file_name?: string;
           file_size?: number | null;
           file_url?: string;
           id?: string;
           load_id?: string | null;
+          mime_type?: string | null;
+          signatory_name?: string | null;
+          signature_url?: string | null;
+          signed_at?: string | null;
           type?: string;
           uploaded_by?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: 'documents_company_id_fkey';
+            columns: ['company_id'];
+            isOneToOne: false;
+            referencedRelation: 'companies';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'documents_load_id_fkey';
             columns: ['load_id'];
@@ -1436,6 +1458,67 @@ export type Database = {
           },
         ];
       };
+      ratings: {
+        Row: {
+          comment: string | null;
+          communication: number | null;
+          created_at: string;
+          id: string;
+          load_id: string;
+          overall: number;
+          professionalism: number | null;
+          rated_company_id: string;
+          rater_id: string;
+          reliability: number | null;
+        };
+        Insert: {
+          comment?: string | null;
+          communication?: number | null;
+          created_at?: string;
+          id?: string;
+          load_id: string;
+          overall: number;
+          professionalism?: number | null;
+          rated_company_id: string;
+          rater_id: string;
+          reliability?: number | null;
+        };
+        Update: {
+          comment?: string | null;
+          communication?: number | null;
+          created_at?: string;
+          id?: string;
+          load_id?: string;
+          overall?: number;
+          professionalism?: number | null;
+          rated_company_id?: string;
+          rater_id?: string;
+          reliability?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ratings_load_id_fkey';
+            columns: ['load_id'];
+            isOneToOne: false;
+            referencedRelation: 'loads';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ratings_rated_company_id_fkey';
+            columns: ['rated_company_id'];
+            isOneToOne: false;
+            referencedRelation: 'companies';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ratings_rater_id_fkey';
+            columns: ['rater_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       saved_searches: {
         Row: {
           alert_enabled: boolean;
@@ -1882,7 +1965,7 @@ export const Constants = {
   },
 } as const;
 
-// ── Helper Types ──────────────────────────────────────────────────────────────
+// Helper type exports
 export type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 export type CompanyRow = Database['public']['Tables']['companies']['Row'];
 export type LoadRow = Database['public']['Tables']['loads']['Row'];
@@ -1890,21 +1973,12 @@ export type TruckRow = Database['public']['Tables']['trucks']['Row'];
 export type BidRow = Database['public']['Tables']['bids']['Row'];
 export type DocumentRow = Database['public']['Tables']['documents']['Row'];
 export type CarrierVerificationRow = Database['public']['Tables']['carrier_verifications']['Row'];
+export type ConversationRow = Database['public']['Tables']['conversations']['Row'];
+export type MessageRow = Database['public']['Tables']['messages']['Row'];
+export type TrackingMilestoneRow = Database['public']['Tables']['tracking_milestones']['Row'];
+export type RatingRow = Database['public']['Tables']['ratings']['Row'];
 
 // Placeholder types for tables not yet in schema
-export type RatingRow = {
-  id: string;
-  created_at: string;
-  load_id: string | null;
-  rated_by: string;
-  rated_entity_id: string;
-  overall: number;
-  communication: number | null;
-  reliability: number | null;
-  professionalism: number | null;
-  comment: string | null;
-};
-
 export type InvoiceRow = {
   id: string;
   load_id: string;
@@ -1912,6 +1986,16 @@ export type InvoiceRow = {
   status: InvoiceStatus;
   created_at: string;
   due_date: string | null;
+  payment_method?: string;
+  quick_pay_fee_usd?: number;
+};
+
+export type SubscriptionRow = {
+  id: string;
+  company_id: string;
+  tier: SubscriptionTier;
+  status: string;
+  created_at: string;
 };
 
 export type UserRole = 'carrier' | 'broker' | 'shipper' | 'admin' | 'driver';
@@ -1936,7 +2020,23 @@ export type LoadStatus =
   | 'cancelled'
   | 'expired';
 export type DocumentType = 'bill_of_lading' | 'proof_of_delivery' | 'rate_confirmation' | 'other';
-export type InvoiceStatus = 'pending' | 'paid' | 'overdue' | 'cancelled';
+export type InvoiceStatus =
+  | 'pending'
+  | 'paid'
+  | 'overdue'
+  | 'cancelled'
+  | 'invoiced'
+  | 'approved'
+  | 'processing'
+  | 'disputed'
+  | 'void';
 export type VerificationStatus = 'pending' | 'verified' | 'failed' | 'expired';
-export type SubscriptionTier = 'free' | 'pro' | 'enterprise';
+export type SubscriptionTier =
+  | 'free'
+  | 'pro'
+  | 'enterprise'
+  | 'carrier_pro'
+  | 'broker_starter'
+  | 'broker_growth'
+  | 'shipper';
 export type TruckStatus = 'available' | 'booked' | 'inactive';

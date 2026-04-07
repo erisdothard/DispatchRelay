@@ -521,7 +521,7 @@ export default function TrackingPage() {
         )}
       </div>
 
-      <BottomNav role={role} />
+      <BottomNav role={role as any} />
 
       {/* 3-dot action sheet */}
       {menuOpen && load && (

@@ -463,14 +463,14 @@ export default function DriverDocumentsPage() {
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-[10px] font-semibold text-fx-orange">
-                                {docLabel(doc.type)}
+                                {docLabel(doc.type as DocumentType)}
                               </span>
                               <Badge variant={status.variant} size="sm">
                                 {status.label}
                               </Badge>
-                              {doc.file_size_bytes && (
+                              {doc.file_size && (
                                 <span className="text-[10px] text-fx-text-dim">
-                                  {formatBytes(doc.file_size_bytes)}
+                                  {formatBytes(doc.file_size)}
                                 </span>
                               )}
                             </div>

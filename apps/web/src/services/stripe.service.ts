@@ -31,7 +31,7 @@ export async function redirectToCheckout(tier: SubscriptionTier, companyId: stri
 }
 
 export async function getSubscription(companyId: string): Promise<SubscriptionRow | null> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('subscriptions')
     .select('*')
     .eq('company_id', companyId)
@@ -41,7 +41,7 @@ export async function getSubscription(companyId: string): Promise<SubscriptionRo
 }
 
 export async function getInvoice(loadId: string): Promise<InvoiceRow | null> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('invoices')
     .select('*')
     .eq('load_id', loadId)
@@ -51,7 +51,7 @@ export async function getInvoice(loadId: string): Promise<InvoiceRow | null> {
 }
 
 export async function approveInvoice(invoiceId: string): Promise<void> {
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('invoices')
     .update({ status: 'approved', approved_at: new Date().toISOString() })
     .eq('id', invoiceId);
@@ -63,7 +63,7 @@ export async function selectPaymentMethod(
   method: 'standard_net30' | 'quick_pay',
 ): Promise<void> {
   // Fetch invoice to compute quick pay fee
-  const { data: invoice, error: fetchError } = await supabase
+  const { data: invoice, error: fetchError } = await (supabase as any)
     .from('invoices')
     .select('amount_usd')
     .eq('id', invoiceId)
@@ -76,7 +76,7 @@ export async function selectPaymentMethod(
       ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('invoices')
     .update({
       payment_method: method,

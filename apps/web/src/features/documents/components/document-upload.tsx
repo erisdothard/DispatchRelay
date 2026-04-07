@@ -181,11 +181,11 @@ export function DocumentUpload({ loadId, role }: DocumentUploadProps) {
                 <p className="text-sm font-semibold text-fx-text truncate">{doc.file_name}</p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-[10px] font-semibold text-fx-orange">
-                    {DOC_LABEL[doc.type]}
+                    {DOC_LABEL[doc.type as DocumentType]}
                   </span>
-                  {doc.file_size_bytes && (
+                  {doc.file_size && (
                     <span className="text-[10px] text-fx-text-dim">
-                      {formatBytes(doc.file_size_bytes)}
+                      {formatBytes(doc.file_size)}
                     </span>
                   )}
                   <span className="text-[10px] text-fx-text-dim">

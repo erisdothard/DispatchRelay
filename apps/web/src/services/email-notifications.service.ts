@@ -17,7 +17,7 @@ async function enqueue(trigger: EmailTrigger): Promise<void> {
     p_type: 'email',
     p_recipient: trigger.to,
     p_subject: trigger.subject,
-    p_payload: { template: trigger.template, data: trigger.data },
+    p_payload: { template: trigger.template, data: trigger.data } as any,
   });
 
   // Non-fatal — email failure should never block the main action
@@ -169,7 +169,7 @@ export async function enqueueSms(params: {
   const { error } = await supabase.rpc('enqueue_notification', {
     p_type: 'sms',
     p_recipient: params.to,
-    p_subject: null,
+    p_subject: null as any,
     p_payload: { message: params.message },
   });
   if (error) {

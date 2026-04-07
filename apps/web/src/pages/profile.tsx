@@ -183,12 +183,12 @@ export default function ProfilePage() {
         </div>
 
         {/* Reviews Section */}
-        {profile?.company_id && (
+        {company?.id && (
           <div className="mx-5 mb-6">
             <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3 px-1">
               Company Reviews
             </p>
-            <CompanyReviewsList companyId={profile.company_id} />
+            <CompanyReviewsList companyId={company.id} />
           </div>
         )}
 
@@ -241,7 +241,7 @@ export default function ProfilePage() {
         <p className="text-center text-[10px] text-fx-text-dim pb-6">FreightX v2.0.0 · Phase 13</p>
       </div>
 
-      <BottomNav role={role === 'admin' ? 'carrier' : role} />
+      <BottomNav role={(role === 'admin' ? 'carrier' : role) as any} />
 
       <EditProfileSheet open={editProfileOpen} onClose={() => setEditProfileOpen(false)} />
       <EditCompanySheet open={editCompanyOpen} onClose={() => setEditCompanyOpen(false)} />

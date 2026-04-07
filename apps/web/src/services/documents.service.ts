@@ -47,7 +47,7 @@ export async function uploadDocument(params: {
       type: params.type,
       file_name: params.file.name,
       file_url: urlData.publicUrl,
-      file_size_bytes: params.file.size,
+      file_size: params.file.size,
       mime_type: params.file.type,
       bol_number: params.bolNumber ?? null,
     })

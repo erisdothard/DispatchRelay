@@ -3,7 +3,14 @@
  * This keeps the LoadCard and existing UI components unchanged.
  */
 import type { Load, Truck, TrackingMilestone } from '@freightx/shared';
-import type { LoadRow, TruckRow, TrackingMilestoneRow } from './database.types';
+import type {
+  LoadRow,
+  TruckRow,
+  TrackingMilestoneRow,
+  EquipmentType,
+  LoadStatus,
+  TruckStatus,
+} from './database.types';
 import { titleCase } from './utils';
 
 export function rowToLoad(row: LoadRow): Load {
@@ -22,13 +29,13 @@ export function rowToLoad(row: LoadRow): Load {
     destZip: row.dest_zip ?? undefined,
     pickupDate: row.pickup_date,
     deliveryDate: row.delivery_date,
-    equipment: row.equipment,
+    equipment: row.equipment as EquipmentType,
     commodity: titleCase(row.commodity),
     weightLbs: row.weight_lbs,
     rateUsd: row.rate_usd,
     ratePerMile: row.rate_per_mile ?? 0,
     totalMiles: row.total_miles ?? undefined,
-    status: row.status,
+    status: row.status as LoadStatus,
     bidCount: row.bid_count,
     hazmat: row.hazmat,
     tempControlled: row.temp_controlled,
@@ -52,13 +59,13 @@ export function rowToTruck(row: TruckRow): Truck {
     destCity: row.dest_city ? titleCase(row.dest_city) : undefined,
     destState: row.dest_state?.toUpperCase() ?? undefined,
     availableDate: row.available_date,
-    equipment: row.equipment,
+    equipment: row.equipment as EquipmentType,
     lengthFt: row.length_ft ?? undefined,
     weightCapacityLbs: row.weight_capacity_lbs ?? undefined,
     driverName: row.driver_name ?? undefined,
     driverPhone: row.driver_phone ?? undefined,
     driverId: row.driver_id ?? undefined,
-    status: row.status,
+    status: row.status as TruckStatus,
   };
 }
 

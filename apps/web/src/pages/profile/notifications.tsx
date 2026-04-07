@@ -249,7 +249,7 @@ export default function NotificationsPage() {
         <p className="text-center text-[10px] text-fx-text-dim mt-6">FreightX v0.13.0 · Phase 13</p>
       </div>
 
-      <BottomNav role={role === 'admin' ? 'carrier' : role} />
+      <BottomNav role={(role === 'admin' ? 'carrier' : role) as any} />
     </div>
   );
 }

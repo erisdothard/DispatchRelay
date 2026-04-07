@@ -540,7 +540,7 @@ export default function MessagesPage() {
         </div>
       )}
 
-      <BottomNav role={role} />
+      <BottomNav role={role as any} />
     </div>
   );
 }

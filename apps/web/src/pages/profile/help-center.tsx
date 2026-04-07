@@ -160,7 +160,7 @@ export default function HelpCenterPage() {
         <p className="text-center text-[10px] text-fx-text-dim">FreightX v0.2.0 · Phase 2</p>
       </div>
 
-      <BottomNav role={role === 'admin' ? 'carrier' : role} />
+      <BottomNav role={(role === 'admin' ? 'carrier' : role) as any} />
     </div>
   );
 }
