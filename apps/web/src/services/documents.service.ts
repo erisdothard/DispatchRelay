@@ -23,6 +23,7 @@ export async function uploadDocument(params: {
   companyId: string | null;
   type: DocumentType;
   file: File;
+  bolNumber?: string;
 }): Promise<DocumentRow> {
   const ext = params.file.name.split('.').pop() ?? 'bin';
   const path = `${params.loadId}/${params.type}-${Date.now()}.${ext}`;
@@ -48,6 +49,7 @@ export async function uploadDocument(params: {
       file_url: urlData.publicUrl,
       file_size_bytes: params.file.size,
       mime_type: params.file.type,
+      bol_number: params.bolNumber ?? null,
     })
     .select()
     .single();

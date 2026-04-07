@@ -125,14 +125,14 @@ async function main() {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
   // ── 1. Auth Users ──────────────────────────────────────────────────────────
-  header('1/5  Auth Users');
+  header('1/6  Auth Users');
   const ids = {};
   for (const u of TEST_USERS) {
     ids[u.idKey] = await upsertUser(u);
   }
 
   // ── 2. Profiles ────────────────────────────────────────────────────────────
-  header('2/5  Profiles');
+  header('2/6  Profiles');
   for (const u of TEST_USERS) {
     const { error } = await sb.from('profiles').upsert(
       {
@@ -150,7 +150,7 @@ async function main() {
   }
 
   // ── 3. Companies ───────────────────────────────────────────────────────────
-  header('3/5  Companies');
+  header('3/6  Companies');
   const companyDefs = [
     {
       key: 'broker',
@@ -229,8 +229,27 @@ async function main() {
     log(`✅  ${c.name}`);
   }
 
+  // ── 3.5. Broker Payment Metrics ────────────────────────────────────────────
+  header('3.5/6  Broker Payment Metrics');
+  if (companyIds.broker) {
+    const { error } = await sb.from('broker_payment_metrics').upsert(
+      {
+        company_id: companyIds.broker,
+        avg_days_to_pay: 14.2,
+        payment_count: 47,
+        on_time_pct: 93.6,
+        total_paid_usd: 128450.0,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'company_id' },
+    );
+
+    if (error) warn(`broker payment metrics: ${error.message}`);
+    else log('✅  Broker payment metrics seeded');
+  }
+
   // ── 4. Loads ───────────────────────────────────────────────────────────────
-  header('4/5  Loads');
+  header('4/6  Loads');
 
   const loadsData = [
     // ── Posted (open for bids)
@@ -516,7 +535,7 @@ async function main() {
   }
 
   // ── 6. Bids ────────────────────────────────────────────────────────────────
-  header('5/5  Bids');
+  header('5/6  Bids');
   const bidsData = [
     {
       load_number: 'FX-TEST-0006',

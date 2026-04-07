@@ -19,6 +19,7 @@ import { Badge } from '@/shared/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { EditProfileSheet } from '@/features/profile/components/edit-profile-sheet';
 import { EditCompanySheet } from '@/features/profile/components/edit-company-sheet';
+import { CompanyReviewsList } from '@/features/companies/components/company-reviews-list';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -180,6 +181,16 @@ export default function ProfilePage() {
             </p>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        {profile?.company_id && (
+          <div className="mx-5 mb-6">
+            <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3 px-1">
+              Company Reviews
+            </p>
+            <CompanyReviewsList companyId={profile.company_id} />
+          </div>
+        )}
 
         {/* Menu sections */}
         <div className="px-5 space-y-6 pb-4">

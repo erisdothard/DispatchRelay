@@ -26,6 +26,7 @@ import { BidSheet } from '@/features/bids/components/bid-sheet';
 import { BidListSheet } from '@/features/bids/components/bid-list-sheet';
 import { DocumentUpload } from '@/features/documents/components/document-upload';
 import { SignedBolViewer } from '@/features/documents/components/signed-bol-viewer';
+import { BrokerCreditBadge } from './broker-credit-badge';
 import { getDocumentsForLoad } from '@/services/documents.service';
 import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
@@ -310,6 +311,16 @@ export function LoadDetailSheet({
             <InfoRow icon={<Package size={14} />} label="Load #" value={load.loadNumber} />
           )}
         </div>
+
+        {/* Broker Payment Metrics */}
+        {isCarrier && load.companyId && (
+          <div className="mb-5">
+            <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+              Broker Payment History
+            </p>
+            <BrokerCreditBadge companyId={load.companyId} inline={false} />
+          </div>
+        )}
 
         {/* Tags */}
         {(load.tempControlled || load.hazmat || (load.bidCount && load.bidCount > 0)) && (

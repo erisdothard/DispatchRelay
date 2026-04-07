@@ -76,6 +76,7 @@ function BolUploadSheet({
   onClose: () => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
+  const [bolNumber, setBolNumber] = useState('');
   const [alreadySigned, setAlreadySigned] = useState(false);
   const [loaderName, setLoaderName] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -96,6 +97,7 @@ function BolUploadSheet({
         companyId,
         type: 'bill_of_lading',
         file,
+        bolNumber: bolNumber.trim() || undefined,
       });
 
       // If marked as already signed, update the doc + notify
@@ -180,6 +182,22 @@ function BolUploadSheet({
             >
               Change
             </button>
+          </div>
+        )}
+
+        {/* BOL Number */}
+        {file && (
+          <div>
+            <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+              BOL Number
+            </p>
+            <input
+              type="text"
+              placeholder="e.g., BOL-123456 (optional)"
+              value={bolNumber}
+              onChange={(e) => setBolNumber(e.target.value)}
+              className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
+            />
           </div>
         )}
 

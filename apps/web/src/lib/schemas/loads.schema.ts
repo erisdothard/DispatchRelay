@@ -37,6 +37,33 @@ export const CreateLoadInputSchema = z.object({
   weight_lbs: z.number().positive().optional().nullable(),
   total_miles: z.number().positive().optional().nullable(),
   assignee_id: z.string().uuid().optional().nullable(),
+  freight_class: z
+    .enum([
+      '50',
+      '55',
+      '60',
+      '65',
+      '70',
+      '77.5',
+      '85',
+      '92.5',
+      '100',
+      '110',
+      '125',
+      '150',
+      '175',
+      '200',
+      '250',
+      '300',
+      '400',
+      '500',
+    ])
+    .optional(),
+  packaging_type: z
+    .enum(['pallets', 'crates', 'boxes', 'drums', 'bags', 'rolls', 'loose', 'other'])
+    .optional(),
+  po_number: z.string().max(50).optional(),
+  shipper_reference: z.string().max(100).optional(),
 });
 
 export type LoadFiltersInput = z.infer<typeof LoadFiltersSchema>;

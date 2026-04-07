@@ -3,6 +3,13 @@ import { BookmarkPlus, Bookmark, TrendingUp, Loader2, ChevronDown } from 'lucide
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select';
 import { createLoad } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
@@ -48,6 +55,10 @@ const EMPTY_FORM = {
   hazmat: false,
   tempControlled: false,
   assigneeId: null as string | null,
+  freightClass: '' as string,
+  packagingType: '' as string,
+  poNumber: '',
+  shipperReference: '',
 };
 
 interface LoadTemplate {
@@ -240,6 +251,10 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         assigned_driver_id: null,
         second_driver_id: null,
         assignee_id: form.assigneeId ?? null,
+        freight_class: form.freightClass || null,
+        packaging_type: form.packagingType || null,
+        po_number: form.poNumber.trim() || null,
+        shipper_reference: form.shipperReference.trim() || null,
       });
 
       setForm(EMPTY_FORM);
@@ -446,6 +461,86 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
             onChange={(e) => set('commodity', e.target.value)}
             required
           />
+        </div>
+
+        {/* Freight Class + Packaging */}
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+              Freight Class (NMFC)
+            </p>
+            <Select value={form.freightClass} onValueChange={(val) => set('freightClass', val)}>
+              <SelectTrigger className={fieldClass}>
+                <SelectValue placeholder="Optional" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="50">Class 50</SelectItem>
+                <SelectItem value="55">Class 55</SelectItem>
+                <SelectItem value="60">Class 60</SelectItem>
+                <SelectItem value="65">Class 65</SelectItem>
+                <SelectItem value="70">Class 70</SelectItem>
+                <SelectItem value="77.5">Class 77.5</SelectItem>
+                <SelectItem value="85">Class 85</SelectItem>
+                <SelectItem value="92.5">Class 92.5</SelectItem>
+                <SelectItem value="100">Class 100</SelectItem>
+                <SelectItem value="110">Class 110</SelectItem>
+                <SelectItem value="125">Class 125</SelectItem>
+                <SelectItem value="150">Class 150</SelectItem>
+                <SelectItem value="175">Class 175</SelectItem>
+                <SelectItem value="200">Class 200</SelectItem>
+                <SelectItem value="250">Class 250</SelectItem>
+                <SelectItem value="300">Class 300</SelectItem>
+                <SelectItem value="400">Class 400</SelectItem>
+                <SelectItem value="500">Class 500</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+              Packaging
+            </p>
+            <Select value={form.packagingType} onValueChange={(val) => set('packagingType', val)}>
+              <SelectTrigger className={fieldClass}>
+                <SelectValue placeholder="Optional" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pallets">Pallets</SelectItem>
+                <SelectItem value="crates">Crates</SelectItem>
+                <SelectItem value="boxes">Boxes</SelectItem>
+                <SelectItem value="drums">Drums</SelectItem>
+                <SelectItem value="bags">Bags</SelectItem>
+                <SelectItem value="rolls">Rolls</SelectItem>
+                <SelectItem value="loose">Loose</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Reference Numbers */}
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+              PO Number
+            </p>
+            <Input
+              placeholder="Optional"
+              value={form.poNumber}
+              onChange={(e) => set('poNumber', e.target.value)}
+              maxLength={50}
+            />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+              Shipper Reference
+            </p>
+            <Input
+              placeholder="Optional"
+              value={form.shipperReference}
+              onChange={(e) => set('shipperReference', e.target.value)}
+              maxLength={100}
+            />
+          </div>
         </div>
 
         {/* Weight + Miles */}

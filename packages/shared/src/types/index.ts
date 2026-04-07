@@ -49,6 +49,7 @@ export interface Load {
   id: string;
   loadNumber: string;
   postedBy: string;
+  companyId?: string;
   companyName: string;
   originCity: string;
   originState: string;
@@ -76,6 +77,10 @@ export interface Load {
   secondDriverId?: string;
   assigneeId?: string | null;
   assigneeName?: string | null;
+  freight_class?: string;
+  packaging_type?: string;
+  po_number?: string;
+  shipper_reference?: string;
 }
 
 export interface Truck {

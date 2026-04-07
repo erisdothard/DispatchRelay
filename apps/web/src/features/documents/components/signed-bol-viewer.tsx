@@ -142,6 +142,24 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
                 },
                 { label: 'Broker', value: load.companyName },
                 { label: 'Rate', value: `$${load.rateUsd.toLocaleString()}` },
+                ...(load.freight_class
+                  ? [{ label: 'Freight Class', value: `Class ${load.freight_class}` }]
+                  : []),
+                ...(load.packaging_type
+                  ? [
+                      {
+                        label: 'Packaging',
+                        value:
+                          load.packaging_type.charAt(0).toUpperCase() +
+                          load.packaging_type.slice(1),
+                      },
+                    ]
+                  : []),
+                ...(load.po_number ? [{ label: 'PO Number', value: load.po_number }] : []),
+                ...(load.shipper_reference
+                  ? [{ label: 'Shipper Ref', value: load.shipper_reference }]
+                  : []),
+                ...(doc.bol_number ? [{ label: 'BOL Number', value: doc.bol_number }] : []),
               ].map(({ label, value }) => (
                 <div key={label}>
                   <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
