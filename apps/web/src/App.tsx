@@ -92,7 +92,7 @@ export default function App() {
           <Route
             path="/carrier/fleet"
             element={
-              <ProtectedRoute requiredRole="carrier">
+              <ProtectedRoute requiredRole={['carrier', 'broker']}>
                 <CarrierFleetPage />
               </ProtectedRoute>
             }
@@ -100,7 +100,7 @@ export default function App() {
           <Route
             path="/carrier/team"
             element={
-              <ProtectedRoute requiredRole="carrier">
+              <ProtectedRoute requiredRole={['carrier', 'broker']}>
                 <CarrierTeamPage />
               </ProtectedRoute>
             }

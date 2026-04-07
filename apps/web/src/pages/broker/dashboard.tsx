@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, TrendingUp, Package, DollarSign, Clock } from 'lucide-react';
+import { Search, TrendingUp, Package, DollarSign, Clock, Truck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -121,6 +121,21 @@ export default function BrokerDashboard() {
             )}
           </div>
         </div>
+
+        {/* My Fleet */}
+        <button
+          onClick={() => navigate('/carrier/fleet')}
+          className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-4 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200 text-left"
+        >
+          <div className="w-12 h-12 rounded-xl bg-fx-orange/15 flex items-center justify-center shrink-0">
+            <Truck size={20} className="text-fx-orange" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-white">My Fleet</p>
+            <p className="text-[11px] text-fx-text-dim mt-0.5">Manage trucks & drivers</p>
+          </div>
+          <span className="text-fx-text-dim text-xs">→</span>
+        </button>
 
         {/* Carrier Network */}
         <button

@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   /** If provided, redirects to /[role] dashboard when role doesn't match */
-  requiredRole?: string;
+  requiredRole?: string | string[];
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
@@ -22,8 +22,11 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && profile?.role && profile.role !== requiredRole) {
-    return <Navigate to={`/${profile.role}`} replace />;
+  if (requiredRole && profile?.role) {
+    const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    if (!allowedRoles.includes(profile.role)) {
+      return <Navigate to={`/${profile.role}`} replace />;
+    }
   }
 
   return <>{children}</>;
