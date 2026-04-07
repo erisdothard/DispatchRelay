@@ -3,6 +3,7 @@ import { Search, TrendingUp, Package, DollarSign, Clock, Truck } from 'lucide-re
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
+import { ViewSwitcher } from '@/shared/components/view-switcher';
 import { StatCard } from '@/shared/components/stat-card';
 import { LoadCard } from '@/features/loads/components/load-card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -42,6 +43,7 @@ export default function BrokerDashboard() {
         name={name}
         notificationCount={unreadCount}
         onNotificationClick={() => setNotifsOpen(true)}
+        right={<ViewSwitcher />}
       />
 
       {/* Search */}

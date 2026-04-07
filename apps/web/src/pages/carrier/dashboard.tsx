@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, ArrowUpRight, MapPin, Navigation, UserCheck } from 'lucide-react';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { BottomNav } from '@/shared/components/bottom-nav';
+import { ViewSwitcher } from '@/shared/components/view-switcher';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyActiveLoads } from '@/services/loads.service';
 import { getBolStatusForLoads } from '@/services/documents.service';
@@ -92,7 +93,7 @@ export default function CarrierDashboard() {
       <IOSStatusBar />
 
       {/* Header */}
-      <div className="px-5 pb-5 flex items-center justify-between">
+      <div className="px-5 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="w-12 h-12 rounded-full bg-orange-gradient flex items-center justify-center card-orange-highlight">
@@ -123,6 +124,11 @@ export default function CarrierDashboard() {
             </span>
           )}
         </button>
+      </div>
+
+      {/* View Switcher */}
+      <div className="px-5 pb-5 flex justify-center">
+        <ViewSwitcher />
       </div>
 
       {/* Scrollable content */}
