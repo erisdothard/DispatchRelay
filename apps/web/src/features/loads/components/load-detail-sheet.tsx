@@ -160,7 +160,10 @@ export function LoadDetailSheet({
   const isBroker = role === 'broker' || role === 'admin';
   const isCarrier = role === 'carrier';
   const canEdit =
-    user && load && (load.postedBy === user.id || user.role === 'admin') && liveStatus === 'posted';
+    user &&
+    load &&
+    (load.postedBy === user.id || user.role === 'admin') &&
+    (liveStatus === 'posted' || liveStatus === 'bid_received');
 
   return (
     <>
