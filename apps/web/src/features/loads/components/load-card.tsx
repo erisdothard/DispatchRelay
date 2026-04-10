@@ -9,7 +9,45 @@ import {
 } from '@/shared/lib/freight';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
+import type { LoadStatus } from '@/lib/database.types';
 import { getLaneStats } from '@/services/rate-intelligence.service';
+
+/** Returns badge variant for a load status */
+function getStatusBadgeVariant(status: LoadStatus): 'blue' | 'orange' | 'green' | 'red' | 'gray' {
+  switch (status) {
+    case 'posted':
+    case 'awarded':
+    case 'dispatched':
+      return 'blue';
+    case 'in_transit':
+      return 'orange';
+    case 'delivered':
+    case 'completed':
+      return 'green';
+    case 'cancelled':
+    case 'expired':
+      return 'red';
+    default:
+      return 'gray';
+  }
+}
+
+/** Returns human-readable label for a load status */
+function getStatusLabel(status: LoadStatus): string {
+  const labels: Record<LoadStatus, string> = {
+    draft: 'Draft',
+    posted: 'Posted',
+    bid_received: 'Bids In',
+    awarded: 'Awarded',
+    dispatched: 'Dispatched',
+    in_transit: 'In Transit',
+    delivered: 'Delivered',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+    expired: 'Expired',
+  };
+  return labels[status] ?? status;
+}
 
 /** Inline market badge — fetches lane avg via React Query (cached, deduplicated) */
 function MarketBadge({ load }: { load: Load }) {
@@ -96,16 +134,40 @@ export function LoadCard({ load, onBid, onPress, showBidButton = true, className
         </div>
       </div>
 
-      {/* Equipment + special tags */}
+      {/* Equipment + status + special tags */}
       <div className="flex items-center gap-1.5 mb-4 flex-wrap">
         <span className="text-[11px] font-semibold text-fx-text-dim bg-fx-surface-2 px-2.5 py-1 rounded-full">
           {EQUIPMENT_LABELS[load.equipment] ?? load.equipment}
         </span>
-        {isCancelled && (
-          <span className="text-[11px] font-semibold text-red-400 bg-red-400/10 px-2.5 py-1 rounded-full border border-red-400/20">
-            CANCELLED
-          </span>
-        )}
+        {/* Status badge */}
+        {(() => {
+          const variant = getStatusBadgeVariant(load.status);
+          const label = getStatusLabel(load.status);
+          const colors = {
+            blue: { text: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' },
+            orange: {
+              text: 'text-orange-400',
+              bg: 'bg-orange-400/10',
+              border: 'border-orange-400/20',
+            },
+            green: { text: 'text-green-400', bg: 'bg-green-400/10', border: 'border-green-400/20' },
+            red: { text: 'text-red-400', bg: 'bg-red-400/10', border: 'border-red-400/20' },
+            gray: { text: 'text-gray-400', bg: 'bg-gray-400/10', border: 'border-gray-400/20' },
+          };
+          const c = colors[variant];
+          return (
+            <span
+              className={cn(
+                'text-[11px] font-semibold px-2.5 py-1 rounded-full border',
+                c.text,
+                c.bg,
+                c.border,
+              )}
+            >
+              {label}
+            </span>
+          );
+        })()}
         {load.tempControlled && (
           <span className="text-[11px] font-semibold text-blue-400 bg-blue-400/10 px-2.5 py-1 rounded-full border border-blue-400/20">
             ❄ Temp

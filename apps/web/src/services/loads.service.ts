@@ -227,28 +227,57 @@ export async function recordBookingRateHistory(loadId: string): Promise<void> {
 }
 
 /**
- * Get loads where this carrier has an accepted bid (awarded/dispatched/in_transit/delivered).
+ * Get loads where this carrier has an accepted bid OR where carrier's company owns the load.
  */
 export async function getMyActiveLoads(carrierId: string): Promise<Load[]> {
-  // 1. Find all accepted bids for this carrier
+  // 1. Get carrier's company via company_members join
+  const { data: membership } = await supabase
+    .from('company_members')
+    .select('company_id')
+    .eq('user_id', carrierId)
+    .single();
+
+  // 2. Find all accepted bids for this carrier
   const { data: bids, error: bidErr } = await supabase
     .from('bids')
     .select('load_id')
     .eq('carrier_id', carrierId)
     .eq('status', 'accepted');
   if (bidErr) throw bidErr;
-  if (!bids || bids.length === 0) return [];
 
-  const loadIds = bids.map((b) => b.load_id);
+  const bidLoadIds = (bids ?? []).map((b) => b.load_id);
 
-  // 2. Fetch those loads
-  const { data, error } = await supabase
-    .from('loads')
-    .select('*')
-    .in('id', loadIds)
-    .order('pickup_date', { ascending: true });
+  // 3. Build query for loads from two sources:
+  //    - Loads where carrier has accepted bid
+  //    - Loads where carrier's company owns the load and status is active
+  let query = supabase.from('loads').select('*');
+
+  if (bidLoadIds.length > 0 && membership?.company_id) {
+    query = query.or(
+      `id.in.(${bidLoadIds.join(',')}),and(company_id.eq.${membership.company_id},status.in.(awarded,dispatched,in_transit))`,
+    );
+  } else if (bidLoadIds.length > 0) {
+    query = query.in('id', bidLoadIds);
+  } else if (membership?.company_id) {
+    query = query
+      .eq('company_id', membership.company_id)
+      .in('status', ['awarded', 'dispatched', 'in_transit']);
+  } else {
+    return [];
+  }
+
+  const { data, error } = await query.order('pickup_date', { ascending: true });
   if (error) throw error;
-  return (data ?? []).map(rowToLoad);
+
+  // 4. Deduplicate by load ID (in case a load appears in both queries)
+  const uniqueLoads = new Map<string, LoadRow>();
+  (data ?? []).forEach((load) => {
+    if (!uniqueLoads.has(load.id)) {
+      uniqueLoads.set(load.id, load);
+    }
+  });
+
+  return Array.from(uniqueLoads.values()).map(rowToLoad);
 }
 
 /**

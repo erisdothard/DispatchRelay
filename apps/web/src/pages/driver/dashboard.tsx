@@ -40,13 +40,17 @@ export default function DriverDashboard() {
   const [loads, setLoads] = useState<Load[]>([]);
   const [activeLoads, setActiveLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
-  const [sharingLocation, setSharingLocation] = useState(() => {
+  const [manualGpsToggle, setManualGpsToggle] = useState(() => {
     try {
       return localStorage.getItem('fx-gps-sharing') === 'true';
     } catch {
       return false;
     }
   });
+
+  // GPS is on if: manual toggle is on OR any load is in_transit
+  const hasInTransitLoads = activeLoads.some((l) => l.status === 'in_transit');
+  const sharingLocation = manualGpsToggle || hasInTransitLoads;
   const { notifications, unreadCount, markAllRead } = useNotifications();
   const { hasConsented, grantConsent } = useGpsConsent();
   const [consentModalOpen, setConsentModalOpen] = useState(false);
@@ -54,11 +58,11 @@ export default function DriverDashboard() {
   // Persist GPS sharing toggle across sessions
   useEffect(() => {
     try {
-      localStorage.setItem('fx-gps-sharing', String(sharingLocation));
+      localStorage.setItem('fx-gps-sharing', String(manualGpsToggle));
     } catch {
       /* ignored */
     }
-  }, [sharingLocation]);
+  }, [manualGpsToggle]);
 
   useEffect(() => {
     if (user?.id) {
@@ -120,19 +124,26 @@ export default function DriverDashboard() {
         </button>
       </div>
 
-      {/* GPS pingers — one per active (non-delivered) load, only when sharing is on */}
-      {sharingLocation &&
-        activeLoads.map((l) => <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />)}
+      {/* GPS pingers — auto-enabled for in_transit, manual toggle for others */}
+      {activeLoads
+        .filter((l) => l.status === 'in_transit' || sharingLocation)
+        .map((l) => (
+          <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />
+        ))}
 
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
         {/* Share Location banner */}
         <button
           onClick={() => {
-            if (!sharingLocation && !hasConsented) {
+            if (hasInTransitLoads) {
+              // GPS is auto-locked when loads are in_transit
+              return;
+            }
+            if (!manualGpsToggle && !hasConsented) {
               setConsentModalOpen(true);
               return;
             }
-            setSharingLocation((v) => !v);
+            setManualGpsToggle((v) => !v);
           }}
           className="w-full flex items-center justify-between rounded-2xl p-4 active-scale"
           style={{
@@ -140,6 +151,7 @@ export default function DriverDashboard() {
               ? 'linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.08))'
               : 'rgba(255,255,255,0.04)',
             border: `1px solid ${sharingLocation ? 'rgba(34,197,94,0.35)' : 'rgba(255,255,255,0.08)'}`,
+            opacity: hasInTransitLoads ? 0.9 : 1,
           }}
         >
           <div className="flex items-center gap-3">
@@ -152,13 +164,17 @@ export default function DriverDashboard() {
               <Radio size={18} className={sharingLocation ? 'text-green-400' : 'text-fx-orange'} />
             </div>
             <div className="text-left">
-              <p className="text-[14px] font-semibold text-white">Share Location</p>
+              <p className="text-[14px] font-semibold text-white">
+                Share Location {hasInTransitLoads && '🔒'}
+              </p>
               <p className="text-[11px] text-fx-text-dim mt-0.5">
-                {sharingLocation
-                  ? activeLoads.length > 0
-                    ? `Sharing GPS for ${activeLoads.length} load${activeLoads.length > 1 ? 's' : ''}`
-                    : 'Sharing live GPS'
-                  : 'Tap to share your GPS with carrier'}
+                {hasInTransitLoads
+                  ? 'GPS auto-enabled for in-transit loads'
+                  : sharingLocation
+                    ? activeLoads.length > 0
+                      ? `Sharing GPS for ${activeLoads.length} load${activeLoads.length > 1 ? 's' : ''}`
+                      : 'Sharing live GPS'
+                    : 'Tap to share your GPS with carrier'}
               </p>
             </div>
           </div>
@@ -295,7 +311,7 @@ export default function DriverDashboard() {
                     setConsentModalOpen(true);
                     return;
                   }
-                  setSharingLocation(true);
+                  setManualGpsToggle(true);
                 },
               },
               { label: 'Scan Receipt', icon: '🧾', action: () => navigate('/driver/receipts') },
@@ -330,7 +346,7 @@ export default function DriverDashboard() {
         onAllow={() => {
           grantConsent();
           setConsentModalOpen(false);
-          setSharingLocation(true);
+          setManualGpsToggle(true);
         }}
         onDismiss={() => setConsentModalOpen(false)}
       />
