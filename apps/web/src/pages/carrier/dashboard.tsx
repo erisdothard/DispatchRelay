@@ -56,19 +56,28 @@ export default function CarrierDashboard() {
     }
   }, [user?.id]);
 
-  const statusPriority: Record<string, number> = {
-    in_transit: 0,
-    dispatched: 1,
-    awarded: 2,
-    delivered: 3,
-    completed: 4,
-  };
-  const recentLoads = [...loads]
-    .sort((a, b) => (statusPriority[a.status] ?? 5) - (statusPriority[b.status] ?? 5))
-    .slice(0, 3);
   const activeLoads = loads.filter((l) =>
     ['dispatched', 'in_transit', 'awarded'].includes(l.status),
   );
+
+  // Show loads posted in last 7 days, excluding active loads
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const recentLoads = [...loads]
+    .filter((l) => {
+      if (!l.postedAt) return false;
+      const postedDate = new Date(l.postedAt);
+      return (
+        postedDate >= sevenDaysAgo && !['dispatched', 'in_transit', 'awarded'].includes(l.status)
+      );
+    })
+    .sort((a, b) => {
+      const aDate = a.postedAt ? new Date(a.postedAt).getTime() : 0;
+      const bDate = b.postedAt ? new Date(b.postedAt).getTime() : 0;
+      return bDate - aDate;
+    })
+    .slice(0, 3);
 
   // Carousel dot tracking
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -284,81 +293,93 @@ export default function CarrierDashboard() {
           </div>
         )}
 
-        {/* Recent Shipping */}
-        {recentLoads.length > 0 && (
+        {/* Recent Loads */}
+        {loads.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[17px] font-bold text-white tracking-[-0.01em]">Recent Shipping</p>
-              <button
-                onClick={() => navigate('/carrier/loads')}
-                className="text-[13px] font-semibold text-fx-orange flex items-center gap-1"
-              >
-                See All <ArrowUpRight size={13} />
-              </button>
+              <div>
+                <p className="text-[17px] font-bold text-white tracking-[-0.01em]">Recent Loads</p>
+                <p className="text-[12px] text-fx-text-dim mt-0.5">(Last 7 Days)</p>
+              </div>
+              {recentLoads.length > 0 && (
+                <button
+                  onClick={() => navigate('/carrier/loads?filter=recent')}
+                  className="text-[13px] font-semibold text-fx-orange flex items-center gap-1"
+                >
+                  See All <ArrowUpRight size={13} />
+                </button>
+              )}
             </div>
 
-            <div className="space-y-3">
-              {recentLoads.map((load, i) => {
-                const bol = bolStatuses.find((b) => b.loadId === load.id);
-                const showBolBadge = ['dispatched', 'in_transit'].includes(load.status);
+            {recentLoads.length === 0 ? (
+              <div className="text-center py-8 bg-fx-surface rounded-ios p-5">
+                <p className="text-sm text-fx-text-dim">No loads posted in the last 7 days</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentLoads.map((load, i) => {
+                  const bol = bolStatuses.find((b) => b.loadId === load.id);
+                  const showBolBadge = ['dispatched', 'in_transit'].includes(load.status);
 
-                return (
-                  <button
-                    key={load.id}
-                    onClick={() => setSelectedLoad(load)}
-                    className="relative w-full bg-orange-gradient rounded-ios p-5 card-orange-highlight text-left active-scale overflow-hidden grain"
-                    style={{
-                      filter: i === 1 ? 'brightness(0.91)' : i === 2 ? 'brightness(0.82)' : 'none',
-                    }}
-                  >
-                    <p
-                      className="text-[32px] font-extrabold text-white leading-none mb-1"
-                      style={{ letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}
+                  return (
+                    <button
+                      key={load.id}
+                      onClick={() => setSelectedLoad(load)}
+                      className="relative w-full bg-orange-gradient rounded-ios p-5 card-orange-highlight text-left active-scale overflow-hidden grain"
+                      style={{
+                        filter:
+                          i === 1 ? 'brightness(0.91)' : i === 2 ? 'brightness(0.82)' : 'none',
+                      }}
                     >
-                      {load.loadNumber}
-                    </p>
-                    <p className="text-[11px] text-white/50 font-medium mb-3 tracking-wide uppercase">
-                      {load.commodity} · {load.totalMiles ? `${load.totalMiles} mi` : '—'}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-[13px] text-white/80 font-semibold">
-                        {load.originCity} → {load.destCity}
+                      <p
+                        className="text-[32px] font-extrabold text-white leading-none mb-1"
+                        style={{ letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}
+                      >
+                        {load.loadNumber}
                       </p>
-                      <div className="flex items-center gap-1.5">
-                        {showBolBadge && bol && (
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                              bol.signed
-                                ? 'bg-green-500/30 text-green-200'
-                                : bol.hasBol
-                                  ? 'bg-orange-400/30 text-orange-200'
-                                  : 'bg-white/15 text-white/60'
-                            }`}
-                          >
-                            {bol.signed ? 'BOL Signed' : bol.hasBol ? 'BOL Pending' : 'No BOL'}
+                      <p className="text-[11px] text-white/50 font-medium mb-3 tracking-wide uppercase">
+                        {load.commodity} · {load.totalMiles ? `${load.totalMiles} mi` : '—'}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[13px] text-white/80 font-semibold">
+                          {load.originCity} → {load.destCity}
+                        </p>
+                        <div className="flex items-center gap-1.5">
+                          {showBolBadge && bol && (
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                bol.signed
+                                  ? 'bg-green-500/30 text-green-200'
+                                  : bol.hasBol
+                                    ? 'bg-orange-400/30 text-orange-200'
+                                    : 'bg-white/15 text-white/60'
+                              }`}
+                            >
+                              {bol.signed ? 'BOL Signed' : bol.hasBol ? 'BOL Pending' : 'No BOL'}
+                            </span>
+                          )}
+                          <span className="text-[11px] font-bold text-white bg-black/25 px-2.5 py-1 rounded-full">
+                            {load.status === 'delivered'
+                              ? 'Delivered'
+                              : load.status === 'completed'
+                                ? 'Completed'
+                                : load.status === 'in_transit'
+                                  ? 'In Transit'
+                                  : load.status === 'dispatched'
+                                    ? 'Dispatched'
+                                    : load.status === 'awarded'
+                                      ? 'Awarded'
+                                      : load.status === 'bid_received'
+                                        ? 'Bid Received'
+                                        : 'Posted'}
                           </span>
-                        )}
-                        <span className="text-[11px] font-bold text-white bg-black/25 px-2.5 py-1 rounded-full">
-                          {load.status === 'delivered'
-                            ? 'Delivered'
-                            : load.status === 'completed'
-                              ? 'Completed'
-                              : load.status === 'in_transit'
-                                ? 'In Transit'
-                                : load.status === 'dispatched'
-                                  ? 'Dispatched'
-                                  : load.status === 'awarded'
-                                    ? 'Awarded'
-                                    : load.status === 'bid_received'
-                                      ? 'Bid Received'
-                                      : 'Posted'}
-                        </span>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

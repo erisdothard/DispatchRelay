@@ -16,6 +16,7 @@ export interface LoadFilters {
   originState?: string;
   destState?: string;
   minRatePerMile?: number;
+  postedAfter?: string; // ISO date string
   page?: number; // 0-indexed
 }
 
@@ -57,6 +58,9 @@ export async function getLoads(filters: LoadFilters = {}): Promise<Load[]> {
   }
   if (filters.minRatePerMile && filters.minRatePerMile > 0) {
     query = query.gte('rate_per_mile', filters.minRatePerMile);
+  }
+  if (filters.postedAfter) {
+    query = query.gte('posted_at', filters.postedAfter);
   }
   if (filters.search) {
     // Use full-text search if search_vector column exists, otherwise fall back to ilike
@@ -102,6 +106,9 @@ export async function getLoadsPage(filters: LoadFilters = {}): Promise<LoadsPage
   }
   if (filters.minRatePerMile && filters.minRatePerMile > 0) {
     query = query.gte('rate_per_mile', filters.minRatePerMile);
+  }
+  if (filters.postedAfter) {
+    query = query.gte('posted_at', filters.postedAfter);
   }
   if (filters.search) {
     const s = `%${filters.search}%`;

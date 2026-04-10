@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, X, WifiOff, Settings2, Sparkles, Truck } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -23,6 +24,9 @@ type Tab = 'my_loads' | 'all' | 'matches';
 
 export default function CarrierLoadsPage() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isRecentFilter = searchParams.get('filter') === 'recent';
+
   const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
   const [equipFilter, setEquipFilter] = useState('All');
@@ -51,6 +55,9 @@ export default function CarrierLoadsPage() {
   }, [refreshMyLoads]);
 
   // All loads tab
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
   const {
     loads,
     loading: loadsLoading,
@@ -59,6 +66,7 @@ export default function CarrierLoadsPage() {
   } = useLoads({
     equipment: equipFilter === 'All' ? 'all' : (equipFilter as EquipmentType),
     search: search || undefined,
+    postedAfter: isRecentFilter ? sevenDaysAgo.toISOString() : undefined,
     ...aiFilters,
   });
 
@@ -89,7 +97,7 @@ export default function CarrierLoadsPage() {
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">
       <TopHeader
-        title="Load Board"
+        title={isRecentFilter ? 'Recent Loads (Last 7 Days)' : 'Load Board'}
         showBack
         right={
           <button
@@ -100,6 +108,18 @@ export default function CarrierLoadsPage() {
           </button>
         }
       />
+
+      {/* Clear recent filter button */}
+      {isRecentFilter && (
+        <div className="px-5 pt-3 pb-2">
+          <button
+            onClick={() => setSearchParams({})}
+            className="text-sm text-fx-orange flex items-center gap-1.5 hover:underline"
+          >
+            ← Show All Loads
+          </button>
+        </div>
+      )}
 
       {/* Tabs */}
       <div
