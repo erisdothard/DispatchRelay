@@ -29,7 +29,7 @@ const NEXT_STATUS: Partial<Record<LoadStatus, LoadStatus>> = {
   delivered: 'completed',
 };
 
-const REQUIRES_DRIVER: LoadStatus[] = ['dispatched', 'in_transit'];
+const REQUIRES_DRIVER: LoadStatus[] = ['in_transit'];
 
 interface LoadStatusStepperProps {
   loadId: string;
