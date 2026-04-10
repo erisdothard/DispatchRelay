@@ -42,6 +42,9 @@ export async function getLoads(filters: LoadFilters = {}): Promise<Load[]> {
   }
   if (filters.status && filters.status !== 'all') {
     query = query.eq('status', filters.status);
+  } else if (!filters.status || filters.status === 'all') {
+    // By default, exclude canceled loads from load board
+    query = query.neq('status', 'cancelled');
   }
   if (filters.postedBy) {
     query = query.eq('posted_by', filters.postedBy);
