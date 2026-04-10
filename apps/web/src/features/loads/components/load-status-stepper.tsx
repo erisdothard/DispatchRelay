@@ -16,8 +16,8 @@ const STEPS: { status: LoadStatus; label: string }[] = [
 
 // Which role can advance to which statuses
 const ROLE_CAN_ADVANCE: Record<string, LoadStatus[]> = {
-  carrier: ['in_transit', 'delivered'],
-  broker: ['dispatched', 'completed'],
+  carrier: ['dispatched', 'in_transit', 'delivered'],
+  broker: ['completed'],
   admin: ['dispatched', 'in_transit', 'delivered', 'completed'],
   driver: ['delivered'],
 };
