@@ -23,7 +23,7 @@ type Tab = 'my_loads' | 'all' | 'matches';
 
 export default function CarrierLoadsPage() {
   const { user } = useAuth();
-  const [tab, setTab] = useState<Tab>('my_loads');
+  const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
   const [equipFilter, setEquipFilter] = useState('All');
   const [aiFilters, setAiFilters] = useState<LoadFilters>({});
