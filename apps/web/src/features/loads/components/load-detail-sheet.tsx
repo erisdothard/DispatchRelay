@@ -14,6 +14,7 @@ import {
   Users,
   FileUp,
   Pencil,
+  UserCheck,
 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import {
@@ -29,6 +30,7 @@ import { DocumentUpload } from '@/features/documents/components/document-upload'
 import { SignedBolViewer } from '@/features/documents/components/signed-bol-viewer';
 import { BrokerCreditBadge } from './broker-credit-badge';
 import { EditLoadSheet } from './edit-load-sheet';
+import { AssignDriverSheet } from './assign-driver-sheet';
 import { getDocumentsForLoad } from '@/services/documents.service';
 import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
@@ -90,6 +92,7 @@ export function LoadDetailSheet({
   const [bookError, setBookError] = useState<string | null>(null);
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [assignDriverOpen, setAssignDriverOpen] = useState(false);
 
   async function handleViewSignedBol() {
     if (!load) return;
@@ -295,6 +298,19 @@ export function LoadDetailSheet({
               onStatusAdvanced={(s) => setCurrentStatus(s)}
               onDispatched={() => setDocsOpen(true)}
             />
+          </div>
+        )}
+
+        {/* Assign Driver - for carrier on awarded/dispatched loads without driver */}
+        {isCarrier && ['awarded', 'dispatched'].includes(liveStatus) && !load.assignedDriverId && (
+          <div className="mb-5">
+            <button
+              onClick={() => setAssignDriverOpen(true)}
+              className="w-full h-11 rounded-2xl border border-fx-orange/40 text-sm font-semibold text-fx-orange flex items-center justify-center gap-2 hover:bg-fx-orange/5 transition-colors"
+            >
+              <UserCheck size={14} />
+              Assign Driver
+            </button>
           </div>
         )}
 
@@ -545,6 +561,16 @@ export function LoadDetailSheet({
       {signedBolDoc && (
         <SignedBolViewer doc={signedBolDoc} load={load} onClose={() => setSignedBolDoc(null)} />
       )}
+
+      <AssignDriverSheet
+        open={assignDriverOpen}
+        onClose={() => setAssignDriverOpen(false)}
+        load={load}
+        onAssigned={() => {
+          setAssignDriverOpen(false);
+          onClose(); // Close detail sheet so parent can refresh
+        }}
+      />
     </>
   );
 }
