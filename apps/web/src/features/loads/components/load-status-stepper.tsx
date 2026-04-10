@@ -19,7 +19,7 @@ const ROLE_CAN_ADVANCE: Record<string, LoadStatus[]> = {
   carrier: ['dispatched', 'in_transit', 'delivered'],
   broker: ['completed'],
   admin: ['dispatched', 'in_transit', 'delivered', 'completed'],
-  driver: ['delivered'],
+  driver: ['in_transit', 'delivered'],
 };
 
 const NEXT_STATUS: Partial<Record<LoadStatus, LoadStatus>> = {
