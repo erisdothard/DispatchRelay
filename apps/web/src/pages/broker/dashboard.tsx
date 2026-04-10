@@ -36,7 +36,8 @@ export default function BrokerDashboard() {
   const totalRevenue = loads.reduce((sum, l) => sum + l.rateUsd, 0);
   const revenueLabel =
     totalRevenue >= 1000 ? `$${(totalRevenue / 1000).toFixed(1)}k` : `$${totalRevenue}`;
-  const recentLoads = loads.slice(0, 3);
+  // Exclude canceled loads from recent loads
+  const recentLoads = loads.filter((l) => l.status !== 'cancelled').slice(0, 3);
 
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">

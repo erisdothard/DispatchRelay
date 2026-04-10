@@ -57,6 +57,7 @@ export function LoadCard({ load, onBid, onPress, showBidButton = true, className
   const age = getLoadAge(load.postedAt);
   const credit = getBrokerCreditLabel(load.brokerCreditScore);
   const profit = calcGrossProfit(load);
+  const isCancelled = load.status === 'cancelled';
 
   return (
     <div
@@ -64,6 +65,7 @@ export function LoadCard({ load, onBid, onPress, showBidButton = true, className
       className={cn(
         'bg-fx-surface rounded-ios p-5 card-highlight active-scale transition-colors',
         onPress ? 'cursor-pointer' : '',
+        isCancelled && 'opacity-60 bg-fx-surface/50',
         className,
       )}
     >
@@ -99,6 +101,11 @@ export function LoadCard({ load, onBid, onPress, showBidButton = true, className
         <span className="text-[11px] font-semibold text-fx-text-dim bg-fx-surface-2 px-2.5 py-1 rounded-full">
           {EQUIPMENT_LABELS[load.equipment] ?? load.equipment}
         </span>
+        {isCancelled && (
+          <span className="text-[11px] font-semibold text-red-400 bg-red-400/10 px-2.5 py-1 rounded-full border border-red-400/20">
+            CANCELLED
+          </span>
+        )}
         {load.tempControlled && (
           <span className="text-[11px] font-semibold text-blue-400 bg-blue-400/10 px-2.5 py-1 rounded-full border border-blue-400/20">
             ❄ Temp

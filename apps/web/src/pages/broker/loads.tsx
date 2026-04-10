@@ -10,12 +10,13 @@ import { cn } from '@/shared/lib/utils';
 import type { Load } from '@freightx/shared';
 import type { LoadStatus } from '@/lib/database.types';
 
-const STATUS_FILTERS = ['All', 'posted', 'in_transit', 'delivered'];
+const STATUS_FILTERS = ['All', 'posted', 'in_transit', 'delivered', 'cancelled'];
 const STATUS_LABELS: Record<string, string> = {
   All: 'All Loads',
   posted: 'Posted',
   in_transit: 'In Transit',
   delivered: 'Delivered',
+  cancelled: 'Cancelled',
 };
 
 export default function BrokerLoadsPage() {

@@ -84,6 +84,9 @@ export async function getLoadsPage(filters: LoadFilters = {}): Promise<LoadsPage
   }
   if (filters.status && filters.status !== 'all') {
     query = query.eq('status', filters.status);
+  } else if (!filters.status || filters.status === 'all') {
+    // By default, exclude canceled loads from public load board
+    query = query.neq('status', 'cancelled');
   }
   if (filters.postedBy) {
     query = query.eq('posted_by', filters.postedBy);
