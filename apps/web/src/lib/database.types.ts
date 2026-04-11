@@ -1025,7 +1025,10 @@ export type Database = {
           company_id: string | null;
           company_name: string;
           created_at: string;
+          delivery_appt_end: string | null;
+          delivery_appt_start: string | null;
           delivery_date: string;
+          delivery_notes: string | null;
           dest_address: string | null;
           dest_address_normalized: string | null;
           dest_address_raw: string | null;
@@ -1037,8 +1040,11 @@ export type Database = {
           equipment: string;
           freight_class: string | null;
           hazmat: boolean;
+          height_in: number | null;
           id: string;
+          length_in: number | null;
           load_number: string;
+          loading_notes: string | null;
           origin_address: string | null;
           origin_address_normalized: string | null;
           origin_address_raw: string | null;
@@ -1048,20 +1054,35 @@ export type Database = {
           origin_state: string;
           origin_zip: string | null;
           packaging_type: string | null;
+          pallets_count: number | null;
+          pickup_appt_end: string | null;
+          pickup_appt_start: string | null;
           pickup_date: string;
+          pieces_count: number | null;
           po_number: string | null;
           posted_at: string;
           posted_by: string | null;
           preferred_carriers_only: boolean;
           rate_per_mile: number | null;
           rate_usd: number;
+          receiver_contact_email: string | null;
+          receiver_contact_name: string | null;
+          receiver_contact_phone: string | null;
+          receiver_name: string | null;
           search_vector: unknown;
           second_driver_id: string | null;
+          shipper_contact_email: string | null;
+          shipper_contact_name: string | null;
+          shipper_contact_phone: string | null;
+          shipper_name: string | null;
           shipper_reference: string | null;
+          special_instructions: string | null;
+          stackable: boolean | null;
           status: string;
           temp_controlled: boolean;
           total_miles: number | null;
           weight_lbs: number;
+          width_in: number | null;
         };
         Insert: {
           assigned_driver_id?: string | null;
@@ -1072,7 +1093,10 @@ export type Database = {
           company_id?: string | null;
           company_name: string;
           created_at?: string;
+          delivery_appt_end?: string | null;
+          delivery_appt_start?: string | null;
           delivery_date: string;
+          delivery_notes?: string | null;
           dest_address?: string | null;
           dest_address_normalized?: string | null;
           dest_address_raw?: string | null;
@@ -1084,8 +1108,11 @@ export type Database = {
           equipment: string;
           freight_class?: string | null;
           hazmat?: boolean;
+          height_in?: number | null;
           id?: string;
+          length_in?: number | null;
           load_number: string;
+          loading_notes?: string | null;
           origin_address?: string | null;
           origin_address_normalized?: string | null;
           origin_address_raw?: string | null;
@@ -1095,20 +1122,35 @@ export type Database = {
           origin_state: string;
           origin_zip?: string | null;
           packaging_type?: string | null;
+          pallets_count?: number | null;
+          pickup_appt_end?: string | null;
+          pickup_appt_start?: string | null;
           pickup_date: string;
+          pieces_count?: number | null;
           po_number?: string | null;
           posted_at?: string;
           posted_by?: string | null;
           preferred_carriers_only?: boolean;
           rate_per_mile?: number | null;
           rate_usd: number;
+          receiver_contact_email?: string | null;
+          receiver_contact_name?: string | null;
+          receiver_contact_phone?: string | null;
+          receiver_name?: string | null;
           search_vector?: unknown;
           second_driver_id?: string | null;
+          shipper_contact_email?: string | null;
+          shipper_contact_name?: string | null;
+          shipper_contact_phone?: string | null;
+          shipper_name?: string | null;
           shipper_reference?: string | null;
+          special_instructions?: string | null;
+          stackable?: boolean | null;
           status?: string;
           temp_controlled?: boolean;
           total_miles?: number | null;
           weight_lbs: number;
+          width_in?: number | null;
         };
         Update: {
           assigned_driver_id?: string | null;
@@ -1119,7 +1161,10 @@ export type Database = {
           company_id?: string | null;
           company_name?: string;
           created_at?: string;
+          delivery_appt_end?: string | null;
+          delivery_appt_start?: string | null;
           delivery_date?: string;
+          delivery_notes?: string | null;
           dest_address?: string | null;
           dest_address_normalized?: string | null;
           dest_address_raw?: string | null;
@@ -1131,8 +1176,11 @@ export type Database = {
           equipment?: string;
           freight_class?: string | null;
           hazmat?: boolean;
+          height_in?: number | null;
           id?: string;
+          length_in?: number | null;
           load_number?: string;
+          loading_notes?: string | null;
           origin_address?: string | null;
           origin_address_normalized?: string | null;
           origin_address_raw?: string | null;
@@ -1142,20 +1190,35 @@ export type Database = {
           origin_state?: string;
           origin_zip?: string | null;
           packaging_type?: string | null;
+          pallets_count?: number | null;
+          pickup_appt_end?: string | null;
+          pickup_appt_start?: string | null;
           pickup_date?: string;
+          pieces_count?: number | null;
           po_number?: string | null;
           posted_at?: string;
           posted_by?: string | null;
           preferred_carriers_only?: boolean;
           rate_per_mile?: number | null;
           rate_usd?: number;
+          receiver_contact_email?: string | null;
+          receiver_contact_name?: string | null;
+          receiver_contact_phone?: string | null;
+          receiver_name?: string | null;
           search_vector?: unknown;
           second_driver_id?: string | null;
+          shipper_contact_email?: string | null;
+          shipper_contact_name?: string | null;
+          shipper_contact_phone?: string | null;
+          shipper_name?: string | null;
           shipper_reference?: string | null;
+          special_instructions?: string | null;
+          stackable?: boolean | null;
           status?: string;
           temp_controlled?: boolean;
           total_miles?: number | null;
           weight_lbs?: number;
+          width_in?: number | null;
         };
         Relationships: [
           {
@@ -3248,36 +3311,52 @@ export const Constants = {
   },
 } as const;
 
-// Type aliases for backward compatibility
-export type ProfileRow = Database['public']['Tables']['profiles']['Row'];
-export type CompanyRow = Database['public']['Tables']['companies']['Row'];
+// ─────────────────────────────────────────────────────────────────────────────
+// Convenience Type Exports
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Table Row Types
+// ─────────────────────────────────────────────────────────────────────────────
+
 export type LoadRow = Database['public']['Tables']['loads']['Row'];
 export type TruckRow = Database['public']['Tables']['trucks']['Row'];
+export type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+export type CompanyRow = Database['public']['Tables']['companies']['Row'];
 export type BidRow = Database['public']['Tables']['bids']['Row'];
-export type MessageRow = Database['public']['Tables']['messages']['Row'];
-export type ConversationRow = Database['public']['Tables']['conversations']['Row'];
 export type DocumentRow = Database['public']['Tables']['documents']['Row'];
-export type RatingRow = Database['public']['Tables']['ratings']['Row'];
-export type CarrierVerificationRow = Database['public']['Tables']['carrier_verifications']['Row'];
 export type TrackingMilestoneRow = Database['public']['Tables']['tracking_milestones']['Row'];
+export type RatingRow = Database['public']['Tables']['ratings']['Row'];
+export type ConversationRow = Database['public']['Tables']['conversations']['Row'];
+export type MessageRow = Database['public']['Tables']['messages']['Row'];
+export type CarrierVerificationRow = Database['public']['Tables']['carrier_verifications']['Row'];
 
-// Placeholder types for features not yet implemented
-export type InvoiceRow = {
-  id: string;
-  status: string;
-  amount_usd: number;
-  due_date: string;
-  payment_method: string;
-  quick_pay_fee_usd: number;
-};
-export type SubscriptionRow = { id: string; tier: string };
+// ─────────────────────────────────────────────────────────────────────────────
+// Enum & Status Types
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Enum types
-export type UserRole = 'carrier' | 'broker' | 'shipper' | 'admin' | 'driver';
-export type LoadStatus = any;
-export type EquipmentType = any;
-export type TruckStatus = any;
-export type DocumentType = any;
-export type InvoiceStatus = any;
-export type SubscriptionTier = any;
+export type DocumentType = Database['public']['Tables']['documents']['Row']['type'];
 export type VerificationStatus = Database['public']['Enums']['verification_status'];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Placeholder Types (for features not yet implemented)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type InvoiceRow = { id: string; status: string; [key: string]: unknown };
+export type SubscriptionRow = { id: string; tier: string; [key: string]: unknown };
+export type InvoiceStatus = 'pending' | 'paid' | 'cancelled' | 'invoiced';
+export type SubscriptionTier =
+  | 'free'
+  | 'basic'
+  | 'pro'
+  | 'enterprise'
+  | 'carrier_pro'
+  | 'broker_starter'
+  | 'broker_growth'
+  | 'shipper';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Re-exports from @freightx/shared (for backwards compatibility)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type { UserRole, EquipmentType, LoadStatus, TruckStatus } from '@freightx/shared';

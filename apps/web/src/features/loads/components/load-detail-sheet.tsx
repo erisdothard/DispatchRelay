@@ -15,6 +15,7 @@ import {
   FileUp,
   Pencil,
   UserCheck,
+  FileText,
 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import {
@@ -63,6 +64,28 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
       <span className="text-sm font-semibold text-fx-text">{value}</span>
     </div>
   );
+}
+
+function formatApptWindow(start?: string, end?: string): string {
+  if (!start && !end) return '—';
+  const fmt = (date: string) =>
+    new Date(date).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  if (start && end) return `${fmt(start)} - ${fmt(end)}`;
+  if (start) return `After ${fmt(start)}`;
+  if (end) return `Before ${fmt(end)}`;
+  return '—';
+}
+
+function formatDimensions(l?: number, w?: number, h?: number): string {
+  if (!l && !w && !h) return '—';
+  const parts = [];
+  if (l) parts.push(`${l}"`);
+  if (w) parts.push(`${w}"`);
+  if (h) parts.push(`${h}"`);
+  return parts.join(' × ');
 }
 
 const ACTIVE_STATUSES: LoadStatus[] = [
@@ -336,7 +359,214 @@ export function LoadDetailSheet({
           {load.loadNumber && (
             <InfoRow icon={<Package size={14} />} label="Load #" value={load.loadNumber} />
           )}
+
+          {/* Additional freight details - show after award */}
+          {ACTIVE_STATUSES.includes(liveStatus) && (
+            <>
+              {load.freight_class && (
+                <InfoRow
+                  icon={<Package size={14} />}
+                  label="Freight Class"
+                  value={load.freight_class}
+                />
+              )}
+              {load.packaging_type && (
+                <InfoRow
+                  icon={<Package size={14} />}
+                  label="Packaging"
+                  value={load.packaging_type}
+                />
+              )}
+              {load.piecesCount && (
+                <InfoRow
+                  icon={<Package size={14} />}
+                  label="Pieces"
+                  value={String(load.piecesCount)}
+                />
+              )}
+              {load.palletsCount && (
+                <InfoRow
+                  icon={<Package size={14} />}
+                  label="Pallets"
+                  value={String(load.palletsCount)}
+                />
+              )}
+              {(load.lengthIn || load.widthIn || load.heightIn) && (
+                <InfoRow
+                  icon={<Package size={14} />}
+                  label="Dimensions"
+                  value={formatDimensions(load.lengthIn, load.widthIn, load.heightIn)}
+                />
+              )}
+              {typeof load.stackable === 'boolean' && (
+                <InfoRow
+                  icon={<Package size={14} />}
+                  label="Stackable"
+                  value={load.stackable ? 'Yes' : 'No'}
+                />
+              )}
+            </>
+          )}
         </div>
+
+        {/* Contact Information - Show for carriers/brokers on awarded+ loads */}
+        {(isCarrier || isBroker) &&
+          ACTIVE_STATUSES.includes(liveStatus) &&
+          (load.shipperName || load.receiverName) && (
+            <div className="mb-5">
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+                Contact Information
+              </p>
+
+              {/* Shipper Contact */}
+              {load.shipperName && (
+                <div className="mb-3 p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-1">Shipper</p>
+                  <p className="text-sm font-bold text-fx-text">{load.shipperName}</p>
+                  {load.shipperContactName && (
+                    <p className="text-xs text-fx-text-muted mt-1">
+                      Contact: {load.shipperContactName}
+                    </p>
+                  )}
+                  {load.shipperContactPhone && (
+                    <a
+                      href={`tel:${load.shipperContactPhone}`}
+                      className="text-xs text-fx-orange block mt-1"
+                    >
+                      {load.shipperContactPhone}
+                    </a>
+                  )}
+                  {load.shipperContactEmail && (
+                    <a
+                      href={`mailto:${load.shipperContactEmail}`}
+                      className="text-xs text-fx-orange block mt-0.5"
+                    >
+                      {load.shipperContactEmail}
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* Receiver Contact */}
+              {load.receiverName && (
+                <div className="p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-1">Receiver</p>
+                  <p className="text-sm font-bold text-fx-text">{load.receiverName}</p>
+                  {load.receiverContactName && (
+                    <p className="text-xs text-fx-text-muted mt-1">
+                      Contact: {load.receiverContactName}
+                    </p>
+                  )}
+                  {load.receiverContactPhone && (
+                    <a
+                      href={`tel:${load.receiverContactPhone}`}
+                      className="text-xs text-fx-orange block mt-1"
+                    >
+                      {load.receiverContactPhone}
+                    </a>
+                  )}
+                  {load.receiverContactEmail && (
+                    <a
+                      href={`mailto:${load.receiverContactEmail}`}
+                      className="text-xs text-fx-orange block mt-0.5"
+                    >
+                      {load.receiverContactEmail}
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+        {/* Appointment Windows - Show for carriers/drivers on awarded+ loads */}
+        {(isCarrier || role === 'driver') &&
+          ACTIVE_STATUSES.includes(liveStatus) &&
+          (load.pickupApptStart ||
+            load.pickupApptEnd ||
+            load.deliveryApptStart ||
+            load.deliveryApptEnd) && (
+            <div className="mb-5">
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+                Appointment Times
+              </p>
+
+              {(load.pickupApptStart || load.pickupApptEnd) && (
+                <InfoRow
+                  icon={<Clock size={14} />}
+                  label="Pickup Window"
+                  value={formatApptWindow(load.pickupApptStart, load.pickupApptEnd)}
+                />
+              )}
+
+              {(load.deliveryApptStart || load.deliveryApptEnd) && (
+                <InfoRow
+                  icon={<Clock size={14} />}
+                  label="Delivery Window"
+                  value={formatApptWindow(load.deliveryApptStart, load.deliveryApptEnd)}
+                />
+              )}
+            </div>
+          )}
+
+        {/* Reference Numbers & Instructions - Show for carriers/brokers on awarded+ loads */}
+        {(isCarrier || isBroker) &&
+          ACTIVE_STATUSES.includes(liveStatus) &&
+          (load.po_number ||
+            load.shipper_reference ||
+            load.specialInstructions ||
+            load.loadingNotes ||
+            load.deliveryNotes) && (
+            <div className="mb-5">
+              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+                Additional Information
+              </p>
+
+              <div className="space-y-3">
+                {load.po_number && (
+                  <InfoRow icon={<FileText size={14} />} label="PO Number" value={load.po_number} />
+                )}
+                {load.shipper_reference && (
+                  <InfoRow
+                    icon={<FileText size={14} />}
+                    label="Shipper Ref"
+                    value={load.shipper_reference}
+                  />
+                )}
+
+                {/* Special Instructions */}
+                {load.specialInstructions && (
+                  <div className="p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+                    <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-2">
+                      Special Instructions
+                    </p>
+                    <p className="text-xs text-fx-text whitespace-pre-wrap">
+                      {load.specialInstructions}
+                    </p>
+                  </div>
+                )}
+
+                {/* Loading Notes (dock info, gate codes) */}
+                {load.loadingNotes && (
+                  <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                    <p className="text-[10px] font-bold text-blue-400 uppercase mb-2">
+                      📍 Pickup Location Notes
+                    </p>
+                    <p className="text-xs text-fx-text whitespace-pre-wrap">{load.loadingNotes}</p>
+                  </div>
+                )}
+
+                {/* Delivery Notes */}
+                {load.deliveryNotes && (
+                  <div className="p-3 rounded-xl bg-green-500/5 border border-green-500/20">
+                    <p className="text-[10px] font-bold text-green-400 uppercase mb-2">
+                      🚚 Delivery Location Notes
+                    </p>
+                    <p className="text-xs text-fx-text whitespace-pre-wrap">{load.deliveryNotes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
         {/* Broker Payment Metrics */}
         {isCarrier && load.companyId && (
@@ -555,7 +785,7 @@ export function LoadDetailSheet({
         onClose={() => setAccessorialsOpen(false)}
         loadId={load.id}
         baseRate={load.rateUsd}
-        role={role ?? 'carrier'}
+        role={(role ?? 'carrier') as UserRole}
       />
 
       {signedBolDoc && (

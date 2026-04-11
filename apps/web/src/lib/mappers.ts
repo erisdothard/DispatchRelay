@@ -2,15 +2,15 @@
  * Converts Supabase snake_case rows to camelCase shared types.
  * This keeps the LoadCard and existing UI components unchanged.
  */
-import type { Load, Truck, TrackingMilestone } from '@freightx/shared';
 import type {
-  LoadRow,
-  TruckRow,
-  TrackingMilestoneRow,
+  Load,
+  Truck,
+  TrackingMilestone,
   EquipmentType,
   LoadStatus,
   TruckStatus,
-} from './database.types';
+} from '@freightx/shared';
+import type { LoadRow, TruckRow, TrackingMilestoneRow } from './database.types';
 import { titleCase } from './utils';
 
 export function rowToLoad(row: LoadRow): Load {
@@ -46,6 +46,37 @@ export function rowToLoad(row: LoadRow): Load {
     assigneeId: row.assignee_id ?? null,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     assigneeName: (row as any).assignee_profile?.full_name ?? null,
+    freight_class: row.freight_class ?? undefined,
+    packaging_type: row.packaging_type ?? undefined,
+    po_number: row.po_number ?? undefined,
+    shipper_reference: row.shipper_reference ?? undefined,
+
+    // Contact Information
+    shipperName: row.shipper_name ?? undefined,
+    shipperContactName: row.shipper_contact_name ?? undefined,
+    shipperContactPhone: row.shipper_contact_phone ?? undefined,
+    shipperContactEmail: row.shipper_contact_email ?? undefined,
+    receiverName: row.receiver_name ?? undefined,
+    receiverContactName: row.receiver_contact_name ?? undefined,
+    receiverContactPhone: row.receiver_contact_phone ?? undefined,
+    receiverContactEmail: row.receiver_contact_email ?? undefined,
+
+    // Appointment Times
+    pickupApptStart: row.pickup_appt_start ?? undefined,
+    pickupApptEnd: row.pickup_appt_end ?? undefined,
+    deliveryApptStart: row.delivery_appt_start ?? undefined,
+    deliveryApptEnd: row.delivery_appt_end ?? undefined,
+
+    // Freight Details
+    piecesCount: row.pieces_count ?? undefined,
+    palletsCount: row.pallets_count ?? undefined,
+    lengthIn: row.length_in ?? undefined,
+    widthIn: row.width_in ?? undefined,
+    heightIn: row.height_in ?? undefined,
+    stackable: row.stackable ?? undefined,
+    specialInstructions: row.special_instructions ?? undefined,
+    loadingNotes: row.loading_notes ?? undefined,
+    deliveryNotes: row.delivery_notes ?? undefined,
   };
 }
 

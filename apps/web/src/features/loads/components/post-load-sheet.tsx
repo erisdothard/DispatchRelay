@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { BookmarkPlus, Bookmark, TrendingUp, Loader2, ChevronDown } from 'lucide-react';
+import {
+  BookmarkPlus,
+  Bookmark,
+  TrendingUp,
+  Loader2,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
@@ -59,6 +66,30 @@ const EMPTY_FORM = {
   packagingType: '' as string,
   poNumber: '',
   shipperReference: '',
+  // Contact Information
+  shipperName: '',
+  shipperContactName: '',
+  shipperContactPhone: '',
+  shipperContactEmail: '',
+  receiverName: '',
+  receiverContactName: '',
+  receiverContactPhone: '',
+  receiverContactEmail: '',
+  // Appointment Times
+  pickupApptStart: '',
+  pickupApptEnd: '',
+  deliveryApptStart: '',
+  deliveryApptEnd: '',
+  // Freight Details
+  piecesCount: '',
+  palletsCount: '',
+  lengthIn: '',
+  widthIn: '',
+  heightIn: '',
+  stackable: true as boolean,
+  specialInstructions: '',
+  loadingNotes: '',
+  deliveryNotes: '',
 };
 
 interface LoadTemplate {
@@ -99,6 +130,12 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
   const [rateSuggestion, setRateSuggestion] = useState<RateSuggestion | null>(null);
   const [laneStats, setLaneStats] = useState<LaneStats | null>(null);
   const [fetchingRate, setFetchingRate] = useState(false);
+
+  // Collapsible enterprise detail sections
+  const [showContactInfo, setShowContactInfo] = useState(false);
+  const [showApptTimes, setShowApptTimes] = useState(false);
+  const [showFreightDetails, setShowFreightDetails] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   function set<K extends keyof typeof EMPTY_FORM>(key: K, val: (typeof EMPTY_FORM)[K]) {
     setForm((f) => ({ ...f, [key]: val }));
@@ -264,6 +301,30 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         po_number: form.poNumber.trim() || null,
         shipper_reference: form.shipperReference.trim() || null,
         preferred_carriers_only: false,
+        // Contact Information
+        shipper_name: form.shipperName.trim() || null,
+        shipper_contact_name: form.shipperContactName.trim() || null,
+        shipper_contact_phone: form.shipperContactPhone.trim() || null,
+        shipper_contact_email: form.shipperContactEmail.trim() || null,
+        receiver_name: form.receiverName.trim() || null,
+        receiver_contact_name: form.receiverContactName.trim() || null,
+        receiver_contact_phone: form.receiverContactPhone.trim() || null,
+        receiver_contact_email: form.receiverContactEmail.trim() || null,
+        // Appointment Times
+        pickup_appt_start: form.pickupApptStart || null,
+        pickup_appt_end: form.pickupApptEnd || null,
+        delivery_appt_start: form.deliveryApptStart || null,
+        delivery_appt_end: form.deliveryApptEnd || null,
+        // Freight Details
+        pieces_count: form.piecesCount ? parseInt(form.piecesCount) : null,
+        pallets_count: form.palletsCount ? parseInt(form.palletsCount) : null,
+        length_in: form.lengthIn ? parseInt(form.lengthIn) : null,
+        width_in: form.widthIn ? parseInt(form.widthIn) : null,
+        height_in: form.heightIn ? parseInt(form.heightIn) : null,
+        stackable: form.stackable,
+        special_instructions: form.specialInstructions.trim() || null,
+        loading_notes: form.loadingNotes.trim() || null,
+        delivery_notes: form.deliveryNotes.trim() || null,
       });
 
       setForm(EMPTY_FORM);
@@ -734,6 +795,294 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
             </div>
           </div>
         )}
+
+        {/* Enterprise Load Details (Collapsible) */}
+        <div className="space-y-3">
+          <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest">
+            Enterprise Load Details (Optional)
+          </p>
+
+          {/* Contact Information */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowContactInfo((v) => !v)}
+              className="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-fx-border hover:border-fx-orange/30 transition-colors"
+            >
+              <span className="text-xs font-semibold text-fx-text">Contact Information</span>
+              <ChevronRight
+                size={14}
+                className={`text-fx-text-muted transition-transform ${showContactInfo ? 'rotate-90' : ''}`}
+              />
+            </button>
+            {showContactInfo && (
+              <div className="mt-3 space-y-3 pl-3">
+                {/* Shipper Contact */}
+                <div>
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                    Shipper/Pickup Location
+                  </p>
+                  <Input
+                    placeholder="Shipper Company Name"
+                    value={form.shipperName}
+                    onChange={(e) => set('shipperName', e.target.value)}
+                  />
+                  <div className="grid grid-cols-1 gap-2 mt-2">
+                    <Input
+                      placeholder="Contact Name"
+                      value={form.shipperContactName}
+                      onChange={(e) => set('shipperContactName', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Contact Phone"
+                      type="tel"
+                      value={form.shipperContactPhone}
+                      onChange={(e) => set('shipperContactPhone', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Contact Email"
+                      type="email"
+                      value={form.shipperContactEmail}
+                      onChange={(e) => set('shipperContactEmail', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Receiver Contact */}
+                <div>
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                    Receiver/Delivery Location
+                  </p>
+                  <Input
+                    placeholder="Receiver Company Name"
+                    value={form.receiverName}
+                    onChange={(e) => set('receiverName', e.target.value)}
+                  />
+                  <div className="grid grid-cols-1 gap-2 mt-2">
+                    <Input
+                      placeholder="Contact Name"
+                      value={form.receiverContactName}
+                      onChange={(e) => set('receiverContactName', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Contact Phone"
+                      type="tel"
+                      value={form.receiverContactPhone}
+                      onChange={(e) => set('receiverContactPhone', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Contact Email"
+                      type="email"
+                      value={form.receiverContactEmail}
+                      onChange={(e) => set('receiverContactEmail', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Appointment Times */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowApptTimes((v) => !v)}
+              className="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-fx-border hover:border-fx-orange/30 transition-colors"
+            >
+              <span className="text-xs font-semibold text-fx-text">Appointment Windows</span>
+              <ChevronRight
+                size={14}
+                className={`text-fx-text-muted transition-transform ${showApptTimes ? 'rotate-90' : ''}`}
+              />
+            </button>
+            {showApptTimes && (
+              <div className="mt-3 space-y-3 pl-3">
+                <div>
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                    Pickup Appointment
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="datetime-local"
+                      placeholder="Start"
+                      value={form.pickupApptStart}
+                      onChange={(e) => set('pickupApptStart', e.target.value)}
+                      className={fieldClass}
+                      style={{ colorScheme: 'dark' }}
+                    />
+                    <input
+                      type="datetime-local"
+                      placeholder="End"
+                      value={form.pickupApptEnd}
+                      onChange={(e) => set('pickupApptEnd', e.target.value)}
+                      className={fieldClass}
+                      style={{ colorScheme: 'dark' }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                    Delivery Appointment
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="datetime-local"
+                      placeholder="Start"
+                      value={form.deliveryApptStart}
+                      onChange={(e) => set('deliveryApptStart', e.target.value)}
+                      className={fieldClass}
+                      style={{ colorScheme: 'dark' }}
+                    />
+                    <input
+                      type="datetime-local"
+                      placeholder="End"
+                      value={form.deliveryApptEnd}
+                      onChange={(e) => set('deliveryApptEnd', e.target.value)}
+                      className={fieldClass}
+                      style={{ colorScheme: 'dark' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Detailed Freight Info */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowFreightDetails((v) => !v)}
+              className="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-fx-border hover:border-fx-orange/30 transition-colors"
+            >
+              <span className="text-xs font-semibold text-fx-text">Detailed Freight Info</span>
+              <ChevronRight
+                size={14}
+                className={`text-fx-text-muted transition-transform ${showFreightDetails ? 'rotate-90' : ''}`}
+              />
+            </button>
+            {showFreightDetails && (
+              <div className="mt-3 space-y-3 pl-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                      Pieces Count
+                    </p>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={form.piecesCount}
+                      onChange={(e) => set('piecesCount', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                      Pallets Count
+                    </p>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={form.palletsCount}
+                      onChange={(e) => set('palletsCount', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                    Dimensions (inches)
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input
+                      type="number"
+                      placeholder="Length"
+                      value={form.lengthIn}
+                      onChange={(e) => set('lengthIn', e.target.value)}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Width"
+                      value={form.widthIn}
+                      onChange={(e) => set('widthIn', e.target.value)}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Height"
+                      value={form.heightIn}
+                      onChange={(e) => set('heightIn', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.stackable}
+                    onChange={(e) => set('stackable', e.target.checked)}
+                    className="w-4 h-4 accent-orange-500 rounded"
+                  />
+                  <span className="text-sm font-semibold text-fx-text-muted">Stackable</span>
+                </label>
+              </div>
+            )}
+          </div>
+
+          {/* Special Instructions & Notes */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowInstructions((v) => !v)}
+              className="w-full flex items-center justify-between py-2 px-3 rounded-xl border border-fx-border hover:border-fx-orange/30 transition-colors"
+            >
+              <span className="text-xs font-semibold text-fx-text">Instructions & Notes</span>
+              <ChevronRight
+                size={14}
+                className={`text-fx-text-muted transition-transform ${showInstructions ? 'rotate-90' : ''}`}
+              />
+            </button>
+            {showInstructions && (
+              <div className="mt-3 space-y-3 pl-3">
+                <div>
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                    Special Instructions
+                  </p>
+                  <textarea
+                    placeholder="Any special handling or routing requirements..."
+                    value={form.specialInstructions}
+                    onChange={(e) => set('specialInstructions', e.target.value)}
+                    rows={3}
+                    className={`${fieldClass} resize-none`}
+                  />
+                </div>
+
+                <div>
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                    Pickup Location Notes
+                  </p>
+                  <textarea
+                    placeholder="Dock info, gate codes, parking instructions..."
+                    value={form.loadingNotes}
+                    onChange={(e) => set('loadingNotes', e.target.value)}
+                    rows={3}
+                    className={`${fieldClass} resize-none`}
+                  />
+                </div>
+
+                <div>
+                  <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-2">
+                    Delivery Location Notes
+                  </p>
+                  <textarea
+                    placeholder="Dock info, gate codes, delivery requirements..."
+                    value={form.deliveryNotes}
+                    onChange={(e) => set('deliveryNotes', e.target.value)}
+                    rows={3}
+                    className={`${fieldClass} resize-none`}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Save as Template */}
         <div>

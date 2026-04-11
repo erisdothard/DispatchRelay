@@ -81,6 +81,33 @@ export interface Load {
   packaging_type?: string;
   po_number?: string;
   shipper_reference?: string;
+
+  // Contact Information
+  shipperName?: string;
+  shipperContactName?: string;
+  shipperContactPhone?: string;
+  shipperContactEmail?: string;
+  receiverName?: string;
+  receiverContactName?: string;
+  receiverContactPhone?: string;
+  receiverContactEmail?: string;
+
+  // Appointment Times
+  pickupApptStart?: string;
+  pickupApptEnd?: string;
+  deliveryApptStart?: string;
+  deliveryApptEnd?: string;
+
+  // Freight Details
+  piecesCount?: number;
+  palletsCount?: number;
+  lengthIn?: number;
+  widthIn?: number;
+  heightIn?: number;
+  stackable?: boolean;
+  specialInstructions?: string;
+  loadingNotes?: string;
+  deliveryNotes?: string;
 }
 
 export interface Truck {
