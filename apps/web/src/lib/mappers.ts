@@ -19,6 +19,8 @@ export function rowToLoad(row: LoadRow): Load {
     loadNumber: row.load_number,
     postedBy: row.posted_by ?? '',
     companyName: row.company_name,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    companyLogoUrl: ((row as any).company_logo_url as any)?.logo_url ?? undefined,
     originCity: titleCase(row.origin_city),
     originState: row.origin_state?.toUpperCase(),
     originAddress: row.origin_address ?? undefined,

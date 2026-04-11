@@ -28,3 +28,36 @@ export async function updateCompany(
   const { error } = await supabase.from('companies').update(updates).eq('id', id);
   return { error: error?.message ?? null };
 }
+
+export async function uploadCompanyLogo(companyId: string, file: File): Promise<string> {
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Please select an image file');
+  }
+
+  // Validate file size (5MB max)
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  if (file.size > maxSize) {
+    throw new Error('Image must be smaller than 5MB');
+  }
+
+  // Extract file extension
+  const fileExt = file.name.split('.').pop();
+  const filePath = `company-logos/${companyId}-${Date.now()}.${fileExt}`;
+
+  // Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from('company-logos')
+    .upload(filePath, file, { upsert: true, contentType: file.type });
+
+  if (uploadError) {
+    throw new Error(`Upload failed: ${uploadError.message}`);
+  }
+
+  // Get public URL
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from('company-logos').getPublicUrl(filePath);
+
+  return publicUrl;
+}

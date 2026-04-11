@@ -246,9 +246,22 @@ export function LoadCard({ load, onBid, onPress, showBidButton = true, className
 
           {/* Sub row: company + credit + age + market badge */}
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-            <span className="text-[11px] text-fx-text-dim truncate max-w-[110px]">
-              {load.companyName}
-            </span>
+            <div className="flex items-center gap-1.5">
+              {load.companyLogoUrl ? (
+                <img
+                  src={load.companyLogoUrl}
+                  alt={load.companyName}
+                  className="h-4 w-4 rounded object-cover"
+                />
+              ) : (
+                <div className="h-4 w-4 rounded bg-brand/10 flex items-center justify-center text-[8px] font-medium text-brand">
+                  {load.companyName.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+              <span className="text-[11px] text-fx-text-dim truncate max-w-[110px]">
+                {load.companyName}
+              </span>
+            </div>
             {credit && (
               <span
                 className="text-[10px] font-bold flex items-center gap-0.5"

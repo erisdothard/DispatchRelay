@@ -154,6 +154,35 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Company Logo Section */}
+        {company && (
+          <div className="px-5 mb-6">
+            <button
+              onClick={() => setEditCompanyOpen(true)}
+              className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-4 hover:bg-fx-surface-2 transition-colors"
+            >
+              <div className="w-16 h-16 rounded-lg bg-fx-orange/10 border-2 border-fx-orange/30 flex items-center justify-center overflow-hidden shrink-0">
+                {company.logo_url ? (
+                  <img
+                    src={company.logo_url}
+                    alt={company.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-xl font-extrabold text-fx-orange">
+                    {company.name.slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-bold text-fx-text">{company.name}</p>
+                <p className="text-xs text-fx-text-muted mt-0.5">Tap to edit company profile</p>
+              </div>
+              <ChevronRight size={18} className="text-fx-text-dim" />
+            </button>
+          </div>
+        )}
+
         {/* Stats strip */}
         <div className="mx-5 mb-6 bg-fx-surface border border-fx-border rounded-2xl grid grid-cols-3 divide-x divide-fx-border">
           <div className="p-4 text-center">

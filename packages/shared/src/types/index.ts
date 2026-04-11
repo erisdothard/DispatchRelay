@@ -51,6 +51,7 @@ export interface Load {
   postedBy: string;
   companyId?: string;
   companyName: string;
+  companyLogoUrl?: string;
   originCity: string;
   originState: string;
   originAddress?: string;

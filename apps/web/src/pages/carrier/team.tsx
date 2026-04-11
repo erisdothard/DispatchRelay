@@ -405,7 +405,13 @@ function MembersTabContent() {
     <div className="space-y-4">
       {/* Company header */}
       <div className="text-center">
-        <Users size={32} className="text-fx-orange mx-auto mb-2" />
+        <div className="w-12 h-12 mx-auto mb-3 rounded-lg bg-fx-orange/10 border-2 border-fx-orange/30 flex items-center justify-center overflow-hidden">
+          {company?.logo_url ? (
+            <img src={company.logo_url} alt={company.name} className="w-full h-full object-cover" />
+          ) : (
+            <Users size={24} className="text-fx-orange" />
+          )}
+        </div>
         <h1 className="text-xl font-bold text-fx-text">{company?.name ?? 'Your Company'}</h1>
         <p className="text-sm text-fx-text-muted">
           {members.length} member{members.length !== 1 ? 's' : ''}

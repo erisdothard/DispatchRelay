@@ -3342,9 +3342,16 @@ export type VerificationStatus = Database['public']['Enums']['verification_statu
 // Placeholder Types (for features not yet implemented)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type InvoiceRow = { id: string; status: string; [key: string]: unknown };
+export type InvoiceRow = {
+  id: string;
+  status: string;
+  created_at: string;
+  due_date: string;
+  amount_usd: number;
+  [key: string]: unknown;
+};
 export type SubscriptionRow = { id: string; tier: string; [key: string]: unknown };
-export type InvoiceStatus = 'pending' | 'paid' | 'cancelled' | 'invoiced';
+export type InvoiceStatus = 'pending' | 'paid' | 'cancelled' | 'invoiced' | 'approved';
 export type SubscriptionTier =
   | 'free'
   | 'basic'

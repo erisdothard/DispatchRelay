@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { updateCompany } from '@/services/companies.service';
+import { updateCompany, uploadCompanyLogo } from '@/services/companies.service';
+import { Camera } from 'lucide-react';
 
 interface EditCompanySheetProps {
   open: boolean;
@@ -12,7 +13,9 @@ interface EditCompanySheetProps {
 
 export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
   const { profile, company, createCompany, refreshProfile } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [form, setForm] = useState({
@@ -26,6 +29,7 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
     city: '',
     state: '',
     zip: '',
+    logo_url: '',
   });
 
   useEffect(() => {
@@ -44,9 +48,26 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
         city: company.city ?? '',
         state: company.state ?? '',
         zip: company.zip ?? '',
+        logo_url: company.logo_url ?? '',
       });
     }
   }, [open, company]);
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !company?.id) return;
+
+    setUploading(true);
+    try {
+      const publicUrl = await uploadCompanyLogo(company.id, file);
+      setForm((prev) => ({ ...prev, logo_url: publicUrl }));
+    } catch (err) {
+      console.error('Upload failed:', err);
+      setError(err instanceof Error ? err.message : 'Failed to upload logo');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   function set(key: keyof typeof form, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
@@ -68,6 +89,7 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
       city: form.city.trim() || null,
       state: form.state.trim().toUpperCase().slice(0, 2) || null,
       zip: form.zip.trim() || null,
+      logo_url: form.logo_url || null,
     };
 
     let err: string | null = null;
@@ -112,6 +134,53 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
       title={company ? 'Company Profile' : 'Create Company'}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Company Logo */}
+        {company && (
+          <div>
+            <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3 text-center">
+              Company Logo
+            </p>
+
+            <div className="flex flex-col items-center gap-4">
+              {/* Current/Preview Logo */}
+              <div className="relative">
+                <div className="w-16 h-16 rounded-lg bg-fx-orange/10 border-2 border-fx-orange/30 flex items-center justify-center overflow-hidden">
+                  {form.logo_url ? (
+                    <img
+                      src={form.logo_url}
+                      alt="Company logo"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-xl font-extrabold text-fx-orange">
+                      {form.name.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="absolute -bottom-1 -right-1 w-8 h-8 bg-fx-orange rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity"
+                >
+                  {uploading ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Camera size={14} className="text-white" />
+                  )}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Company name */}
         <div>
           <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">

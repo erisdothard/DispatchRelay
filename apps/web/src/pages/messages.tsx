@@ -169,14 +169,23 @@ function NewMessageContent({
                 disabled={creating}
                 className="w-full text-left bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3 hover:border-fx-orange/40 transition-colors disabled:opacity-50"
               >
-                <div className="w-10 h-10 rounded-xl bg-fx-orange/10 flex items-center justify-center shrink-0">
-                  <Package size={16} className="text-fx-orange" />
+                <div className="w-10 h-10 rounded-xl bg-fx-orange/10 flex items-center justify-center shrink-0 overflow-hidden">
+                  {load.companyLogoUrl ? (
+                    <img
+                      src={load.companyLogoUrl}
+                      alt={load.companyName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Package size={16} className="text-fx-orange" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-fx-orange">{load.loadNumber}</p>
                   <p className="text-xs text-fx-text-muted truncate">
                     {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
                   </p>
+                  <p className="text-[10px] text-fx-text-dim truncate mt-0.5">{load.companyName}</p>
                 </div>
                 <span className="text-[10px] font-bold text-fx-text-dim bg-fx-surface-2 px-2 py-0.5 rounded-full">
                   {load.status === 'in_transit'

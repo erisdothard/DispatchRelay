@@ -34,7 +34,10 @@ export async function getLoads(filters: LoadFilters = {}): Promise<Load[]> {
 
   let query = supabase
     .from('loads')
-    .select('*, assignee_profile:assignee_id(full_name)', { count: 'estimated' })
+    .select(
+      '*, assignee_profile:assignee_id(full_name), company_logo_url:companies!loads_company_id_fkey(logo_url)',
+      { count: 'estimated' },
+    )
     .order('posted_at', { ascending: false })
     .range(from, to);
 
@@ -82,7 +85,10 @@ export async function getLoadsPage(filters: LoadFilters = {}): Promise<LoadsPage
 
   let query = supabase
     .from('loads')
-    .select('*, assignee_profile:assignee_id(full_name)', { count: 'exact' })
+    .select(
+      '*, assignee_profile:assignee_id(full_name), company_logo_url:companies!loads_company_id_fkey(logo_url)',
+      { count: 'exact' },
+    )
     .order('posted_at', { ascending: false })
     .range(from, to);
 
@@ -257,7 +263,9 @@ export async function getMyActiveLoads(carrierId: string): Promise<Load[]> {
   // 3. Build query for loads from two sources:
   //    - Loads where carrier has accepted bid
   //    - Loads where carrier's company owns the load and status is active
-  let query = supabase.from('loads').select('*');
+  let query = supabase
+    .from('loads')
+    .select('*, company_logo_url:companies!loads_company_id_fkey(logo_url)');
 
   if (bidLoadIds.length > 0 && membership?.company_id) {
     query = query.or(
@@ -349,7 +357,7 @@ export async function assignCoDriver(loadId: string, driverId: string | null): P
 export async function getDriverLoads(driverId: string, status?: string): Promise<Load[]> {
   let query = supabase
     .from('loads')
-    .select('*')
+    .select('*, company_logo_url:companies!loads_company_id_fkey(logo_url)')
     .or(`assigned_driver_id.eq.${driverId},second_driver_id.eq.${driverId}`)
     .order('pickup_date', { ascending: true });
 

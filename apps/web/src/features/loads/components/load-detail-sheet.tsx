@@ -354,7 +354,31 @@ export function LoadDetailSheet({
             label="Weight"
             value={`${(load.weightLbs / 1000).toFixed(0)}k lbs`}
           />
-          <InfoRow icon={<MapPin size={14} />} label="Broker" value={load.companyName} />
+          <div
+            className="flex items-center gap-3 py-3"
+            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <div className="w-8 h-8 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
+              <span className="text-fx-text-muted">
+                <MapPin size={14} />
+              </span>
+            </div>
+            <span className="text-sm text-fx-text-muted flex-1">Broker</span>
+            <div className="flex items-center gap-2">
+              {load.companyLogoUrl ? (
+                <img
+                  src={load.companyLogoUrl}
+                  alt={load.companyName}
+                  className="h-5 w-5 rounded object-cover"
+                />
+              ) : (
+                <div className="h-5 w-5 rounded bg-brand/10 flex items-center justify-center text-[9px] font-medium text-brand">
+                  {load.companyName.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+              <span className="text-sm font-semibold text-fx-text">{load.companyName}</span>
+            </div>
+          </div>
           {age && <InfoRow icon={<Clock size={14} />} label="Posted" value={age} />}
           {load.loadNumber && (
             <InfoRow icon={<Package size={14} />} label="Load #" value={load.loadNumber} />
