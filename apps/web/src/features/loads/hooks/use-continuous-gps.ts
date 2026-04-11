@@ -42,30 +42,35 @@ export function useContinuousGps(): UseContinuousGpsReturn {
 
   // Activate GPS pinging
   // Note: loadNumber is null because we're tracking between loads
+  // TODO: Add updateInterval option to useDriverLocation hook to support different
+  // ping frequencies for driving vs on-duty (30s vs 60s)
   useDriverLocation({
     loadNumber: null as any, // Between-load tracking (no specific load)
     active: shouldTrack,
-    updateInterval: dutyStatus === 'driving' ? 30000 : 60000, // 30s when driving, 60s when on-duty
   });
 
   // Load current duty status from database on mount
   useEffect(() => {
     if (!user?.id) return;
 
-    supabase
-      .from('profiles')
-      .select('current_duty_status, last_location_update')
-      .eq('id', user.id)
-      .single()
-      .then(({ data }) => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('current_duty_status, last_location_update')
+          .eq('id', user.id)
+          .single();
+
         if (data) {
           setDutyStatusState(((data as any).current_duty_status as DutyStatus) ?? 'off_duty');
           if ((data as any).last_location_update) {
             setLastLocationUpdate(new Date((data as any).last_location_update));
           }
         }
-      })
-      .catch(console.error);
+      } catch (error) {
+        console.error('[useContinuousGps] Failed to load duty status:', error);
+      }
+    })();
   }, [user?.id]);
 
   // Subscribe to duty status changes (in case driver changes status on another device)
