@@ -320,6 +320,9 @@ export function LoadDetailSheet({
               hasDriverAssigned={!!load.assignedDriverId}
               onStatusAdvanced={(s) => setCurrentStatus(s)}
               onDispatched={() => setDocsOpen(true)}
+              loadNumber={load.loadNumber}
+              origin={`${load.originCity}, ${load.originState}`}
+              dest={`${load.destCity}, ${load.destState}`}
             />
           </div>
         )}

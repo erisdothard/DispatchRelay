@@ -17,6 +17,33 @@ export async function getDocumentsForLoad(loadId: string): Promise<DocumentRow[]
   return (data ?? []) as DocumentRow[];
 }
 
+export async function createDocument(params: {
+  loadId: string;
+  type: DocumentType;
+  fileName: string;
+  uploadedBy?: string;
+  companyId?: string | null;
+  bolNumber?: string;
+}): Promise<DocumentRow> {
+  const { data, error } = await supabase
+    .from('documents')
+    .insert({
+      load_id: params.loadId,
+      uploaded_by: params.uploadedBy ?? null,
+      company_id: params.companyId ?? null,
+      type: params.type,
+      file_name: params.fileName,
+      file_url: '', // Will be updated after signature capture
+      file_size: 0,
+      mime_type: 'application/pdf',
+      bol_number: params.bolNumber ?? null,
+    })
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  return data as DocumentRow;
+}
+
 export async function uploadDocument(params: {
   loadId: string;
   uploadedBy: string;
