@@ -12,6 +12,7 @@ import { NotificationSheet } from '@/features/notifications/components/notificat
 import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
 import { useGpsConsent } from '@/features/loads/hooks/use-gps-consent';
 import { GpsConsentModal } from '@/features/loads/components/gps-consent-modal';
+import { canSendGps } from '@/lib/permissions';
 import type { Load } from '@freightx/shared';
 
 /** Renders nothing — just activates GPS pinging for a single load */
@@ -40,6 +41,7 @@ export default function DriverDashboard() {
   const [loads, setLoads] = useState<Load[]>([]);
   const [activeLoads, setActiveLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
+  const [canSendGpsPermission, setCanSendGpsPermission] = useState(false);
   const [manualGpsToggle, setManualGpsToggle] = useState(() => {
     try {
       return localStorage.getItem('fx-gps-sharing') === 'true';
@@ -54,6 +56,15 @@ export default function DriverDashboard() {
   const { notifications, unreadCount, markAllRead } = useNotifications();
   const { hasConsented, grantConsent } = useGpsConsent();
   const [consentModalOpen, setConsentModalOpen] = useState(false);
+
+  // Check GPS send permission on mount
+  useEffect(() => {
+    if (user?.id && profile?.role) {
+      canSendGps(profile.role as any, user.id)
+        .then(setCanSendGpsPermission)
+        .catch(() => setCanSendGpsPermission(false));
+    }
+  }, [user?.id, profile?.role]);
 
   // Persist GPS sharing toggle across sessions
   useEffect(() => {
@@ -303,17 +314,22 @@ export default function DriverDashboard() {
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {[
-              {
-                label: 'Send GPS',
-                icon: '📍',
-                action: () => {
-                  if (!hasConsented) {
-                    setConsentModalOpen(true);
-                    return;
-                  }
-                  setManualGpsToggle(true);
-                },
-              },
+              // Only show "Send GPS" if user has permission (driver or owner-operator)
+              ...(canSendGpsPermission
+                ? [
+                    {
+                      label: 'Send GPS',
+                      icon: '📍',
+                      action: () => {
+                        if (!hasConsented) {
+                          setConsentModalOpen(true);
+                          return;
+                        }
+                        setManualGpsToggle(true);
+                      },
+                    },
+                  ]
+                : []),
               { label: 'Scan Receipt', icon: '🧾', action: () => navigate('/driver/receipts') },
               { label: 'Tire Log', icon: '🛞', action: () => navigate('/driver/tire-log') },
               { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
