@@ -1,4 +1,4 @@
-import { DollarSign, Clock, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
+import { DollarSign, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { InvoiceRow, InvoiceStatus } from '@/lib/database.types';
 import { approveInvoice, selectPaymentMethod } from '@/services/stripe.service';
 import { useState } from 'react';
@@ -32,33 +32,13 @@ const STATUS_CONFIG: Record<
     className: 'text-blue-400 bg-blue-400/10 border-blue-400/30',
     icon: CheckCircle2,
   },
-  processing: {
-    label: 'Processing',
-    className: 'text-purple-400 bg-purple-400/10 border-purple-400/30',
-    icon: Zap,
-  },
   paid: {
     label: 'Paid',
     className: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
     icon: CheckCircle2,
   },
-  overdue: {
-    label: 'Overdue',
-    className: 'text-red-400 bg-red-400/10 border-red-400/30',
-    icon: AlertCircle,
-  },
-  disputed: {
-    label: 'Disputed',
-    className: 'text-red-400 bg-red-400/10 border-red-400/30',
-    icon: AlertCircle,
-  },
   cancelled: {
     label: 'Cancelled',
-    className: 'text-zinc-500 bg-zinc-500/10 border-zinc-500/30',
-    icon: AlertCircle,
-  },
-  void: {
-    label: 'Void',
     className: 'text-zinc-500 bg-zinc-500/10 border-zinc-500/30',
     icon: AlertCircle,
   },

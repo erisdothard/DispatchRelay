@@ -3344,10 +3344,12 @@ export type VerificationStatus = Database['public']['Enums']['verification_statu
 
 export type InvoiceRow = {
   id: string;
-  status: string;
+  status: InvoiceStatus;
   created_at: string;
   due_date: string;
   amount_usd: number;
+  payment_method?: string;
+  quick_pay_fee_usd?: number;
   [key: string]: unknown;
 };
 export type SubscriptionRow = { id: string; tier: string; [key: string]: unknown };
