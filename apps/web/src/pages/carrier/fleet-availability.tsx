@@ -63,7 +63,7 @@ export default function FleetAvailabilityPage() {
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<DutyStatus | 'all'>('all');
 
-  const { summary: dutySummary } = useFleetDutyStatus(profile?.company_id);
+  const { summary: dutySummary } = useFleetDutyStatus((profile as any)?.company_id);
 
   // Fetch on-duty drivers
   useEffect(() => {
@@ -71,13 +71,13 @@ export default function FleetAvailabilityPage() {
 
     async function fetchDrivers() {
       try {
-        const { data, error } = await supabase.rpc('get_onduty_drivers_for_carrier', {
-          p_carrier_id: user.id,
+        const { data, error } = await (supabase.rpc as any)('get_onduty_drivers_for_carrier', {
+          p_carrier_id: user!.id,
         });
 
         if (error) throw error;
 
-        setDrivers((data as FleetDriver[]) ?? []);
+        setDrivers((data as any as FleetDriver[]) ?? []);
       } catch (error) {
         console.error('[FleetAvailability] Failed to fetch drivers:', error);
       } finally {

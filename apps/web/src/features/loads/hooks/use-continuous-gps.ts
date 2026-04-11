@@ -43,7 +43,7 @@ export function useContinuousGps(): UseContinuousGpsReturn {
   // Activate GPS pinging
   // Note: loadNumber is null because we're tracking between loads
   useDriverLocation({
-    loadNumber: null,
+    loadNumber: null as any, // Between-load tracking (no specific load)
     active: shouldTrack,
     updateInterval: dutyStatus === 'driving' ? 30000 : 60000, // 30s when driving, 60s when on-duty
   });
@@ -59,9 +59,9 @@ export function useContinuousGps(): UseContinuousGpsReturn {
       .single()
       .then(({ data }) => {
         if (data) {
-          setDutyStatusState((data.current_duty_status as DutyStatus) ?? 'off_duty');
-          if (data.last_location_update) {
-            setLastLocationUpdate(new Date(data.last_location_update));
+          setDutyStatusState(((data as any).current_duty_status as DutyStatus) ?? 'off_duty');
+          if ((data as any).last_location_update) {
+            setLastLocationUpdate(new Date((data as any).last_location_update));
           }
         }
       })
@@ -108,7 +108,7 @@ export function useContinuousGps(): UseContinuousGpsReturn {
 
     try {
       // Call RPC function to update duty status
-      const { error } = await supabase.rpc('set_driver_duty_status', {
+      const { error } = await (supabase.rpc as any)('set_driver_duty_status', {
         p_driver_id: user.id,
         p_duty_status: status,
       });
@@ -122,7 +122,7 @@ export function useContinuousGps(): UseContinuousGpsReturn {
       if (status === 'on_duty' || status === 'driving') {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
-            await supabase.rpc('update_driver_location', {
+            await (supabase.rpc as any)('update_driver_location', {
               p_driver_id: user.id,
               p_latitude: position.coords.latitude,
               p_longitude: position.coords.longitude,
@@ -169,7 +169,7 @@ export function useFleetDutyStatus(companyId?: string) {
 
     async function fetchSummary() {
       try {
-        const { data, error } = await supabase.rpc('get_fleet_availability_summary', {
+        const { data, error } = await (supabase.rpc as any)('get_fleet_availability_summary', {
           p_company_id: companyId,
         });
 
@@ -183,7 +183,7 @@ export function useFleetDutyStatus(companyId?: string) {
             driving: 0,
           };
 
-          for (const row of data) {
+          for (const row of data as any[]) {
             newSummary[row.duty_status as DutyStatus] = Number(row.driver_count);
           }
 

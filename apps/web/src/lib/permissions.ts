@@ -65,7 +65,7 @@ export async function isOwnerOperator(userId: string): Promise<boolean> {
       .eq('id', userId)
       .single();
 
-    if (!profile || profile.role !== 'carrier' || !profile.company_id) {
+    if (!profile || (profile as any).role !== 'carrier' || !(profile as any).company_id) {
       return false;
     }
 
@@ -139,11 +139,13 @@ export async function canAccessLoadGps(userId: string, loadNumber: string): Prom
 
     if (!load) return false;
 
+    const loadData = load as any;
+
     // User is poster, carrier, or driver
     if (
-      load.posted_by === userId ||
-      load.accepted_by === userId ||
-      load.assigned_driver_id === userId
+      loadData.posted_by === userId ||
+      loadData.accepted_by === userId ||
+      loadData.assigned_driver_id === userId
     ) {
       return true;
     }
@@ -152,7 +154,7 @@ export async function canAccessLoadGps(userId: string, loadNumber: string): Prom
     const { data: bids } = await supabase
       .from('bids')
       .select('id')
-      .eq('load_id', load.posted_by) // Need to join through loads table
+      .eq('load_id', loadData.posted_by) // Need to join through loads table
       .eq('bidder_id', userId)
       .limit(1);
 

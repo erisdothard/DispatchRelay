@@ -43,7 +43,7 @@ export async function findNearestDrivers(
   limit: number = 10,
 ): Promise<NearestDriver[]> {
   try {
-    const { data, error } = await supabase.rpc('find_nearest_available_drivers', {
+    const { data, error } = await (supabase.rpc as any)('find_nearest_available_drivers', {
       p_pickup_lat: pickupLat,
       p_pickup_lng: pickupLng,
       p_max_distance_miles: maxDistanceMiles,
@@ -52,12 +52,12 @@ export async function findNearestDrivers(
 
     if (error) throw error;
 
-    if (!data || data.length === 0) {
+    if (!data || (data as any[]).length === 0) {
       return [];
     }
 
     // Add ETA calculation (simple: distance / avg_speed)
-    const drivers = data.map((driver: NearestDriver) => ({
+    const drivers = (data as any[]).map((driver: NearestDriver) => ({
       ...driver,
       eta_minutes: calculateETA(driver.distance_miles, driver.duty_status),
     }));
