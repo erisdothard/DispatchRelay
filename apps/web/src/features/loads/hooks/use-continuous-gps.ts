@@ -62,9 +62,9 @@ export function useContinuousGps(): UseContinuousGpsReturn {
           .single();
 
         if (data) {
-          setDutyStatusState(((data as any).current_duty_status as DutyStatus) ?? 'off_duty');
-          if ((data as any).last_location_update) {
-            setLastLocationUpdate(new Date((data as any).last_location_update));
+          setDutyStatusState((data.current_duty_status as DutyStatus) ?? 'off_duty');
+          if (data.last_location_update) {
+            setLastLocationUpdate(new Date(data.last_location_update));
           }
         }
       } catch (error) {
@@ -113,7 +113,7 @@ export function useContinuousGps(): UseContinuousGpsReturn {
 
     try {
       // Call RPC function to update duty status
-      const { error } = await (supabase.rpc as any)('set_driver_duty_status', {
+      const { error } = await supabase.rpc('set_driver_duty_status', {
         p_driver_id: user.id,
         p_duty_status: status,
       });
@@ -127,7 +127,7 @@ export function useContinuousGps(): UseContinuousGpsReturn {
       if (status === 'on_duty' || status === 'driving') {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
-            await (supabase.rpc as any)('update_driver_location', {
+            await supabase.rpc('update_driver_location', {
               p_driver_id: user.id,
               p_latitude: position.coords.latitude,
               p_longitude: position.coords.longitude,
@@ -174,8 +174,8 @@ export function useFleetDutyStatus(companyId?: string) {
 
     async function fetchSummary() {
       try {
-        const { data, error } = await (supabase.rpc as any)('get_fleet_availability_summary', {
-          p_company_id: companyId,
+        const { data, error } = await supabase.rpc('get_fleet_availability_summary', {
+          p_company_id: companyId!,
         });
 
         if (error) throw error;
@@ -188,7 +188,7 @@ export function useFleetDutyStatus(companyId?: string) {
             driving: 0,
           };
 
-          for (const row of data as any[]) {
+          for (const row of data as any) {
             newSummary[row.duty_status as DutyStatus] = Number(row.driver_count);
           }
 
