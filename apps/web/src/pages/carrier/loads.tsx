@@ -27,7 +27,7 @@ export default function CarrierLoadsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const isRecentFilter = searchParams.get('filter') === 'recent';
 
-  const [tab, setTab] = useState<Tab>('all');
+  const [tab, setTab] = useState<Tab>('my_loads');
   const [search, setSearch] = useState('');
   const [equipFilter, setEquipFilter] = useState('All');
   const [aiFilters, setAiFilters] = useState<LoadFilters>({});
