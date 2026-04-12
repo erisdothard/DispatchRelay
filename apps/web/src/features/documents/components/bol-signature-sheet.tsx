@@ -1,7 +1,12 @@
 import { useRef, useState, useEffect } from 'react';
 import { Loader2, RotateCcw, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { markBolSigned, notifyBolSignedParties } from '@/services/documents.service';
+import {
+  markBolSigned,
+  notifyBolSignedParties,
+  getDocumentsForLoad,
+} from '@/services/documents.service';
+import { embedSignatureIntoPdf } from '@/services/pdf-signature-embed.service';
 
 interface BolSignatureSheetProps {
   open: boolean;
@@ -112,33 +117,61 @@ export function BolSignatureSheet({
     setError('');
 
     try {
-      // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob(
-          (b) => (b ? resolve(b) : reject(new Error('Canvas empty'))),
-          'image/png',
-          0.95,
-        );
+      // 1. Get current BOL document to access original PDF URL
+      const docs = await getDocumentsForLoad(loadId);
+      const bolDoc = docs.find((d) => d.id === documentId);
+      if (!bolDoc?.file_url) throw new Error('BOL document not found');
+
+      // 2. Convert canvas to data URL
+      const signatureDataUrl = canvas.toDataURL('image/png', 0.95);
+
+      // 3. Embed signature into PDF
+      const signedPdfBlob = await embedSignatureIntoPdf({
+        pdfUrl: bolDoc.file_url,
+        signatureDataUrl,
+        signatoryName: signatoryName.trim(),
+        signedAt: new Date(),
       });
 
-      // Upload signature PNG
-      const path = `documents/signatures/bol-${loadId}-${Date.now()}.png`;
+      // 4. Upload signed PDF (replace original)
+      const path = `${loadId}/bill_of_lading-signed-${Date.now()}.pdf`;
       const { error: uploadError } = await supabase.storage
         .from('documents')
-        .upload(path, blob, { contentType: 'image/png', upsert: true });
+        .upload(path, signedPdfBlob, { contentType: 'application/pdf', upsert: true });
       if (uploadError) throw uploadError;
 
       const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
-      const signatureUrl = urlData.publicUrl;
+      const signedPdfUrl = urlData.publicUrl;
 
-      // Mark document as signed
+      // 5. Also save signature PNG separately (for in-app display)
+      const signaturePngPath = `documents/signatures/bol-${loadId}-${Date.now()}.png`;
+      const signatureBlob = await fetch(signatureDataUrl).then((r) => r.blob());
+      await supabase.storage.from('documents').upload(signaturePngPath, signatureBlob, {
+        contentType: 'image/png',
+        upsert: true,
+      });
+
+      const { data: sigUrlData } = supabase.storage
+        .from('documents')
+        .getPublicUrl(signaturePngPath);
+
+      // 6. Update document record with signed PDF + signature metadata
       await markBolSigned({
         documentId,
         signatoryName: signatoryName.trim(),
-        signatureUrl,
+        signatureUrl: sigUrlData.publicUrl, // Separate PNG for quick preview
+        signedPdfUrl, // Full signed PDF
       });
 
-      // Notify broker + carrier (non-blocking)
+      // 7. Delete old unsigned PDF (cleanup)
+      if (bolDoc.file_url) {
+        const oldPath = bolDoc.file_url.split('/documents/')[1];
+        if (oldPath && !oldPath.includes('signed')) {
+          await supabase.storage.from('documents').remove([oldPath]);
+        }
+      }
+
+      // 8. Notify broker + carrier (non-blocking)
       notifyBolSignedParties({
         loadId,
         loadNumber,
@@ -147,7 +180,7 @@ export function BolSignatureSheet({
         signerName: signatoryName.trim(),
       }).catch(console.warn);
 
-      onSigned(signatureUrl);
+      onSigned(signedPdfUrl);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save signature');

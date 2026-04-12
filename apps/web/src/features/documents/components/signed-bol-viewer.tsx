@@ -1,4 +1,4 @@
-import { X, Printer } from 'lucide-react';
+import { X, Printer, Download } from 'lucide-react';
 import type { DocumentRow } from '@/lib/database.types';
 import type { Load } from '@freightx/shared';
 
@@ -211,21 +211,28 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
               </div>
             </div>
 
-            {/* Original file link */}
-            {doc.file_url && (
-              <a
-                href={doc.file_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="no-print flex items-center justify-center gap-2 w-full h-11 rounded-xl text-sm font-semibold text-fx-text-dim hover:text-white transition-colors"
+            {/* Download signed PDF */}
+            <div className="flex gap-3 no-print">
+              {doc.file_url && (
+                <a
+                  href={doc.file_url}
+                  download={`BOL-${load.loadNumber}-signed.pdf`}
+                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-semibold text-white bg-fx-orange hover:bg-fx-orange/90 transition-colors"
+                >
+                  <Download size={16} /> Download Signed BOL
+                </a>
+              )}
+              <button
+                onClick={() => window.print()}
+                className="flex items-center gap-2 h-11 px-4 rounded-xl text-sm font-semibold text-fx-text-dim hover:text-white transition-colors"
                 style={{
                   background: 'rgba(255,255,255,0.05)',
                   border: '1px solid rgba(255,255,255,0.08)',
                 }}
               >
-                View Original BOL File
-              </a>
-            )}
+                <Printer size={16} /> Print
+              </button>
+            </div>
           </div>
         </div>
       </div>

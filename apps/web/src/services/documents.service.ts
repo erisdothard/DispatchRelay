@@ -121,7 +121,8 @@ export async function getBolStatusForLoads(loadIds: string[]): Promise<BolStatus
 export async function markBolSigned(params: {
   documentId: string;
   signatoryName: string;
-  signatureUrl?: string;
+  signatureUrl?: string; // Separate PNG (for quick preview)
+  signedPdfUrl?: string; // Full signed PDF URL
 }): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any)
@@ -130,6 +131,7 @@ export async function markBolSigned(params: {
       signed_at: new Date().toISOString(),
       signature_url: params.signatureUrl ?? null,
       signatory_name: params.signatoryName,
+      ...(params.signedPdfUrl && { file_url: params.signedPdfUrl }), // Replace with signed PDF
     })
     .eq('id', params.documentId);
   if (error) throw new Error(error.message);
