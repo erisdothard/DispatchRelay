@@ -58,9 +58,27 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
     if (!file || !company?.id) return;
 
     setUploading(true);
+    setError(null);
     try {
+      // Upload to storage
       const publicUrl = await uploadCompanyLogo(company.id, file);
+      console.log('Logo uploaded, URL:', publicUrl);
+
+      // Immediately save to database so all team members see it
+      const { error: saveError } = await updateCompany(company.id, { logo_url: publicUrl });
+      if (saveError) {
+        throw new Error(saveError);
+      }
+
+      // Update form state
       setForm((prev) => ({ ...prev, logo_url: publicUrl }));
+
+      // Refresh profile to update context
+      await refreshProfile();
+
+      // Show success briefly
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
       console.error('Upload failed:', err);
       setError(err instanceof Error ? err.message : 'Failed to upload logo');
@@ -126,6 +144,7 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
   const companyType = company?.type ?? (profile?.role === 'admin' ? 'carrier' : profile?.role);
   const isCarrier = companyType === 'carrier';
   const isBroker = companyType === 'broker';
+  const isOwner = company?.owner_id === profile?.id;
 
   return (
     <BottomSheet
@@ -134,8 +153,8 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
       title={company ? 'Company Profile' : 'Create Company'}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Company Logo */}
-        {company && (
+        {/* Company Logo - Only owners can edit */}
+        {company && isOwner && (
           <div>
             <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3 text-center">
               Company Logo
@@ -177,6 +196,25 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
                   className="hidden"
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Company Logo - Read-only for non-owners */}
+        {company && !isOwner && form.logo_url && (
+          <div>
+            <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-3 text-center">
+              Company Logo
+            </p>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-16 h-16 rounded-lg bg-fx-orange/10 border-2 border-fx-orange/30 flex items-center justify-center overflow-hidden">
+                <img
+                  src={form.logo_url}
+                  alt="Company logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p className="text-xs text-fx-text-dim">Only the company owner can change the logo</p>
             </div>
           </div>
         )}
@@ -300,9 +338,9 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
           <p className="text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-3">{error}</p>
         )}
 
-        {success && (
+        {success && !uploading && (
           <p className="text-sm text-green-400 bg-green-400/10 rounded-xl px-4 py-3 text-center font-semibold">
-            ✓ Saved!
+            ✓ Saved! All team members will see this change.
           </p>
         )}
 
