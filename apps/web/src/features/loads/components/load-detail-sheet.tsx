@@ -740,28 +740,36 @@ export function LoadDetailSheet({
                 </button>
               )}
 
-              {liveStatus !== 'cancelled' &&
-                liveStatus !== 'completed' &&
-                liveStatus !== 'delivered' &&
+              {(liveStatus === 'posted' ||
+                liveStatus === 'bid_received' ||
+                liveStatus === 'awarded') &&
                 (cancelConfirm ? (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setCancelConfirm(false)}
-                      className="flex-1 h-11 rounded-2xl border border-fx-border text-sm font-bold text-fx-text-muted"
-                    >
-                      Keep Load
-                    </button>
-                    <button
-                      onClick={handleCancel}
-                      disabled={cancelling}
-                      className="flex-1 h-11 rounded-2xl bg-red-500 text-sm font-bold text-white disabled:opacity-50"
-                    >
-                      {cancelling ? (
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
-                      ) : (
-                        'Yes, Cancel Load'
-                      )}
-                    </button>
+                  <div className="flex flex-col gap-2">
+                    {liveStatus === 'awarded' && (
+                      <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
+                        Warning: This load has been awarded to a carrier. Cancelling may impact your
+                        reputation.
+                      </p>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setCancelConfirm(false)}
+                        className="flex-1 h-11 rounded-2xl border border-fx-border text-sm font-bold text-fx-text-muted"
+                      >
+                        Keep Load
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        disabled={cancelling}
+                        className="flex-1 h-11 rounded-2xl bg-red-500 text-sm font-bold text-white disabled:opacity-50"
+                      >
+                        {cancelling ? (
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
+                        ) : (
+                          'Yes, Cancel Load'
+                        )}
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <button

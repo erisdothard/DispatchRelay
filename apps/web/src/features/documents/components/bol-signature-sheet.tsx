@@ -120,30 +120,35 @@ export function BolSignatureSheet({
       // 1. Get current BOL document to access original PDF URL
       const docs = await getDocumentsForLoad(loadId);
       const bolDoc = docs.find((d) => d.id === documentId);
-      if (!bolDoc?.file_url) throw new Error('BOL document not found');
+      if (!bolDoc) throw new Error('BOL document not found');
 
       // 2. Convert canvas to data URL
       const signatureDataUrl = canvas.toDataURL('image/png', 0.95);
 
-      // 3. Embed signature into PDF
-      const signedPdfBlob = await embedSignatureIntoPdf({
-        pdfUrl: bolDoc.file_url,
-        signatureDataUrl,
-        signatoryName: signatoryName.trim(),
-        signedAt: new Date(),
-      });
+      const hasRealPdf = !!bolDoc.file_url;
+      let signedPdfUrl: string | undefined;
 
-      // 4. Upload signed PDF (replace original)
-      const path = `${loadId}/bill_of_lading-signed-${Date.now()}.pdf`;
-      const { error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(path, signedPdfBlob, { contentType: 'application/pdf', upsert: true });
-      if (uploadError) throw uploadError;
+      if (hasRealPdf) {
+        // 3a. Embed signature into existing PDF
+        const signedPdfBlob = await embedSignatureIntoPdf({
+          pdfUrl: bolDoc.file_url,
+          signatureDataUrl,
+          signatoryName: signatoryName.trim(),
+          signedAt: new Date(),
+        });
 
-      const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
-      const signedPdfUrl = urlData.publicUrl;
+        // 4a. Upload signed PDF (replace original)
+        const path = `${loadId}/bill_of_lading-signed-${Date.now()}.pdf`;
+        const { error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(path, signedPdfBlob, { contentType: 'application/pdf', upsert: true });
+        if (uploadError) throw uploadError;
 
-      // 5. Also save signature PNG separately (for in-app display)
+        const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
+        signedPdfUrl = urlData.publicUrl;
+      }
+
+      // 5. Save signature PNG (for in-app display, and as primary artifact when no PDF exists)
       const signaturePngPath = `documents/signatures/bol-${loadId}-${Date.now()}.png`;
       const signatureBlob = await fetch(signatureDataUrl).then((r) => r.blob());
       await supabase.storage.from('documents').upload(signaturePngPath, signatureBlob, {
@@ -155,16 +160,16 @@ export function BolSignatureSheet({
         .from('documents')
         .getPublicUrl(signaturePngPath);
 
-      // 6. Update document record with signed PDF + signature metadata
+      // 6. Update document record with signature metadata (+ signed PDF if available)
       await markBolSigned({
         documentId,
         signatoryName: signatoryName.trim(),
-        signatureUrl: sigUrlData.publicUrl, // Separate PNG for quick preview
-        signedPdfUrl, // Full signed PDF
+        signatureUrl: sigUrlData.publicUrl,
+        ...(signedPdfUrl && { signedPdfUrl }),
       });
 
-      // 7. Delete old unsigned PDF (cleanup)
-      if (bolDoc.file_url) {
+      // 7. Delete old unsigned PDF (cleanup) — only if we replaced it
+      if (hasRealPdf && signedPdfUrl) {
         const oldPath = bolDoc.file_url.split('/documents/')[1];
         if (oldPath && !oldPath.includes('signed')) {
           await supabase.storage.from('documents').remove([oldPath]);
@@ -180,7 +185,7 @@ export function BolSignatureSheet({
         signerName: signatoryName.trim(),
       }).catch(console.warn);
 
-      onSigned(signedPdfUrl);
+      onSigned(signedPdfUrl ?? sigUrlData.publicUrl);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save signature');
