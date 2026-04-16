@@ -1,11 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Loader2, RotateCcw, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import {
-  markBolSigned,
-  notifyBolSignedParties,
-  getDocumentsForLoad,
-} from '@/services/documents.service';
+import { markBolSigned, notifyBolSignedParties } from '@/services/documents.service';
 import { embedSignatureIntoPdf } from '@/services/pdf-signature-embed.service';
 
 interface BolSignatureSheetProps {
@@ -117,10 +113,13 @@ export function BolSignatureSheet({
     setError('');
 
     try {
-      // 1. Get current BOL document to access original PDF URL
-      const docs = await getDocumentsForLoad(loadId);
-      const bolDoc = docs.find((d) => d.id === documentId);
-      if (!bolDoc) throw new Error('BOL document not found');
+      // 1. Fetch the specific BOL document record by ID
+      const { data: bolDoc, error: bolDocErr } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('id', documentId)
+        .single();
+      if (bolDocErr || !bolDoc) throw new Error('BOL document not found');
 
       // 2. Convert canvas to data URL
       const signatureDataUrl = canvas.toDataURL('image/png', 0.95);
@@ -183,6 +182,7 @@ export function BolSignatureSheet({
         origin,
         dest,
         signerName: signatoryName.trim(),
+        bolPdfUrl: signedPdfUrl,
       }).catch(console.warn);
 
       onSigned(signedPdfUrl ?? sigUrlData.publicUrl);

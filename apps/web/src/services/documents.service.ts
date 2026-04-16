@@ -148,10 +148,11 @@ export async function notifyBolSignedParties(params: {
   origin: string;
   dest: string;
   signerName: string;
+  bolPdfUrl?: string;
 }): Promise<void> {
-  const { loadId, loadNumber, origin, dest, signerName } = params;
+  const { loadId, loadNumber, origin, dest, signerName, bolPdfUrl } = params;
   const body = `${signerName} signed BOL for load ${loadNumber}`;
-  const emailData = { loadNumber, origin, dest, signedBy: signerName };
+  const emailData = { loadNumber, origin, dest, signedBy: signerName, bolPdfUrl };
 
   try {
     // Parallel: resolve broker (load poster) + carrier (accepted bid)

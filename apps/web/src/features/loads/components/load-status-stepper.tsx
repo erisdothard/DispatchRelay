@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { updateLoad } from '@/services/loads.service';
 import { createDocument } from '@/services/documents.service';
 import { BolSignatureSheet } from '@/features/documents/components/bol-signature-sheet';
@@ -84,10 +85,14 @@ export function LoadStatusStepper({
       setError(null);
       try {
         // Create a BOL document record first
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         const doc = await createDocument({
           loadId,
           type: 'bill_of_lading',
           fileName: `BOL-${loadNumber || loadId}.pdf`,
+          uploadedBy: user?.id,
         });
         setBolDocId(doc.id);
         setBolSignOpen(true);

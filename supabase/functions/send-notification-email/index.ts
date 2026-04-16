@@ -200,18 +200,30 @@ Deno.serve(async (req) => {
 
     const html = buildEmailHtml(template, data);
 
+    const emailBody: Record<string, unknown> = {
+      from: 'FreightX <notifications@freightx.app>',
+      to: [to],
+      subject,
+      html,
+    };
+
+    // Attach signed BOL PDF when available
+    if (template === 'bol_signed' && data.bol_pdf_url) {
+      emailBody.attachments = [
+        {
+          filename: `BOL-${data.load_number ?? 'document'}.pdf`,
+          path: data.bol_pdf_url as string,
+        },
+      ];
+    }
+
     const resp = await fetch(RESEND_API_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: 'FreightX <notifications@freightx.app>',
-        to: [to],
-        subject,
-        html,
-      }),
+      body: JSON.stringify(emailBody),
     });
 
     if (!resp.ok) {

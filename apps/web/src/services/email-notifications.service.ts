@@ -146,6 +146,7 @@ export async function notifyBolSigned(params: {
   origin: string;
   dest: string;
   signedBy: string;
+  bolPdfUrl?: string;
 }): Promise<void> {
   await enqueue({
     template: 'bol_signed',
@@ -156,6 +157,7 @@ export async function notifyBolSigned(params: {
       origin: params.origin,
       dest: params.dest,
       signed_by: params.signedBy,
+      ...(params.bolPdfUrl && { bol_pdf_url: params.bolPdfUrl }),
     },
   });
 }
