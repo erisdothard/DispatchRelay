@@ -131,6 +131,7 @@ export function LoadDetailSheet({
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [assignDriverOpen, setAssignDriverOpen] = useState(false);
+  const [driverAssigned, setDriverAssigned] = useState(!!load?.assignedDriverId);
   const [nudgeSent, setNudgeSent] = useState(false);
   const [receiptConfirmed, setReceiptConfirmed] = useState(false);
   const [confirmingReceipt, setConfirmingReceipt] = useState(false);
@@ -482,7 +483,7 @@ export function LoadDetailSheet({
               loadId={load.id}
               currentStatus={liveStatus}
               role={role}
-              hasDriverAssigned={!!load.assignedDriverId}
+              hasDriverAssigned={driverAssigned || !!load.assignedDriverId}
               rateConSigned={rateConSigned}
               onStatusAdvanced={(s) => setCurrentStatus(s)}
               onDispatched={() => setDocsOpen(true)}
@@ -560,7 +561,7 @@ export function LoadDetailSheet({
                 className="w-full h-11 rounded-2xl border border-fx-orange/40 text-sm font-semibold text-fx-orange flex items-center justify-center gap-2 hover:bg-fx-orange/5 transition-colors"
               >
                 <UserCheck size={14} />
-                {load.assignedDriverId ? 'Reassign Driver' : 'Assign Driver'}
+                {driverAssigned || load.assignedDriverId ? 'Reassign Driver' : 'Assign Driver'}
               </button>
             </div>
           )}
@@ -1513,7 +1514,7 @@ export function LoadDetailSheet({
         load={load}
         onAssigned={() => {
           setAssignDriverOpen(false);
-          onClose(); // Close detail sheet so parent can refresh
+          setDriverAssigned(true);
         }}
       />
 
@@ -1528,6 +1529,7 @@ export function LoadDetailSheet({
           onSigned={() => {
             setRateConOpen(false);
             setRateConSigned(true);
+            if (!driverAssigned) setAssignDriverOpen(true);
           }}
         />
       )}
