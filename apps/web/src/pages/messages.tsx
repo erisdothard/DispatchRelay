@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Search, Send, ArrowLeft, Plus, X, Package, User, Loader2 } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -259,6 +260,7 @@ function NewMessageContent({
 
 export default function MessagesPage() {
   const { user, profile } = useAuth();
+  const location = useLocation();
   const [conversations, setConversations] = useState<ConversationRow[]>([]);
   const [selected, setSelected] = useState<ConversationRow | null>(null);
   const [messages, setMessages] = useState<MessageRow[]>([]);
@@ -271,10 +273,21 @@ export default function MessagesPage() {
 
   const role = (profile?.role === 'admin' ? 'carrier' : profile?.role) ?? 'carrier';
 
-  // Load conversations
+  // Load conversations, then auto-select if navigated from load detail
   useEffect(() => {
     if (!user) return;
-    getConversations(user.id).then(setConversations).catch(console.error);
+    getConversations(user.id)
+      .then((convos) => {
+        setConversations(convos);
+        const incoming = (location.state as { openConversation?: ConversationRow } | null)
+          ?.openConversation;
+        if (incoming) {
+          const match = convos.find((c) => c.id === incoming.id) ?? incoming;
+          setSelected(match);
+        }
+      })
+      .catch(console.error);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const fetchMessages = useCallback((id: string) => {

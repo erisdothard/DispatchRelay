@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   Scale,
@@ -16,6 +17,10 @@ import {
   Pencil,
   UserCheck,
   FileText,
+  MessageSquare,
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import {
@@ -33,6 +38,8 @@ import { BrokerCreditBadge } from './broker-credit-badge';
 import { EditLoadSheet } from './edit-load-sheet';
 import { AssignDriverSheet } from './assign-driver-sheet';
 import { getDocumentsForLoad, getBolStatusForLoads } from '@/services/documents.service';
+import { getOrCreateConversation } from '@/services/messages.service';
+import { RateConSignatureSheet } from '@/features/documents/components/rate-con-signature-sheet';
 import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
 import { bookNow } from '@/services/bids.service';
@@ -102,7 +109,8 @@ export function LoadDetailSheet({
   showBidButton = true,
   role,
 }: LoadDetailSheetProps) {
-  const { user } = useAuth();
+  const { user, company } = useAuth();
+  const navigate = useNavigate();
   const [bidOpen, setBidOpen] = useState(false);
   const [bidListOpen, setBidListOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -110,6 +118,8 @@ export function LoadDetailSheet({
   const [signedBolDoc, setSignedBolDoc] = useState<DocumentRow | null>(null);
   const [loadingBol, setLoadingBol] = useState(false);
   const [hasSignedBol, setHasSignedBol] = useState(false);
+  const [rateConSigned, setRateConSigned] = useState(false);
+  const [rateConOpen, setRateConOpen] = useState(false);
   const [accessorialsOpen, setAccessorialsOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<LoadStatus | null>(null);
   const [booking, setBooking] = useState(false);
@@ -117,21 +127,33 @@ export function LoadDetailSheet({
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [assignDriverOpen, setAssignDriverOpen] = useState(false);
+  // Profit estimator
+  const [profitExpanded, setProfitExpanded] = useState(false);
+  const [costPerMile, setCostPerMile] = useState<string>(
+    () => localStorage.getItem('fx_carrier_cpp') ?? '1.80',
+  );
+  // Message broker
+  const [messaging, setMessaging] = useState(false);
 
   useEffect(() => {
     if (!load?.id) return;
     const loadId = load.id;
 
-    async function checkBolStatus() {
+    async function checkDocStatus() {
       try {
-        const [status] = await getBolStatusForLoads([loadId]);
-        setHasSignedBol(status?.signed ?? false);
+        const [bolStatus] = await getBolStatusForLoads([loadId]);
+        setHasSignedBol(bolStatus?.signed ?? false);
+
+        // Check if rate con is signed (for awarded loads)
+        const docs = await getDocumentsForLoad(loadId);
+        const signedRateCon = docs.find((d) => d.type === 'rate_confirmation' && !!d.signed_at);
+        setRateConSigned(!!signedRateCon);
       } catch {
         setHasSignedBol(false);
       }
     }
 
-    checkBolStatus();
+    checkDocStatus();
   }, [load?.id]);
 
   async function handleViewSignedBol() {
@@ -175,6 +197,30 @@ export function LoadDetailSheet({
     } finally {
       setBooking(false);
     }
+  }
+
+  async function handleMessageBroker() {
+    if (!load || !user) return;
+    setMessaging(true);
+    try {
+      const convo = await getOrCreateConversation(
+        user.id,
+        load.postedBy || user.id,
+        load.companyName,
+        'broker',
+      );
+      navigate('/messages', { state: { openConversation: convo } });
+    } catch {
+      // fall through — navigate to messages and user can start manually
+      navigate('/messages');
+    } finally {
+      setMessaging(false);
+    }
+  }
+
+  function saveCostPerMile(val: string) {
+    setCostPerMile(val);
+    localStorage.setItem('fx_carrier_cpp', val);
   }
 
   if (!load) return null;
@@ -335,12 +381,43 @@ export function LoadDetailSheet({
               currentStatus={liveStatus}
               role={role}
               hasDriverAssigned={!!load.assignedDriverId}
+              rateConSigned={rateConSigned}
               onStatusAdvanced={(s) => setCurrentStatus(s)}
               onDispatched={() => setDocsOpen(true)}
+              onRateConRequired={() => setRateConOpen(true)}
               loadNumber={load.loadNumber}
               origin={`${load.originCity}, ${load.originState}`}
               dest={`${load.destCity}, ${load.destState}`}
             />
+          </div>
+        )}
+
+        {/* Rate Con CTA - carrier must sign before dispatch */}
+        {isCarrier && liveStatus === 'awarded' && !rateConSigned && (
+          <div className="mb-5">
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-3">
+              <p className="text-xs font-bold text-amber-400 mb-1">Rate Confirmation Required</p>
+              <p className="text-[11px] text-fx-text-muted">
+                Sign the rate confirmation to lock in your rate before dispatch.
+              </p>
+            </div>
+            <button
+              onClick={() => setRateConOpen(true)}
+              className="w-full h-11 rounded-2xl bg-fx-orange text-white text-sm font-bold flex items-center justify-center gap-2"
+            >
+              <FileText size={14} />
+              Sign Rate Confirmation
+            </button>
+          </div>
+        )}
+
+        {/* Rate Con signed badge */}
+        {isCarrier && liveStatus !== 'posted' && rateConSigned && (
+          <div className="mb-5 flex items-center gap-2 px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20">
+            <FileText size={13} className="text-green-400" />
+            <span className="text-[12px] font-semibold text-green-400">
+              Rate Confirmation Signed
+            </span>
           </div>
         )}
 
@@ -452,6 +529,92 @@ export function LoadDetailSheet({
             </>
           )}
         </div>
+
+        {/* Profit Estimator - carrier only, any load with a rate */}
+        {isCarrier && load.rateUsd > 0 && (
+          <div className="mb-5">
+            <button
+              onClick={() => setProfitExpanded((e) => !e)}
+              className="w-full flex items-center justify-between py-2"
+            >
+              <div className="flex items-center gap-2">
+                <DollarSign size={13} className="text-fx-orange" />
+                <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
+                  Profit Estimator
+                </p>
+              </div>
+              {profitExpanded ? (
+                <ChevronUp size={14} className="text-fx-text-dim" />
+              ) : (
+                <ChevronDown size={14} className="text-fx-text-dim" />
+              )}
+            </button>
+            {profitExpanded && (
+              <div className="space-y-3 mt-2">
+                <div className="flex items-center gap-2">
+                  <label className="text-[11px] text-fx-text-muted whitespace-nowrap">
+                    My cost/mile ($):
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={costPerMile}
+                    onChange={(e) => saveCostPerMile(e.target.value)}
+                    className="w-24 h-8 bg-fx-surface-2 border border-fx-border rounded-lg text-fx-text text-sm px-2 focus:border-fx-orange outline-none"
+                  />
+                  <span className="text-[10px] text-fx-text-dim">saved automatically</span>
+                </div>
+                {(() => {
+                  const cpp = parseFloat(costPerMile) || 0;
+                  const miles = load.totalMiles ?? 0;
+                  const revenue = load.rateUsd;
+                  const fuelAndOps = miles * cpp;
+                  const net = revenue - fuelAndOps;
+                  const netPerMile = miles > 0 ? net / miles : 0;
+                  return (
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="bg-fx-surface-2 border border-fx-border rounded-xl p-3 text-center">
+                        <p className="text-[10px] text-fx-text-dim mb-1">Revenue</p>
+                        <p className="text-sm font-bold text-fx-text">
+                          ${revenue.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-fx-surface-2 border border-fx-border rounded-xl p-3 text-center">
+                        <p className="text-[10px] text-fx-text-dim mb-1">Est. Cost</p>
+                        <p className="text-sm font-bold text-red-400">
+                          {miles > 0 ? `-$${fuelAndOps.toFixed(0)}` : '—'}
+                        </p>
+                      </div>
+                      <div
+                        className="rounded-xl p-3 text-center border"
+                        style={{
+                          background: net >= 0 ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
+                          borderColor: net >= 0 ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)',
+                        }}
+                      >
+                        <p className="text-[10px] text-fx-text-dim mb-1">Net</p>
+                        <p
+                          className="text-sm font-bold"
+                          style={{ color: net >= 0 ? '#4ade80' : '#f87171' }}
+                        >
+                          {miles > 0 ? `$${net.toFixed(0)}` : '—'}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
+                {load.totalMiles && parseFloat(costPerMile) > 0 && (
+                  <p className="text-[10px] text-fx-text-dim text-center">
+                    {load.totalMiles} miles ×{' '}
+                    <span className="text-fx-text">${parseFloat(costPerMile).toFixed(2)}/mi</span>{' '}
+                    operating cost estimate
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Contact Information - Show for carriers/brokers on awarded+ loads */}
         {(isCarrier || isBroker) &&
@@ -822,6 +985,24 @@ export function LoadDetailSheet({
                 : `Status: ${liveStatus.replace('_', ' ')}`}
             </div>
           )}
+
+          {/* Carrier: message broker button on awarded+ loads */}
+          {isCarrier && ACTIVE_STATUSES.includes(liveStatus) && load.postedBy && (
+            <button
+              onClick={handleMessageBroker}
+              disabled={messaging}
+              className="w-full h-11 rounded-2xl border border-fx-border text-sm font-semibold text-fx-text-muted flex items-center justify-center gap-2 hover:border-fx-orange/40 hover:text-fx-orange transition-colors disabled:opacity-50"
+            >
+              {messaging ? (
+                <span className="w-4 h-4 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
+              ) : (
+                <>
+                  <MessageSquare size={14} />
+                  Message Broker
+                </>
+              )}
+            </button>
+          )}
         </div>
       </BottomSheet>
 
@@ -865,6 +1046,21 @@ export function LoadDetailSheet({
           onClose(); // Close detail sheet so parent can refresh
         }}
       />
+
+      {rateConOpen && user && (
+        <RateConSignatureSheet
+          open={rateConOpen}
+          onClose={() => setRateConOpen(false)}
+          load={load}
+          carrierName={company?.name ?? 'Carrier'}
+          brokerName={load.companyName}
+          uploadedBy={user.id}
+          onSigned={() => {
+            setRateConOpen(false);
+            setRateConSigned(true);
+          }}
+        />
+      )}
     </>
   );
 }

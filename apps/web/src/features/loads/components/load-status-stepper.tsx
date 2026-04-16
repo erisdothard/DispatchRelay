@@ -39,8 +39,10 @@ interface LoadStatusStepperProps {
   currentStatus: LoadStatus;
   role: UserRole;
   hasDriverAssigned?: boolean;
+  rateConSigned?: boolean;
   onStatusAdvanced?: (newStatus: LoadStatus) => void;
   onDispatched?: () => void;
+  onRateConRequired?: () => void;
   loadNumber?: string;
   origin?: string;
   dest?: string;
@@ -51,8 +53,10 @@ export function LoadStatusStepper({
   currentStatus,
   role,
   hasDriverAssigned = false,
+  rateConSigned = true,
   onStatusAdvanced,
   onDispatched,
+  onRateConRequired,
   loadNumber = '',
   origin = '',
   dest = '',
@@ -76,6 +80,13 @@ export function LoadStatusStepper({
         'Assign a driver before advancing to ' +
           (STEPS.find((s) => s.status === nextStatus)?.label ?? nextStatus),
       );
+      return;
+    }
+
+    // Require signed rate confirmation before dispatch (carrier role only)
+    if (nextStatus === 'dispatched' && !rateConSigned && role === 'carrier') {
+      onRateConRequired?.();
+      setError('Rate confirmation must be signed before dispatch.');
       return;
     }
 
