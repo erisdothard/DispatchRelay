@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Search, Send, ArrowLeft, Plus, X, Package, User, Loader2 } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
-import { cn, getInitials } from '@/shared/lib/utils';
+import { cn, getInitials, getNavRole } from '@/shared/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import {
@@ -271,7 +271,7 @@ export default function MessagesPage() {
   const [newMessageType, setNewMessageType] = useState<'load' | 'user' | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const role = (profile?.role === 'admin' ? 'carrier' : profile?.role) ?? 'carrier';
+  const role = getNavRole(profile?.role);
 
   // Load conversations, then auto-select if navigated from load detail
   useEffect(() => {

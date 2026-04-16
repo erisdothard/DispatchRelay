@@ -1,6 +1,6 @@
 # FreightX — Feature Catalog
 
-**Last audited:** 2026-03-30 (updated Phase 15–19)
+**Last audited:** 2026-04-12 (updated Phase 20)
 **Audit basis:** Source code in `apps/web/src/features/`, `apps/web/src/services/`, `apps/web/src/pages/`, `database/migrations/`, and `supabase/functions/`
 
 This catalog reflects only what exists in code. It is not a wishlist.
@@ -20,28 +20,29 @@ This catalog reflects only what exists in code. It is not a wishlist.
 
 ## Phase Map
 
-| Phase    | Focus                                                                                      | Status      |
-| -------- | ------------------------------------------------------------------------------------------ | ----------- |
-| Phase 0  | Repo, CI/CD, Tooling                                                                       | ✅ Complete |
-| Phase 1  | Auth, registration, profiles, companies                                                    | ✅ Complete |
-| Phase 2  | Load CRUD, truck CRUD, search, dashboards                                                  | ✅ Complete |
-| Phase 3  | Real-time board, chat, notifications                                                       | ✅ Complete |
-| Phase 4  | Bidding, booking, rate con, lifecycle, documents                                           | ✅ Complete |
-| Phase 5  | Carrier verification, Stripe billing, invoicing, payments, ratings                         | ✅ Complete |
-| Phase 6  | Testing, performance, monitoring, launch                                                   | ✅ Complete |
-| Phase 7  | Elite Automation Scripts                                                                   | ✅ Complete |
-| Phase 8  | Study Guide & Learning Platform                                                            | ✅ Complete |
-| Phase 9  | Apple Maps-Style Live Maps                                                                 | ✅ Complete |
-| Phase 10 | Interactive Maps & Profiles                                                                | ✅ Complete |
-| Phase 11 | AI Assisted Load Seeking                                                                   | ✅ Complete |
-| Phase 12 | GPS Real-Time Tracking                                                                     | ✅ Complete |
-| Phase 13 | Enterprise Completion (email/SMS, teams, templates, e-sig, rate intelligence, scale infra) | ✅ Complete |
-| Phase 14 | Driver Tools, Advanced Tracking, RLS Hardening                                             | ✅ Complete |
-| Phase 15 | Infra hardening (Zod schemas, React Query, realtime dedup)                                 | ✅ Complete |
-| Phase 16 | Lane Intelligence (trend charts, popular lanes, market badge)                              | ✅ Complete |
-| Phase 17 | Carrier Finance (risk score, insurance monitoring, factoring)                              | ✅ Complete |
-| Phase 18 | Mobile, Ops & Notifications (Web Push, SMS templates, CSV import)                          | ✅ Complete |
-| Phase 19 | Live Load Operations — GPS accuracy, BOL download, equipment pills, assignee, incident log | ✅ Complete |
+| Phase    | Focus                                                                                           | Status      |
+| -------- | ----------------------------------------------------------------------------------------------- | ----------- |
+| Phase 0  | Repo, CI/CD, Tooling                                                                            | ✅ Complete |
+| Phase 1  | Auth, registration, profiles, companies                                                         | ✅ Complete |
+| Phase 2  | Load CRUD, truck CRUD, search, dashboards                                                       | ✅ Complete |
+| Phase 3  | Real-time board, chat, notifications                                                            | ✅ Complete |
+| Phase 4  | Bidding, booking, rate con, lifecycle, documents                                                | ✅ Complete |
+| Phase 5  | Carrier verification, Stripe billing, invoicing, payments, ratings                              | ✅ Complete |
+| Phase 6  | Testing, performance, monitoring, launch                                                        | ✅ Complete |
+| Phase 7  | Elite Automation Scripts                                                                        | ✅ Complete |
+| Phase 8  | Study Guide & Learning Platform                                                                 | ✅ Complete |
+| Phase 9  | Apple Maps-Style Live Maps                                                                      | ✅ Complete |
+| Phase 10 | Interactive Maps & Profiles                                                                     | ✅ Complete |
+| Phase 11 | AI Assisted Load Seeking                                                                        | ✅ Complete |
+| Phase 12 | GPS Real-Time Tracking                                                                          | ✅ Complete |
+| Phase 13 | Enterprise Completion (email/SMS, teams, templates, e-sig, rate intelligence, scale infra)      | ✅ Complete |
+| Phase 14 | Driver Tools, Advanced Tracking, RLS Hardening                                                  | ✅ Complete |
+| Phase 15 | Infra hardening (Zod schemas, React Query, realtime dedup)                                      | ✅ Complete |
+| Phase 16 | Lane Intelligence (trend charts, popular lanes, market badge)                                   | ✅ Complete |
+| Phase 17 | Carrier Finance (risk score, insurance monitoring, factoring)                                   | ✅ Complete |
+| Phase 18 | Mobile, Ops & Notifications (Web Push, SMS templates, CSV import)                               | ✅ Complete |
+| Phase 19 | Live Load Operations — GPS accuracy, BOL download, equipment pills, assignee, incident log      | ✅ Complete |
+| Phase 20 | Enterprise polish — hybrid roles, load editing, BOL signatures, company branding, GPS hardening | ✅ Complete |
 
 ---
 
@@ -74,6 +75,9 @@ This catalog reflects only what exists in code. It is not a wishlist.
 | Multi-user company teams (invite by email, role assignment, revoke) | ✅     | Carrier, Broker, Shipper | P1       | 13    | `services/company-members.service.ts`, `features/profile/components/edit-company-sheet.tsx` |
 | Company member roles: owner, admin, dispatcher, accounting, viewer  | ✅     | Carrier, Broker, Shipper | P1       | 13    | `services/company-members.service.ts`                                                       |
 | Driver role — assigned to carrier company, limited access           | ✅     | Driver                   | P1       | 14    | `database/migrations/026-driver-role.sql`, `AuthContext.tsx`                                |
+| Broker+carrier hybrid role capabilities                             | ✅     | Broker, Carrier          | P1       | 20    | `pages/broker/dashboard.tsx`, `pages/carrier/dashboard.tsx`                                 |
+| View switcher for broker+carrier hybrid users                       | ✅     | Broker, Carrier          | P1       | 20    | Dashboard pages                                                                             |
+| Company logo upload and display (owner-only, auto-save)             | ✅     | Carrier, Broker, Shipper | P2       | 20    | `features/profile/components/edit-company-sheet.tsx`                                        |
 
 ---
 
@@ -105,6 +109,19 @@ This catalog reflects only what exists in code. It is not a wishlist.
 | Equipment type pill selector on post-load form (replaces native select — iOS dark mode fix)                                            | ✅     | Broker, Shipper          | P1       | 19    | `features/loads/components/post-load-sheet.tsx`                                              |
 | Team member (assignee) assignment when posting a load                                                                                  | ✅     | Broker, Shipper          | P1       | 19    | `features/loads/components/post-load-sheet.tsx`, `database/migrations/050-load-assignee.sql` |
 | "Assigned" badge on load card when assignee_id is set                                                                                  | ✅     | Broker, Shipper          | P2       | 19    | `features/loads/components/load-card.tsx`                                                    |
+| Load editing (update posted loads)                                                                                                     | ✅     | Broker, Shipper          | P0       | 20    | `services/loads.service.ts`, `features/loads/components/post-load-sheet.tsx`                 |
+| Broker can edit loads until bid is accepted                                                                                            | ✅     | Broker                   | P0       | 20    | `services/loads.service.ts`                                                                  |
+| Canceled loads excluded from getLoads() query                                                                                          | ✅     | All                      | P1       | 20    | `services/loads.service.ts`                                                                  |
+| Canceled load UX improvements across all views                                                                                         | ✅     | All                      | P1       | 20    | `services/loads.service.ts`, load pages                                                      |
+| Date-based filtering for recent loads                                                                                                  | ✅     | All                      | P1       | 20    | `services/loads.service.ts`                                                                  |
+| Quick load preview on dashboard recent loads                                                                                           | ✅     | All                      | P1       | 20    | Dashboard pages                                                                              |
+| "All Loads" as default tab on carrier load board                                                                                       | ✅     | Carrier                  | P1       | 20    | `pages/carrier/loads.tsx`                                                                    |
+| Assign driver from load detail sheet                                                                                                   | ✅     | Carrier                  | P1       | 20    | `features/loads/components/load-detail-sheet.tsx`                                            |
+| Allow dispatch before driver assignment                                                                                                | ✅     | Carrier, Broker          | P1       | 20    | `services/loads.service.ts`                                                                  |
+| Drivers can mark loads as in transit                                                                                                   | ✅     | Driver                   | P1       | 20    | `features/loads/components/load-status-stepper.tsx`                                          |
+| Dispatch permissions removed from broker role                                                                                          | ✅     | Broker                   | P1       | 20    | `features/loads/components/load-status-stepper.tsx`                                          |
+| Load cancellation restricted to broker/shipper only                                                                                    | ✅     | Broker, Shipper          | P1       | 20    | `services/loads.service.ts`                                                                  |
+| Enterprise load detail enhancement                                                                                                     | ✅     | All                      | P1       | 20    | `features/loads/components/load-detail-sheet.tsx`                                            |
 
 ---
 
@@ -178,6 +195,7 @@ This catalog reflects only what exists in code. It is not a wishlist.
 | Stadia Alidade Smooth Dark tile theme                                                                                   | ✅     | All                      | P1       | 9     | `shared/components/map-view`                                                                                                                     |
 | Tracking milestones — customer-visible progress labels (Picked Up, In Transit, Delivered) separate from GPS breadcrumbs | ✅     | All                      | P0       | 9     | `database/migrations/001-initial-schema.sql` (tracking_milestones table)                                                                         |
 | Street-level geocoding for map pins (geocodeAddress() with city-level fallback)                                         | ✅     | All                      | P1       | 19    | `lib/geocoding.ts` (geocodeAddress), `shared/components/map-view.tsx` (originAddress/destAddress props)                                          |
+| Enterprise GPS architecture — security hardening, geocoding, fleet tracking                                             | ✅     | All                      | P1       | 20    | GPS services, migrations                                                                                                                         |
 
 ---
 
@@ -196,6 +214,10 @@ This catalog reflects only what exists in code. It is not a wishlist.
 | getBolStatusForLoads() — bulk BOL status check across multiple loads                                                          | ✅     | Carrier, Broker         | P1       | 4     | `services/documents.service.ts`                                                                   |
 | "Already signed at dock" toggle on driver BOL upload                                                                          | ✅     | Driver                  | P1       | 4     | `features/bookings/components/bol-signature-sheet.tsx`                                            |
 | Signed BOL viewer — printable modal with signature image, signatory, timestamp (window.print())                               | ✅     | Driver, Carrier, Broker | P1       | 19    | `features/documents/components/signed-bol-viewer.tsx`                                             |
+| BOL electronic signature triggered on delivered status                                                                        | ✅     | Driver, Carrier         | P0       | 20    | `features/bookings/components/bol-signature-sheet.tsx`                                            |
+| "View Signed BOL" button shown only when BOL exists and is signed                                                             | ✅     | Driver, Carrier, Broker | P1       | 20    | `features/loads/components/load-detail-sheet.tsx`                                                 |
+| Signature embedded into BOL PDF for portable proof                                                                            | ✅     | All                     | P1       | 20    | `features/bookings/components/bol-signature-sheet.tsx`                                            |
+| Document uploads locked after BOL is signed                                                                                   | ✅     | All                     | P1       | 20    | `features/documents/components/document-upload.tsx`                                               |
 
 ---
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
+import { getNavRole } from '@/shared/lib/utils';
 
 // TODO: replace with real support number when ready
 const SUPPORT_PHONE = '+18005551234';
@@ -62,7 +63,7 @@ export default function HelpCenterPage() {
   const { profile } = useAuth();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const role = profile?.role ?? 'carrier';
+  const role = getNavRole(profile?.role);
 
   const toggle = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -160,7 +161,7 @@ export default function HelpCenterPage() {
         <p className="text-center text-[10px] text-fx-text-dim">FreightX v0.2.0 · Phase 2</p>
       </div>
 
-      <BottomNav role={(role === 'admin' ? 'carrier' : role) as any} />
+      <BottomNav role={role} />
     </div>
   );
 }

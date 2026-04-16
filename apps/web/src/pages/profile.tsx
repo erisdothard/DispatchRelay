@@ -13,6 +13,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getNavRole } from '@/shared/lib/utils';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { Badge } from '@/shared/components/ui/badge';
@@ -29,7 +30,7 @@ export default function ProfilePage() {
 
   const name = profile?.full_name ?? 'User';
   const email = profile?.email ?? '';
-  const role = profile?.role ?? 'carrier';
+  const role = getNavRole(profile?.role);
   const avatarUrl = profile?.avatar_url;
   const initials = name
     .split(' ')
@@ -270,7 +271,7 @@ export default function ProfilePage() {
         <p className="text-center text-[10px] text-fx-text-dim pb-6">FreightX v2.0.0 · Phase 13</p>
       </div>
 
-      <BottomNav role={(role === 'admin' ? 'carrier' : role) as any} />
+      <BottomNav role={role} />
 
       <EditProfileSheet open={editProfileOpen} onClose={() => setEditProfileOpen(false)} />
       <EditCompanySheet open={editCompanyOpen} onClose={() => setEditCompanyOpen(false)} />

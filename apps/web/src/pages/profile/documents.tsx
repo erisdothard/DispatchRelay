@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
+import { getNavRole } from '@/shared/lib/utils';
 
 interface DocumentStatus {
   id: string;
@@ -20,7 +21,7 @@ export default function DocumentsPage() {
   const { profile, company } = useAuth();
   const [uploading, setUploading] = useState<string | null>(null);
 
-  const role = profile?.role ?? 'carrier';
+  const role = getNavRole(profile?.role);
 
   // Document requirements based on role
   const isCarrier = role === 'carrier';
@@ -263,7 +264,7 @@ export default function DocumentsPage() {
         <p className="text-center text-[10px] text-fx-text-dim mt-6">FreightX v0.2.0 · Phase 2</p>
       </div>
 
-      <BottomNav role={(role === 'admin' ? 'carrier' : role) as any} />
+      <BottomNav role={role} />
     </div>
   );
 }

@@ -48,6 +48,9 @@ export default function ShipperDashboard() {
   }, [user?.id]);
 
   const name = profile?.full_name ?? 'Shipper';
+  const inTransitLoads = loads.filter((l) => l.status === 'in_transit');
+  const deliveredUnconfirmed = loads.filter((l) => l.status === 'delivered');
+  const needsAttention = [...deliveredUnconfirmed, ...inTransitLoads];
 
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">
@@ -70,6 +73,55 @@ export default function ShipperDashboard() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
+        {/* Needs Attention */}
+        {needsAttention.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
+                Needs Attention
+              </h2>
+              <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-fx-orange text-white text-[10px] font-bold flex items-center justify-center">
+                {needsAttention.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {needsAttention.map((load) => {
+                const isDelivered = load.status === 'delivered';
+                return (
+                  <button
+                    key={load.id}
+                    onClick={() => setSelectedLoad(load)}
+                    className={`w-full text-left p-4 rounded-2xl border ${
+                      isDelivered
+                        ? 'bg-green-500/10 border-green-500/30'
+                        : 'bg-fx-orange/10 border-fx-orange/30'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          isDelivered
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-fx-orange/20 text-fx-orange'
+                        }`}
+                      >
+                        {isDelivered ? 'CONFIRM RECEIPT' : 'IN TRANSIT'}
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold text-fx-text">
+                      {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
+                    </p>
+                    <p className="text-xs text-fx-text-muted mt-0.5">
+                      {isDelivered ? 'Tap to confirm delivery receipt' : 'Tap to track shipment'}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
         <div>
           <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">

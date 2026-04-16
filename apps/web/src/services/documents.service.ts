@@ -210,6 +210,11 @@ export async function notifyBolSignedParties(params: {
   }
 }
 
+export async function deleteDocument(docId: string): Promise<void> {
+  const { error } = await supabase.from('documents').delete().eq('id', docId);
+  if (error) throw new Error(error.message);
+}
+
 export async function getSignedUrl(filePath: string): Promise<string> {
   const { data, error } = await supabase.storage.from('documents').createSignedUrl(filePath, 3600); // 1 hour
   if (error) throw new Error(error.message);

@@ -45,6 +45,20 @@ export function formatRelativeTime(dateStr: string): string {
   return formatDate(dateStr);
 }
 
+/** For broker users who can switch between carrier/broker portals,
+ *  returns the nav role based on their last active portal (stored in localStorage).
+ *  All other roles return as-is. */
+export function getNavRole(
+  profileRole: string | undefined | null,
+): 'carrier' | 'broker' | 'driver' | 'shipper' {
+  if (!profileRole || profileRole === 'admin') return 'carrier';
+  if (profileRole === 'broker') {
+    const stored = localStorage.getItem('fx_portal') as 'broker' | 'carrier' | null;
+    return stored === 'carrier' ? 'carrier' : 'broker';
+  }
+  return profileRole as 'carrier' | 'driver' | 'shipper';
+}
+
 export function getInitials(name: string): string {
   return name
     .split(' ')

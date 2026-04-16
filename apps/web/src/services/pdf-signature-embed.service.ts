@@ -11,11 +11,17 @@ export async function embedSignatureIntoPdf(params: EmbedSignatureParams): Promi
   const { pdfUrl, signatureDataUrl, signatoryName, signedAt } = params;
 
   // 1. Load original PDF
-  const pdfBytes = await fetch(pdfUrl).then((r) => r.arrayBuffer());
+  const pdfBytes = await fetch(pdfUrl).then((r) => {
+    if (!r.ok) throw new Error(`Failed to load PDF (${r.status})`);
+    return r.arrayBuffer();
+  });
   const pdfDoc = await PDFDocument.load(pdfBytes);
 
   // 2. Embed signature PNG
-  const signatureImageBytes = await fetch(signatureDataUrl).then((r) => r.arrayBuffer());
+  const signatureImageBytes = await fetch(signatureDataUrl).then((r) => {
+    if (!r.ok) throw new Error(`Failed to load signature image (${r.status})`);
+    return r.arrayBuffer();
+  });
   const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
 
   // 3. Get last page (or create signature page)

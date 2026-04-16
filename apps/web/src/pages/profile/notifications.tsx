@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
+import { getNavRole } from '@/shared/lib/utils';
 import { supabase } from '@/lib/supabase';
 
 interface ChannelSettings {
@@ -83,7 +84,7 @@ export default function NotificationsPage() {
   const [settings, setSettings] = useState<NotificationSettings>(DEFAULTS);
   const [phoneNumber, setPhoneNumber] = useState('');
 
-  const role = profile?.role ?? 'carrier';
+  const role = getNavRole(profile?.role);
 
   // Load preferences from DB
   useEffect(() => {
@@ -249,7 +250,7 @@ export default function NotificationsPage() {
         <p className="text-center text-[10px] text-fx-text-dim mt-6">FreightX v0.13.0 · Phase 13</p>
       </div>
 
-      <BottomNav role={(role === 'admin' ? 'carrier' : role) as any} />
+      <BottomNav role={role} />
     </div>
   );
 }

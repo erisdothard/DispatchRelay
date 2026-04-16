@@ -3,6 +3,7 @@ import { Loader2, RotateCcw, Check, FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { embedSignatureIntoPdf } from '@/services/pdf-signature-embed.service';
 import { generateRateConBlob } from '@/features/bookings/lib/generate-rate-con';
+import { notifyRateConSigned } from '@/services/email-notifications.service';
 import type { Load } from '@freightx/shared';
 
 interface RateConSignatureSheetProps {
@@ -169,7 +170,41 @@ export function RateConSignatureSheet({
       });
       if (dbErr) throw new Error(dbErr.message);
 
-      // 8. Clean up unsigned PDF
+      // 8. Notify broker by email + in-app notification (non-fatal)
+      if (load.postedBy) {
+        const { data: brokerProfile } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('id', load.postedBy)
+          .single();
+        if (brokerProfile?.email) {
+          notifyRateConSigned({
+            brokerEmail: brokerProfile.email,
+            loadNumber: load.loadNumber,
+            origin: `${load.originCity}, ${load.originState}`,
+            dest: `${load.destCity}, ${load.destState}`,
+            carrierName,
+            signedBy: signatoryName.trim(),
+            rateConPdfUrl: signedUrlData.publicUrl,
+          }).catch(() => {});
+        }
+        // In-app notification for broker
+        supabase
+          .from('notifications')
+          .insert({
+            user_id: load.postedBy,
+            type: 'rate_con_signed',
+            title: 'Rate Confirmation Signed',
+            body: `${carrierName} signed the rate confirmation for load ${load.loadNumber}. Ready to dispatch.`,
+            load_id: load.id,
+          })
+          .then(
+            () => undefined,
+            () => undefined,
+          );
+      }
+
+      // 9. Clean up unsigned PDF
       await supabase.storage
         .from('documents')
         .remove([unsignedPath])
@@ -187,7 +222,7 @@ export function RateConSignatureSheet({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div
         className="relative w-full max-w-lg rounded-t-3xl p-6 space-y-4"

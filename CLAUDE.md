@@ -161,13 +161,11 @@ See `.env.example` for full list with comments.
 
 ## Active Work
 
-### Phase 20 (current)
+### Phase 21 (next)
 
 - TBD
 
 ### Recently Completed
 
-- Phase 19: Live load ops production readiness
-- Load assignments with assignee_id + assigneeName
-- Equipment nav hidden for broker role
-- Team page bottom nav role fixes
+- Phase 20: Enterprise polish — load editing, BOL signatures in PDF, broker+carrier hybrid roles, company logo upload, GPS hardening, canceled load UX, dispatch permission fixes
+- Phase 19: Live load ops production readiness — load assignments, equipment pills, incident log, GPS accuracy

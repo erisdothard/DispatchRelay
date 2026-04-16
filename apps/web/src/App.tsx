@@ -32,6 +32,9 @@ const CarrierTeamSettingsPage = lazyRetry(() => import('@/pages/carrier/team-set
 const BrokerDashboard = lazyRetry(() => import('@/pages/broker/dashboard'));
 const BrokerLoadsPage = lazyRetry(() => import('@/pages/broker/loads'));
 
+const ShipperDashboard = lazyRetry(() => import('@/pages/shipper/dashboard'));
+const ShipperLoadsPage = lazyRetry(() => import('@/pages/shipper/loads'));
+
 const DriverDashboard = lazyRetry(() => import('@/pages/driver/dashboard'));
 const DriverLoadsPage = lazyRetry(() => import('@/pages/driver/loads'));
 const DriverDocumentsPage = lazyRetry(() => import('@/pages/driver/documents'));
@@ -132,10 +135,32 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/broker/team"
+            element={
+              <ProtectedRoute requiredRole={['broker', 'carrier']}>
+                <CarrierTeamPage />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Shipper → Driver redirects */}
-          <Route path="/shipper" element={<Navigate to="/driver" replace />} />
-          <Route path="/shipper/*" element={<Navigate to="/driver" replace />} />
+          {/* Shipper */}
+          <Route
+            path="/shipper"
+            element={
+              <ProtectedRoute requiredRole="shipper">
+                <ShipperDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/shipper/loads"
+            element={
+              <ProtectedRoute requiredRole="shipper">
+                <ShipperLoadsPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Driver */}
           <Route

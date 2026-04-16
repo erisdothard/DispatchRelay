@@ -7,11 +7,13 @@ import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/lib/utils';
 import { getDriverLoads } from '@/services/loads.service';
+import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Load } from '@freightx/shared';
 
-const STATUS_FILTERS = ['All', 'dispatched', 'in_transit', 'delivered'];
+const STATUS_FILTERS = ['active', 'delivered', 'All'];
 const STATUS_LABELS: Record<string, string> = {
+  active: 'Active',
   All: 'All Loads',
   dispatched: 'Dispatched',
   awarded: 'Awarded',
@@ -29,7 +31,7 @@ export default function DriverLoadsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('active');
   const [loads, setLoads] = useState<Load[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
@@ -47,6 +49,13 @@ export default function DriverLoadsPage() {
     fetchLoads();
   }, [fetchLoads]);
 
+  useEffect(() => {
+    if (!user?.id) return;
+    return realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, () => {
+      fetchLoads();
+    });
+  }, [user?.id, fetchLoads]);
+
   const STATUS_ORDER: Record<string, number> = {
     in_transit: 0,
     dispatched: 1,
@@ -56,7 +65,9 @@ export default function DriverLoadsPage() {
 
   const filtered = loads
     .filter((l) => {
-      if (statusFilter !== 'All' && l.status !== statusFilter) return false;
+      if (statusFilter === 'active') {
+        if (!['dispatched', 'in_transit', 'awarded'].includes(l.status)) return false;
+      } else if (statusFilter !== 'All' && l.status !== statusFilter) return false;
       if (search) {
         const s = search.toLowerCase();
         return (

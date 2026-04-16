@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Building2, Package } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/shared/lib/utils';
@@ -8,10 +9,16 @@ export function ViewSwitcher() {
   const location = useLocation();
   const { profile } = useAuth();
 
+  const isCarrierView = location.pathname.startsWith('/carrier');
+
+  // Persist active portal so shared pages (messages, profile) can use the right nav
+  useEffect(() => {
+    if (profile?.role !== 'broker') return;
+    localStorage.setItem('fx_portal', isCarrierView ? 'carrier' : 'broker');
+  }, [isCarrierView, profile?.role]);
+
   // Only show for brokers (hybrid broker+carrier users)
   if (profile?.role !== 'broker') return null;
-
-  const isCarrierView = location.pathname.startsWith('/carrier');
 
   return (
     <div className="flex items-center gap-1 bg-fx-surface border border-fx-border rounded-xl p-1">

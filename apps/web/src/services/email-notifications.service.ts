@@ -162,6 +162,51 @@ export async function notifyBolSigned(params: {
   });
 }
 
+export async function notifyRateConSigned(params: {
+  brokerEmail: string;
+  loadNumber: string;
+  origin: string;
+  dest: string;
+  carrierName: string;
+  signedBy: string;
+  rateConPdfUrl?: string;
+}): Promise<void> {
+  await enqueue({
+    template: 'rate_con_signed',
+    to: params.brokerEmail,
+    subject: `Rate confirmation signed — Load ${params.loadNumber}`,
+    data: {
+      load_number: params.loadNumber,
+      origin: params.origin,
+      dest: params.dest,
+      carrier_name: params.carrierName,
+      signed_by: params.signedBy,
+      ...(params.rateConPdfUrl && { rate_con_pdf_url: params.rateConPdfUrl }),
+    },
+  });
+}
+
+export async function notifyDriverAssigned(params: {
+  driverEmail: string;
+  loadNumber: string;
+  origin: string;
+  dest: string;
+  pickupDate: string;
+}): Promise<void> {
+  await enqueue({
+    template: 'load_status_change',
+    to: params.driverEmail,
+    subject: `You've been assigned load ${params.loadNumber}`,
+    data: {
+      load_number: params.loadNumber,
+      origin: params.origin,
+      dest: params.dest,
+      status: 'assigned to you',
+      pickup_date: params.pickupDate,
+    },
+  });
+}
+
 // ── SMS helpers ──────────────────────────────────────────────────────────────
 
 export async function enqueueSms(params: {

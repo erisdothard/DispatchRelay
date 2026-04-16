@@ -115,7 +115,7 @@ export async function acceptBid(bidId: string): Promise<void> {
     );
   }
 
-  // Email carrier — bid accepted
+  // Email + in-app notification to carrier — bid accepted
   if (bid) {
     const { data: carrier } = await supabase
       .from('profiles')
@@ -124,17 +124,34 @@ export async function acceptBid(bidId: string): Promise<void> {
       .single();
 
     const load = Array.isArray(bid.loads) ? bid.loads[0] : bid.loads;
-    if (carrier?.email && load) {
-      notifyBidAccepted({
-        carrierEmail: carrier.email as string,
-        loadNumber: load.load_number,
-        origin: `${load.origin_city}, ${load.origin_state}`,
-        dest: `${load.dest_city}, ${load.dest_state}`,
-        pickupDate: load.pickup_date ?? '',
-      }).then(
-        () => undefined,
-        () => undefined,
-      );
+    if (load) {
+      // In-app notification
+      supabase
+        .from('notifications')
+        .insert({
+          user_id: bid.carrier_id,
+          type: 'bid_accepted',
+          title: 'Bid Accepted — Sign Rate Con',
+          body: `Your bid on load ${load.load_number} (${load.origin_city} → ${load.dest_city}) was accepted. Sign the rate confirmation to dispatch.`,
+          load_id: (load as { id?: string }).id ?? null,
+        })
+        .then(
+          () => undefined,
+          () => undefined,
+        );
+
+      if (carrier?.email) {
+        notifyBidAccepted({
+          carrierEmail: carrier.email as string,
+          loadNumber: load.load_number,
+          origin: `${load.origin_city}, ${load.origin_state}`,
+          dest: `${load.dest_city}, ${load.dest_state}`,
+          pickupDate: load.pickup_date ?? '',
+        }).then(
+          () => undefined,
+          () => undefined,
+        );
+      }
     }
   }
 }

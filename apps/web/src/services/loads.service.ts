@@ -3,7 +3,7 @@ import { rowToLoad, rowToMilestone } from '@/lib/mappers';
 import type { LoadRow, EquipmentType, LoadStatus } from '@/lib/database.types';
 import type { Load, TrackingMilestone } from '@freightx/shared';
 import { recordLaneRate } from './rate-intelligence.service';
-import { notifyLoadStatusChange } from './email-notifications.service';
+import { notifyLoadStatusChange, notifyDriverAssigned } from './email-notifications.service';
 import { LoadFiltersSchema, CreateLoadInputSchema } from '@/lib/schemas/loads.schema';
 
 export const PAGE_SIZE = 25;
@@ -144,6 +144,12 @@ export async function getLoadByNumber(loadNumber: string): Promise<Load | null> 
   return rowToLoad(data);
 }
 
+export async function getLoadById(id: string): Promise<Load | null> {
+  const { data, error } = await supabase.from('loads').select('*').eq('id', id).single();
+  if (error) return null;
+  return rowToLoad(data);
+}
+
 export async function createLoad(
   load: Omit<LoadRow, 'id' | 'created_at' | 'search_vector'>,
 ): Promise<Load> {
@@ -216,6 +222,20 @@ export async function updateLoad(id: string, updates: Partial<LoadRow>): Promise
         () => undefined,
       );
     }
+
+    supabase
+      .from('notifications')
+      .insert({
+        user_id: data.posted_by,
+        type: 'load_status_change',
+        title: `Load ${data.load_number} — ${updates.status.replace(/_/g, ' ')}`,
+        body: `Load ${data.load_number} (${data.origin_city} → ${data.dest_city}) is now ${updates.status.replace(/_/g, ' ')}.`,
+        load_id: data.id,
+      })
+      .then(
+        () => undefined,
+        () => undefined,
+      );
   }
 
   return rowToLoad(data);
@@ -281,6 +301,9 @@ export async function getMyActiveLoads(carrierId: string): Promise<Load[]> {
     return [];
   }
 
+  // Exclude terminal statuses from carrier "My Loads" view
+  query = query.not('status', 'in', '("completed","cancelled","tonu","rejected","delivered")');
+
   const { data, error } = await query.order('pickup_date', { ascending: true });
   if (error) throw error;
 
@@ -314,7 +337,7 @@ export async function assignDriver(loadId: string, driverId: string): Promise<Lo
     throw error;
   }
 
-  // Notify driver of assignment
+  // In-app notification to driver
   await supabase.from('notifications').insert({
     user_id: driverId,
     type: 'load_assigned',
@@ -322,6 +345,25 @@ export async function assignDriver(loadId: string, driverId: string): Promise<Lo
     body: `You have been assigned load ${data.load_number}: ${data.origin_city}, ${data.origin_state} → ${data.dest_city}, ${data.dest_state}`,
     load_id: data.id,
   });
+
+  // Email driver (non-fatal)
+  const { data: driverProfile } = await supabase
+    .from('profiles')
+    .select('email')
+    .eq('id', driverId)
+    .single();
+  if (driverProfile?.email) {
+    notifyDriverAssigned({
+      driverEmail: driverProfile.email,
+      loadNumber: data.load_number,
+      origin: `${data.origin_city}, ${data.origin_state}`,
+      dest: `${data.dest_city}, ${data.dest_state}`,
+      pickupDate: data.pickup_date ?? '',
+    }).then(
+      () => undefined,
+      () => undefined,
+    );
+  }
 
   return rowToLoad(data);
 }
@@ -363,6 +405,9 @@ export async function getDriverLoads(driverId: string, status?: string): Promise
 
   if (status) {
     query = query.eq('status', status as LoadStatus);
+  } else {
+    // Hide fully closed loads from default view
+    query = query.not('status', 'in', '("completed","cancelled","tonu","rejected")');
   }
 
   const { data, error } = await query;
@@ -398,6 +443,36 @@ export async function getCompanyDrivers(
       fullName: m.profiles.full_name ?? m.profiles.email,
       email: m.profiles.email,
     }));
+}
+
+export async function nudgeCarrier(
+  loadId: string,
+  carrierId: string,
+  loadNumber: string,
+): Promise<void> {
+  const { error } = await supabase.from('notifications').insert({
+    user_id: carrierId,
+    type: 'load_reminder',
+    title: 'Load Awaiting Dispatch',
+    body: `Load ${loadNumber} has been awarded and is waiting for you to sign the rate confirmation and dispatch.`,
+    load_id: loadId,
+  });
+  if (error) throw error;
+}
+
+export async function confirmReceipt(
+  loadId: string,
+  brokerId: string,
+  loadNumber: string,
+): Promise<void> {
+  const { error } = await supabase.from('notifications').insert({
+    user_id: brokerId,
+    type: 'receipt_confirmed',
+    title: 'Delivery Confirmed by Shipper',
+    body: `Shipper has confirmed receipt of Load ${loadNumber}. Ready to close out.`,
+    load_id: loadId,
+  });
+  if (error) throw error;
 }
 
 export async function getTrackingMilestones(loadNumber: string): Promise<TrackingMilestone[]> {

@@ -5,7 +5,8 @@ import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { ViewSwitcher } from '@/shared/components/view-switcher';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMyActiveLoads } from '@/services/loads.service';
+import { getMyActiveLoads, getLoadById } from '@/services/loads.service';
+import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { getBolStatusForLoads } from '@/services/documents.service';
 import type { BolStatus } from '@/services/documents.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
@@ -42,23 +43,31 @@ export default function CarrierDashboard() {
 
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
-  useEffect(() => {
-    if (user?.id) {
-      getMyActiveLoads(user.id)
-        .then((all) => {
-          setLoads(all);
-          const ids = all.map((l) => l.id);
-          if (ids.length > 0) {
-            getBolStatusForLoads(ids).then(setBolStatuses).catch(console.error);
-          }
-        })
-        .catch(console.error);
-    }
+  const fetchLoads = useCallback(() => {
+    if (!user?.id) return;
+    getMyActiveLoads(user.id)
+      .then((all) => {
+        setLoads(all);
+        const ids = all.map((l) => l.id);
+        if (ids.length > 0) getBolStatusForLoads(ids).then(setBolStatuses).catch(console.error);
+      })
+      .catch(console.error);
   }, [user?.id]);
+
+  useEffect(() => {
+    fetchLoads();
+  }, [fetchLoads]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    return realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, fetchLoads);
+  }, [user?.id, fetchLoads]);
 
   const activeLoads = loads.filter((l) =>
     ['dispatched', 'in_transit', 'awarded'].includes(l.status),
   );
+  const awardedLoads = activeLoads.filter((l) => l.status === 'awarded');
+  const inProgressLoads = activeLoads.filter((l) => l.status !== 'awarded');
 
   // Show loads posted in last 7 days, excluding active loads
   const sevenDaysAgo = new Date();
@@ -87,9 +96,9 @@ export default function CarrierDashboard() {
     const el = carouselRef.current;
     if (!el) return;
     const scrollLeft = el.scrollLeft;
-    const cardWidth = el.scrollWidth / activeLoads.length;
+    const cardWidth = el.scrollWidth / (inProgressLoads.length || 1);
     setActiveSlide(Math.round(scrollLeft / cardWidth));
-  }, [activeLoads.length]);
+  }, [inProgressLoads.length]);
 
   const name = profile?.full_name ?? 'Driver';
   const companyName = company?.name ?? '';
@@ -138,19 +147,22 @@ export default function CarrierDashboard() {
       </div>
 
       {/* View Switcher */}
-      <div className="px-5 pb-5 flex justify-center">
+      <div className="px-5 pb-4 flex justify-center">
         <ViewSwitcher />
       </div>
 
+      {/* Divider */}
+      <div className="mx-5 mb-6 h-px bg-white/[0.05]" />
+
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-5 space-y-6 pb-2">
+      <div className="flex-1 overflow-y-auto scrollbar-hide px-5 space-y-8 pb-2">
         {/* Quick actions */}
         <div className="grid grid-cols-2 gap-3">
           {QUICK_ACTIONS.map((item) => (
             <button
               key={item.label}
               onClick={() => navigate(item.path)}
-              className="bg-fx-surface rounded-ios-sm p-4 flex items-center gap-3 active-scale card-highlight text-left transition-colors hover:bg-fx-surface-2"
+              className="bg-fx-surface border border-white/[0.06] rounded-ios-sm p-4 flex items-center gap-3 active-scale card-highlight text-left transition-colors hover:bg-fx-surface-2"
             >
               <div className="w-10 h-10 rounded-ios-xs bg-fx-orange/15 flex items-center justify-center shrink-0">
                 {item.icon}
@@ -163,28 +175,95 @@ export default function CarrierDashboard() {
           ))}
         </div>
 
-        {/* Current Shipping — Carousel */}
-        {activeLoads.length > 0 && (
+        {/* Action Required — Awarded loads needing dispatch */}
+        {awardedLoads.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[17px] font-bold text-white tracking-[-0.01em]">
-                Current Shipping
-              </p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
+                  Pending
+                </p>
+                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
+                  Action Required
+                </p>
+              </div>
+              <span className="text-[11px] font-bold text-amber-900 bg-amber-400 px-2.5 py-1 rounded-full">
+                {awardedLoads.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {awardedLoads.map((load) => (
+                <button
+                  key={load.id}
+                  onClick={() => setSelectedLoad(load)}
+                  className="w-full text-left bg-amber-500/[0.06] border border-amber-500/20 rounded-ios-sm p-4 active-scale transition-colors"
+                  style={{ boxShadow: 'inset 3px 0 0 rgba(251, 191, 36, 0.65)' }}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-[11px] text-fx-text-dim">Load {load.loadNumber}</p>
+                      <p className="text-[15px] font-bold text-white mt-0.5">
+                        {load.originCity} → {load.destCity}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[15px] font-bold text-fx-orange">
+                        ${load.rateUsd.toLocaleString()}
+                      </p>
+                      <span className="text-[10px] font-semibold text-amber-400 tracking-[0.06em] uppercase">
+                        Needs Dispatch
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] text-fx-text-dim">
+                      {load.assignedDriverId ? (
+                        <span className="text-green-400 font-semibold">Driver assigned</span>
+                      ) : (
+                        <span className="text-amber-400">No driver assigned</span>
+                      )}
+                    </p>
+                    <p className="text-[11px] font-bold text-amber-400">
+                      Sign Rate Con &amp; Dispatch →
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Current Shipping — Carousel */}
+        {inProgressLoads.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
+                  Live
+                </p>
+                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
+                  Current Shipping
+                </p>
+              </div>
               <span className="text-[11px] font-semibold text-white bg-fx-orange px-2.5 py-1 rounded-full">
-                {activeLoads.length} Active
+                {inProgressLoads.length} Active
               </span>
             </div>
 
             <div
-              ref={carouselRef}
-              onScroll={handleScroll}
-              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3 -mx-5 px-5"
+              ref={inProgressLoads.length > 1 ? carouselRef : undefined}
+              onScroll={inProgressLoads.length > 1 ? handleScroll : undefined}
+              className={
+                inProgressLoads.length > 1
+                  ? 'flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3 -mx-5 px-5'
+                  : 'space-y-3'
+              }
             >
-              {activeLoads.map((currentLoad) => (
+              {inProgressLoads.map((currentLoad) => (
                 <button
                   key={currentLoad.id}
                   onClick={() => navigate(`/track/${currentLoad.loadNumber}`)}
-                  className="min-w-[85%] snap-center bg-fx-surface rounded-ios p-5 card-highlight text-left shrink-0 active-scale transition-colors"
+                  className={`${inProgressLoads.length > 1 ? 'min-w-[85%] snap-center shrink-0' : 'w-full'} bg-fx-surface border border-white/[0.06] rounded-ios p-5 card-highlight text-left active-scale transition-colors`}
                 >
                   <p className="text-[13px] font-medium text-fx-text-dim">
                     ID {currentLoad.loadNumber}
@@ -208,12 +287,26 @@ export default function CarrierDashboard() {
                     <div className="w-full h-[3px] bg-fx-border rounded-full" />
                     <div
                       className="absolute left-0 top-0 h-[3px] rounded-full bg-orange-gradient"
-                      style={{ width: currentLoad.status === 'in_transit' ? '58%' : '20%' }}
+                      style={{
+                        width:
+                          currentLoad.status === 'in_transit'
+                            ? '75%'
+                            : currentLoad.status === 'dispatched'
+                              ? '50%'
+                              : '25%',
+                      }}
                     />
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-orange-gradient ring-2 ring-fx-bg" />
                     <div
                       className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-orange-gradient ring-2 ring-fx-bg shadow-orange-glow-sm"
-                      style={{ left: currentLoad.status === 'in_transit' ? '58%' : '20%' }}
+                      style={{
+                        left:
+                          currentLoad.status === 'in_transit'
+                            ? '75%'
+                            : currentLoad.status === 'dispatched'
+                              ? '50%'
+                              : '25%',
+                      }}
                     />
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 rounded-full bg-fx-border ring-2 ring-fx-bg" />
                   </div>
@@ -253,34 +346,27 @@ export default function CarrierDashboard() {
                   </div>
 
                   {/* Assign Driver button */}
-                  {!currentLoad.assignedDriverId &&
-                    ['awarded', 'dispatched'].includes(currentLoad.status) && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          setAssignLoad(currentLoad);
-                        }}
-                        className="mt-4 w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
-                      >
-                        <UserCheck size={14} />
-                        Assign Driver
-                      </button>
-                    )}
-                  {currentLoad.assignedDriverId && (
-                    <div className="mt-4 flex items-center gap-2 text-xs text-green-400 font-semibold">
+                  {['awarded', 'dispatched'].includes(currentLoad.status) && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        setAssignLoad(currentLoad);
+                      }}
+                      className="mt-4 w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
+                    >
                       <UserCheck size={14} />
-                      Driver Assigned
-                    </div>
+                      {currentLoad.assignedDriverId ? 'Reassign Driver' : 'Assign Driver'}
+                    </button>
                   )}
                 </button>
               ))}
             </div>
 
             {/* Dot indicators */}
-            {activeLoads.length > 1 && (
+            {inProgressLoads.length > 1 && (
               <div className="flex items-center justify-center gap-1.5 mt-3">
-                {activeLoads.map((_, i) => (
+                {inProgressLoads.map((_, i) => (
                   <div
                     key={i}
                     className={`h-1.5 rounded-full transition-all ${
@@ -296,10 +382,12 @@ export default function CarrierDashboard() {
         {/* Recent Loads */}
         {loads.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-[17px] font-bold text-white tracking-[-0.01em]">Recent Loads</p>
-                <p className="text-[12px] text-fx-text-dim mt-0.5">(Last 7 Days)</p>
+                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
+                  Last 7 Days
+                </p>
+                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">Recent Loads</p>
               </div>
               {recentLoads.length > 0 && (
                 <button
@@ -332,13 +420,15 @@ export default function CarrierDashboard() {
                       }}
                     >
                       <p
-                        className="text-[32px] font-extrabold text-white leading-none mb-1"
-                        style={{ letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}
+                        className="text-[34px] font-black text-white leading-none mb-1"
+                        style={{ letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}
                       >
                         {load.loadNumber}
                       </p>
-                      <p className="text-[11px] text-white/50 font-medium mb-3 tracking-wide uppercase">
-                        {load.commodity} · {load.totalMiles ? `${load.totalMiles} mi` : '—'}
+                      <p className="text-[10px] text-white/40 font-semibold mb-3 tracking-[0.08em] uppercase">
+                        {load.commodity}
+                        {load.totalMiles ? <span className="text-white/25 mx-1.5">·</span> : null}
+                        {load.totalMiles ? `${load.totalMiles} mi` : null}
                       </p>
                       <div className="flex items-center justify-between">
                         <p className="text-[13px] text-white/80 font-semibold">
@@ -386,9 +476,11 @@ export default function CarrierDashboard() {
         {/* Empty state */}
         {loads.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="text-5xl mb-4">🚛</div>
-            <p className="font-bold text-fx-text">No loads yet</p>
-            <p className="text-sm text-fx-text-muted mt-1">Browse the load board to get started</p>
+            <div className="w-14 h-14 rounded-full bg-fx-surface border border-white/[0.06] flex items-center justify-center mb-4">
+              <Navigation size={22} className="text-fx-text-dim" />
+            </div>
+            <p className="font-bold text-fx-text">No active loads</p>
+            <p className="text-sm text-fx-text-dim mt-1">Browse the load board to get started</p>
           </div>
         )}
       </div>
@@ -401,13 +493,20 @@ export default function CarrierDashboard() {
         notifications={notifications}
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
+        onNotificationClick={async (n) => {
+          if (n.load_id) {
+            setNotifsOpen(false);
+            const found = loads.find((l) => l.id === n.load_id) ?? (await getLoadById(n.load_id));
+            if (found) setSelectedLoad(found);
+          }
+        }}
       />
 
       <LoadDetailSheet
         load={selectedLoad}
         onClose={() => setSelectedLoad(null)}
         showBidButton={false}
-        role={profile?.role as 'broker' | 'carrier' | 'driver' | undefined}
+        role="carrier"
       />
 
       {assignLoad && (

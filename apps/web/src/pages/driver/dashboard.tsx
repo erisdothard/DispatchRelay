@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Package, Clock, TrendingDown, CheckCircle, Radio } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -6,9 +6,11 @@ import { BottomNav } from '@/shared/components/bottom-nav';
 import { StatCard } from '@/shared/components/stat-card';
 import { Badge } from '@/shared/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { getDriverLoads } from '@/services/loads.service';
+import { getDriverLoads, getLoadById } from '@/services/loads.service';
+import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
+import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
 import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
 import { useGpsConsent } from '@/features/loads/hooks/use-gps-consent';
 import { GpsConsentModal } from '@/features/loads/components/gps-consent-modal';
@@ -41,6 +43,7 @@ export default function DriverDashboard() {
   const [loads, setLoads] = useState<Load[]>([]);
   const [activeLoads, setActiveLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
+  const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
   const [canSendGpsPermission, setCanSendGpsPermission] = useState(false);
   const [manualGpsToggle, setManualGpsToggle] = useState(() => {
     try {
@@ -75,43 +78,46 @@ export default function DriverDashboard() {
     }
   }, [manualGpsToggle]);
 
-  useEffect(() => {
-    if (user?.id) {
-      getDriverLoads(user.id)
-        .then((all) => {
-          // Sort: in_transit first, then dispatched/awarded, then delivered/completed
-          const priority: Record<string, number> = {
-            in_transit: 0,
-            dispatched: 1,
-            awarded: 2,
-            delivered: 3,
-            completed: 4,
-          };
-          const sorted = [...all].sort(
-            (a, b) => (priority[a.status] ?? 5) - (priority[b.status] ?? 5),
-          );
-          setLoads(sorted.slice(0, 5));
-        })
-        .catch(console.error);
-    }
+  const fetchLoads = useCallback(() => {
+    if (!user?.id) return;
+    const terminal = new Set([
+      'delivered',
+      'cancelled',
+      'tonu',
+      'rejected',
+      'draft',
+      'pending_approval',
+    ]);
+    const priority: Record<string, number> = {
+      in_transit: 0,
+      dispatched: 1,
+      awarded: 2,
+      delivered: 3,
+      completed: 4,
+    };
+    getDriverLoads(user.id)
+      .then((all) => {
+        const sorted = [...all].sort(
+          (a, b) => (priority[a.status] ?? 5) - (priority[b.status] ?? 5),
+        );
+        setLoads(sorted.slice(0, 5));
+        setActiveLoads(all.filter((l) => !terminal.has(l.status)));
+      })
+      .catch(console.error);
   }, [user?.id]);
 
   useEffect(() => {
-    if (user?.id) {
-      // Fetch all assigned loads, filter to GPS-eligible (everything before delivered)
-      const terminal = new Set([
-        'delivered',
-        'cancelled',
-        'tonu',
-        'rejected',
-        'draft',
-        'pending_approval',
-      ]);
-      getDriverLoads(user.id)
-        .then((all) => setActiveLoads(all.filter((l) => !terminal.has(l.status))))
-        .catch(console.error);
-    }
-  }, [user?.id]);
+    fetchLoads();
+  }, [fetchLoads]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    return realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, fetchLoads);
+  }, [user?.id, fetchLoads]);
+
+  const inTransitCount = loads.filter((l) => l.status === 'in_transit').length;
+  const deliveredCount = loads.filter((l) => l.status === 'delivered').length;
+  const completedCount = loads.filter((l) => l.status === 'completed').length;
 
   const name = profile?.full_name ?? 'Driver';
 
@@ -200,6 +206,59 @@ export default function DriverDashboard() {
           </div>
         </button>
 
+        {/* Next Step — highest priority active load */}
+        {(() => {
+          const priorityLoad =
+            activeLoads.find((l) => l.status === 'in_transit') ||
+            activeLoads.find((l) => l.status === 'dispatched') ||
+            activeLoads.find((l) => l.status === 'awarded');
+          if (!priorityLoad) return null;
+
+          const config = {
+            awarded: {
+              label: 'Awaiting Dispatch',
+              sub: 'Your carrier is finalizing paperwork. Stand by.',
+              color: 'bg-fx-surface border-white/[0.08]',
+              textColor: 'text-fx-text-muted',
+              btnClass: 'bg-fx-surface-2 text-fx-text-dim border border-white/[0.08]',
+            },
+            dispatched: {
+              label: 'Navigate to Pickup',
+              sub: `${priorityLoad.originCity}, ${priorityLoad.originState}`,
+              color: 'bg-blue-500/10 border-blue-500/30',
+              textColor: 'text-blue-400',
+              btnClass: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+            },
+            in_transit: {
+              label: 'Deliver & Sign BOL',
+              sub: `${priorityLoad.destCity}, ${priorityLoad.destState}`,
+              color: 'bg-fx-orange/10 border-fx-orange/30',
+              textColor: 'text-fx-orange',
+              btnClass: 'bg-fx-orange text-white',
+            },
+          }[priorityLoad.status as 'awarded' | 'dispatched' | 'in_transit'];
+
+          if (!config) return null;
+
+          return (
+            <button
+              onClick={() => setSelectedLoad(priorityLoad)}
+              className={`w-full text-left p-4 rounded-2xl border mb-1 ${config.color}`}
+            >
+              <p className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-1">
+                Your Next Step · {priorityLoad.loadNumber}
+              </p>
+              <p className={`text-[15px] font-bold mb-0.5 ${config.textColor}`}>{config.label}</p>
+              <p className="text-[12px] text-fx-text-muted mb-3">{config.sub}</p>
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold ${config.btnClass}`}
+              >
+                Open Load →
+              </span>
+            </button>
+          );
+        })()}
+
         {/* Stats */}
         <div>
           <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
@@ -217,25 +276,25 @@ export default function DriverDashboard() {
               icon={<Package size={16} />}
             />
             <StatCard
-              label="Avg Transit"
-              value="2.1d"
-              trend="down"
-              trendValue="-0.5d vs last month"
+              label="In Transit"
+              value={String(inTransitCount)}
+              trend="flat"
+              trendValue="currently moving"
               icon={<Clock size={16} />}
               highlight
             />
             <StatCard
-              label="On-Time"
-              value="96%"
+              label="Delivered"
+              value={String(deliveredCount)}
               trend="up"
-              trendValue="Above target"
+              trendValue="completed deliveries"
               icon={<CheckCircle size={16} />}
             />
             <StatCard
-              label="Avg Rate"
-              value="$2.74"
-              trend="down"
-              trendValue="-$0.12 vs avg"
+              label="Completed"
+              value={String(completedCount)}
+              trend="up"
+              trendValue="fully closed"
               icon={<TrendingDown size={16} />}
             />
           </div>
@@ -264,7 +323,7 @@ export default function DriverDashboard() {
                 <div
                   key={load.id}
                   className="p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/track/${load.loadNumber}`)}
+                  onClick={() => setSelectedLoad(load)}
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-0.5">
@@ -300,7 +359,20 @@ export default function DriverDashboard() {
                       })}
                     </p>
                   </div>
-                  <span className="text-fx-text-dim">›</span>
+                  <div className="flex items-center gap-2">
+                    {load.status === 'in_transit' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/track/${load.loadNumber}`);
+                        }}
+                        className="text-[11px] font-semibold text-fx-orange"
+                      >
+                        Track →
+                      </button>
+                    )}
+                    <span className="text-fx-text-dim">›</span>
+                  </div>
                 </div>
               ))
             )}
@@ -355,6 +427,20 @@ export default function DriverDashboard() {
         notifications={notifications}
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
+        onNotificationClick={async (n) => {
+          if (n.load_id) {
+            setNotifsOpen(false);
+            const found = loads.find((l) => l.id === n.load_id) ?? (await getLoadById(n.load_id));
+            if (found) setSelectedLoad(found);
+          }
+        }}
+      />
+
+      <LoadDetailSheet
+        load={selectedLoad}
+        onClose={() => setSelectedLoad(null)}
+        showBidButton={false}
+        role="driver"
       />
 
       <GpsConsentModal

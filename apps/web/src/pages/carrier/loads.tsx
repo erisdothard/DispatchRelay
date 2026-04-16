@@ -13,6 +13,7 @@ import { useLoads } from '@/features/loads/hooks/use-loads';
 import { useMatchScores } from '@/features/loads/hooks/use-match-scores';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyActiveLoads } from '@/services/loads.service';
+import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { cn } from '@/shared/lib/utils';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
@@ -53,6 +54,13 @@ export default function CarrierLoadsPage() {
   useEffect(() => {
     refreshMyLoads();
   }, [refreshMyLoads]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    return realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, () => {
+      refreshMyLoads();
+    });
+  }, [user?.id, refreshMyLoads]);
 
   // All loads tab
   const sevenDaysAgo = new Date();

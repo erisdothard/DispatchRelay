@@ -134,8 +134,8 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
   // Collapsible enterprise detail sections
   const [showContactInfo, setShowContactInfo] = useState(false);
   const [showApptTimes, setShowApptTimes] = useState(false);
-  const [showFreightDetails, setShowFreightDetails] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [showFreightDetails, setShowFreightDetails] = useState(true);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   function set<K extends keyof typeof EMPTY_FORM>(key: K, val: (typeof EMPTY_FORM)[K]) {
     setForm((f) => ({ ...f, [key]: val }));

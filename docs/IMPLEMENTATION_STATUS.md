@@ -1,6 +1,6 @@
 # FreightX — Implementation Status
 
-**Last Updated:** 2026-03-30
+**Last Updated:** 2026-04-12
 **Audit basis:** Source code in `apps/web/src/`, `database/migrations/`, `supabase/functions/`, `apps/web/package.json`, `apps/web/tailwind.config.ts`
 
 This document records what is actually built. Do not use it as a roadmap. For unbuilt items, see `DEVELOPMENT_ROADMAP.md`. For the full feature inventory, see `FEATURE_CATALOG.md`.
@@ -50,6 +50,8 @@ This document records what is actually built. Do not use it as a roadmap. For un
 - Company member roles: owner, admin, dispatcher, accounting, viewer
 - Driver role linked to carrier company (separate from owner/admin)
 - Avatar upload to Supabase Storage
+- Broker+carrier hybrid role capabilities with view switcher
+- Company logo upload and display (owner-only, auto-save to Supabase Storage)
 
 ### Load Board
 
@@ -67,6 +69,19 @@ This document records what is actually built. Do not use it as a roadmap. For un
 - Role-specific load pages: carrier (`/carrier/loads`), broker (`/broker/loads`), shipper (`/shipper/loads`), driver (`/driver/loads`)
 - Carrier load board tabs: My Loads / All Loads / Matches
 - Co-driver assignment (`040-co-driver.sql`)
+- Load editing — update posted loads before bid acceptance
+- Broker can edit loads until a bid is accepted
+- Canceled loads excluded from `getLoads()` query
+- Canceled load UX improvements across all role views
+- Date-based filtering for recent loads
+- Quick load preview on dashboard recent loads cards
+- "All Loads" as default tab on carrier load board
+- Assign driver directly from load detail sheet
+- Allow dispatch before driver assignment
+- Drivers can mark loads as in transit
+- Dispatch permissions removed from broker role
+- Load cancellation restricted to broker/shipper only
+- Enterprise load detail enhancement (richer detail sheet)
 
 ### AI-Powered Load Search
 
@@ -116,12 +131,18 @@ This document records what is actually built. Do not use it as a roadmap. For un
 - SVG teardrop load pins with route glow
 - Animated truck markers with direction indicator
 - `DwellTimeCard` component showing dwell status on tracking page
+- Enterprise GPS architecture — security hardening, geocoding, fleet tracking
 
 ### Documents
 
 - Upload and store: BOL, POD, rate confirmation, insurance certificate, W-9
 - Document viewer
 - Documents page for driver and carrier/broker verification
+- BOL electronic signature triggered on delivered status
+- "View Signed BOL" button shown only when BOL exists and is signed
+- Signature embedded into BOL PDF for portable proof
+- Document uploads locked after BOL is signed
+- BOL signature bug fix — restrict load cancellation after signing
 
 ### Carrier Verification
 
@@ -206,6 +227,8 @@ This document records what is actually built. Do not use it as a roadmap. For un
 - Broker dashboard
 - Shipper dashboard
 - Driver dashboard
+- View switcher on dashboards for broker+carrier hybrid users
+- Quick load preview cards on all role dashboards
 
 ### Driver-Specific Tools
 

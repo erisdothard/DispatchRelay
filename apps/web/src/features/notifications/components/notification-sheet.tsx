@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Bell, Package, MessageSquare, Zap, CheckCheck, Radio } from 'lucide-react';
+import { Bell, Package, MessageSquare, Zap, CheckCheck, Radio, FileCheck } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import type { AppNotification } from '../hooks/use-notifications';
 
@@ -12,6 +12,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
   load_booked: <Package size={14} className="text-green-400" />,
   load_cancelled: <Package size={14} className="text-red-400" />,
   gps_request: <Radio size={14} className="text-green-400" />,
+  bol_signed: <FileCheck size={14} className="text-green-400" />,
 };
 
 function timeAgo(iso: string): string {
@@ -29,6 +30,7 @@ interface NotificationSheetProps {
   notifications: AppNotification[];
   unreadCount: number;
   onMarkAllRead: () => void;
+  onNotificationClick?: (notification: AppNotification) => void;
 }
 
 export function NotificationSheet({
@@ -37,6 +39,7 @@ export function NotificationSheet({
   notifications,
   unreadCount,
   onMarkAllRead,
+  onNotificationClick,
 }: NotificationSheetProps) {
   // Mark all read when sheet opens
   useEffect(() => {
@@ -69,13 +72,15 @@ export function NotificationSheet({
       ) : (
         <div className="space-y-2">
           {notifications.map((n) => (
-            <div
+            <button
               key={n.id}
-              className={`flex items-start gap-3 p-3 rounded-xl transition-colors ${
+              type="button"
+              onClick={() => onNotificationClick?.(n)}
+              className={`w-full text-left flex items-start gap-3 p-3 rounded-xl transition-colors ${
                 !n.read
                   ? 'bg-fx-orange/5 border border-fx-orange/15'
                   : 'bg-fx-surface border border-fx-border'
-              }`}
+              } ${n.load_id && onNotificationClick ? 'cursor-pointer hover:bg-fx-surface-2' : ''}`}
             >
               <div className="w-8 h-8 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0 mt-0.5">
                 {TYPE_ICON[n.type] ?? <Bell size={14} className="text-fx-text-muted" />}
@@ -94,7 +99,7 @@ export function NotificationSheet({
                 {n.body && <p className="text-xs text-fx-text-dim mt-0.5 leading-snug">{n.body}</p>}
               </div>
               {!n.read && <div className="w-2 h-2 rounded-full bg-fx-orange shrink-0 mt-1.5" />}
-            </div>
+            </button>
           ))}
         </div>
       )}

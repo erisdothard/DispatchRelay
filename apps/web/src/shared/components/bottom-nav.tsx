@@ -4,15 +4,16 @@ import {
   Search,
   MessageSquare,
   User,
-  Users,
   Package,
-  BarChart2,
   FileText,
   DollarSign,
+  MapPin,
+  Truck,
+  PlusCircle,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
-type NavRole = 'carrier' | 'broker' | 'driver';
+type NavRole = 'carrier' | 'broker' | 'driver' | 'shipper';
 
 interface NavItem {
   label: string;
@@ -22,16 +23,16 @@ interface NavItem {
 
 const carrierNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/carrier' },
-  { label: 'Loads', icon: <Search size={22} />, path: '/carrier/loads' },
-  { label: 'Team', icon: <Users size={22} />, path: '/carrier/team' },
+  { label: 'Load Board', icon: <Search size={22} />, path: '/carrier/loads' },
+  { label: 'Fleet', icon: <Truck size={22} />, path: '/carrier/fleet' },
   { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
 
 const brokerNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/broker' },
-  { label: 'Loads', icon: <Package size={22} />, path: '/broker/loads' },
-  { label: 'Team', icon: <Users size={22} />, path: '/carrier/team' },
+  { label: 'My Loads', icon: <Package size={22} />, path: '/broker/loads' },
+  { label: 'Post Load', icon: <PlusCircle size={22} />, path: '/broker/loads?post=1' },
   { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
@@ -44,16 +45,24 @@ const driverNav: NavItem[] = [
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
 
+const shipperNav: NavItem[] = [
+  { label: 'Home', icon: <Home size={22} />, path: '/shipper' },
+  { label: 'Shipments', icon: <Package size={22} />, path: '/shipper/loads' },
+  { label: 'Track', icon: <MapPin size={22} />, path: '/track' },
+  { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
+  { label: 'Profile', icon: <User size={22} />, path: '/profile' },
+];
+
 const navByRole: Record<NavRole, NavItem[]> = {
   carrier: carrierNav,
   broker: brokerNav,
   driver: driverNav,
+  shipper: shipperNav,
 };
 
-export function BottomNav({ role }: { role: NavRole | 'shipper' }) {
+export function BottomNav({ role }: { role: NavRole }) {
   const location = useLocation();
-  const resolvedRole: NavRole = role === 'shipper' ? 'driver' : role;
-  const items = navByRole[resolvedRole];
+  const items = navByRole[role];
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50">
@@ -65,10 +74,16 @@ export function BottomNav({ role }: { role: NavRole | 'shipper' }) {
 
       <div className="relative flex items-center justify-around px-1 pb-safe pt-2 h-[68px]">
         {items.map((item) => {
+          const basePath = item.path.split('?')[0];
           const isActive =
-            item.path === '/carrier' || item.path === '/broker' || item.path === '/driver'
-              ? location.pathname === item.path
-              : location.pathname.startsWith(item.path);
+            basePath === '/carrier' ||
+            basePath === '/broker' ||
+            basePath === '/driver' ||
+            basePath === '/shipper'
+              ? location.pathname === basePath
+              : item.label === 'Post Load'
+                ? false
+                : location.pathname.startsWith(basePath);
 
           return (
             <Link

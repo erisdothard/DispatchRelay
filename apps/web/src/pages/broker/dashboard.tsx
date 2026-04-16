@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, TrendingUp, Package, DollarSign, Clock } from 'lucide-react';
+import { Search, TrendingUp, Package, DollarSign, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -7,7 +7,7 @@ import { ViewSwitcher } from '@/shared/components/view-switcher';
 import { StatCard } from '@/shared/components/stat-card';
 import { LoadCard } from '@/features/loads/components/load-card';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLoads } from '@/services/loads.service';
+import { getLoads, getLoadById } from '@/services/loads.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { CarrierRelationshipsSheet } from '@/features/carriers/components/carrier-relationships-sheet';
@@ -24,7 +24,7 @@ export default function BrokerDashboard() {
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
   useEffect(() => {
-    getLoads().then(setLoads).catch(console.error);
+    getLoads({ postedBy: user?.id }).then(setLoads).catch(console.error);
   }, [user]);
 
   const name = profile?.full_name ?? 'Broker';
@@ -36,6 +36,10 @@ export default function BrokerDashboard() {
   const totalRevenue = loads.reduce((sum, l) => sum + l.rateUsd, 0);
   const revenueLabel =
     totalRevenue >= 1000 ? `$${(totalRevenue / 1000).toFixed(1)}k` : `$${totalRevenue}`;
+  const deliveredLoads = loads.filter((l) => ['delivered', 'completed'].includes(l.status)).length;
+  const inProgressLoads = loads.filter((l) =>
+    ['awarded', 'dispatched', 'in_transit'].includes(l.status),
+  ).length;
   // Exclude canceled loads from recent loads
   const recentLoads = loads.filter((l) => l.status !== 'cancelled').slice(0, 3);
 
@@ -89,17 +93,17 @@ export default function BrokerDashboard() {
               highlight
             />
             <StatCard
-              label="Avg Transit"
-              value="1.8d"
-              trend="down"
-              trendValue="-0.3d improved"
-              icon={<Clock size={16} />}
+              label="Delivered"
+              value={String(deliveredLoads || '—')}
+              trend="up"
+              trendValue="completed loads"
+              icon={<CheckCircle size={16} />}
             />
             <StatCard
-              label="On-Time Rate"
-              value="94%"
-              trend="up"
-              trendValue="Industry avg 89%"
+              label="In Progress"
+              value={String(inProgressLoads || '—')}
+              trend="flat"
+              trendValue="active loads"
               icon={<TrendingUp size={16} />}
             />
           </div>
@@ -160,6 +164,13 @@ export default function BrokerDashboard() {
         notifications={notifications}
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
+        onNotificationClick={async (n) => {
+          if (n.load_id) {
+            setNotifsOpen(false);
+            const found = loads.find((l) => l.id === n.load_id) ?? (await getLoadById(n.load_id));
+            if (found) setSelectedLoad(found);
+          }
+        }}
       />
 
       <CarrierRelationshipsSheet

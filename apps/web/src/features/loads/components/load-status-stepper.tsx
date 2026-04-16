@@ -68,8 +68,11 @@ export function LoadStatusStepper({
 
   const currentIdx = STEPS.findIndex((s) => s.status === currentStatus);
   const nextStatus = NEXT_STATUS[currentStatus];
+  const gatedByRateCon = nextStatus === 'dispatched' && !rateConSigned && role === 'carrier';
   const canAdvance =
-    nextStatus !== undefined && (ROLE_CAN_ADVANCE[role] ?? []).includes(nextStatus);
+    nextStatus !== undefined &&
+    (ROLE_CAN_ADVANCE[role] ?? []).includes(nextStatus) &&
+    !gatedByRateCon;
   const needsDriver =
     nextStatus !== undefined && REQUIRES_DRIVER.includes(nextStatus) && !hasDriverAssigned;
 
@@ -80,13 +83,6 @@ export function LoadStatusStepper({
         'Assign a driver before advancing to ' +
           (STEPS.find((s) => s.status === nextStatus)?.label ?? nextStatus),
       );
-      return;
-    }
-
-    // Require signed rate confirmation before dispatch (carrier role only)
-    if (nextStatus === 'dispatched' && !rateConSigned && role === 'carrier') {
-      onRateConRequired?.();
-      setError('Rate confirmation must be signed before dispatch.');
       return;
     }
 

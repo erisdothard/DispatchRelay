@@ -9,6 +9,7 @@ import {
   Loader2,
   Check,
   ImagePlus,
+  Trash2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -21,6 +22,7 @@ import {
   uploadDocument,
   markBolSigned,
   notifyBolSignedParties,
+  deleteDocument,
 } from '@/services/documents.service';
 import { BolSignatureSheet } from '@/features/documents/components/bol-signature-sheet';
 import { SignedBolViewer } from '@/features/documents/components/signed-bol-viewer';
@@ -281,6 +283,7 @@ export default function DriverDocumentsPage() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [uploadType, setUploadType] = useState<DocumentType>('proof_of_delivery');
   const [justUploaded, setJustUploaded] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   // BOL signing state (canvas)
   const [signingDoc, setSigningDoc] = useState<{
@@ -368,6 +371,19 @@ export default function DriverDocumentsPage() {
       cameraInputRef.current?.click();
     } else {
       fileInputRef.current?.click();
+    }
+  }
+
+  async function handleDeleteDoc(docId: string) {
+    if (!window.confirm('Delete this document?')) return;
+    setDeleting(docId);
+    try {
+      await deleteDocument(docId);
+      fetchAll();
+    } catch (e) {
+      console.error('Delete failed', e);
+    } finally {
+      setDeleting(null);
     }
   }
 
@@ -477,30 +493,44 @@ export default function DriverDocumentsPage() {
                           </div>
 
                           {/* Actions */}
-                          {isBolUnsigned && isActive ? (
+                          <div className="flex items-center gap-2 shrink-0">
+                            {isBolUnsigned && isActive ? (
+                              <button
+                                onClick={() => setSigningDoc({ doc, load })}
+                                className="h-8 px-3 rounded-xl bg-fx-orange text-white text-[11px] font-bold flex items-center gap-1.5"
+                              >
+                                <PenLine size={12} /> Get Signature
+                              </button>
+                            ) : doc.type === 'bill_of_lading' && doc.signed_at ? (
+                              <button
+                                onClick={() => setViewingSignedBol({ doc, load })}
+                                className="h-8 px-3 rounded-xl bg-green-500/15 border border-green-500/30 text-green-400 text-[11px] font-bold flex items-center gap-1.5"
+                              >
+                                <CheckCircle2 size={12} /> View Signed BOL
+                              </button>
+                            ) : (
+                              <a
+                                href={doc.file_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-fx-text-dim hover:text-fx-orange transition-colors"
+                              >
+                                <Download size={14} />
+                              </a>
+                            )}
                             <button
-                              onClick={() => setSigningDoc({ doc, load })}
-                              className="h-8 px-3 rounded-xl bg-fx-orange text-white text-[11px] font-bold flex items-center gap-1.5 shrink-0"
+                              onClick={() => handleDeleteDoc(doc.id)}
+                              disabled={deleting === doc.id}
+                              className="text-fx-text-dim hover:text-red-400 transition-colors disabled:opacity-40"
+                              title="Delete document"
                             >
-                              <PenLine size={12} /> Get Signature
+                              {deleting === doc.id ? (
+                                <span className="w-3.5 h-3.5 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin inline-block" />
+                              ) : (
+                                <Trash2 size={14} />
+                              )}
                             </button>
-                          ) : doc.type === 'bill_of_lading' && doc.signed_at ? (
-                            <button
-                              onClick={() => setViewingSignedBol({ doc, load })}
-                              className="h-8 px-3 rounded-xl bg-green-500/15 border border-green-500/30 text-green-400 text-[11px] font-bold flex items-center gap-1.5 shrink-0"
-                            >
-                              <CheckCircle2 size={12} /> View Signed BOL
-                            </button>
-                          ) : (
-                            <a
-                              href={doc.file_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-fx-text-dim hover:text-fx-orange transition-colors shrink-0"
-                            >
-                              <Download size={14} />
-                            </a>
-                          )}
+                          </div>
                         </div>
                       );
                     })

@@ -43,7 +43,7 @@ import { RateConSignatureSheet } from '@/features/documents/components/rate-con-
 import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
 import { bookNow } from '@/services/bids.service';
-import { updateLoad } from '@/services/loads.service';
+import { updateLoad, nudgeCarrier, confirmReceipt } from '@/services/loads.service';
 import { generateRateCon } from '@/features/bookings/lib/generate-rate-con';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
@@ -119,6 +119,8 @@ export function LoadDetailSheet({
   const [loadingBol, setLoadingBol] = useState(false);
   const [hasSignedBol, setHasSignedBol] = useState(false);
   const [rateConSigned, setRateConSigned] = useState(false);
+  const [rateConDownloadUrl, setRateConDownloadUrl] = useState<string | null>(null);
+  const [bolDownloadUrl, setBolDownloadUrl] = useState<string | null>(null);
   const [rateConOpen, setRateConOpen] = useState(false);
   const [accessorialsOpen, setAccessorialsOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<LoadStatus | null>(null);
@@ -127,6 +129,11 @@ export function LoadDetailSheet({
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [assignDriverOpen, setAssignDriverOpen] = useState(false);
+  const [nudgeSent, setNudgeSent] = useState(false);
+  const [receiptConfirmed, setReceiptConfirmed] = useState(false);
+  const [confirmingReceipt, setConfirmingReceipt] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const toggle = (key: string) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
   // Profit estimator
   const [profitExpanded, setProfitExpanded] = useState(false);
   const [costPerMile, setCostPerMile] = useState<string>(
@@ -148,12 +155,18 @@ export function LoadDetailSheet({
         const docs = await getDocumentsForLoad(loadId);
         const signedRateCon = docs.find((d) => d.type === 'rate_confirmation' && !!d.signed_at);
         setRateConSigned(!!signedRateCon);
+        setRateConDownloadUrl(signedRateCon?.file_url ?? null);
+
+        const signedBol = docs.find((d) => d.type === 'bill_of_lading' && !!d.signed_at);
+        setBolDownloadUrl(signedBol?.file_url ?? null);
       } catch {
         setHasSignedBol(false);
       }
     }
 
     checkDocStatus();
+    setNudgeSent(false);
+    setReceiptConfirmed(false);
   }, [load?.id]);
 
   async function handleViewSignedBol() {
@@ -167,6 +180,29 @@ export function LoadDetailSheet({
       // silently ignore
     } finally {
       setLoadingBol(false);
+    }
+  }
+
+  async function handleNudgeCarrier() {
+    if (!load?.assigneeId) return;
+    try {
+      await nudgeCarrier(load.id, load.assigneeId, load.loadNumber);
+      setNudgeSent(true);
+    } catch {
+      // silently ignore — notification failure shouldn't block the UI
+    }
+  }
+
+  async function handleConfirmReceipt() {
+    if (!load?.postedBy) return;
+    setConfirmingReceipt(true);
+    try {
+      await confirmReceipt(load.id, load.postedBy, load.loadNumber);
+      setReceiptConfirmed(true);
+    } catch {
+      // silently ignore
+    } finally {
+      setConfirmingReceipt(false);
     }
   }
 
@@ -393,6 +429,33 @@ export function LoadDetailSheet({
           </div>
         )}
 
+        {/* Broker: waiting for carrier to dispatch */}
+        {isBroker && liveStatus === 'awarded' && (
+          <div className="mb-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+            <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">
+              Waiting on Carrier
+            </p>
+            <p className="text-[12px] text-fx-text-muted mb-3">
+              <span className="font-semibold text-fx-text">
+                {load.assigneeName ?? 'The carrier'}
+              </span>{' '}
+              needs to sign the rate confirmation and dispatch. Send a reminder if they haven't
+              acted.
+            </p>
+            {load.assigneeId ? (
+              <button
+                onClick={handleNudgeCarrier}
+                disabled={nudgeSent}
+                className="w-full h-10 rounded-xl text-sm font-bold border border-amber-500/40 text-amber-400 disabled:opacity-50 transition-opacity"
+              >
+                {nudgeSent ? '✓ Reminder Sent' : 'Nudge Carrier'}
+              </button>
+            ) : (
+              <p className="text-[11px] text-fx-text-dim">No carrier contact available.</p>
+            )}
+          </div>
+        )}
+
         {/* Rate Con CTA - carrier must sign before dispatch */}
         {isCarrier && liveStatus === 'awarded' && !rateConSigned && (
           <div className="mb-5">
@@ -422,18 +485,20 @@ export function LoadDetailSheet({
           </div>
         )}
 
-        {/* Assign Driver - for carrier on awarded/dispatched loads without driver */}
-        {isCarrier && ['awarded', 'dispatched'].includes(liveStatus) && !load.assignedDriverId && (
-          <div className="mb-5">
-            <button
-              onClick={() => setAssignDriverOpen(true)}
-              className="w-full h-11 rounded-2xl border border-fx-orange/40 text-sm font-semibold text-fx-orange flex items-center justify-center gap-2 hover:bg-fx-orange/5 transition-colors"
-            >
-              <UserCheck size={14} />
-              Assign Driver
-            </button>
-          </div>
-        )}
+        {/* Assign Driver - only after rate con signed (awarded) or when dispatched/in_transit */}
+        {isCarrier &&
+          ['awarded', 'dispatched', 'in_transit'].includes(liveStatus) &&
+          (liveStatus !== 'awarded' || rateConSigned) && (
+            <div className="mb-5">
+              <button
+                onClick={() => setAssignDriverOpen(true)}
+                className="w-full h-11 rounded-2xl border border-fx-orange/40 text-sm font-semibold text-fx-orange flex items-center justify-center gap-2 hover:bg-fx-orange/5 transition-colors"
+              >
+                <UserCheck size={14} />
+                {load.assignedDriverId ? 'Reassign Driver' : 'Assign Driver'}
+              </button>
+            </div>
+          )}
 
         {/* Shipper: carrier assigned info */}
         {isShipper && ACTIVE_STATUSES.includes(liveStatus) && load.assigneeName && (
@@ -464,6 +529,43 @@ export function LoadDetailSheet({
             </p>
           </div>
         )}
+        {isShipper && liveStatus === 'dispatched' && (
+          <div className="mb-5 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+            <p className="text-xs font-bold text-blue-400 mb-1">On the Way to Pickup</p>
+            <p className="text-[11px] text-fx-text-dim">
+              Your carrier is en route to the pickup location. You'll get an update when they're in
+              transit.
+            </p>
+          </div>
+        )}
+        {isShipper && liveStatus === 'in_transit' && (
+          <div className="mb-5 p-3 rounded-xl bg-fx-orange/10 border border-fx-orange/20">
+            <p className="text-xs font-bold text-fx-orange mb-1">Shipment In Transit</p>
+            <p className="text-[11px] text-fx-text-dim">
+              Your load is on the road. Tap "Track Shipment" below for live updates.
+            </p>
+          </div>
+        )}
+        {isShipper && liveStatus === 'delivered' && !receiptConfirmed && (
+          <div className="mb-5 p-3 rounded-xl bg-green-500/10 border border-green-500/20">
+            <p className="text-xs font-bold text-green-400 mb-1">Delivered — Action Required</p>
+            <p className="text-[11px] text-fx-text-dim">
+              Your shipment has been delivered. Please confirm receipt so the broker can close this
+              load.
+            </p>
+          </div>
+        )}
+        {isShipper &&
+          (liveStatus === 'completed' || (liveStatus === 'delivered' && receiptConfirmed)) && (
+            <div className="mb-5 p-3 rounded-xl bg-green-500/10 border border-green-500/20">
+              <p className="text-xs font-bold text-green-400 mb-1">✓ Delivery Confirmed</p>
+              <p className="text-[11px] text-fx-text-dim">
+                {liveStatus === 'completed'
+                  ? 'This load has been fully closed out.'
+                  : 'Your broker has been notified and will close this load shortly.'}
+              </p>
+            </div>
+          )}
 
         {/* Detail rows */}
         <div className="mb-5">
@@ -512,57 +614,51 @@ export function LoadDetailSheet({
             <InfoRow icon={<Package size={14} />} label="Load #" value={load.loadNumber} />
           )}
 
-          {/* Additional freight details - show after award */}
-          {ACTIVE_STATUSES.includes(liveStatus) && (
-            <>
-              {load.freight_class && (
-                <InfoRow
-                  icon={<Package size={14} />}
-                  label="Freight Class"
-                  value={load.freight_class}
-                />
-              )}
-              {load.packaging_type && (
-                <InfoRow
-                  icon={<Package size={14} />}
-                  label="Packaging"
-                  value={load.packaging_type}
-                />
-              )}
-              {load.piecesCount && (
-                <InfoRow
-                  icon={<Package size={14} />}
-                  label="Pieces"
-                  value={String(load.piecesCount)}
-                />
-              )}
-              {load.palletsCount && (
-                <InfoRow
-                  icon={<Package size={14} />}
-                  label="Pallets"
-                  value={String(load.palletsCount)}
-                />
-              )}
-              {(load.lengthIn || load.widthIn || load.heightIn) && (
-                <InfoRow
-                  icon={<Package size={14} />}
-                  label="Dimensions"
-                  value={formatDimensions(load.lengthIn, load.widthIn, load.heightIn)}
-                />
-              )}
-              {typeof load.stackable === 'boolean' && (
-                <InfoRow
-                  icon={<Package size={14} />}
-                  label="Stackable"
-                  value={load.stackable ? 'Yes' : 'No'}
-                />
-              )}
-            </>
-          )}
+          {/* Additional freight details — always visible */}
+          <>
+            {load.freight_class && (
+              <InfoRow
+                icon={<Package size={14} />}
+                label="Freight Class"
+                value={load.freight_class}
+              />
+            )}
+            {load.packaging_type && (
+              <InfoRow icon={<Package size={14} />} label="Packaging" value={load.packaging_type} />
+            )}
+            {load.piecesCount && (
+              <InfoRow
+                icon={<Package size={14} />}
+                label="Pieces"
+                value={String(load.piecesCount)}
+              />
+            )}
+            {load.palletsCount && (
+              <InfoRow
+                icon={<Package size={14} />}
+                label="Pallets"
+                value={String(load.palletsCount)}
+              />
+            )}
+            {(load.lengthIn || load.widthIn || load.heightIn) && (
+              <InfoRow
+                icon={<Package size={14} />}
+                label="Dimensions"
+                value={formatDimensions(load.lengthIn, load.widthIn, load.heightIn)}
+              />
+            )}
+            {typeof load.stackable === 'boolean' && (
+              <InfoRow
+                icon={<Package size={14} />}
+                label="Stackable"
+                value={load.stackable ? 'Yes' : 'No'}
+              />
+            )}
+          </>
         </div>
 
         {/* Profit Estimator - carrier only, any load with a rate */}
-        {isCarrier && load.rateUsd > 0 && (
+        {(isCarrier || role === 'driver') && load.rateUsd > 0 && (
           <div className="mb-5">
             <button
               onClick={() => setProfitExpanded((e) => !e)}
@@ -647,107 +743,136 @@ export function LoadDetailSheet({
           </div>
         )}
 
-        {/* Contact Information - Show for carriers/brokers on awarded+ loads */}
-        {(isCarrier || isBroker) &&
+        {/* Contact Information - Show for carriers/brokers/drivers on awarded+ loads */}
+        {(isCarrier || isBroker || role === 'driver') &&
           ACTIVE_STATUSES.includes(liveStatus) &&
           (load.shipperName || load.receiverName) && (
             <div className="mb-5">
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
-                Contact Information
-              </p>
+              <button
+                onClick={() => toggle('contact')}
+                className="w-full flex items-center justify-between mb-3"
+              >
+                <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
+                  Contact Information
+                </p>
+                {expanded.contact ? (
+                  <ChevronUp size={14} className="text-fx-text-dim" />
+                ) : (
+                  <ChevronDown size={14} className="text-fx-text-dim" />
+                )}
+              </button>
+              {expanded.contact && (
+                <>
+                  {/* Shipper Contact */}
+                  {load.shipperName && (
+                    <div className="mb-3 p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+                      <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-1">
+                        Shipper
+                      </p>
+                      <p className="text-sm font-bold text-fx-text">{load.shipperName}</p>
+                      {load.shipperContactName && (
+                        <p className="text-xs text-fx-text-muted mt-1">
+                          Contact: {load.shipperContactName}
+                        </p>
+                      )}
+                      {load.shipperContactPhone && (
+                        <a
+                          href={`tel:${load.shipperContactPhone}`}
+                          className="text-xs text-fx-orange block mt-1"
+                        >
+                          {load.shipperContactPhone}
+                        </a>
+                      )}
+                      {load.shipperContactEmail && (
+                        <a
+                          href={`mailto:${load.shipperContactEmail}`}
+                          className="text-xs text-fx-orange block mt-0.5"
+                        >
+                          {load.shipperContactEmail}
+                        </a>
+                      )}
+                    </div>
+                  )}
 
-              {/* Shipper Contact */}
-              {load.shipperName && (
-                <div className="mb-3 p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
-                  <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-1">Shipper</p>
-                  <p className="text-sm font-bold text-fx-text">{load.shipperName}</p>
-                  {load.shipperContactName && (
-                    <p className="text-xs text-fx-text-muted mt-1">
-                      Contact: {load.shipperContactName}
-                    </p>
+                  {/* Receiver Contact */}
+                  {load.receiverName && (
+                    <div className="p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+                      <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-1">
+                        Receiver
+                      </p>
+                      <p className="text-sm font-bold text-fx-text">{load.receiverName}</p>
+                      {load.receiverContactName && (
+                        <p className="text-xs text-fx-text-muted mt-1">
+                          Contact: {load.receiverContactName}
+                        </p>
+                      )}
+                      {load.receiverContactPhone && (
+                        <a
+                          href={`tel:${load.receiverContactPhone}`}
+                          className="text-xs text-fx-orange block mt-1"
+                        >
+                          {load.receiverContactPhone}
+                        </a>
+                      )}
+                      {load.receiverContactEmail && (
+                        <a
+                          href={`mailto:${load.receiverContactEmail}`}
+                          className="text-xs text-fx-orange block mt-0.5"
+                        >
+                          {load.receiverContactEmail}
+                        </a>
+                      )}
+                    </div>
                   )}
-                  {load.shipperContactPhone && (
-                    <a
-                      href={`tel:${load.shipperContactPhone}`}
-                      className="text-xs text-fx-orange block mt-1"
-                    >
-                      {load.shipperContactPhone}
-                    </a>
-                  )}
-                  {load.shipperContactEmail && (
-                    <a
-                      href={`mailto:${load.shipperContactEmail}`}
-                      className="text-xs text-fx-orange block mt-0.5"
-                    >
-                      {load.shipperContactEmail}
-                    </a>
-                  )}
-                </div>
-              )}
-
-              {/* Receiver Contact */}
-              {load.receiverName && (
-                <div className="p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
-                  <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-1">Receiver</p>
-                  <p className="text-sm font-bold text-fx-text">{load.receiverName}</p>
-                  {load.receiverContactName && (
-                    <p className="text-xs text-fx-text-muted mt-1">
-                      Contact: {load.receiverContactName}
-                    </p>
-                  )}
-                  {load.receiverContactPhone && (
-                    <a
-                      href={`tel:${load.receiverContactPhone}`}
-                      className="text-xs text-fx-orange block mt-1"
-                    >
-                      {load.receiverContactPhone}
-                    </a>
-                  )}
-                  {load.receiverContactEmail && (
-                    <a
-                      href={`mailto:${load.receiverContactEmail}`}
-                      className="text-xs text-fx-orange block mt-0.5"
-                    >
-                      {load.receiverContactEmail}
-                    </a>
-                  )}
-                </div>
+                </>
               )}
             </div>
           )}
 
-        {/* Appointment Windows - Show for carriers/drivers on awarded+ loads */}
-        {(isCarrier || role === 'driver') &&
+        {/* Appointment Windows - Show for carriers/brokers/drivers on awarded+ loads */}
+        {(isCarrier || isBroker || role === 'driver') &&
           ACTIVE_STATUSES.includes(liveStatus) &&
           (load.pickupApptStart ||
             load.pickupApptEnd ||
             load.deliveryApptStart ||
             load.deliveryApptEnd) && (
             <div className="mb-5">
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
-                Appointment Times
-              </p>
-
-              {(load.pickupApptStart || load.pickupApptEnd) && (
-                <InfoRow
-                  icon={<Clock size={14} />}
-                  label="Pickup Window"
-                  value={formatApptWindow(load.pickupApptStart, load.pickupApptEnd)}
-                />
-              )}
-
-              {(load.deliveryApptStart || load.deliveryApptEnd) && (
-                <InfoRow
-                  icon={<Clock size={14} />}
-                  label="Delivery Window"
-                  value={formatApptWindow(load.deliveryApptStart, load.deliveryApptEnd)}
-                />
+              <button
+                onClick={() => toggle('appointments')}
+                className="w-full flex items-center justify-between mb-3"
+              >
+                <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
+                  Appointment Times
+                </p>
+                {expanded.appointments ? (
+                  <ChevronUp size={14} className="text-fx-text-dim" />
+                ) : (
+                  <ChevronDown size={14} className="text-fx-text-dim" />
+                )}
+              </button>
+              {expanded.appointments && (
+                <>
+                  {(load.pickupApptStart || load.pickupApptEnd) && (
+                    <InfoRow
+                      icon={<Clock size={14} />}
+                      label="Pickup Window"
+                      value={formatApptWindow(load.pickupApptStart, load.pickupApptEnd)}
+                    />
+                  )}
+                  {(load.deliveryApptStart || load.deliveryApptEnd) && (
+                    <InfoRow
+                      icon={<Clock size={14} />}
+                      label="Delivery Window"
+                      value={formatApptWindow(load.deliveryApptStart, load.deliveryApptEnd)}
+                    />
+                  )}
+                </>
               )}
             </div>
           )}
 
-        {/* Reference Numbers & Instructions - Show for carriers/brokers on awarded+ loads */}
-        {(isCarrier || isBroker) &&
+        {/* Reference Numbers & Instructions - Show for carriers/brokers/drivers on awarded+ loads */}
+        {(isCarrier || isBroker || role === 'driver') &&
           ACTIVE_STATUSES.includes(liveStatus) &&
           (load.po_number ||
             load.shipper_reference ||
@@ -755,54 +880,67 @@ export function LoadDetailSheet({
             load.loadingNotes ||
             load.deliveryNotes) && (
             <div className="mb-5">
-              <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
-                Additional Information
-              </p>
-
-              <div className="space-y-3">
-                {load.po_number && (
-                  <InfoRow icon={<FileText size={14} />} label="PO Number" value={load.po_number} />
+              <button
+                onClick={() => toggle('refs')}
+                className="w-full flex items-center justify-between mb-3"
+              >
+                <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
+                  Additional Information
+                </p>
+                {expanded.refs ? (
+                  <ChevronUp size={14} className="text-fx-text-dim" />
+                ) : (
+                  <ChevronDown size={14} className="text-fx-text-dim" />
                 )}
-                {load.shipper_reference && (
-                  <InfoRow
-                    icon={<FileText size={14} />}
-                    label="Shipper Ref"
-                    value={load.shipper_reference}
-                  />
-                )}
-
-                {/* Special Instructions */}
-                {load.specialInstructions && (
-                  <div className="p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
-                    <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-2">
-                      Special Instructions
-                    </p>
-                    <p className="text-xs text-fx-text whitespace-pre-wrap">
-                      {load.specialInstructions}
-                    </p>
-                  </div>
-                )}
-
-                {/* Loading Notes (dock info, gate codes) */}
-                {load.loadingNotes && (
-                  <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20">
-                    <p className="text-[10px] font-bold text-blue-400 uppercase mb-2">
-                      📍 Pickup Location Notes
-                    </p>
-                    <p className="text-xs text-fx-text whitespace-pre-wrap">{load.loadingNotes}</p>
-                  </div>
-                )}
-
-                {/* Delivery Notes */}
-                {load.deliveryNotes && (
-                  <div className="p-3 rounded-xl bg-green-500/5 border border-green-500/20">
-                    <p className="text-[10px] font-bold text-green-400 uppercase mb-2">
-                      🚚 Delivery Location Notes
-                    </p>
-                    <p className="text-xs text-fx-text whitespace-pre-wrap">{load.deliveryNotes}</p>
-                  </div>
-                )}
-              </div>
+              </button>
+              {expanded.refs && (
+                <div className="space-y-3">
+                  {load.po_number && (
+                    <InfoRow
+                      icon={<FileText size={14} />}
+                      label="PO Number"
+                      value={load.po_number}
+                    />
+                  )}
+                  {load.shipper_reference && (
+                    <InfoRow
+                      icon={<FileText size={14} />}
+                      label="Shipper Ref"
+                      value={load.shipper_reference}
+                    />
+                  )}
+                  {load.specialInstructions && (
+                    <div className="p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+                      <p className="text-[10px] font-bold text-fx-text-dim uppercase mb-2">
+                        Special Instructions
+                      </p>
+                      <p className="text-xs text-fx-text whitespace-pre-wrap">
+                        {load.specialInstructions}
+                      </p>
+                    </div>
+                  )}
+                  {load.loadingNotes && (
+                    <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20">
+                      <p className="text-[10px] font-bold text-blue-400 uppercase mb-2">
+                        📍 Pickup Location Notes
+                      </p>
+                      <p className="text-xs text-fx-text whitespace-pre-wrap">
+                        {load.loadingNotes}
+                      </p>
+                    </div>
+                  )}
+                  {load.deliveryNotes && (
+                    <div className="p-3 rounded-xl bg-green-500/5 border border-green-500/20">
+                      <p className="text-[10px] font-bold text-green-400 uppercase mb-2">
+                        🚚 Delivery Location Notes
+                      </p>
+                      <p className="text-xs text-fx-text whitespace-pre-wrap">
+                        {load.deliveryNotes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -854,31 +992,64 @@ export function LoadDetailSheet({
               <DocumentUpload loadId={load.id} role={role!} />
             )}
 
-            {/* Only show if signed BOL exists */}
+            {/* Signed BOL — view + download */}
             {hasSignedBol && (
               <>
-                <button
-                  onClick={handleViewSignedBol}
-                  disabled={loadingBol}
-                  className="mt-2 w-full h-10 rounded-xl border text-[12px] font-semibold flex items-center justify-center gap-2 transition-colors"
-                  style={{
-                    borderColor: 'rgba(34,197,94,0.3)',
-                    color: '#4ade80',
-                    background: 'rgba(34,197,94,0.06)',
-                  }}
-                >
-                  {loadingBol ? (
-                    <span className="w-4 h-4 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
-                  ) : (
-                    '✓ View Signed BOL'
+                <div className="mt-2 flex gap-2">
+                  <button
+                    onClick={handleViewSignedBol}
+                    disabled={loadingBol}
+                    className="flex-1 h-10 rounded-xl border text-[12px] font-semibold flex items-center justify-center gap-2 transition-colors"
+                    style={{
+                      borderColor: 'rgba(34,197,94,0.3)',
+                      color: '#4ade80',
+                      background: 'rgba(34,197,94,0.06)',
+                    }}
+                  >
+                    {loadingBol ? (
+                      <span className="w-4 h-4 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
+                    ) : (
+                      '✓ View BOL'
+                    )}
+                  </button>
+                  {bolDownloadUrl && (
+                    <a
+                      href={bolDownloadUrl}
+                      download
+                      target="_blank"
+                      rel="noreferrer"
+                      className="h-10 w-10 rounded-xl border flex items-center justify-center shrink-0 transition-colors"
+                      style={{
+                        borderColor: 'rgba(34,197,94,0.3)',
+                        color: '#4ade80',
+                        background: 'rgba(34,197,94,0.06)',
+                      }}
+                      title="Download signed BOL"
+                    >
+                      <ArrowRight size={14} className="-rotate-45" />
+                    </a>
                   )}
-                </button>
+                </div>
                 {docsOpen && (
                   <div className="mt-3 text-xs text-fx-text-muted text-center">
                     BOL signed and locked. No additional uploads allowed.
                   </div>
                 )}
               </>
+            )}
+
+            {/* Signed Rate Con — download for carrier */}
+            {isCarrier && rateConSigned && rateConDownloadUrl && (
+              <a
+                href={rateConDownloadUrl}
+                download
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 w-full h-10 rounded-xl border border-fx-orange/30 text-[12px] font-semibold text-fx-orange flex items-center justify-center gap-2 transition-colors hover:bg-fx-orange/5"
+              >
+                <FileText size={13} />
+                Download Signed Rate Con
+              </a>
             )}
           </div>
         )}
@@ -1037,7 +1208,7 @@ export function LoadDetailSheet({
             </button>
           )}
 
-          {/* Shipper: track shipment (in transit) + contact broker */}
+          {/* Shipper actions */}
           {isShipper && (
             <>
               {liveStatus === 'in_transit' && (
@@ -1048,6 +1219,28 @@ export function LoadDetailSheet({
                 >
                   Track Shipment →
                 </button>
+              )}
+              {liveStatus === 'delivered' && !receiptConfirmed && (
+                <button
+                  onClick={handleConfirmReceipt}
+                  disabled={confirmingReceipt}
+                  className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white disabled:opacity-50 active-scale"
+                  style={{
+                    background: 'linear-gradient(145deg, #22c55e, #16a34a)',
+                    boxShadow: '0 4px 20px rgba(34,197,94,0.35)',
+                  }}
+                >
+                  {confirmingReceipt ? (
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    '✓ Confirm Receipt'
+                  )}
+                </button>
+              )}
+              {liveStatus === 'delivered' && receiptConfirmed && (
+                <div className="w-full h-11 rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-green-400 bg-green-500/10 border border-green-500/20">
+                  ✓ Receipt Confirmed
+                </div>
               )}
               {load.postedBy && (
                 <button

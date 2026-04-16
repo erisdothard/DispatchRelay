@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Plus, Search, X, SlidersHorizontal, WifiOff } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -36,10 +37,19 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function BrokerLoadsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showPost, setShowPost] = useState(false);
   const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
+
+  // Open post sheet when navigated here via "Post Load" nav tab
+  useEffect(() => {
+    if (searchParams.get('post') === '1') {
+      setShowPost(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const { loads, loading, error, refresh } = useLoads({
     status: statusFilter === 'All' ? 'all' : (statusFilter as LoadStatus),
