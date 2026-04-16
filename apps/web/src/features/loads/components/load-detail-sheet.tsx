@@ -248,6 +248,7 @@ export function LoadDetailSheet({
   const showDocs = ACTIVE_STATUSES.includes(liveStatus) && !!role;
   const isBroker = role === 'broker' || role === 'admin';
   const isCarrier = role === 'carrier';
+  const isShipper = role === 'shipper';
   const canEdit =
     user &&
     load &&
@@ -431,6 +432,36 @@ export function LoadDetailSheet({
               <UserCheck size={14} />
               Assign Driver
             </button>
+          </div>
+        )}
+
+        {/* Shipper: carrier assigned info */}
+        {isShipper && ACTIVE_STATUSES.includes(liveStatus) && load.assigneeName && (
+          <div className="mb-5 flex items-center gap-3 p-3 rounded-xl bg-green-500/10 border border-green-500/20">
+            <UserCheck size={14} className="text-green-400 shrink-0" />
+            <div>
+              <p className="text-[10px] font-bold text-green-400 uppercase">Carrier Assigned</p>
+              <p className="text-sm font-bold text-fx-text">{load.assigneeName}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Shipper: status context for pre-award states */}
+        {isShipper && liveStatus === 'posted' && (
+          <div className="mb-5 p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+            <p className="text-xs font-bold text-fx-text-muted mb-1">Awaiting Carrier</p>
+            <p className="text-[11px] text-fx-text-dim">
+              Your load is live on the board. Carriers are reviewing it.
+            </p>
+          </div>
+        )}
+        {isShipper && liveStatus === 'bid_received' && (
+          <div className="mb-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <p className="text-xs font-bold text-amber-400 mb-1">Bids Received</p>
+            <p className="text-[11px] text-fx-text-dim">
+              Carriers have submitted bids. Your broker is reviewing and will assign a carrier
+              shortly.
+            </p>
           </div>
         )}
 
@@ -818,8 +849,10 @@ export function LoadDetailSheet({
               </p>
               <FileUp size={14} className="text-fx-orange" />
             </button>
-            {/* Hide upload if BOL is signed */}
-            {docsOpen && !hasSignedBol && <DocumentUpload loadId={load.id} role={role!} />}
+            {/* Hide upload if BOL is signed or user is shipper */}
+            {docsOpen && !hasSignedBol && !isShipper && (
+              <DocumentUpload loadId={load.id} role={role!} />
+            )}
 
             {/* Only show if signed BOL exists */}
             {hasSignedBol && (
@@ -1002,6 +1035,37 @@ export function LoadDetailSheet({
                 </>
               )}
             </button>
+          )}
+
+          {/* Shipper: track shipment (in transit) + contact broker */}
+          {isShipper && (
+            <>
+              {liveStatus === 'in_transit' && (
+                <button
+                  onClick={() => navigate(`/track/${load.loadNumber}`)}
+                  className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white bg-orange-gradient active-scale"
+                  style={{ boxShadow: '0 4px 20px rgba(232,96,48,0.4)' }}
+                >
+                  Track Shipment →
+                </button>
+              )}
+              {load.postedBy && (
+                <button
+                  onClick={handleMessageBroker}
+                  disabled={messaging}
+                  className="w-full h-11 rounded-2xl border border-fx-border text-sm font-semibold text-fx-text-muted flex items-center justify-center gap-2 hover:border-fx-orange/40 hover:text-fx-orange transition-colors disabled:opacity-50"
+                >
+                  {messaging ? (
+                    <span className="w-4 h-4 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <MessageSquare size={14} />
+                      Message Broker
+                    </>
+                  )}
+                </button>
+              )}
+            </>
           )}
         </div>
       </BottomSheet>

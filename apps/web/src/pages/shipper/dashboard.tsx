@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Package, Clock, TrendingDown, CheckCircle, Radio } from 'lucide-react';
+import { Search, Package, Clock, TrendingDown, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -7,74 +7,43 @@ import { StatCard } from '@/shared/components/stat-card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLoads } from '@/services/loads.service';
+import { getLoads, getLoadById } from '@/services/loads.service';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
-import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
+import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
 import type { Load } from '@freightx/shared';
-
-/** Renders nothing — just activates GPS pinging for a single load */
-function GpsPinger({ loadNumber }: { loadNumber: string }) {
-  useDriverLocation({ loadNumber, active: true });
-  return null;
-}
 
 const statusBadge: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
   in_transit: 'orange',
+  dispatched: 'orange',
   posted: 'blue',
+  bid_received: 'blue',
+  awarded: 'blue',
   delivered: 'green',
+  completed: 'green',
 };
 
 const statusLabel: Record<string, string> = {
+  posted: 'Posted',
+  bid_received: 'Bids Received',
+  awarded: 'Carrier Assigned',
+  dispatched: 'Dispatched',
   in_transit: 'In Transit',
-  posted: 'Awaiting Pickup',
   delivered: 'Delivered',
+  completed: 'Completed',
 };
 
 export default function ShipperDashboard() {
   const navigate = useNavigate();
   const { profile, user } = useAuth();
   const [loads, setLoads] = useState<Load[]>([]);
-  const [activeLoads, setActiveLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
-  const [sharingLocation, setSharingLocation] = useState(() => {
-    try {
-      return localStorage.getItem('fx-gps-sharing') === 'true';
-    } catch {
-      return false;
-    }
-  });
+  const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
   const { notifications, unreadCount, markAllRead } = useNotifications();
-
-  // Persist GPS sharing toggle across sessions
-  useEffect(() => {
-    try {
-      localStorage.setItem('fx-gps-sharing', String(sharingLocation));
-    } catch {
-      /* ignored */
-    }
-  }, [sharingLocation]);
-
-  useEffect(() => {
-    getLoads()
-      .then((all) => setLoads(all.slice(0, 5)))
-      .catch(console.error);
-  }, []);
 
   useEffect(() => {
     if (user?.id) {
-      // Fetch all loads, filter to GPS-eligible (everything before delivered)
-      const terminal = new Set([
-        'delivered',
-        'cancelled',
-        'tonu',
-        'rejected',
-        'draft',
-        'pending_approval',
-      ]);
-      getLoads()
-        .then((all) => setActiveLoads(all.filter((l) => !terminal.has(l.status))))
-        .catch(console.error);
+      getLoads({ postedBy: user.id }).then(setLoads).catch(console.error);
     }
   }, [user?.id]);
 
@@ -100,53 +69,7 @@ export default function ShipperDashboard() {
         </button>
       </div>
 
-      {/* GPS pingers — one per active (non-delivered) load, only when sharing is on */}
-      {sharingLocation &&
-        activeLoads.map((l) => <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />)}
-
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
-        {/* Share Location banner — always visible so shipper can share GPS anytime */}
-        <button
-          onClick={() => setSharingLocation((v) => !v)}
-          className="w-full flex items-center justify-between rounded-2xl p-4 active-scale"
-          style={{
-            background: sharingLocation
-              ? 'linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.08))'
-              : 'rgba(255,255,255,0.04)',
-            border: `1px solid ${sharingLocation ? 'rgba(34,197,94,0.35)' : 'rgba(255,255,255,0.08)'}`,
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-              style={{
-                background: sharingLocation ? 'rgba(34,197,94,0.2)' : 'rgba(232,96,48,0.12)',
-              }}
-            >
-              <Radio size={18} className={sharingLocation ? 'text-green-400' : 'text-fx-orange'} />
-            </div>
-            <div className="text-left">
-              <p className="text-[14px] font-semibold text-white">Share Location</p>
-              <p className="text-[11px] text-fx-text-dim mt-0.5">
-                {sharingLocation
-                  ? activeLoads.length > 0
-                    ? `Sharing GPS for ${activeLoads.length} load${activeLoads.length > 1 ? 's' : ''}`
-                    : 'Sharing live GPS'
-                  : 'Tap to share your GPS with carrier'}
-              </p>
-            </div>
-          </div>
-          <div
-            className="w-12 h-7 rounded-full relative transition-colors"
-            style={{ background: sharingLocation ? '#22c55e' : 'rgba(255,255,255,0.12)' }}
-          >
-            <div
-              className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform"
-              style={{ transform: sharingLocation ? 'translateX(22px)' : 'translateX(2px)' }}
-            />
-          </div>
-        </button>
-
         {/* Stats */}
         <div>
           <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
@@ -154,32 +77,38 @@ export default function ShipperDashboard() {
           </h2>
           <div className="grid grid-cols-2 gap-3">
             <StatCard
-              label="Active Shipments"
-              value={String(loads.filter((l) => l.status === 'in_transit').length || 4)}
+              label="Active"
+              value={String(
+                loads.filter((l) => ['awarded', 'dispatched', 'in_transit'].includes(l.status))
+                  .length,
+              )}
               trend="flat"
-              trendValue="2 in transit"
+              trendValue="In progress"
               icon={<Package size={16} />}
             />
             <StatCard
-              label="Avg Transit"
-              value="2.1d"
-              trend="down"
-              trendValue="-0.5d vs last month"
+              label="Pending"
+              value={String(
+                loads.filter((l) => ['posted', 'bid_received'].includes(l.status)).length,
+              )}
+              trend="flat"
+              trendValue="Awaiting carrier"
               icon={<Clock size={16} />}
-              highlight
             />
             <StatCard
-              label="On-Time"
-              value="96%"
-              trend="up"
-              trendValue="Above target"
+              label="Delivered"
+              value={String(
+                loads.filter((l) => ['delivered', 'completed'].includes(l.status)).length,
+              )}
+              trend="flat"
+              trendValue="All time"
               icon={<CheckCircle size={16} />}
             />
             <StatCard
-              label="Avg Rate"
-              value="$2.74"
-              trend="down"
-              trendValue="-$0.12 vs avg"
+              label="Total Loads"
+              value={String(loads.length)}
+              trend="flat"
+              trendValue="Lifetime"
               icon={<TrendingDown size={16} />}
             />
           </div>
@@ -206,7 +135,7 @@ export default function ShipperDashboard() {
                 <div
                   key={load.id}
                   className="p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/track/${load.loadNumber}`)}
+                  onClick={() => setSelectedLoad(load)}
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-0.5">
@@ -240,7 +169,7 @@ export default function ShipperDashboard() {
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Book Shipment', icon: '📦', action: () => navigate('/shipper/loads') },
-              { label: 'Send Live GPS', icon: '📍', action: () => setSharingLocation(true) },
+              { label: 'View Shipments', icon: '📋', action: () => navigate('/shipper/loads') },
               { label: 'Track Load', icon: '🔍', action: () => navigate('/track') },
               { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
             ].map((item) => (
@@ -275,6 +204,20 @@ export default function ShipperDashboard() {
         notifications={notifications}
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
+        onNotificationClick={async (n) => {
+          if (n.load_id) {
+            setNotifsOpen(false);
+            const found = loads.find((l) => l.id === n.load_id) ?? (await getLoadById(n.load_id));
+            if (found) setSelectedLoad(found);
+          }
+        }}
+      />
+
+      <LoadDetailSheet
+        load={selectedLoad}
+        onClose={() => setSelectedLoad(null)}
+        showBidButton={false}
+        role="shipper"
       />
     </div>
   );

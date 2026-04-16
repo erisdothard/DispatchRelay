@@ -12,17 +12,34 @@ import { getLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Load } from '@freightx/shared';
 
-const STATUS_FILTERS = ['All', 'posted', 'in_transit', 'delivered'];
+const STATUS_FILTERS = [
+  'All',
+  'posted',
+  'bid_received',
+  'awarded',
+  'dispatched',
+  'in_transit',
+  'delivered',
+  'completed',
+];
 const STATUS_LABELS: Record<string, string> = {
-  All: 'All Shipments',
-  posted: 'Awaiting Pickup',
+  All: 'All',
+  posted: 'Posted',
+  bid_received: 'Bids Received',
+  awarded: 'Carrier Assigned',
+  dispatched: 'Dispatched',
   in_transit: 'In Transit',
   delivered: 'Delivered',
+  completed: 'Completed',
 };
 const STATUS_BADGE: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
   posted: 'blue',
+  bid_received: 'blue',
+  awarded: 'blue',
+  dispatched: 'orange',
   in_transit: 'orange',
   delivered: 'green',
+  completed: 'green',
 };
 
 export default function ShipperLoadsPage() {
