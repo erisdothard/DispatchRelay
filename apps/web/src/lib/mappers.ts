@@ -79,6 +79,7 @@ export function rowToLoad(row: LoadRow): Load {
     specialInstructions: row.special_instructions ?? undefined,
     loadingNotes: row.loading_notes ?? undefined,
     deliveryNotes: row.delivery_notes ?? undefined,
+    fullPartial: (row.full_partial as 'full' | 'partial') ?? undefined,
   };
 }
 

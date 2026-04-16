@@ -49,6 +49,8 @@ import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
 import type { LoadStatus, UserRole } from '@/lib/database.types';
 import { useAuth } from '@/contexts/AuthContext';
+import { haversineDistance } from '@/shared/lib/utils';
+import { supabase } from '@/lib/supabase';
 
 interface LoadDetailSheetProps {
   load: Load | null;
@@ -139,6 +141,17 @@ export function LoadDetailSheet({
   const [costPerMile, setCostPerMile] = useState<string>(
     () => localStorage.getItem('fx_carrier_cpp') ?? '1.80',
   );
+  const [mpg, setMpg] = useState<string>(() => localStorage.getItem('fx_mpg') ?? '6.5');
+  const [fuelPrice, setFuelPrice] = useState<string>(
+    () => localStorage.getItem('fx_fuel_price') ?? '4.00',
+  );
+  const [factoringPct, setFactoringPct] = useState<string>(
+    () => localStorage.getItem('fx_factoring_pct') ?? '0',
+  );
+  // Distance to pickup
+  const [distanceMi, setDistanceMi] = useState<number | null>(null);
+  // Broker factoring acceptance
+  const [acceptsFactoring, setAcceptsFactoring] = useState<boolean | null>(null);
   // Message broker
   const [messaging, setMessaging] = useState(false);
 
@@ -168,6 +181,43 @@ export function LoadDetailSheet({
     setNudgeSent(false);
     setReceiptConfirmed(false);
   }, [load?.id]);
+
+  // Geolocation: distance to pickup (carrier/driver only, silent on denial)
+  useEffect(() => {
+    if (!load?.id) return;
+    const originLat = (load as unknown as { originLat?: number }).originLat;
+    const originLng = (load as unknown as { originLng?: number }).originLng;
+    if (!originLat || !originLng) return;
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const dist = haversineDistance(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          originLat,
+          originLng,
+        );
+        setDistanceMi(Math.round(dist));
+      },
+      () => setDistanceMi(null),
+      { timeout: 5000 },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [load?.id]);
+
+  // Fetch broker factoring acceptance
+  useEffect(() => {
+    if (!load?.companyId) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('companies')
+      .select('accepts_factoring')
+      .eq('id', load.companyId)
+      .maybeSingle()
+      .then(({ data }: { data: { accepts_factoring: boolean } | null }) => {
+        setAcceptsFactoring(data?.accepts_factoring ?? false);
+      });
+  }, [load?.companyId]);
 
   async function handleViewSignedBol() {
     if (!load) return;
@@ -258,6 +308,18 @@ export function LoadDetailSheet({
     setCostPerMile(val);
     localStorage.setItem('fx_carrier_cpp', val);
   }
+  function saveMpg(val: string) {
+    setMpg(val);
+    localStorage.setItem('fx_mpg', val);
+  }
+  function saveFuelPrice(val: string) {
+    setFuelPrice(val);
+    localStorage.setItem('fx_fuel_price', val);
+  }
+  function saveFactoringPct(val: string) {
+    setFactoringPct(val);
+    localStorage.setItem('fx_factoring_pct', val);
+  }
 
   if (!load) return null;
 
@@ -315,6 +377,9 @@ export function LoadDetailSheet({
                     <p className="text-[17px] font-extrabold text-white tracking-tight">
                       {load.originCity}, {load.originState}
                     </p>
+                    {(isCarrier || role === 'driver') && distanceMi !== null && (
+                      <p className="text-[11px] text-fx-text-dim mt-0.5">{distanceMi} mi away</p>
+                    )}
                     {showFullAddress && load.originAddress && (
                       <p className="text-[12px] text-fx-text-muted mt-0.5">
                         {load.originAddress}
@@ -571,11 +636,27 @@ export function LoadDetailSheet({
         <div className="mb-5">
           <InfoRow icon={<Calendar size={14} />} label="Pickup" value={pickupFmt} />
           <InfoRow icon={<Calendar size={14} />} label="Delivery" value={deliveryFmt} />
-          <InfoRow
-            icon={<Package size={14} />}
-            label="Equipment"
-            value={EQUIPMENT_LABELS[load.equipment] ?? load.equipment}
-          />
+          <div
+            className="flex items-center gap-3 py-3"
+            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <div className="w-8 h-8 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
+              <span className="text-fx-text-muted">
+                <Package size={14} />
+              </span>
+            </div>
+            <span className="text-sm text-fx-text-muted flex-1">Equipment</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-fx-text">
+                {EQUIPMENT_LABELS[load.equipment] ?? load.equipment}
+              </span>
+              {load.fullPartial && (
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-fx-surface border border-fx-border text-fx-text-dim">
+                  {load.fullPartial === 'full' ? 'Full Truckload' : 'Partial'}
+                </span>
+              )}
+            </div>
+          </div>
           {load.commodity && (
             <InfoRow icon={<Package size={14} />} label="Commodity" value={load.commodity} />
           )}
@@ -678,66 +759,131 @@ export function LoadDetailSheet({
             </button>
             {profitExpanded && (
               <div className="space-y-3 mt-2">
-                <div className="flex items-center gap-2">
-                  <label className="text-[11px] text-fx-text-muted whitespace-nowrap">
-                    My cost/mile ($):
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={costPerMile}
-                    onChange={(e) => saveCostPerMile(e.target.value)}
-                    className="w-24 h-8 bg-fx-surface-2 border border-fx-border rounded-lg text-fx-text text-sm px-2 focus:border-fx-orange outline-none"
-                  />
-                  <span className="text-[10px] text-fx-text-dim">saved automatically</span>
+                {/* Inputs */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-fx-text-dim block mb-1">
+                      Op Cost ($/mi)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={costPerMile}
+                      onChange={(e) => saveCostPerMile(e.target.value)}
+                      className="w-full h-8 bg-fx-surface-2 border border-fx-border rounded-lg text-fx-text text-sm px-2 focus:border-fx-orange outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-fx-text-dim block mb-1">MPG</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="1"
+                      value={mpg}
+                      onChange={(e) => saveMpg(e.target.value)}
+                      className="w-full h-8 bg-fx-surface-2 border border-fx-border rounded-lg text-fx-text text-sm px-2 focus:border-fx-orange outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-fx-text-dim block mb-1">
+                      Fuel Price ($/gal)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={fuelPrice}
+                      onChange={(e) => saveFuelPrice(e.target.value)}
+                      className="w-full h-8 bg-fx-surface-2 border border-fx-border rounded-lg text-fx-text text-sm px-2 focus:border-fx-orange outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-fx-text-dim block mb-1">Factoring (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="10"
+                      value={factoringPct}
+                      onChange={(e) => saveFactoringPct(e.target.value)}
+                      className="w-full h-8 bg-fx-surface-2 border border-fx-border rounded-lg text-fx-text text-sm px-2 focus:border-fx-orange outline-none"
+                    />
+                  </div>
                 </div>
+                {/* Breakdown table */}
                 {(() => {
-                  const cpp = parseFloat(costPerMile) || 0;
                   const miles = load.totalMiles ?? 0;
-                  const revenue = load.rateUsd;
-                  const fuelAndOps = miles * cpp;
-                  const net = revenue - fuelAndOps;
+                  const rateUsd = load.rateUsd;
+                  const fuelCost =
+                    miles > 0
+                      ? (miles / (parseFloat(mpg) || 6.5)) * (parseFloat(fuelPrice) || 4)
+                      : 0;
+                  const opCost = miles * (parseFloat(costPerMile) || 0);
+                  const factoringFee = rateUsd * ((parseFloat(factoringPct) || 0) / 100);
+                  const net = rateUsd - fuelCost - opCost - factoringFee;
                   const netPerMile = miles > 0 ? net / miles : 0;
+                  const rows = [
+                    {
+                      label: 'All In Rate',
+                      value: `$${rateUsd.toLocaleString()}`,
+                      color: 'text-fx-text',
+                    },
+                    {
+                      label: 'Fuel Cost',
+                      value: miles > 0 ? `-$${fuelCost.toFixed(0)}` : '—',
+                      color: 'text-red-400',
+                    },
+                    {
+                      label: 'Operating',
+                      value: miles > 0 ? `-$${opCost.toFixed(0)}` : '—',
+                      color: 'text-red-400',
+                    },
+                    {
+                      label: 'Factoring Fee',
+                      value: factoringFee > 0 ? `-$${factoringFee.toFixed(0)}` : '$0',
+                      color: factoringFee > 0 ? 'text-red-400' : 'text-fx-text-dim',
+                    },
+                  ];
                   return (
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="bg-fx-surface-2 border border-fx-border rounded-xl p-3 text-center">
-                        <p className="text-[10px] text-fx-text-dim mb-1">Revenue</p>
-                        <p className="text-sm font-bold text-fx-text">
-                          ${revenue.toLocaleString()}
-                        </p>
-                      </div>
-                      <div className="bg-fx-surface-2 border border-fx-border rounded-xl p-3 text-center">
-                        <p className="text-[10px] text-fx-text-dim mb-1">Est. Cost</p>
-                        <p className="text-sm font-bold text-red-400">
-                          {miles > 0 ? `-$${fuelAndOps.toFixed(0)}` : '—'}
-                        </p>
-                      </div>
+                    <div
+                      className="rounded-xl overflow-hidden"
+                      style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+                    >
+                      {rows.map((r) => (
+                        <div
+                          key={r.label}
+                          className="flex justify-between items-center px-3 py-2"
+                          style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                        >
+                          <span className="text-[12px] text-fx-text-muted">{r.label}</span>
+                          <span className={`text-[12px] font-semibold ${r.color}`}>{r.value}</span>
+                        </div>
+                      ))}
                       <div
-                        className="rounded-xl p-3 text-center border"
+                        className="flex justify-between items-center px-3 py-2.5"
                         style={{
                           background: net >= 0 ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
-                          borderColor: net >= 0 ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)',
                         }}
                       >
-                        <p className="text-[10px] text-fx-text-dim mb-1">Net</p>
-                        <p
-                          className="text-sm font-bold"
-                          style={{ color: net >= 0 ? '#4ade80' : '#f87171' }}
-                        >
-                          {miles > 0 ? `$${net.toFixed(0)}` : '—'}
-                        </p>
+                        <span className="text-[12px] font-bold text-fx-text">Approx. Profit</span>
+                        <div className="text-right">
+                          <span
+                            className="text-[13px] font-black"
+                            style={{ color: net >= 0 ? '#4ade80' : '#f87171' }}
+                          >
+                            {miles > 0 ? `$${net.toFixed(0)}` : '—'}
+                          </span>
+                          {miles > 0 && (
+                            <span className="text-[10px] text-fx-text-dim ml-2">
+                              ${netPerMile.toFixed(2)}/mi
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
                 })()}
-                {load.totalMiles && parseFloat(costPerMile) > 0 && (
-                  <p className="text-[10px] text-fx-text-dim text-center">
-                    {load.totalMiles} miles ×{' '}
-                    <span className="text-fx-text">${parseFloat(costPerMile).toFixed(2)}/mi</span>{' '}
-                    operating cost estimate
-                  </p>
-                )}
               </div>
             )}
           </div>
@@ -951,6 +1097,22 @@ export function LoadDetailSheet({
               Broker Payment History
             </p>
             <BrokerCreditBadge companyId={load.companyId} inline={false} />
+            {acceptsFactoring !== null && (
+              <div
+                className="flex justify-between items-center px-3 py-2 mt-2 rounded-xl"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                }}
+              >
+                <span className="text-[12px] text-fx-text-muted">Factoring</span>
+                {acceptsFactoring ? (
+                  <span className="text-[12px] font-bold text-green-400">✓ Accepted</span>
+                ) : (
+                  <span className="text-[12px] font-semibold text-fx-text-dim">✗ Not Accepted</span>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -1066,6 +1228,57 @@ export function LoadDetailSheet({
               </p>
               <span className="text-[11px] font-semibold text-fx-orange">Manage →</span>
             </button>
+          </div>
+        )}
+
+        {/* Load Resources - carrier/driver only */}
+        {(isCarrier || role === 'driver') && (
+          <div className="mb-5">
+            <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
+              Load Resources
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                {
+                  title: 'Factor This Load',
+                  desc: 'Get paid faster with non-recourse factoring',
+                  href: 'https://www.triumphbusiness.com/freight-factoring',
+                },
+                {
+                  title: 'Per-Load Insurance',
+                  desc: 'All-risk cargo coverage up to $2M',
+                  href: 'https://www.truckinsurance.com',
+                },
+                {
+                  title: 'ELD Tracking',
+                  desc: 'Connect your ELD for automatic status updates',
+                  href: 'https://www.samsara.com',
+                },
+                {
+                  title: 'Cross-Border Services',
+                  desc: 'eManifest and customs filing',
+                  href: 'https://www.borderconnect.com',
+                },
+              ].map((resource) => (
+                <a
+                  key={resource.title}
+                  href={resource.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-3 rounded-xl flex flex-col gap-1.5 hover:border-fx-orange/30 transition-colors"
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                  }}
+                >
+                  <p className="text-[12px] font-bold text-fx-text">{resource.title}</p>
+                  <p className="text-[10px] text-fx-text-dim leading-snug">{resource.desc}</p>
+                  <span className="text-[10px] font-semibold text-fx-orange mt-0.5">
+                    Learn More →
+                  </span>
+                </a>
+              ))}
+            </div>
           </div>
         )}
 

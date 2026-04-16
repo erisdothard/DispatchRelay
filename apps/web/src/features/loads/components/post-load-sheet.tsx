@@ -59,6 +59,7 @@ const EMPTY_FORM = {
   weightLbs: '',
   rateUsd: '',
   totalMiles: '',
+  fullPartial: 'full' as 'full' | 'partial',
   hazmat: false,
   tempControlled: false,
   assigneeId: null as string | null,
@@ -322,6 +323,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         width_in: form.widthIn ? parseInt(form.widthIn) : null,
         height_in: form.heightIn ? parseInt(form.heightIn) : null,
         stackable: form.stackable,
+        full_partial: form.fullPartial,
         special_instructions: form.specialInstructions.trim() || null,
         loading_notes: form.loadingNotes.trim() || null,
         delivery_notes: form.deliveryNotes.trim() || null,
@@ -514,6 +516,41 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                   }
                 >
                   {EQUIPMENT_LABELS[eq] ?? eq}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Full / Partial toggle */}
+        <div>
+          <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+            Load Type
+          </p>
+          <div className="flex gap-2">
+            {(['full', 'partial'] as const).map((opt) => {
+              const selected = form.fullPartial === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => set('fullPartial', opt)}
+                  className="flex-1 h-10 rounded-xl text-[12px] font-semibold transition-all"
+                  style={
+                    selected
+                      ? {
+                          background: 'rgba(232,96,48,0.18)',
+                          border: '1px solid rgba(232,96,48,0.6)',
+                          color: '#E86030',
+                        }
+                      : {
+                          background: '#111',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          color: 'rgba(255,255,255,0.5)',
+                        }
+                  }
+                >
+                  {opt === 'full' ? 'Full Truckload' : 'Partial'}
                 </button>
               );
             })}

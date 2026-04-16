@@ -109,6 +109,7 @@ export interface Load {
   specialInstructions?: string;
   loadingNotes?: string;
   deliveryNotes?: string;
+  fullPartial?: 'full' | 'partial';
 }
 
 export interface Truck {

@@ -1039,6 +1039,7 @@ export type Database = {
           dest_zip: string | null;
           equipment: string;
           freight_class: string | null;
+          full_partial: string | null;
           hazmat: boolean;
           height_in: number | null;
           id: string;
@@ -1107,6 +1108,7 @@ export type Database = {
           dest_zip?: string | null;
           equipment: string;
           freight_class?: string | null;
+          full_partial?: string | null;
           hazmat?: boolean;
           height_in?: number | null;
           id?: string;
@@ -1175,6 +1177,7 @@ export type Database = {
           dest_zip?: string | null;
           equipment?: string;
           freight_class?: string | null;
+          full_partial?: string | null;
           hazmat?: boolean;
           height_in?: number | null;
           id?: string;
