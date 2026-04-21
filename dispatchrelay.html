@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DispatchRelay — AI voice system for small carriers</title>
+<meta name="description" content="DispatchRelay handles broker check calls for small trucking carriers so your dispatcher can book more loads. Built by Syntra AI." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink: #0A0E1A;
+  --ink-2: #1A1F2E;
+  --bone: #F5F2EA;
+  --bone-2: #ECE7D9;
+  --rust: #C94A28;
+  --rust-dark: #8F3319;
+  --amber: #E8A838;
+  --line: rgba(10, 14, 26, 0.12);
+  --line-strong: rgba(10, 14, 26, 0.35);
+  --muted: rgba(10, 14, 26, 0.65);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Archivo', sans-serif;
+  background: var(--bone);
+  color: var(--ink);
+  line-height: 1.55;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+/* ---------- TICKER ---------- */
+.ticker {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 10px 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--ink-2);
+}
+.ticker-track {
+  display: flex;
+  gap: 48px;
+  white-space: nowrap;
+  animation: scroll 35s linear infinite;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+.ticker-item { display: flex; align-items: center; gap: 10px; }
+.ticker-dot { width: 6px; height: 6px; background: var(--amber); border-radius: 50%; flex-shrink: 0; }
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- NAV ---------- */
+nav {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: var(--bone);
+  z-index: 50;
+}
+.nav-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-left: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.nav-cta {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 10px 20px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+.nav-cta:hover { background: var(--rust); }
+
+/* ---------- HERO ---------- */
+.hero {
+  padding: 80px 0 100px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 64px;
+  align-items: end;
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--rust);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--rust);
+}
+h1 {
+  font-size: clamp(48px, 7vw, 88px);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  margin-bottom: 32px;
+}
+h1 .accent {
+  color: var(--rust);
+  font-style: italic;
+  font-weight: 900;
+}
+.hero-sub {
+  font-size: 19px;
+  color: var(--muted);
+  max-width: 520px;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+.hero-ctas {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 16px 28px;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--bone);
+}
+.btn-primary:hover { background: var(--rust); transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+.btn-secondary:hover { background: var(--ink); color: var(--bone); }
+
+.hero-stat-block {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 32px;
+  position: relative;
+}
+.hero-stat-block::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px;
+  height: 4px;
+  background: var(--amber);
+}
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 12px;
+}
+.stat-big {
+  font-size: 72px;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+.stat-desc {
+  font-size: 14px;
+  color: rgba(245, 242, 234, 0.75);
+  line-height: 1.5;
+}
+.source {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(245, 242, 234, 0.45);
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(245, 242, 234, 0.15);
+}
+
+/* ---------- PROBLEM ---------- */
+.problem {
+  padding: 100px 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--bone-2);
+}
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  margin-bottom: 60px;
+  max-width: 900px;
+}
+.section-title em { color: var(--rust); font-style: italic; font-weight: 900; }
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-left: 1px solid var(--line-strong);
+  border-top: 1px solid var(--line-strong);
+}
+.problem-card {
+  padding: 40px 32px;
+  border-right: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  background: var(--bone);
+}
+.problem-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--rust);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+.problem-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  line-height: 1.15;
+}
+.problem-card p {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* ---------- SOLUTION ---------- */
+.solution {
+  padding: 100px 0;
+  border-bottom: 1px solid var(--line);
+}
+.solution-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.solution-list {
+  list-style: none;
+}
+.solution-item {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.solution-item:last-child { border-bottom: none; }
+.solution-num {
+  width: 40px;
+  height: 40px;
+  background: var(--ink);
+  color: var(--amber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.solution-content h4 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.solution-content p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.demo-card {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 40px 36px;
+  position: relative;
+}
+.demo-card::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px;
+  height: 4px;
+  background: var(--rust);
+}
+.demo-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.demo-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+.msg {
+  padding: 14px 18px;
+  line-height: 1.5;
+}
+.msg-broker {
+  background: rgba(245, 242, 234, 0.08);
+  border-left: 2px solid var(--amber);
+}
+.msg-ai {
+  background: rgba(201, 74, 40, 0.15);
+  border-left: 2px solid var(--rust);
+}
+.msg-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(245, 242, 234, 0.5);
+  margin-bottom: 6px;
+}
+
+/* ---------- OFFERS ---------- */
+.offers {
+  padding: 100px 0;
+  background: var(--ink);
+  color: var(--bone);
+  border-bottom: 1px solid var(--ink-2);
+}
+.offers .section-label { color: var(--amber); }
+.offers .section-title { color: var(--bone); }
+.offers .section-title em { color: var(--amber); }
+
+.offer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid rgba(245, 242, 234, 0.15);
+}
+.offer-card {
+  padding: 48px 36px;
+  border-right: 1px solid rgba(245, 242, 234, 0.15);
+  position: relative;
+  transition: background 0.2s;
+}
+.offer-card:last-child { border-right: none; }
+.offer-card:hover { background: var(--ink-2); }
+.offer-card.featured {
+  background: var(--bone);
+  color: var(--ink);
+}
+.offer-card.featured::before {
+  content: 'MOST POPULAR';
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--rust);
+  color: var(--bone);
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+.offer-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 24px;
+}
+.offer-card.featured .offer-tag { color: var(--rust); }
+.offer-name {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  line-height: 1.1;
+}
+.offer-for {
+  font-size: 13px;
+  color: rgba(245, 242, 234, 0.6);
+  margin-bottom: 28px;
+  line-height: 1.4;
+}
+.offer-card.featured .offer-for { color: var(--muted); }
+.offer-price {
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.offer-price-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--amber);
+  margin-bottom: 32px;
+}
+.offer-card.featured .offer-price-sub { color: var(--rust); }
+.offer-features {
+  list-style: none;
+  margin-bottom: 32px;
+}
+.offer-features li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(245, 242, 234, 0.08);
+  font-size: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: start;
+}
+.offer-card.featured .offer-features li {
+  border-bottom-color: var(--line);
+}
+.offer-features li::before {
+  content: '→';
+  color: var(--amber);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.offer-card.featured .offer-features li::before { color: var(--rust); }
+.offer-btn {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  background: var(--amber);
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+}
+.offer-btn:hover { background: var(--bone); }
+.offer-card.featured .offer-btn { background: var(--ink); color: var(--bone); }
+.offer-card.featured .offer-btn:hover { background: var(--rust); }
+
+/* ---------- PROOF ---------- */
+.proof {
+  padding: 100px 0;
+  border-bottom: 1px solid var(--line);
+}
+.proof-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.proof-content h2 {
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  margin-bottom: 32px;
+}
+.proof-content h2 em { color: var(--rust); font-style: italic; font-weight: 900; }
+.proof-content p {
+  font-size: 17px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.proof-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-top: 40px;
+  border-top: 1px solid var(--line-strong);
+  border-left: 1px solid var(--line-strong);
+}
+.proof-stat {
+  padding: 28px 24px;
+  border-right: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+}
+.proof-stat-num {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: var(--rust);
+}
+.proof-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.freightx-card {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 48px;
+  position: relative;
+}
+.freightx-card::before {
+  content: 'CASE STUDY';
+  position: absolute;
+  top: -12px;
+  left: 32px;
+  background: var(--rust);
+  color: var(--bone);
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+}
+.freightx-card h3 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+.freightx-card .subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--amber);
+  margin-bottom: 28px;
+  letter-spacing: 0.05em;
+}
+.freightx-card p {
+  font-size: 15px;
+  color: rgba(245, 242, 234, 0.8);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.freightx-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+.tech-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 5px 10px;
+  background: rgba(245, 242, 234, 0.08);
+  color: var(--bone);
+  border: 1px solid rgba(245, 242, 234, 0.15);
+}
+
+/* ---------- FAQ ---------- */
+.faq {
+  padding: 100px 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--bone-2);
+}
+.faq-list {
+  max-width: 900px;
+  border-top: 1px solid var(--line-strong);
+}
+.faq-item {
+  border-bottom: 1px solid var(--line-strong);
+  padding: 28px 0;
+}
+.faq-q {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 16px;
+  align-items: start;
+}
+.faq-q::before {
+  content: 'Q';
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--rust);
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 24px;
+}
+.faq-a {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.6;
+  padding-left: 40px;
+}
+
+/* ---------- CTA ---------- */
+.final-cta {
+  padding: 120px 0;
+  background: var(--rust);
+  color: var(--bone);
+  position: relative;
+  overflow: hidden;
+}
+.final-cta::before {
+  content: 'DISPATCHRELAY';
+  position: absolute;
+  bottom: -40px;
+  left: -20px;
+  font-size: 240px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: rgba(245, 242, 234, 0.08);
+  pointer-events: none;
+  line-height: 0.8;
+}
+.final-cta-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.final-cta h2 {
+  font-size: clamp(48px, 7vw, 84px);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  margin-bottom: 32px;
+}
+.final-cta p {
+  font-size: 20px;
+  margin-bottom: 48px;
+  color: rgba(245, 242, 234, 0.9);
+  line-height: 1.5;
+}
+.final-cta .btn-primary {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 20px 36px;
+  font-size: 16px;
+}
+.final-cta .btn-primary:hover { background: var(--bone); color: var(--ink); }
+
+/* ---------- FOOTER ---------- */
+footer {
+  padding: 40px 0;
+  background: var(--ink);
+  color: var(--bone);
+  font-size: 13px;
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-meta {
+  font-family: 'JetBrains Mono', monospace;
+  color: rgba(245, 242, 234, 0.5);
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 900px) {
+  .hero-grid, .solution-grid, .proof-grid { grid-template-columns: 1fr; gap: 48px; }
+  .problem-grid, .offer-grid { grid-template-columns: 1fr; }
+  .proof-stats { grid-template-columns: 1fr 1fr; }
+  .container { padding: 0 20px; }
+  .hero { padding: 48px 0 60px; }
+  .problem, .solution, .offers, .proof, .faq { padding: 60px 0; }
+  .final-cta { padding: 80px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="ticker-dot"></span>SMALL CARRIER BUILT</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>LIVE IN 10 DAYS</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>NO ENTERPRISE CONTRACTS</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>HANDLES BROKER CHECK CALLS</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>$2,500 FLAT SETUP</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>BUILT BY THE TEAM BEHIND FREIGHTX</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>SMALL CARRIER BUILT</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>LIVE IN 10 DAYS</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>NO ENTERPRISE CONTRACTS</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>HANDLES BROKER CHECK CALLS</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>$2,500 FLAT SETUP</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>BUILT BY THE TEAM BEHIND FREIGHTX</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="container nav-inner">
+    <div class="logo">
+      <div class="logo-mark">DR</div>
+      <span>DispatchRelay</span>
+      <span class="logo-sub">/ by Syntra AI</span>
+    </div>
+    <a href="#book" class="nav-cta">Book a 15-min call</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">For small trucking carriers</div>
+        <h1>Your dispatcher shouldn't <span class="accent">live</span> on the phone.</h1>
+        <p class="hero-sub">DispatchRelay is an AI voice system that handles inbound broker check calls for your fleet. Your dispatcher stops answering "where's my load?" forty times a day and starts booking freight.</p>
+        <div class="hero-ctas">
+          <a href="#book" class="btn btn-primary">Book a 15-min call →</a>
+          <a href="#how" class="btn btn-secondary">See how it works</a>
+        </div>
+      </div>
+      <div class="hero-stat-block">
+        <div class="stat-label">The problem in one number</div>
+        <div class="stat-big">60%</div>
+        <div class="stat-desc">of your dispatcher's day is spent on broker check calls, status updates, and rate confirmations. Time they could be booking loads.</div>
+        <div class="source">Source: Industry surveys, 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="container">
+    <div class="section-label">/ The problem</div>
+    <h2 class="section-title">Every small carrier hits the <em>same wall</em>.</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-num">01 / THE CALL VOLUME</div>
+        <h3>40-60 check calls a day</h3>
+        <p>A 20-truck carrier gets 40 to 60 inbound check calls plus 20 to 40 outbound rate calls. One dispatcher. One phone. The math doesn't work.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">02 / THE ENTERPRISE GAP</div>
+        <h3>Priced out of the real tools</h3>
+        <p>McLeod, Trimble, TMW, HappyRobot — all built for 200+ truck fleets with dedicated IT. 6-to-12 month implementations. Custom quotes. Out of reach.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">03 / THE COST OF STAYING MANUAL</div>
+        <h3>Loads slip through the cracks</h3>
+        <p>Missed return-load opportunities. Dispatchers burning out. Drivers waiting on answers. Every call your dispatcher is stuck on is a load someone else booked.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution" id="how">
+  <div class="container">
+    <div class="section-label">/ The fix</div>
+    <h2 class="section-title">How <em>DispatchRelay</em> works.</h2>
+    <div class="solution-grid">
+      <ul class="solution-list">
+        <li class="solution-item">
+          <div class="solution-num">01</div>
+          <div class="solution-content">
+            <h4>We port your dispatch line</h4>
+            <p>Broker calls route to the AI first. It answers in under two rings with a natural voice — no IVR menu, no "press 1 for."</p>
+          </div>
+        </li>
+        <li class="solution-item">
+          <div class="solution-num">02</div>
+          <div class="solution-content">
+            <h4>It pulls live load data</h4>
+            <p>Connected to your existing dispatch board, driver trackers, or spreadsheet. When a broker asks about load #4581, it already knows.</p>
+          </div>
+        </li>
+        <li class="solution-item">
+          <div class="solution-num">03</div>
+          <div class="solution-content">
+            <h4>It answers and logs the call</h4>
+            <p>Status, ETA, location, POD confirmation. Handled. A summary lands in your dispatcher's inbox within seconds.</p>
+          </div>
+        </li>
+        <li class="solution-item">
+          <div class="solution-num">04</div>
+          <div class="solution-content">
+            <h4>Escalation when it matters</h4>
+            <p>Angry broker. Rate negotiation. Load rejection. It transfers straight to your dispatcher with the context already summarized.</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="demo-card">
+        <div class="demo-tag">/ sample broker call</div>
+        <div class="demo-transcript">
+          <div class="msg msg-broker">
+            <div class="msg-label">BROKER INBOUND</div>
+            "Hey, this is Mike at Sunrise Logistics. Just checking on load 4581, the Nashville to Dallas run."
+          </div>
+          <div class="msg msg-ai">
+            <div class="msg-label">DISPATCHRELAY</div>
+            "Hi Mike. Load 4581 picked up at 7:14 this morning. Driver's currently 42 miles east of Little Rock, ETA to Dallas is 4:20 PM Central. Want me to send a tracking link?"
+          </div>
+          <div class="msg msg-broker">
+            <div class="msg-label">BROKER</div>
+            "Yeah send it. Thanks."
+          </div>
+          <div class="msg msg-ai">
+            <div class="msg-label">DISPATCHRELAY</div>
+            "Sent. Have a good one, Mike."
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFERS -->
+<section class="offers" id="offers">
+  <div class="container">
+    <div class="section-label">/ Pricing</div>
+    <h2 class="section-title">Three tiers. <em>One price</em> for each.</h2>
+
+    <div class="offer-grid">
+      <div class="offer-card">
+        <div class="offer-tag">/ Tier 01</div>
+        <div class="offer-name">Dispatcher Relief</div>
+        <div class="offer-for">For carriers running 5–25 trucks drowning in check calls</div>
+        <div class="offer-price">$2,500</div>
+        <div class="offer-price-sub">setup + $300/mo</div>
+        <ul class="offer-features">
+          <li>AI voice agent on your dispatch line</li>
+          <li>Handles inbound broker check calls</li>
+          <li>Pulls live driver and load status</li>
+          <li>Call logs sent to your inbox</li>
+          <li>Live in 10 business days</li>
+        </ul>
+        <a href="#book" class="offer-btn">Start here</a>
+      </div>
+
+      <div class="offer-card featured">
+        <div class="offer-tag">/ Tier 02</div>
+        <div class="offer-name">Small Carrier Ops Stack</div>
+        <div class="offer-for">For 10–50 truck carriers ready to automate the back office</div>
+        <div class="offer-price">$6,500</div>
+        <div class="offer-price-sub">setup + $600/mo</div>
+        <ul class="offer-features">
+          <li>Everything in Tier 01</li>
+          <li>Outbound broker rate checking</li>
+          <li>Load board monitoring & alerts</li>
+          <li>Broker verification + credit alerts</li>
+          <li>Driver status dashboard</li>
+          <li>Live in 3 weeks</li>
+        </ul>
+        <a href="#book" class="offer-btn">Most carriers pick this</a>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-tag">/ Tier 03</div>
+        <div class="offer-name">Custom Build</div>
+        <div class="offer-for">For carriers and brokers who need a purpose-built platform</div>
+        <div class="offer-price">$10K+</div>
+        <div class="offer-price-sub">scoped per project</div>
+        <ul class="offer-features">
+          <li>Custom dispatch applications</li>
+          <li>Driver + broker + shipper portals</li>
+          <li>Load matching algorithms</li>
+          <li>Full TMS integrations</li>
+          <li>Ongoing engineering support</li>
+        </ul>
+        <a href="#book" class="offer-btn">Talk about it</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="proof">
+  <div class="container">
+    <div class="proof-grid">
+      <div class="proof-content">
+        <div class="section-label">/ The proof</div>
+        <h2>Built by people who actually <em>build for freight</em>.</h2>
+        <p>DispatchRelay comes from Syntra AI — the team behind FreightX, a full uber-for-trucking platform currently in live testing. We didn't watch a YouTube video about dispatching. We built the system.</p>
+        <p>Our background: 8+ years in financial services production environments, SQL-driven data pipelines, API and MCP integrations, live voice agents shipping in production. Anthropic-certified across five specializations.</p>
+
+        <div class="proof-stats">
+          <div class="proof-stat">
+            <div class="proof-stat-num">$13K+</div>
+            <div class="proof-stat-label">Contracts closed via referral</div>
+          </div>
+          <div class="proof-stat">
+            <div class="proof-stat-num">3</div>
+            <div class="proof-stat-label">Active logistics clients</div>
+          </div>
+          <div class="proof-stat">
+            <div class="proof-stat-num">10</div>
+            <div class="proof-stat-label">Days to go live</div>
+          </div>
+          <div class="proof-stat">
+            <div class="proof-stat-num">5</div>
+            <div class="proof-stat-label">Anthropic AI certifications</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="freightx-card">
+        <h3>FreightX</h3>
+        <div class="subtitle">uber-for-trucking · in live test</div>
+        <p>A multi-market logistics platform connecting shippers, dispatchers, and owner-operators. Full application with dispatch logic, driver app, broker portal, and real-time load matching.</p>
+        <p>If we can build the platform, we can automate your phone line.</p>
+        <div class="freightx-tech">
+          <span class="tech-tag">SQL</span>
+          <span class="tech-tag">Python</span>
+          <span class="tech-tag">APIs + MCP</span>
+          <span class="tech-tag">Voice AI</span>
+          <span class="tech-tag">Real-time</span>
+          <span class="tech-tag">Multi-market</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="container">
+    <div class="section-label">/ Common questions</div>
+    <h2 class="section-title">Answered <em>straight</em>.</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Does the AI sound robotic?</div>
+        <div class="faq-a">No. It uses modern voice AI, not 2015-era IVR. Brokers have trouble telling it's not human on routine calls. When it can't handle something, it transfers — it doesn't pretend.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What if a broker asks something it can't answer?</div>
+        <div class="faq-a">Transfers to your dispatcher with the caller name, MC number, load reference, and a summary of what they're asking about. Your dispatcher picks up already knowing the context.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do I need to replace my existing dispatch software?</div>
+        <div class="faq-a">No. DispatchRelay integrates on top of whatever you use — TMS, load board, ELD, even spreadsheets. We build the bridge.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What happens after the 10-day setup?</div>
+        <div class="faq-a">The system is yours. The $300/month covers the phone line, voice infrastructure, and ongoing tuning. If something breaks, we fix it. If your needs change, we adjust.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Why $2,500 when enterprise tools cost $2,000 a month?</div>
+        <div class="faq-a">Because the enterprise tools are built for 200-truck fleets with IT departments. You don't need 4% of what they sell. You need your dispatcher off the phone. That's what this costs to build well.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What's the deposit?</div>
+        <div class="faq-a">50% upfront, 50% at go-live. We don't start building until the deposit clears, and you don't pay the rest until it's working on your line.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta" id="book">
+  <div class="final-cta-inner">
+    <h2>Get your dispatcher <em>off the phone</em>.</h2>
+    <p>15-minute call. We'll look at your current call volume, show you a live demo, and quote your build. No slide decks. No BS.</p>
+    <a href="mailto:erisdothard1@gmail.com?subject=DispatchRelay%20inquiry" class="btn btn-primary">Book a call →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container footer-inner">
+    <div class="logo">
+      <div class="logo-mark">DR</div>
+      <span>DispatchRelay</span>
+    </div>
+    <div class="footer-meta">
+      &copy; 2026 Syntra AI · Nashville, TN · erisdothard1@gmail.com
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
