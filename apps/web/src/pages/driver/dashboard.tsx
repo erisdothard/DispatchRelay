@@ -28,6 +28,7 @@ const statusBadge: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
   dispatched: 'blue',
   awarded: 'blue',
   delivered: 'green',
+  completed: 'green',
 };
 
 const statusLabel: Record<string, string> = {
@@ -35,11 +36,13 @@ const statusLabel: Record<string, string> = {
   dispatched: 'Dispatched',
   awarded: 'Awarded',
   delivered: 'Delivered',
+  completed: 'Completed',
 };
 
 export default function DriverDashboard() {
   const navigate = useNavigate();
   const { profile, user } = useAuth();
+  const [allLoads, setAllLoads] = useState<Load[]>([]);
   const [loads, setLoads] = useState<Load[]>([]);
   const [activeLoads, setActiveLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
@@ -95,8 +98,10 @@ export default function DriverDashboard() {
       delivered: 3,
       completed: 4,
     };
+    // Fetch driver loads (pre-dispatch statuses always excluded at service layer)
     getDriverLoads(user.id)
       .then((all) => {
+        setAllLoads(all);
         const sorted = [...all].sort(
           (a, b) => (priority[a.status] ?? 5) - (priority[b.status] ?? 5),
         );
@@ -115,9 +120,17 @@ export default function DriverDashboard() {
     return realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, fetchLoads);
   }, [user?.id, fetchLoads]);
 
-  const inTransitCount = loads.filter((l) => l.status === 'in_transit').length;
-  const deliveredCount = loads.filter((l) => l.status === 'delivered').length;
-  const completedCount = loads.filter((l) => l.status === 'completed').length;
+  // Keep selectedLoad in sync with realtime updates
+  useEffect(() => {
+    if (!selectedLoad) return;
+    const updated = loads.find((l) => l.id === selectedLoad.id);
+    if (updated) setSelectedLoad(updated);
+  }, [loads]);
+
+  const inTransitCount = allLoads.filter((l) => l.status === 'in_transit').length;
+  const deliveredCount = allLoads.filter((l) => l.status === 'delivered').length;
+  const completedCount = allLoads.filter((l) => l.status === 'completed').length;
+  const deliveredLoads = allLoads.filter((l) => l.status === 'delivered');
 
   const name = profile?.full_name ?? 'Driver';
 
@@ -258,6 +271,43 @@ export default function DriverDashboard() {
             </button>
           );
         })()}
+
+        {/* Waiting on Broker — Delivered loads pending completion */}
+        {deliveredLoads.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
+                Waiting on Broker
+              </h2>
+              <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-green-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {deliveredLoads.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {deliveredLoads.map((load) => (
+                <button
+                  key={load.id}
+                  onClick={() => setSelectedLoad(load)}
+                  className="w-full text-left p-4 rounded-2xl border bg-green-500/[0.06] border-green-500/20"
+                  style={{ boxShadow: 'inset 3px 0 0 rgba(34, 197, 94, 0.65)' }}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/20 text-green-400">
+                      DELIVERED
+                    </span>
+                  </div>
+                  <p className="text-sm font-bold text-fx-text">
+                    {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
+                  </p>
+                  <p className="text-xs text-fx-text-muted mt-1">
+                    Delivered — waiting on broker to mark complete
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div>
@@ -438,7 +488,10 @@ export default function DriverDashboard() {
 
       <LoadDetailSheet
         load={selectedLoad}
-        onClose={() => setSelectedLoad(null)}
+        onClose={() => {
+          setSelectedLoad(null);
+          fetchLoads();
+        }}
         showBidButton={false}
         role="driver"
       />
