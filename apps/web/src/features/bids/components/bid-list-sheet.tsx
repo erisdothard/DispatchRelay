@@ -1,7 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, XCircle, Clock, Users, ArrowLeftRight, DollarSign } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
+  Users,
+  ArrowLeftRight,
+  DollarSign,
+  MessageSquare,
+} from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
-import { getBidsForLoad, acceptBid, declineBid, submitBid } from '@/services/bids.service';
+import { getBidsForLoad, acceptBid, declineBid, counterBid } from '@/services/bids.service';
+import { getOrCreateConversation } from '@/services/messages.service';
 import { SignatureModal } from '@/features/bookings/components/signature-modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -35,6 +45,7 @@ interface BidListSheetProps {
 
 export function BidListSheet({ open, onClose, load, onBidAccepted }: BidListSheetProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [bids, setBids] = useState<BidRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [actingId, setActingId] = useState<string | null>(null);
@@ -42,6 +53,7 @@ export function BidListSheet({ open, onClose, load, onBidAccepted }: BidListShee
   const [counterBidId, setCounterBidId] = useState<string | null>(null);
   const [counterAmount, setCounterAmount] = useState('');
   const [sigModal, setSigModal] = useState<{ bookingId: string; loadNumber: string } | null>(null);
+  const [messagingId, setMessagingId] = useState<string | null>(null);
 
   const fetchBids = useCallback(() => {
     if (!load) return;
@@ -101,16 +113,14 @@ export function BidListSheet({ open, onClose, load, onBidAccepted }: BidListShee
     setActingId(originalBid.id);
     setError(null);
     try {
-      // Mark original as countered
-      await declineBid(originalBid.id);
-      // Submit counter-bid from broker's perspective (using their user/company info)
-      await submitBid({
+      await counterBid({
+        originalBidId: originalBid.id,
         loadId: load.id,
-        carrierId: originalBid.carrier_id, // still attributed to the carrier
+        carrierId: originalBid.carrier_id,
         companyId: originalBid.company_id,
-        companyName: `Counter: ${originalBid.company_name || 'Carrier'}`,
-        amountUsd: amount,
-        notes: `Counter-offer from broker at $${amount.toLocaleString()}`,
+        companyName: originalBid.company_name || 'Carrier',
+        originalAmount: originalBid.amount_usd,
+        counterAmount: amount,
       });
       setCounterBidId(null);
       setCounterAmount('');
@@ -132,6 +142,26 @@ export function BidListSheet({ open, onClose, load, onBidAccepted }: BidListShee
       setError(e instanceof Error ? e.message : 'Failed to decline bid');
     } finally {
       setActingId(null);
+    }
+  }
+
+  async function handleMessageCarrier(bid: BidRow) {
+    if (!user || !load) return;
+    setMessagingId(bid.id);
+    try {
+      const convo = await getOrCreateConversation(
+        user.id,
+        bid.carrier_id,
+        bid.company_name || 'Carrier',
+        'carrier',
+        load.loadNumber,
+      );
+      onClose();
+      navigate('/messages', { state: { openConversation: convo } });
+    } catch {
+      setError('Failed to open conversation');
+    } finally {
+      setMessagingId(null);
     }
   }
 
@@ -200,6 +230,8 @@ export function BidListSheet({ open, onClose, load, onBidAccepted }: BidListShee
                   setCounterBidId(null);
                   setCounterAmount('');
                 }}
+                onMessage={() => handleMessageCarrier(bid)}
+                messaging={messagingId === bid.id}
               />
             ))}
 
@@ -216,6 +248,8 @@ export function BidListSheet({ open, onClose, load, onBidAccepted }: BidListShee
                 askingRate={load?.rateUsd ?? 0}
                 acting={false}
                 readOnly
+                onMessage={() => handleMessageCarrier(bid)}
+                messaging={messagingId === bid.id}
               />
             ))}
           </div>
@@ -249,6 +283,8 @@ function BidCard({
   onCounterAmountChange,
   onCounterSubmit,
   onCounterCancel,
+  onMessage,
+  messaging,
 }: {
   bid: BidRow;
   askingRate: number;
@@ -262,6 +298,8 @@ function BidCard({
   onCounterAmountChange?: (v: string) => void;
   onCounterSubmit?: () => void;
   onCounterCancel?: () => void;
+  onMessage?: () => void;
+  messaging?: boolean;
 }) {
   const diff = askingRate ? ((bid.amount_usd - askingRate) / askingRate) * 100 : 0;
   const diffLabel =
@@ -370,6 +408,24 @@ function BidCard({
             </div>
           )}
         </>
+      )}
+
+      {/* Message carrier button — always available */}
+      {onMessage && (
+        <button
+          onClick={onMessage}
+          disabled={messaging}
+          className="w-full h-8 rounded-xl border border-fx-border text-[11px] font-semibold text-fx-text-muted flex items-center justify-center gap-1.5 hover:border-fx-orange/40 hover:text-fx-orange transition-colors disabled:opacity-50 mt-2"
+        >
+          {messaging ? (
+            <span className="w-3 h-3 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
+          ) : (
+            <>
+              <MessageSquare size={12} />
+              Message Carrier
+            </>
+          )}
+        </button>
       )}
 
       {bid.status === 'accepted' && (

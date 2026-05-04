@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { ConversationRow, MessageRow } from '@/lib/database.types';
+import { notifyNewMessage } from './email-notifications.service';
 
 export async function getConversations(userId: string): Promise<ConversationRow[]> {
   const { data, error } = await supabase
@@ -39,7 +40,67 @@ export async function sendMessage(
     .update({ last_message: text, last_message_at: new Date().toISOString() })
     .eq('id', conversationId);
 
+  // Notify the recipient — in-app + email (non-blocking)
+  const { data: convo } = await supabase
+    .from('conversations')
+    .select('participant_a, participant_b')
+    .eq('id', conversationId)
+    .single();
+
+  if (convo) {
+    const recipientId =
+      convo.participant_a === senderId ? convo.participant_b : convo.participant_a;
+
+    if (recipientId) {
+      // In-app notification
+      const { data: sender } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', senderId)
+        .single();
+
+      const senderName = sender?.full_name || 'Someone';
+
+      supabase
+        .from('notifications')
+        .insert({
+          user_id: recipientId,
+          type: 'new_message',
+          title: `Message from ${senderName}`,
+          body: text.length > 120 ? text.slice(0, 120) + '...' : text,
+          read: false,
+        })
+        .then(
+          () => undefined,
+          () => undefined,
+        );
+
+      // Email notification
+      const { data: recipient } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('id', recipientId)
+        .single();
+
+      if (recipient?.email) {
+        notifyNewMessage({
+          recipientEmail: recipient.email as string,
+          senderName,
+          preview: text,
+        }).then(
+          () => undefined,
+          () => undefined,
+        );
+      }
+    }
+  }
+
   return data;
+}
+
+export async function deleteMessage(messageId: string): Promise<void> {
+  const { error } = await supabase.from('messages').delete().eq('id', messageId);
+  if (error) throw error;
 }
 
 /**

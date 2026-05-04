@@ -82,6 +82,28 @@ export async function notifyBidDeclined(params: {
   });
 }
 
+export async function notifyBidCountered(params: {
+  carrierEmail: string;
+  loadNumber: string;
+  origin: string;
+  dest: string;
+  originalAmount: number;
+  counterAmount: number;
+}): Promise<void> {
+  await enqueue({
+    template: 'bid_countered',
+    to: params.carrierEmail,
+    subject: `Counter-offer on load ${params.loadNumber}`,
+    data: {
+      load_number: params.loadNumber,
+      origin: params.origin,
+      dest: params.dest,
+      original_amount: params.originalAmount,
+      counter_amount: params.counterAmount,
+    },
+  });
+}
+
 export async function notifyBookingConfirmed(params: {
   email: string;
   loadNumber: string;

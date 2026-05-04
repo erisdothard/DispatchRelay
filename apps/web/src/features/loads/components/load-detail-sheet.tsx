@@ -37,6 +37,7 @@ import { BidSheet } from '@/features/bids/components/bid-sheet';
 import { BidListSheet } from '@/features/bids/components/bid-list-sheet';
 import { DocumentUpload } from '@/features/documents/components/document-upload';
 import { SignedBolViewer } from '@/features/documents/components/signed-bol-viewer';
+import { SignedRateConViewer } from '@/features/documents/components/signed-rate-con-viewer';
 import { EditLoadSheet } from './edit-load-sheet';
 import { AssignDriverSheet } from './assign-driver-sheet';
 import { getDocumentsForLoad, getBolStatusForLoads } from '@/services/documents.service';
@@ -44,7 +45,7 @@ import { getOrCreateConversation } from '@/services/messages.service';
 import { RateConSignatureSheet } from '@/features/documents/components/rate-con-signature-sheet';
 import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
-import { bookNow } from '@/services/bids.service';
+import { MapView } from '@/shared/components/map-view';
 import { updateLoad, nudgeCarrier, confirmReceipt } from '@/services/loads.service';
 import { generateRateCon } from '@/features/bookings/lib/generate-rate-con';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
@@ -126,14 +127,18 @@ export function LoadDetailSheet({
   const [rateConDownloadUrl, setRateConDownloadUrl] = useState<string | null>(null);
   const [bolDownloadUrl, setBolDownloadUrl] = useState<string | null>(null);
   const [rateConOpen, setRateConOpen] = useState(false);
+  const [rateConViewerOpen, setRateConViewerOpen] = useState(false);
+  const [signedRateConDoc, setSignedRateConDoc] = useState<
+    import('@/lib/database.types').DocumentRow | null
+  >(null);
   const [accessorialsOpen, setAccessorialsOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<LoadStatus | null>(null);
-  const [booking, setBooking] = useState(false);
-  const [bookError, setBookError] = useState<string | null>(null);
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [dispatching, setDispatching] = useState(false);
   const [assignDriverOpen, setAssignDriverOpen] = useState(false);
   const [driverAssigned, setDriverAssigned] = useState(!!load?.assignedDriverId);
+  const [hasBid, setHasBid] = useState(false);
   const [nudgeSent, setNudgeSent] = useState(false);
   const [receiptConfirmed, setReceiptConfirmed] = useState(false);
   const [confirmingReceipt, setConfirmingReceipt] = useState(false);
@@ -168,6 +173,10 @@ export function LoadDetailSheet({
   const [messaging, setMessaging] = useState(false);
 
   useEffect(() => {
+    setCurrentStatus(null);
+  }, [load?.id]);
+
+  useEffect(() => {
     if (!load?.id) return;
     const loadId = load.id;
 
@@ -181,6 +190,7 @@ export function LoadDetailSheet({
         const signedRateCon = docs.find((d) => d.type === 'rate_confirmation' && !!d.signed_at);
         setRateConSigned(!!signedRateCon);
         setRateConDownloadUrl(signedRateCon?.file_url ?? null);
+        setSignedRateConDoc(signedRateCon ?? null);
 
         const signedBol = docs.find((d) => d.type === 'bill_of_lading' && !!d.signed_at);
         setBolDownloadUrl(signedBol?.file_url ?? null);
@@ -192,7 +202,19 @@ export function LoadDetailSheet({
     checkDocStatus();
     setNudgeSent(false);
     setReceiptConfirmed(false);
-  }, [load?.id]);
+    setHasBid(false);
+
+    // Check if current carrier already has a bid on this load
+    if (user?.id) {
+      supabase
+        .from('bids')
+        .select('id')
+        .eq('load_id', loadId)
+        .eq('carrier_id', user.id)
+        .maybeSingle()
+        .then(({ data }) => setHasBid(!!data));
+    }
+  }, [load?.id, user?.id]);
 
   // Geolocation: distance to pickup (carrier/driver only, silent on denial)
   useEffect(() => {
@@ -313,17 +335,17 @@ export function LoadDetailSheet({
     }
   }
 
-  async function handleBookNow() {
+  async function handleDispatchLoad() {
     if (!load) return;
-    setBooking(true);
-    setBookError(null);
+    setDispatching(true);
     try {
-      await bookNow(load.id);
-      setCurrentStatus('awarded');
-    } catch (e) {
-      setBookError(e instanceof Error ? e.message : 'Booking failed');
+      await updateLoad(load.id, { status: 'dispatched' });
+      setCurrentStatus('dispatched');
+      setDocsOpen(true);
+    } catch {
+      // silently ignore — stepper will reflect current state
     } finally {
-      setBooking(false);
+      setDispatching(false);
     }
   }
 
@@ -452,6 +474,55 @@ export function LoadDetailSheet({
             <div className="flex items-center justify-center">
               <span className="text-[11px] font-semibold text-fx-text-dim bg-fx-surface/60 px-3 py-1 rounded-full">
                 {load.totalMiles} miles
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Route map — always visible, full-width with overlaid labels */}
+        <div className="mb-5 -mx-5 relative overflow-hidden">
+          <MapView
+            origin={{ city: load.originCity, state: load.originState }}
+            destination={{ city: load.destCity, state: load.destState }}
+            originAddress={load.originAddress}
+            destAddress={load.destAddress}
+            inTransit={liveStatus === 'in_transit'}
+            className="h-48"
+          />
+          {/* Overlaid route labels */}
+          <div
+            className="absolute bottom-0 left-0 right-0 px-4 pb-2.5 pt-8 flex items-end justify-between pointer-events-none"
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)' }}
+          >
+            <div>
+              <p className="text-[9px] font-bold text-green-400 uppercase tracking-widest">
+                Pickup
+              </p>
+              <p className="text-[13px] font-bold text-white leading-tight">
+                {load.originCity}, {load.originState}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-[9px] font-bold text-fx-orange uppercase tracking-widest">
+                Drop-off
+              </p>
+              <p className="text-[13px] font-bold text-white leading-tight">
+                {load.destCity}, {load.destState}
+              </p>
+            </div>
+          </div>
+          {/* Miles badge */}
+          {load.totalMiles && (
+            <div className="absolute top-2.5 right-3 pointer-events-none" style={{ zIndex: 1000 }}>
+              <span
+                className="text-[11px] font-bold text-white px-2.5 py-1 rounded-full"
+                style={{
+                  background: 'rgba(14,14,22,0.72)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                }}
+              >
+                {load.totalMiles.toLocaleString()} mi
               </span>
             </div>
           )}
@@ -591,13 +662,38 @@ export function LoadDetailSheet({
               role={role}
               hasDriverAssigned={driverAssigned || !!load.assignedDriverId}
               rateConSigned={rateConSigned}
-              onStatusAdvanced={(s) => setCurrentStatus(s)}
+              onStatusAdvanced={(s) => {
+                setCurrentStatus(s);
+                if (s === 'completed') setTimeout(onClose, 800);
+              }}
               onDispatched={() => setDocsOpen(true)}
               onRateConRequired={() => setRateConOpen(true)}
               loadNumber={load.loadNumber}
               origin={`${load.originCity}, ${load.originState}`}
               dest={`${load.destCity}, ${load.destState}`}
             />
+          </div>
+        )}
+
+        {/* Broker: bids received — review and award */}
+        {isBroker && liveStatus === 'bid_received' && (
+          <div className="mb-5 p-4 rounded-2xl bg-fx-orange/10 border border-fx-orange/30">
+            <p className="text-xs font-bold text-fx-orange uppercase tracking-widest mb-1">
+              Bids Received
+            </p>
+            <p className="text-[12px] text-fx-text-muted mb-3">
+              {load.bidCount && load.bidCount > 0
+                ? `${load.bidCount} carrier${load.bidCount === 1 ? '' : 's'} submitted a bid. Review and accept the best offer to award the load.`
+                : 'Carriers have submitted bids. Review and accept the best offer to award the load.'}
+            </p>
+            <button
+              onClick={() => setBidListOpen(true)}
+              className="w-full h-[44px] rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold text-white bg-orange-gradient active-scale"
+              style={{ boxShadow: '0 4px 16px rgba(232,96,48,0.35)' }}
+            >
+              <Users size={15} />
+              Review Bids &amp; Award →
+            </button>
           </div>
         )}
 
@@ -628,6 +724,56 @@ export function LoadDetailSheet({
           </div>
         )}
 
+        {/* Broker: load en route */}
+        {isBroker && (liveStatus === 'dispatched' || liveStatus === 'in_transit') && (
+          <div className="mb-5 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">
+              {liveStatus === 'dispatched' ? 'En Route to Pickup' : 'Load In Transit'}
+            </p>
+            <p className="text-[12px] text-fx-text-muted">
+              {liveStatus === 'dispatched'
+                ? "Carrier is heading to the pickup location. You'll be notified when the driver marks in transit."
+                : "Driver is on the road. You'll be notified when delivery is confirmed and the BOL is signed."}
+            </p>
+          </div>
+        )}
+
+        {/* Broker: delivered — awaiting BOL */}
+        {isBroker && liveStatus === 'delivered' && !hasSignedBol && (
+          <div className="mb-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+            <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">
+              Awaiting BOL Signature
+            </p>
+            <p className="text-[12px] text-fx-text-muted">
+              The driver still needs to sign the Bill of Lading. You can complete this load once
+              it's signed.
+            </p>
+          </div>
+        )}
+
+        {/* Broker: delivered + BOL signed — ready to complete */}
+        {isBroker && liveStatus === 'delivered' && hasSignedBol && (
+          <div className="mb-5 p-4 rounded-2xl bg-green-500/10 border border-green-500/20">
+            <p className="text-xs font-bold text-green-400 uppercase tracking-widest mb-1">
+              ✓ Delivered — BOL Signed
+            </p>
+            <p className="text-[12px] text-fx-text-muted mb-3">
+              Driver delivered and signed the Bill of Lading. Complete this load to close it out for
+              all parties.
+            </p>
+            {bolDownloadUrl && (
+              <a
+                href={bolDownloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] font-semibold text-green-400 underline underline-offset-2"
+              >
+                View Signed BOL
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Rate Con CTA - carrier must sign before dispatch */}
         {isCarrier && liveStatus === 'awarded' && !rateConSigned && (
           <div className="mb-5">
@@ -647,13 +793,36 @@ export function LoadDetailSheet({
           </div>
         )}
 
-        {/* Rate Con signed badge */}
+        {/* Rate Con signed badge — tap to view */}
         {isCarrier && liveStatus !== 'posted' && rateConSigned && (
-          <div className="mb-5 flex items-center gap-2 px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20">
-            <FileText size={13} className="text-green-400" />
-            <span className="text-[12px] font-semibold text-green-400">
-              Rate Confirmation Signed
-            </span>
+          <button
+            onClick={() => setRateConViewerOpen(true)}
+            className="mb-5 w-full flex items-center justify-between px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <FileText size={13} className="text-green-400" />
+              <span className="text-[12px] font-semibold text-green-400">
+                Rate Confirmation Signed
+              </span>
+            </div>
+            <span className="text-[11px] font-semibold text-green-400">View →</span>
+          </button>
+        )}
+
+        {/* Assigned Driver — carrier only */}
+        {isCarrier && (driverAssigned || load.assignedDriverId) && (
+          <div className="mb-4 flex items-center gap-3 p-3 rounded-2xl bg-fx-surface border border-fx-border">
+            <div className="w-9 h-9 rounded-full bg-green-500/15 flex items-center justify-center shrink-0">
+              <UserCheck size={16} className="text-green-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-semibold text-fx-text-dim uppercase tracking-widest">
+                Assigned Driver
+              </p>
+              <p className="text-sm font-bold text-white truncate">
+                {load.driverName ?? 'Driver assigned'}
+              </p>
+            </div>
           </div>
         )}
 
@@ -671,6 +840,60 @@ export function LoadDetailSheet({
               </button>
             </div>
           )}
+
+        {/* Carrier: waiting on driver alerts */}
+        {isCarrier && liveStatus === 'dispatched' && (
+          <div className="mb-5 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">
+              Waiting on Driver
+            </p>
+            <p className="text-[12px] text-fx-text-muted">
+              Driver has been dispatched. They will mark the load in transit once they're on the
+              road.
+            </p>
+          </div>
+        )}
+        {isCarrier && liveStatus === 'in_transit' && (
+          <div className="mb-5 p-4 rounded-2xl bg-fx-orange/10 border border-fx-orange/20">
+            <p className="text-xs font-bold text-fx-orange uppercase tracking-widest mb-1">
+              Driver In Transit
+            </p>
+            <p className="text-[12px] text-fx-text-muted">
+              Your driver is on the road. You'll be notified when they deliver and sign the BOL.
+            </p>
+          </div>
+        )}
+        {isCarrier && liveStatus === 'delivered' && !hasSignedBol && (
+          <div className="mb-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+            <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">
+              Awaiting BOL Signature
+            </p>
+            <p className="text-[12px] text-fx-text-muted">
+              Driver marked the load as delivered. Waiting for them to sign the Bill of Lading to
+              confirm.
+            </p>
+          </div>
+        )}
+        {isCarrier && liveStatus === 'delivered' && hasSignedBol && (
+          <div className="mb-5 p-4 rounded-2xl bg-green-500/10 border border-green-500/20">
+            <p className="text-xs font-bold text-green-400 uppercase tracking-widest mb-1">
+              ✓ Delivery Confirmed
+            </p>
+            <p className="text-[12px] text-fx-text-muted">
+              Driver delivered and signed the BOL. Waiting for the broker to close out this load.
+            </p>
+            {bolDownloadUrl && (
+              <a
+                href={bolDownloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] font-semibold text-green-400 underline underline-offset-2 mt-2 inline-block"
+              >
+                View Signed BOL
+              </a>
+            )}
+          </div>
+        )}
 
         {/* Shipper: carrier assigned info */}
         {isShipper && ACTIVE_STATUSES.includes(liveStatus) && load.assigneeName && (
@@ -1765,6 +1988,22 @@ export function LoadDetailSheet({
                   ⬇ Download Rate Confirmation
                 </button>
               )}
+              {/* Broker: complete load CTA when delivered + BOL signed */}
+              {liveStatus === 'delivered' && hasSignedBol && (
+                <button
+                  onClick={async () => {
+                    await updateLoad(load.id, { status: 'completed' });
+                    setCurrentStatus('completed');
+                    setTimeout(onClose, 800);
+                  }}
+                  className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white active-scale bg-orange-gradient"
+                  style={{ boxShadow: '0 4px 20px rgba(232,96,48,0.4)' }}
+                >
+                  <ArrowRight size={17} strokeWidth={2.5} />
+                  Complete This Load
+                </button>
+              )}
+
               <button
                 onClick={() => setBidListOpen(true)}
                 className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold bg-fx-surface border border-fx-border text-fx-text hover:border-fx-orange/50 transition-all"
@@ -1826,46 +2065,58 @@ export function LoadDetailSheet({
             </>
           )}
 
-          {/* Carrier: bid now + book now */}
-          {isCarrier && showBidButton && liveStatus === 'posted' && (
-            <>
-              {bookError && (
-                <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-3 py-2">
-                  {bookError}
-                </p>
-              )}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setBidOpen(true)}
-                  className="flex-1 rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white active-scale bg-orange-gradient"
-                  style={{ boxShadow: '0 4px 20px rgba(232,96,48,0.4)', height: '52px' }}
-                >
-                  <Zap size={16} fill="currentColor" />
-                  Bid Now
-                </button>
-                <button
-                  onClick={handleBookNow}
-                  disabled={booking}
-                  className="flex-1 h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold bg-green-500 text-white disabled:opacity-50 hover:opacity-90 transition-opacity"
-                >
-                  {booking ? (
-                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>⚡ Book Now</>
-                  )}
-                </button>
-              </div>
-            </>
-          )}
+          {/* Carrier: bid now */}
+          {isCarrier &&
+            showBidButton &&
+            liveStatus === 'posted' &&
+            (hasBid ? (
+              <button
+                disabled
+                className="w-full rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-fx-text-dim bg-fx-surface border border-fx-border cursor-not-allowed"
+                style={{ height: '52px' }}
+              >
+                <Zap size={16} />
+                Bid Submitted
+              </button>
+            ) : (
+              <button
+                onClick={() => setBidOpen(true)}
+                className="w-full rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white active-scale bg-orange-gradient"
+                style={{ boxShadow: '0 4px 20px rgba(232,96,48,0.4)', height: '52px' }}
+              >
+                <Zap size={16} fill="currentColor" />
+                Bid Now
+              </button>
+            ))}
 
-          {/* Carrier: already bid / awarded */}
-          {isCarrier && liveStatus !== 'posted' && (
-            <div className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-semibold text-fx-text-muted bg-fx-surface border border-fx-border">
-              {liveStatus === 'awarded'
-                ? '🎉 Load Awarded'
-                : `Status: ${liveStatus.replace('_', ' ')}`}
-            </div>
-          )}
+          {/* Carrier: dispatch CTA or status badge */}
+          {isCarrier &&
+            liveStatus !== 'posted' &&
+            (liveStatus === 'awarded' &&
+            rateConSigned &&
+            (driverAssigned || !!load.assignedDriverId) ? (
+              <button
+                onClick={handleDispatchLoad}
+                disabled={dispatching}
+                className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white active-scale bg-orange-gradient disabled:opacity-50"
+                style={{ boxShadow: '0 4px 20px rgba(232,96,48,0.4)' }}
+              >
+                {dispatching ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <ArrowRight size={17} strokeWidth={2.5} />
+                    Mark as Dispatched
+                  </>
+                )}
+              </button>
+            ) : (
+              <div className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-semibold text-fx-text-muted bg-fx-surface border border-fx-border">
+                {liveStatus === 'awarded'
+                  ? '🎉 Load Awarded'
+                  : `Status: ${liveStatus.replace('_', ' ')}`}
+              </div>
+            ))}
 
           {/* Carrier: message broker button on awarded+ loads */}
           {isCarrier && ACTIVE_STATUSES.includes(liveStatus) && load.postedBy && (
@@ -1941,7 +2192,12 @@ export function LoadDetailSheet({
       </BottomSheet>
 
       {/* Nested sheets */}
-      <BidSheet open={bidOpen} onClose={() => setBidOpen(false)} load={load} />
+      <BidSheet
+        open={bidOpen}
+        onClose={() => setBidOpen(false)}
+        load={load}
+        onBidSubmitted={() => setHasBid(true)}
+      />
 
       <BidListSheet
         open={bidListOpen}

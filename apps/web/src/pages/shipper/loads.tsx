@@ -9,6 +9,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { cn } from '@/shared/lib/utils';
 import { getLoads } from '@/services/loads.service';
+import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Load } from '@freightx/shared';
 
@@ -63,6 +64,23 @@ export default function ShipperLoadsPage() {
   useEffect(() => {
     fetchLoads();
   }, [fetchLoads]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const u1 = realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, fetchLoads);
+    const u2 = realtimeSubscribe({ table: 'loads', event: 'INSERT' }, fetchLoads);
+    return () => {
+      u1();
+      u2();
+    };
+  }, [user?.id, fetchLoads]);
+
+  // Keep selectedLoad in sync when loads refresh
+  useEffect(() => {
+    if (!selectedLoad) return;
+    const updated = loads.find((l) => l.id === selectedLoad.id);
+    if (updated) setSelectedLoad(updated);
+  }, [loads]);
 
   const filtered = statusFilter === 'All' ? loads : loads.filter((l) => l.status === statusFilter);
 
@@ -204,7 +222,10 @@ export default function ShipperLoadsPage() {
 
       <LoadDetailSheet
         load={selectedLoad}
-        onClose={() => setSelectedLoad(null)}
+        onClose={() => {
+          setSelectedLoad(null);
+          fetchLoads();
+        }}
         showBidButton={false}
         role="shipper"
       />

@@ -26,6 +26,7 @@ import OnboardingPage from '@/pages/onboarding';
 const CarrierDashboard = lazyRetry(() => import('@/pages/carrier/dashboard'));
 const CarrierLoadsPage = lazyRetry(() => import('@/pages/carrier/loads'));
 const CarrierFleetPage = lazyRetry(() => import('@/pages/carrier/fleet'));
+const CarrierFleetMapPage = lazyRetry(() => import('@/pages/carrier/fleet-map'));
 const CarrierTeamPage = lazyRetry(() => import('@/pages/carrier/team'));
 const CarrierTeamSettingsPage = lazyRetry(() => import('@/pages/carrier/team-settings'));
 
@@ -38,7 +39,6 @@ const ShipperLoadsPage = lazyRetry(() => import('@/pages/shipper/loads'));
 const DriverDashboard = lazyRetry(() => import('@/pages/driver/dashboard'));
 const DriverLoadsPage = lazyRetry(() => import('@/pages/driver/loads'));
 const DriverDocumentsPage = lazyRetry(() => import('@/pages/driver/documents'));
-const DriverTeamPage = lazyRetry(() => import('@/pages/driver/team'));
 const DriverTireLogPage = lazyRetry(() => import('@/pages/driver/tire-log'));
 const DriverReceiptsPage = lazyRetry(() => import('@/pages/driver/receipts'));
 const DriverExpensesPage = lazyRetry(() => import('@/pages/driver/expenses'));
@@ -97,6 +97,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole={['carrier', 'broker']}>
                 <CarrierFleetPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/carrier/map"
+            element={
+              <ProtectedRoute requiredRole={['carrier', 'broker']}>
+                <CarrierFleetMapPage />
               </ProtectedRoute>
             }
           />
@@ -184,14 +192,6 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="driver">
                 <DriverDocumentsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/driver/team"
-            element={
-              <ProtectedRoute requiredRole="driver">
-                <DriverTeamPage />
               </ProtectedRoute>
             }
           />

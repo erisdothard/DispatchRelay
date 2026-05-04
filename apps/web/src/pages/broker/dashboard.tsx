@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, TrendingUp, Package, DollarSign, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -8,6 +8,7 @@ import { StatCard } from '@/shared/components/stat-card';
 import { LoadCard } from '@/features/loads/components/load-card';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLoads, getLoadById } from '@/services/loads.service';
+import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { CarrierRelationshipsSheet } from '@/features/carriers/components/carrier-relationships-sheet';
@@ -23,9 +24,31 @@ export default function BrokerDashboard() {
   const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
+  const fetchLoads = useCallback(() => {
+    if (!user?.id) return;
+    getLoads({ postedBy: user.id }).then(setLoads).catch(console.error);
+  }, [user?.id]);
+
   useEffect(() => {
-    getLoads({ postedBy: user?.id }).then(setLoads).catch(console.error);
-  }, [user]);
+    fetchLoads();
+  }, [fetchLoads]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const u1 = realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, fetchLoads);
+    const u2 = realtimeSubscribe({ table: 'loads', event: 'INSERT' }, fetchLoads);
+    return () => {
+      u1();
+      u2();
+    };
+  }, [user?.id, fetchLoads]);
+
+  // Keep selectedLoad in sync when loads refresh
+  useEffect(() => {
+    if (!selectedLoad) return;
+    const updated = loads.find((l) => l.id === selectedLoad.id);
+    if (updated) setSelectedLoad(updated);
+  }, [loads]);
 
   const name = profile?.full_name ?? 'Broker';
 
@@ -40,8 +63,13 @@ export default function BrokerDashboard() {
   const inProgressLoads = loads.filter((l) =>
     ['awarded', 'dispatched', 'in_transit'].includes(l.status),
   ).length;
+  const deliveredAwaitingCompletion = loads.filter((l) => l.status === 'delivered');
+  const bidsToReview = loads.filter((l) => l.status === 'bid_received');
   // Exclude canceled loads from recent loads
-  const recentLoads = loads.filter((l) => l.status !== 'cancelled').slice(0, 3);
+  const recentLoads = loads
+    .filter((l) => ['posted', 'awarded', 'dispatched', 'in_transit'].includes(l.status))
+    .sort((a, b) => new Date(b.postedAt ?? 0).getTime() - new Date(a.postedAt ?? 0).getTime())
+    .slice(0, 3);
 
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">
@@ -71,6 +99,110 @@ export default function BrokerDashboard() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
+        {/* Action Required — Delivered loads needing completion */}
+        {deliveredAwaitingCompletion.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
+                  Pending
+                </p>
+                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
+                  Action Required
+                </p>
+              </div>
+              <span className="text-[11px] font-bold text-amber-900 bg-amber-400 px-2.5 py-1 rounded-full">
+                {deliveredAwaitingCompletion.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {deliveredAwaitingCompletion.map((load) => (
+                <button
+                  key={load.id}
+                  onClick={() => setSelectedLoad(load)}
+                  className="w-full text-left bg-green-500/[0.06] border border-green-500/20 rounded-ios-sm p-4 active-scale transition-colors"
+                  style={{ boxShadow: 'inset 3px 0 0 rgba(34, 197, 94, 0.65)' }}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-[11px] text-fx-text-dim">Load {load.loadNumber}</p>
+                      <p className="text-[15px] font-bold text-white mt-0.5">
+                        {load.originCity} → {load.destCity}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[15px] font-bold text-fx-orange">
+                        ${load.rateUsd.toLocaleString()}
+                      </p>
+                      <span className="text-[10px] font-semibold text-green-400 tracking-[0.06em] uppercase">
+                        Delivered
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] text-fx-text-dim">
+                      <span className="text-green-400 font-semibold">Ready to close out</span>
+                    </p>
+                    <p className="text-[11px] font-bold text-green-400">Mark Complete →</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Bids to Review */}
+        {bidsToReview.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
+                  Action Required
+                </p>
+                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
+                  Bids to Review
+                </p>
+              </div>
+              <span className="text-[11px] font-bold text-white bg-fx-orange px-2.5 py-1 rounded-full">
+                {bidsToReview.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {bidsToReview.map((load) => (
+                <button
+                  key={load.id}
+                  onClick={() => setSelectedLoad(load)}
+                  className="w-full text-left bg-fx-orange/[0.06] border border-fx-orange/25 rounded-ios-sm p-4 active-scale transition-colors"
+                  style={{ boxShadow: 'inset 3px 0 0 rgba(232,96,48,0.65)' }}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="text-[11px] text-fx-text-dim">Load {load.loadNumber}</p>
+                      <p className="text-[15px] font-bold text-white mt-0.5">
+                        {load.originCity} → {load.destCity}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[15px] font-bold text-fx-orange">
+                        ${load.rateUsd.toLocaleString()}
+                      </p>
+                      <span className="text-[10px] font-semibold text-fx-orange tracking-[0.06em] uppercase">
+                        {load.bidCount ?? 1} Bid{(load.bidCount ?? 1) !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] text-fx-text-dim">
+                      <span className="text-fx-orange font-semibold">Carriers are waiting</span>
+                    </p>
+                    <p className="text-[11px] font-bold text-fx-orange">Review &amp; Award →</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
         <div>
           <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3">
@@ -125,7 +257,7 @@ export default function BrokerDashboard() {
           <div className="space-y-3">
             {recentLoads.length === 0 ? (
               <div className="bg-fx-surface border border-fx-border rounded-2xl p-6 text-center text-sm text-fx-text-muted">
-                No loads posted yet
+                No active loads in pipeline
               </div>
             ) : (
               recentLoads.map((load) => (
@@ -180,7 +312,10 @@ export default function BrokerDashboard() {
 
       <LoadDetailSheet
         load={selectedLoad}
-        onClose={() => setSelectedLoad(null)}
+        onClose={() => {
+          setSelectedLoad(null);
+          fetchLoads();
+        }}
         showBidButton={false}
         role={profile?.role as 'broker' | 'carrier' | 'driver' | undefined}
       />

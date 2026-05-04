@@ -137,7 +137,7 @@ export async function getLoadsPage(filters: LoadFilters = {}): Promise<LoadsPage
 export async function getLoadByNumber(loadNumber: string): Promise<Load | null> {
   const { data, error } = await supabase
     .from('loads')
-    .select('*')
+    .select('*, driver_profile:assigned_driver_id(full_name)')
     .eq('load_number', loadNumber)
     .single();
   if (error) return null;
@@ -285,24 +285,38 @@ export async function getMyActiveLoads(carrierId: string): Promise<Load[]> {
   //    - Loads where carrier's company owns the load and status is active
   let query = supabase
     .from('loads')
-    .select('*, company_logo_url:companies!loads_company_id_fkey(logo_url)');
+    .select(
+      '*, driver_profile:assigned_driver_id(full_name), company_logo_url:companies!loads_company_id_fkey(logo_url)',
+    );
 
   if (bidLoadIds.length > 0 && membership?.company_id) {
     query = query.or(
-      `id.in.(${bidLoadIds.join(',')}),and(company_id.eq.${membership.company_id},status.in.(awarded,dispatched,in_transit))`,
+      `id.in.(${bidLoadIds.join(',')}),and(company_id.eq.${membership.company_id},status.in.(awarded,dispatched,in_transit,delivered,completed,cancelled,expired))`,
     );
   } else if (bidLoadIds.length > 0) {
     query = query.in('id', bidLoadIds);
   } else if (membership?.company_id) {
     query = query
       .eq('company_id', membership.company_id)
-      .in('status', ['awarded', 'dispatched', 'in_transit']);
+      .in('status', [
+        'awarded',
+        'dispatched',
+        'in_transit',
+        'delivered',
+        'completed',
+        'cancelled',
+        'expired',
+      ]);
   } else {
     return [];
   }
 
-  // Exclude terminal statuses from carrier "My Loads" view
-  query = query.not('status', 'in', '("completed","cancelled","tonu","rejected","delivered")');
+  // Exclude pre-award and terminal statuses — carrier only sees loads they're working
+  query = query.not(
+    'status',
+    'in',
+    '("posted","bid_received","cancelled","tonu","rejected","draft")',
+  );
 
   const { data, error } = await query.order('pickup_date', { ascending: true });
   if (error) throw error;
@@ -403,12 +417,16 @@ export async function getDriverLoads(driverId: string, status?: string): Promise
     .or(`assigned_driver_id.eq.${driverId},second_driver_id.eq.${driverId}`)
     .order('pickup_date', { ascending: true });
 
-  if (status) {
+  // Drivers never have a view of pre-dispatch statuses — always exclude them
+  query = query.not('status', 'in', '("posted","bid_received","awarded","draft")');
+
+  if (status && status !== 'all') {
     query = query.eq('status', status as LoadStatus);
-  } else {
-    // Hide fully closed loads from default view
-    query = query.not('status', 'in', '("completed","cancelled","tonu","rejected")');
+  } else if (!status) {
+    // Hide cancelled/rejected but keep completed so drivers see their delivery history
+    query = query.not('status', 'in', '("cancelled","tonu","rejected")');
   }
+  // status === 'all' → no additional filter beyond the pre-dispatch exclusion above
 
   const { data, error } = await query;
   if (error) throw error;

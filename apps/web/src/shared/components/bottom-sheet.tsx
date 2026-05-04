@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 interface BottomSheetProps {
@@ -9,6 +9,8 @@ interface BottomSheetProps {
 }
 
 export function BottomSheet({ open, onClose, title, children }: BottomSheetProps) {
+  const pointerDownTarget = useRef<EventTarget | null>(null);
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
@@ -25,7 +27,16 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
   return (
     <div className="fixed inset-0 z-[60] flex flex-col justify-end">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onPointerDown={(e) => {
+          pointerDownTarget.current = e.target;
+        }}
+        onClick={(e) => {
+          if (pointerDownTarget.current === e.currentTarget) onClose();
+          pointerDownTarget.current = null;
+        }}
+      />
 
       {/* Sheet */}
       <div

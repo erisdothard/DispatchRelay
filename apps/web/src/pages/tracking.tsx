@@ -222,6 +222,15 @@ export default function TrackingPage() {
                     value: `${load.weightLbs.toLocaleString()} lbs`,
                     accent: false,
                   },
+                  ...(load.assignedDriverId
+                    ? [
+                        {
+                          label: 'Driver',
+                          value: load.driverName ?? 'Assigned',
+                          accent: false,
+                        },
+                      ]
+                    : []),
                 ].map(({ label, value, accent }) => (
                   <div key={label}>
                     <p className="text-[11px] text-fx-text-dim font-medium mb-1 uppercase tracking-wide">

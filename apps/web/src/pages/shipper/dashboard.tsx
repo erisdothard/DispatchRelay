@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Package, Clock, TrendingDown, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -8,6 +8,7 @@ import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLoads, getLoadById } from '@/services/loads.service';
+import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
@@ -41,11 +42,31 @@ export default function ShipperDashboard() {
   const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
-  useEffect(() => {
-    if (user?.id) {
-      getLoads({ postedBy: user.id }).then(setLoads).catch(console.error);
-    }
+  const fetchLoads = useCallback(() => {
+    if (!user?.id) return;
+    getLoads({ postedBy: user.id }).then(setLoads).catch(console.error);
   }, [user?.id]);
+
+  useEffect(() => {
+    fetchLoads();
+  }, [fetchLoads]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const u1 = realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, fetchLoads);
+    const u2 = realtimeSubscribe({ table: 'loads', event: 'INSERT' }, fetchLoads);
+    return () => {
+      u1();
+      u2();
+    };
+  }, [user?.id, fetchLoads]);
+
+  // Keep selectedLoad in sync when loads refresh
+  useEffect(() => {
+    if (!selectedLoad) return;
+    const updated = loads.find((l) => l.id === selectedLoad.id);
+    if (updated) setSelectedLoad(updated);
+  }, [loads]);
 
   const name = profile?.full_name ?? 'Shipper';
   const inTransitLoads = loads.filter((l) => l.status === 'in_transit');
@@ -267,7 +288,10 @@ export default function ShipperDashboard() {
 
       <LoadDetailSheet
         load={selectedLoad}
-        onClose={() => setSelectedLoad(null)}
+        onClose={() => {
+          setSelectedLoad(null);
+          fetchLoads();
+        }}
         showBidButton={false}
         role="shipper"
       />

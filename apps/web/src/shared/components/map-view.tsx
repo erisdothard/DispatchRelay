@@ -1,16 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Polyline,
-  Circle,
-  useMap,
-  useMapEvents,
-} from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import Map, { Marker, Source, Layer, type MapRef } from 'react-map-gl/mapbox';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { geocodeCity, geocodeAddress } from '@/lib/geocoding';
+
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
 // ── Apple-style SVG teardrop pins ────────────────────────────────────────────
 
@@ -27,110 +20,59 @@ function makePinSvg(fill: string) {
   );
 }
 
-const originIcon = L.divIcon({
-  className: '',
-  html: makePinSvg('#22c55e'),
-  iconSize: [28, 36],
-  iconAnchor: [14, 36],
-});
+// ── Driver marker — precision dot + heading wedge + pulse ring ────────────────
 
-const destIcon = L.divIcon({
-  className: '',
-  html: makePinSvg('#e86030'),
-  iconSize: [28, 36],
-  iconAnchor: [14, 36],
-});
-
-function makeTruckIcon(live: boolean, heading?: number | null) {
-  const pulse = live
-    ? `<div style="position:absolute;inset:0;border-radius:50%;background:#e86030;` +
-      `animation:fx-pulse-ring 1.8s ease-out infinite;pointer-events:none;z-index:0"></div>`
-    : '';
-  // Direction arrow overlay — only when we have a real heading
-  const arrow =
-    heading != null
-      ? `<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(${heading}deg);` +
-        `width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;` +
-        `border-bottom:9px solid #fff;z-index:2;pointer-events:none"></div>`
-      : '';
-  return L.divIcon({
-    className: '',
-    html:
-      `<div style="position:relative;width:30px;height:30px">` +
-      pulse +
-      arrow +
-      `<div style="position:relative;z-index:1;width:30px;height:30px;` +
-      `background:linear-gradient(145deg,#f07040,#c03a12);border-radius:50%;` +
-      `border:2.5px solid #fff;box-shadow:0 4px 16px rgba(232,96,48,.65);` +
-      `display:flex;align-items:center;justify-content:center;font-size:14px">🚛</div>` +
-      `</div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
-  });
-}
-
-// ── Auto-fit bounds ───────────────────────────────────────────────────────────
-
-function FitBounds({ positions }: { positions: [number, number][] }) {
-  const map = useMap();
-  useEffect(() => {
-    if (positions.length === 0) return;
-    if (positions.length === 1) {
-      map.setView(positions[0], 10, { animate: true });
-    } else {
-      map.fitBounds(L.latLngBounds(positions), { padding: [44, 44], animate: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, JSON.stringify(positions)]);
-  return null;
-}
-
-// ── Glass zoom buttons ────────────────────────────────────────────────────────
-
-function ZoomControl() {
-  const map = useMapEvents({});
+function DriverMarker({ heading, inTransit }: { heading?: number | null; inTransit: boolean }) {
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: 14,
-        right: 12,
-        zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-      }}
-    >
-      {(['+', '−'] as const).map((label, i) => (
-        <button
-          key={label}
-          onClick={() => (i === 0 ? map.zoomIn() : map.zoomOut())}
+    <div style={{ position: 'relative', width: 30, height: 30 }}>
+      {inTransit && (
+        <div
           style={{
-            width: 32,
-            height: 32,
-            background: 'rgba(14,14,22,0.72)',
-            backdropFilter: 'blur(14px)',
-            WebkitBackdropFilter: 'blur(14px)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: i === 0 ? '10px 10px 4px 4px' : '4px 4px 10px 10px',
-            color: '#fff',
-            fontSize: 20,
-            fontWeight: 300,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            lineHeight: 1,
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            background: '#e86030',
+            animation: 'fx-pulse-ring 1.8s ease-out infinite',
+            pointerEvents: 'none',
+            zIndex: 0,
           }}
-        >
-          {label}
-        </button>
-      ))}
+        />
+      )}
+      <svg width="30" height="30" viewBox="0 0 24 24" style={{ position: 'relative', zIndex: 1 }}>
+        {heading != null && (
+          <path
+            d="M12 12 L8 4 L16 4 Z"
+            fill="#e86030"
+            opacity="0.7"
+            transform={`rotate(${heading}, 12, 12)`}
+          />
+        )}
+        <circle cx="12" cy="12" r="6" fill="#e86030" />
+        <circle cx="12" cy="12" r="3" fill="rgba(255,255,255,0.85)" />
+      </svg>
     </div>
   );
 }
 
-// ── MapView ───────────────────────────────────────────────────────────────────
+// ── Geofence circle → GeoJSON polygon ────────────────────────────────────────
+
+function circleToPolygon(lat: number, lng: number, radiusM: number, steps = 64) {
+  const km = radiusM / 1000;
+  const distX = km / (111.32 * Math.cos((lat * Math.PI) / 180));
+  const distY = km / 110.574;
+  const coords: [number, number][] = [];
+  for (let i = 0; i <= steps; i++) {
+    const theta = (i / steps) * 2 * Math.PI;
+    coords.push([lng + distX * Math.cos(theta), lat + distY * Math.sin(theta)]);
+  }
+  return {
+    type: 'Feature' as const,
+    geometry: { type: 'Polygon' as const, coordinates: [coords] },
+    properties: {},
+  };
+}
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface GeofenceCircle {
   lat: number;
@@ -151,7 +93,7 @@ interface MapViewProps {
   className?: string;
   /** Real GPS position [lat, lng]. When provided, replaces interpolated truck position. */
   livePosition?: [number, number];
-  /** Direction of travel in degrees (0–360). Renders an arrow on the truck icon. */
+  /** Direction of travel in degrees (0–360). Renders an arrow on the truck marker. */
   heading?: number | null;
   /** Breadcrumb trail polyline for route replay */
   breadcrumbTrail?: [number, number][];
@@ -160,6 +102,8 @@ interface MapViewProps {
   /** Geofence circles to render on the map */
   geofences?: GeofenceCircle[];
 }
+
+// ── MapView ───────────────────────────────────────────────────────────────────
 
 export function MapView({
   origin,
@@ -175,14 +119,11 @@ export function MapView({
   replayIndex,
   geofences,
 }: MapViewProps) {
+  const mapRef = useRef<MapRef>(null);
   const [originPos, setOriginPos] = useState<[number, number] | null>(null);
   const [destPos, setDestPos] = useState<[number, number] | null>(null);
   const [loading, setLoading] = useState(true);
-  const truckIconRef = useRef(makeTruckIcon(inTransit, heading));
-
-  useEffect(() => {
-    truckIconRef.current = makeTruckIcon(inTransit, heading);
-  }, [inTransit, heading]);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -216,6 +157,22 @@ export function MapView({
     destination?.state,
     destAddress,
   ]);
+
+  // Fit bounds once map loads and positions resolve
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current || !originPos) return;
+    if (destPos) {
+      mapRef.current.fitBounds(
+        [
+          [Math.min(originPos[1], destPos[1]), Math.min(originPos[0], destPos[0])],
+          [Math.max(originPos[1], destPos[1]), Math.max(originPos[0], destPos[0])],
+        ],
+        { padding: 44, animate: true },
+      );
+    } else {
+      mapRef.current.flyTo({ center: [originPos[1], originPos[0]], zoom: 10, animate: true });
+    }
+  }, [mapLoaded, originPos, destPos]);
 
   // Shimmer loading skeleton
   if (loading) {
@@ -253,10 +210,7 @@ export function MapView({
     );
   }
 
-  const positions: [number, number][] = [originPos];
-  if (destPos) positions.push(destPos);
-
-  // Prefer real GPS position; fall back to milestone-based interpolation
+  // Prefer real GPS; fall back to interpolated milestone position
   const truckPos: [number, number] | null = inTransit
     ? (livePosition ??
       (destPos
@@ -267,92 +221,224 @@ export function MapView({
         : null))
     : null;
 
+  // Replay position override
+  const replayPos: [number, number] | null =
+    breadcrumbTrail && replayIndex != null ? (breadcrumbTrail[replayIndex] ?? null) : null;
+
+  // Route GeoJSON — Mapbox expects [lng, lat]
+  const routeCoords: [number, number][] = destPos
+    ? [
+        [originPos[1], originPos[0]],
+        [destPos[1], destPos[0]],
+      ]
+    : [];
+
+  // Breadcrumb GeoJSON — flip [lat, lng] → [lng, lat]
+  const breadcrumbCoords: [number, number][] =
+    breadcrumbTrail && breadcrumbTrail.length > 1
+      ? breadcrumbTrail.map(([lat, lng]) => [lng, lat])
+      : [];
+
   return (
     <div className={`relative rounded-2xl overflow-hidden ${className}`}>
-      <MapContainer
-        center={originPos}
-        zoom={5}
-        zoomControl={false}
+      <Map
+        ref={mapRef}
+        mapboxAccessToken={MAPBOX_TOKEN}
+        mapStyle="mapbox://styles/mapbox/dark-v11"
+        initialViewState={{ longitude: originPos[1], latitude: originPos[0], zoom: 5 }}
+        scrollZoom={false}
+        dragPan
         attributionControl={false}
-        scrollWheelZoom={false}
-        dragging
+        logoPosition="top-right"
+        onLoad={() => setMapLoaded(true)}
         style={{ height: '100%', width: '100%' }}
       >
-        {/* Carto Dark Matter — no API key required */}
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          maxZoom={20}
-        />
-
-        <FitBounds positions={positions} />
-        <ZoomControl />
-
         {/* Route glow halo */}
-        {positions.length === 2 && (
-          <Polyline
-            positions={positions}
-            pathOptions={{
-              color: '#e86030',
-              weight: 12,
-              opacity: 0.15,
-              lineCap: 'round',
-              lineJoin: 'round',
+        {routeCoords.length === 2 && (
+          <Source
+            id="route-glow-src"
+            type="geojson"
+            data={{
+              type: 'Feature',
+              geometry: { type: 'LineString', coordinates: routeCoords },
+              properties: {},
             }}
-          />
+          >
+            <Layer
+              id="route-glow"
+              type="line"
+              paint={{
+                'line-color': '#e86030',
+                'line-width': 12,
+                'line-opacity': 0.15,
+                'line-blur': 6,
+              }}
+              layout={{ 'line-cap': 'round' }}
+            />
+          </Source>
         )}
+
         {/* Route main line */}
-        {positions.length === 2 && (
-          <Polyline
-            positions={positions}
-            pathOptions={{
-              color: '#e86030',
-              weight: 3.5,
-              opacity: 0.95,
-              lineCap: 'round',
-              lineJoin: 'round',
+        {routeCoords.length === 2 && (
+          <Source
+            id="route-src"
+            type="geojson"
+            data={{
+              type: 'Feature',
+              geometry: { type: 'LineString', coordinates: routeCoords },
+              properties: {},
             }}
-          />
+          >
+            <Layer
+              id="route-line"
+              type="line"
+              paint={{ 'line-color': '#e86030', 'line-width': 3.5, 'line-opacity': 0.95 }}
+              layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+            />
+          </Source>
         )}
 
-        {originPos && <Marker position={originPos} icon={originIcon} />}
-        {destPos && <Marker position={destPos} icon={destIcon} />}
-        {truckPos && <Marker position={truckPos} icon={truckIconRef.current} />}
-
-        {/* Breadcrumb trail polyline */}
-        {breadcrumbTrail && breadcrumbTrail.length > 1 && (
-          <Polyline
-            positions={breadcrumbTrail}
-            pathOptions={{
-              color: '#e86030',
-              weight: 2.5,
-              opacity: 0.7,
-              dashArray: '6 4',
-              lineCap: 'round',
+        {/* Breadcrumb dashed trail */}
+        {breadcrumbCoords.length > 1 && (
+          <Source
+            id="breadcrumb-src"
+            type="geojson"
+            data={{
+              type: 'Feature',
+              geometry: { type: 'LineString', coordinates: breadcrumbCoords },
+              properties: {},
             }}
-          />
-        )}
-
-        {/* Replay snap position */}
-        {breadcrumbTrail && replayIndex != null && breadcrumbTrail[replayIndex] && (
-          <Marker position={breadcrumbTrail[replayIndex]} icon={makeTruckIcon(true)} />
+          >
+            <Layer
+              id="breadcrumb-line"
+              type="line"
+              paint={{
+                'line-color': '#e86030',
+                'line-width': 2.5,
+                'line-opacity': 0.7,
+                'line-dasharray': [2, 2],
+              }}
+              layout={{ 'line-cap': 'round' }}
+            />
+          </Source>
         )}
 
         {/* Geofence circles */}
         {geofences?.map((gf, i) => (
-          <Circle
+          <Source
             key={i}
-            center={[gf.lat, gf.lng]}
-            radius={gf.radiusM}
-            pathOptions={{
-              color: '#e86030',
-              fillColor: '#e86030',
-              fillOpacity: 0.1,
-              weight: 1.5,
-              opacity: 0.5,
-            }}
-          />
+            id={`geofence-${i}`}
+            type="geojson"
+            data={circleToPolygon(gf.lat, gf.lng, gf.radiusM)}
+          >
+            <Layer
+              id={`geofence-fill-${i}`}
+              type="fill"
+              paint={{ 'fill-color': '#e86030', 'fill-opacity': 0.1 }}
+            />
+            <Layer
+              id={`geofence-line-${i}`}
+              type="line"
+              paint={{ 'line-color': '#e86030', 'line-width': 1.5, 'line-opacity': 0.5 }}
+            />
+          </Source>
         ))}
-      </MapContainer>
+
+        {/* Origin pin */}
+        <Marker longitude={originPos[1]} latitude={originPos[0]} anchor="bottom">
+          <div dangerouslySetInnerHTML={{ __html: makePinSvg('#22c55e') }} />
+        </Marker>
+
+        {/* Destination pin */}
+        {destPos && (
+          <Marker longitude={destPos[1]} latitude={destPos[0]} anchor="bottom">
+            <div dangerouslySetInnerHTML={{ __html: makePinSvg('#e86030') }} />
+          </Marker>
+        )}
+
+        {/* Live driver marker */}
+        {truckPos && (
+          <Marker longitude={truckPos[1]} latitude={truckPos[0]} anchor="center">
+            <DriverMarker heading={heading} inTransit={inTransit} />
+          </Marker>
+        )}
+
+        {/* Replay snap marker */}
+        {replayPos && (
+          <Marker longitude={replayPos[1]} latitude={replayPos[0]} anchor="center">
+            <DriverMarker heading={null} inTransit={true} />
+          </Marker>
+        )}
+      </Map>
+
+      {/* FIND DRIVER button */}
+      {truckPos && (
+        <button
+          onClick={() =>
+            mapRef.current?.flyTo({ center: [truckPos[1], truckPos[0]], zoom: 15, duration: 800 })
+          }
+          style={{
+            position: 'absolute',
+            bottom: 14,
+            left: 12,
+            zIndex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            background: 'rgba(14,14,22,0.72)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: 20,
+            padding: '6px 12px',
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{ fontSize: 13 }}>🚛</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>
+            FIND DRIVER
+          </span>
+        </button>
+      )}
+
+      {/* Glass zoom buttons */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 14,
+          right: 12,
+          zIndex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        {(['+', '−'] as const).map((label, i) => (
+          <button
+            key={label}
+            onClick={() => (i === 0 ? mapRef.current?.zoomIn() : mapRef.current?.zoomOut())}
+            style={{
+              width: 32,
+              height: 32,
+              background: 'rgba(14,14,22,0.72)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: i === 0 ? '10px 10px 4px 4px' : '4px 4px 10px 10px',
+              color: '#fff',
+              fontSize: 20,
+              fontWeight: 300,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       {/* Live badge */}
       {inTransit && (
@@ -361,7 +447,7 @@ export function MapView({
             position: 'absolute',
             top: 10,
             left: 10,
-            zIndex: 1000,
+            zIndex: 1,
             display: 'flex',
             alignItems: 'center',
             gap: 5,
@@ -389,22 +475,6 @@ export function MapView({
           </span>
         </div>
       )}
-
-      {/* Attribution (required by Stadia) */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 4,
-          left: 6,
-          zIndex: 1000,
-          fontSize: 9,
-          color: 'rgba(255,255,255,0.22)',
-          pointerEvents: 'none',
-          userSelect: 'none',
-        }}
-      >
-        © Carto · OSM
-      </div>
     </div>
   );
 }

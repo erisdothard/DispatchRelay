@@ -15,11 +15,18 @@ import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
 import { useGpsConsent } from '@/features/loads/hooks/use-gps-consent';
 import { GpsConsentModal } from '@/features/loads/components/gps-consent-modal';
 import { canSendGps } from '@/lib/permissions';
+import { supabase } from '@/lib/supabase';
 import type { Load } from '@freightx/shared';
 
 /** Renders nothing — just activates GPS pinging for a single load */
 function GpsPinger({ loadNumber }: { loadNumber: string }) {
   useDriverLocation({ loadNumber, active: true });
+  return null;
+}
+
+/** Renders nothing — activates GPS pinging without a specific load (manual share / idle) */
+function IdleGpsPinger() {
+  useDriverLocation({ loadNumber: '__idle__', active: true });
   return null;
 }
 
@@ -62,6 +69,22 @@ export default function DriverDashboard() {
   const { notifications, unreadCount, markAllRead } = useNotifications();
   const { hasConsented, grantConsent } = useGpsConsent();
   const [consentModalOpen, setConsentModalOpen] = useState(false);
+  const [gpsRequestModalOpen, setGpsRequestModalOpen] = useState(false);
+
+  // Watch for GPS request notifications from carrier
+  useEffect(() => {
+    const gpsReq = notifications.find((n) => n.type === 'gps_request' && !n.read);
+    if (gpsReq && !manualGpsToggle) {
+      if (hasConsented) {
+        // Already consented — auto-enable GPS and mark read
+        setManualGpsToggle(true);
+        supabase.from('notifications').update({ read: true }).eq('id', gpsReq.id).then();
+      } else {
+        // Need consent first
+        setGpsRequestModalOpen(true);
+      }
+    }
+  }, [notifications, manualGpsToggle, hasConsented]);
 
   // Check GPS send permission on mount
   useEffect(() => {
@@ -160,6 +183,8 @@ export default function DriverDashboard() {
         .map((l) => (
           <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />
         ))}
+      {/* Idle GPS pinger — when sharing location but no active loads to attach to */}
+      {sharingLocation && activeLoads.length === 0 && <IdleGpsPinger />}
 
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
         {/* Share Location banner */}
@@ -504,6 +529,29 @@ export default function DriverDashboard() {
           setManualGpsToggle(true);
         }}
         onDismiss={() => setConsentModalOpen(false)}
+      />
+
+      {/* GPS Request from Carrier — prompt driver to share */}
+      <GpsConsentModal
+        open={gpsRequestModalOpen}
+        onAllow={() => {
+          grantConsent();
+          setGpsRequestModalOpen(false);
+          setManualGpsToggle(true);
+          // Mark the gps_request notification as read
+          const gpsReq = notifications.find((n) => n.type === 'gps_request' && !n.read);
+          if (gpsReq) {
+            supabase.from('notifications').update({ read: true }).eq('id', gpsReq.id).then();
+          }
+        }}
+        onDismiss={() => {
+          setGpsRequestModalOpen(false);
+          // Mark as read so we don't keep prompting
+          const gpsReq = notifications.find((n) => n.type === 'gps_request' && !n.read);
+          if (gpsReq) {
+            supabase.from('notifications').update({ read: true }).eq('id', gpsReq.id).then();
+          }
+        }}
       />
     </div>
   );

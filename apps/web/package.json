@@ -33,10 +33,12 @@
     "jspdf": "^4.1.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.469.0",
+    "mapbox-gl": "^3.21.0",
     "pdf-lib": "^1.17.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-leaflet": "^5.0.0",
+    "react-map-gl": "^8.1.1",
     "react-router-dom": "^6.28.0",
     "tailwind-merge": "^2.6.0",
     "zod": "^4.3.6"
