@@ -8,10 +8,13 @@ import {
   FileText,
   DollarSign,
   MapPin,
-  Truck,
   PlusCircle,
+  Bell,
+  Clock,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { useLoadActionCounts } from '@/features/loads/hooks/use-load-action-counts';
+import { useUnreadMessages } from '@/features/messages/hooks/use-unread-messages';
 
 type NavRole = 'carrier' | 'broker' | 'driver' | 'shipper';
 
@@ -24,7 +27,7 @@ interface NavItem {
 const carrierNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/carrier' },
   { label: 'Load Board', icon: <Search size={22} />, path: '/carrier/loads' },
-  { label: 'Fleet', icon: <Truck size={22} />, path: '/carrier/fleet' },
+  { label: 'Alerts', icon: <Bell size={22} />, path: '/carrier/alerts' },
   { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
@@ -40,7 +43,7 @@ const brokerNav: NavItem[] = [
 const driverNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/driver' },
   { label: 'My Loads', icon: <Package size={22} />, path: '/driver/loads' },
-  { label: 'Documents', icon: <FileText size={22} />, path: '/driver/documents' },
+  { label: 'HOS', icon: <Clock size={22} />, path: '/driver/hos' },
   { label: 'Expenses', icon: <DollarSign size={22} />, path: '/driver/expenses' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
@@ -63,6 +66,8 @@ const navByRole: Record<NavRole, NavItem[]> = {
 export function BottomNav({ role }: { role: NavRole }) {
   const location = useLocation();
   const items = navByRole[role];
+  const actionCount = useLoadActionCounts();
+  const unreadMessages = useUnreadMessages();
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50">
@@ -85,6 +90,18 @@ export function BottomNav({ role }: { role: NavRole }) {
                 ? false
                 : location.pathname.startsWith(basePath);
 
+          // Show action badge on the Loads nav item (not Post Load)
+          const isLoadsItem =
+            item.label !== 'Post Load' &&
+            (basePath === '/carrier/loads' ||
+              basePath === '/broker/loads' ||
+              basePath === '/driver/loads');
+          const showBadge = isLoadsItem && actionCount > 0;
+
+          // Show unread badge on Messages nav item
+          const isMessagesItem = item.label === 'Messages';
+          const showMessageBadge = isMessagesItem && unreadMessages > 0;
+
           return (
             <Link
               key={item.path}
@@ -93,11 +110,25 @@ export function BottomNav({ role }: { role: NavRole }) {
             >
               <div
                 className={cn(
-                  'transition-colors duration-150',
+                  'relative transition-colors duration-150',
                   isActive ? 'text-fx-orange' : 'text-fx-text-dim',
                 )}
               >
                 {item.icon}
+                {showBadge && (
+                  <span className="absolute -top-1 -right-1 min-w-[14px] h-3.5 bg-fx-orange rounded-full ring-2 ring-fx-bg flex items-center justify-center px-0.5">
+                    <span className="text-[8px] font-bold text-white leading-none">
+                      {actionCount > 9 ? '9+' : actionCount}
+                    </span>
+                  </span>
+                )}
+                {showMessageBadge && (
+                  <span className="absolute -top-1 -right-1 min-w-[14px] h-3.5 bg-fx-orange rounded-full ring-2 ring-fx-bg flex items-center justify-center px-0.5">
+                    <span className="text-[8px] font-bold text-white leading-none">
+                      {unreadMessages > 9 ? '9+' : unreadMessages}
+                    </span>
+                  </span>
+                )}
               </div>
               <span
                 className={cn(

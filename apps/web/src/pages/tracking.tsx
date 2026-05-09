@@ -222,6 +222,15 @@ export default function TrackingPage() {
                     value: `${load.weightLbs.toLocaleString()} lbs`,
                     accent: false,
                   },
+                  ...(load.assignedDriverId
+                    ? [
+                        {
+                          label: 'Driver',
+                          value: load.driverName ?? 'Assigned',
+                          accent: false,
+                        },
+                      ]
+                    : []),
                 ].map(({ label, value, accent }) => (
                   <div key={label}>
                     <p className="text-[11px] text-fx-text-dim font-medium mb-1 uppercase tracking-wide">
@@ -307,12 +316,12 @@ export default function TrackingPage() {
                     disabled={gpsRequested}
                     onClick={async () => {
                       if (!load.postedBy) return;
-                      const { error } = await supabase.from('notifications').insert({
-                        user_id: load.postedBy,
-                        type: 'gps_request',
-                        title: 'GPS Location Requested',
-                        body: `Carrier is requesting live GPS for load ${load.loadNumber}. Tap to open your dashboard and enable location sharing.`,
-                        load_id: load.id,
+                      const { error } = await supabase.rpc('send_notification', {
+                        p_user_id: load.postedBy,
+                        p_type: 'gps_request',
+                        p_title: 'GPS Location Requested',
+                        p_body: `Carrier is requesting live GPS for load ${load.loadNumber}. Tap to open your dashboard and enable location sharing.`,
+                        p_load_id: load.id,
                       });
                       if (error) console.error('[gps-request] Insert failed:', error);
                       setGpsRequested(true);

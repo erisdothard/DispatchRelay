@@ -9,15 +9,15 @@ const config: Config = {
           orange: '#E86030',
           'orange-hover': '#D05020',
           'orange-light': '#F07848',
-          bg: '#0D0D0D', // near-black with warmth
-          surface: '#1C1C1E', // iOS dark grouped background
-          'surface-2': '#2C2C2E', // iOS elevated surface
-          'surface-3': '#3A3A3C', // highest elevation
-          border: '#38383A', // iOS separator
-          'border-2': '#48484A',
-          text: '#FFFFFF',
-          'text-muted': '#EBEBF5', // iOS secondary label (at 60% opacity)
-          'text-dim': '#636366', // iOS tertiary label
+          bg: 'var(--fx-bg)',
+          surface: 'var(--fx-surface)',
+          'surface-2': 'var(--fx-surface-2)',
+          'surface-3': 'var(--fx-surface-3)',
+          border: 'var(--fx-border)',
+          'border-2': 'var(--fx-border-2)',
+          text: 'var(--fx-text)',
+          'text-muted': 'var(--fx-text-muted)',
+          'text-dim': 'var(--fx-text-dim)',
         },
       },
       fontFamily: {

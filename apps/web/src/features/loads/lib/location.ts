@@ -14,23 +14,40 @@ export interface LocationPing {
 const pendingQueue: LocationPing[] = [];
 let flushing = false;
 
+function pingToRow(ping: LocationPing) {
+  return {
+    load_number: ping.load_number,
+    driver_id: ping.driver_id,
+    latitude: ping.latitude,
+    longitude: ping.longitude,
+    accuracy_m: ping.accuracy_m ?? null,
+    heading_deg: ping.heading_deg != null ? Math.round(ping.heading_deg) : null,
+    speed_ms: ping.speed_ms ?? null,
+  };
+}
+
+/**
+ * Flush queued pings in batches of up to 50.
+ * Uses Supabase bulk insert (single round-trip) to avoid
+ * hammering the DB with 50 individual INSERTs after a dead zone.
+ */
 async function flushQueue() {
   if (flushing || pendingQueue.length === 0) return;
   flushing = true;
+
   while (pendingQueue.length > 0) {
-    const ping = pendingQueue[0];
-    const { error } = await supabase.from('location_pings').insert({
-      load_number: ping.load_number,
-      driver_id: ping.driver_id,
-      latitude: ping.latitude,
-      longitude: ping.longitude,
-      accuracy_m: ping.accuracy_m ?? null,
-      heading_deg: ping.heading_deg != null ? Math.round(ping.heading_deg) : null,
-      speed_ms: ping.speed_ms ?? null,
-    });
+    // Take up to 50 pings per batch
+    const batchSize = Math.min(pendingQueue.length, 50);
+    const batch = pendingQueue.slice(0, batchSize).map(pingToRow);
+
+    const { error } = await supabase.from('location_pings').insert(batch);
+
     if (error) break; // still offline — stop retrying
-    pendingQueue.shift();
+
+    // Remove successfully inserted pings
+    pendingQueue.splice(0, batchSize);
   }
+
   flushing = false;
 }
 
@@ -57,17 +74,8 @@ export async function insertLocationPing(ping: LocationPing) {
     return null; // Rate limited — skip this ping
   }
   lastPingByDriver.set(ping.driver_id, now);
-  const row = {
-    load_number: ping.load_number,
-    driver_id: ping.driver_id,
-    latitude: ping.latitude,
-    longitude: ping.longitude,
-    accuracy_m: ping.accuracy_m ?? null,
-    heading_deg: ping.heading_deg != null ? Math.round(ping.heading_deg) : null,
-    speed_ms: ping.speed_ms ?? null,
-  };
 
-  const { data, error } = await supabase.from('location_pings').insert(row);
+  const { data, error } = await supabase.from('location_pings').insert(pingToRow(ping));
 
   if (error) {
     console.warn('[location-ping] Insert failed, queuing for retry:', error.message);

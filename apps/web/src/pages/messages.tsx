@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Search, Send, ArrowLeft, Plus, X, Package, User, Loader2 } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Search, Send, ArrowLeft, Plus, X, Package, User, Loader2, Trash2 } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { cn, getInitials, getNavRole } from '@/shared/lib/utils';
@@ -10,6 +10,7 @@ import {
   getConversations,
   getMessages,
   sendMessage,
+  deleteMessage,
   getOrCreateConversation,
   searchUsers,
 } from '@/services/messages.service';
@@ -261,6 +262,9 @@ function NewMessageContent({
 export default function MessagesPage() {
   const { user, profile } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+  // Track if user arrived from another page (load detail, bid sheet, etc.)
+  const cameFromOutside = useRef(false);
   const [conversations, setConversations] = useState<ConversationRow[]>([]);
   const [selected, setSelected] = useState<ConversationRow | null>(null);
   const [messages, setMessages] = useState<MessageRow[]>([]);
@@ -269,21 +273,27 @@ export default function MessagesPage() {
   const [search, setSearch] = useState('');
   const [showNewMessage, setShowNewMessage] = useState(false);
   const [newMessageType, setNewMessageType] = useState<'load' | 'user' | null>(null);
+  const [selectedMsgId, setSelectedMsgId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const role = getNavRole(profile?.role);
+
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
 
   // Load conversations, then auto-select if navigated from load detail
   useEffect(() => {
     if (!user) return;
     getConversations(user.id)
-      .then((convos) => {
+      .then(({ data: convos }) => {
         setConversations(convos);
         const incoming = (location.state as { openConversation?: ConversationRow } | null)
           ?.openConversation;
         if (incoming) {
           const match = convos.find((c) => c.id === incoming.id) ?? incoming;
           setSelected(match);
+          cameFromOutside.current = true;
         }
       })
       .catch(console.error);
@@ -291,8 +301,29 @@ export default function MessagesPage() {
   }, [user]);
 
   const fetchMessages = useCallback((id: string) => {
-    getMessages(id).then(setMessages).catch(console.error);
+    getMessages(id)
+      .then(({ data, hasMore }) => {
+        setMessages(data);
+        setHasMoreMessages(hasMore);
+      })
+      .catch(console.error);
   }, []);
+
+  const loadOlderMessages = useCallback(async () => {
+    if (!selected || !hasMoreMessages || loadingOlder) return;
+    const oldest = messages[0];
+    if (!oldest) return;
+    setLoadingOlder(true);
+    try {
+      const { data, hasMore } = await getMessages(selected.id, { before: oldest.created_at });
+      setMessages((prev) => [...data, ...prev]);
+      setHasMoreMessages(hasMore);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingOlder(false);
+    }
+  }, [selected, hasMoreMessages, loadingOlder, messages]);
 
   // Load + live-subscribe to messages when a conversation is selected
   useEffect(() => {
@@ -305,6 +336,16 @@ export default function MessagesPage() {
         'postgres_changes',
         {
           event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${selected.id}`,
+        },
+        () => fetchMessages(selected.id),
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
           schema: 'public',
           table: 'messages',
           filter: `conversation_id=eq.${selected.id}`,
@@ -334,6 +375,20 @@ export default function MessagesPage() {
     setSending(false);
   }
 
+  async function handleDelete(msgId: string) {
+    if (!selected) return;
+    setDeleting(true);
+    try {
+      await deleteMessage(msgId);
+      setMessages((prev) => prev.filter((m) => m.id !== msgId));
+      setSelectedMsgId(null);
+    } catch {
+      console.error('Failed to delete message');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   const filtered = conversations.filter(
     (c) =>
       !search ||
@@ -348,7 +403,14 @@ export default function MessagesPage() {
         {/* Chat header */}
         <div className="sticky top-0 z-20 bg-fx-bg/80 backdrop-blur-md border-b border-fx-border px-5 py-3 flex items-center gap-3">
           <button
-            onClick={() => setSelected(null)}
+            onClick={() => {
+              if (cameFromOutside.current) {
+                cameFromOutside.current = false;
+                navigate(-1);
+              } else {
+                setSelected(null);
+              }
+            }}
             className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-fx-surface transition-colors"
           >
             <ArrowLeft size={18} className="text-fx-text" />
@@ -366,39 +428,69 @@ export default function MessagesPage() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          {hasMoreMessages && (
+            <button
+              onClick={loadOlderMessages}
+              disabled={loadingOlder}
+              className="w-full py-2 text-xs text-fx-text-muted hover:text-fx-accent transition-colors"
+            >
+              {loadingOlder ? 'Loading...' : 'Load older messages'}
+            </button>
+          )}
           {messages.length === 0 ? (
             <p className="text-center text-sm text-fx-text-muted py-10">
               No messages yet. Say hello!
             </p>
           ) : (
-            messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={cn('flex', msg.from_me ? 'justify-end' : 'justify-start')}
-              >
+            messages.map((msg) => {
+              const isSelected = selectedMsgId === msg.id;
+              return (
                 <div
-                  className={cn(
-                    'max-w-[75%] rounded-2xl px-4 py-2.5',
-                    msg.from_me
-                      ? 'bg-fx-orange text-white rounded-br-sm'
-                      : 'bg-fx-surface border border-fx-border text-fx-text rounded-bl-sm',
-                  )}
+                  key={msg.id}
+                  className={cn('flex', msg.from_me ? 'justify-end' : 'justify-start')}
                 >
-                  <p className="text-sm leading-snug">{msg.text}</p>
-                  <p
-                    className={cn(
-                      'text-[10px] mt-1',
-                      msg.from_me ? 'text-white/60 text-right' : 'text-fx-text-dim',
+                  <div className="relative max-w-[75%]">
+                    <div
+                      onClick={() =>
+                        msg.sender_id === user?.id
+                          ? setSelectedMsgId(isSelected ? null : msg.id)
+                          : undefined
+                      }
+                      className={cn(
+                        'rounded-2xl px-4 py-2.5 transition-all',
+                        msg.from_me
+                          ? 'bg-fx-orange text-white rounded-br-sm'
+                          : 'bg-fx-surface border border-fx-border text-fx-text rounded-bl-sm',
+                        msg.sender_id === user?.id && 'cursor-pointer',
+                        isSelected && 'ring-2 ring-red-400/50',
+                      )}
+                    >
+                      <p className="text-sm leading-snug">{msg.text}</p>
+                      <p
+                        className={cn(
+                          'text-[10px] mt-1',
+                          msg.from_me ? 'text-white/60 text-right' : 'text-fx-text-dim',
+                        )}
+                      >
+                        {new Date(msg.created_at).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <button
+                        onClick={() => handleDelete(msg.id)}
+                        disabled={deleting}
+                        className="absolute -top-3 right-0 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 size={13} className="text-white" />
+                      </button>
                     )}
-                  >
-                    {new Date(msg.created_at).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    })}
-                  </p>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
           <div ref={bottomRef} />
         </div>
@@ -554,7 +646,10 @@ export default function MessagesPage() {
                 setShowNewMessage(false);
                 setNewMessageType(null);
                 // Refresh conversations and open the new one
-                if (user) getConversations(user.id).then(setConversations).catch(console.error);
+                if (user)
+                  getConversations(user.id)
+                    .then(({ data: convos }) => setConversations(convos))
+                    .catch(console.error);
                 setSelected(convo);
               }}
             />

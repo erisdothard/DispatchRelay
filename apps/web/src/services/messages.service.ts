@@ -1,24 +1,53 @@
 import { supabase } from '@/lib/supabase';
 import type { ConversationRow, MessageRow } from '@/lib/database.types';
+import { notifyNewMessage } from './email-notifications.service';
 
-export async function getConversations(userId: string): Promise<ConversationRow[]> {
+const PAGE_SIZE = 30;
+
+export async function getConversations(
+  userId: string,
+  page = 0,
+): Promise<{ data: ConversationRow[]; hasMore: boolean }> {
+  const from = page * PAGE_SIZE;
+  const to = from + PAGE_SIZE;
   const { data, error } = await supabase
     .from('conversations')
     .select('*')
     .or(`participant_a.eq.${userId},participant_b.eq.${userId}`)
-    .order('last_message_at', { ascending: false });
+    .order('last_message_at', { ascending: false })
+    .range(from, to);
   if (error) throw error;
-  return data ?? [];
+  const rows = data ?? [];
+  return { data: rows.slice(0, PAGE_SIZE), hasMore: rows.length > PAGE_SIZE };
 }
 
-export async function getMessages(conversationId: string): Promise<MessageRow[]> {
-  const { data, error } = await supabase
+/**
+ * Fetch messages with cursor-based pagination.
+ * Returns newest messages first (for infinite scroll "load older").
+ * Pass `before` as the created_at of the oldest message you have.
+ */
+export async function getMessages(
+  conversationId: string,
+  options?: { before?: string; limit?: number },
+): Promise<{ data: MessageRow[]; hasMore: boolean }> {
+  const limit = options?.limit ?? PAGE_SIZE;
+  let query = supabase
     .from('messages')
     .select('*')
     .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: false })
+    .limit(limit + 1);
+
+  if (options?.before) {
+    query = query.lt('created_at', options.before);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
-  return data ?? [];
+  const rows = data ?? [];
+  const hasMore = rows.length > limit;
+  // Return in chronological order (oldest first) for display
+  return { data: rows.slice(0, limit).reverse(), hasMore };
 }
 
 export async function sendMessage(
@@ -39,7 +68,65 @@ export async function sendMessage(
     .update({ last_message: text, last_message_at: new Date().toISOString() })
     .eq('id', conversationId);
 
+  // Notify the recipient — in-app + email (non-blocking)
+  const { data: convo } = await supabase
+    .from('conversations')
+    .select('participant_a, participant_b')
+    .eq('id', conversationId)
+    .single();
+
+  if (convo) {
+    const recipientId =
+      convo.participant_a === senderId ? convo.participant_b : convo.participant_a;
+
+    if (recipientId) {
+      // In-app notification
+      const { data: sender } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', senderId)
+        .single();
+
+      const senderName = sender?.full_name || 'Someone';
+
+      supabase
+        .rpc('send_notification', {
+          p_user_id: recipientId,
+          p_type: 'new_message',
+          p_title: `Message from ${senderName}`,
+          p_body: text.length > 120 ? text.slice(0, 120) + '...' : text,
+        })
+        .then(
+          () => undefined,
+          () => undefined,
+        );
+
+      // Email notification
+      const { data: recipient } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('id', recipientId)
+        .single();
+
+      if (recipient?.email) {
+        notifyNewMessage({
+          recipientEmail: recipient.email as string,
+          senderName,
+          preview: text,
+        }).then(
+          () => undefined,
+          () => undefined,
+        );
+      }
+    }
+  }
+
   return data;
+}
+
+export async function deleteMessage(messageId: string): Promise<void> {
+  const { error } = await supabase.from('messages').delete().eq('id', messageId);
+  if (error) throw error;
 }
 
 /**

@@ -286,6 +286,20 @@ export default function AdminDashboard() {
                 <span className="text-sm text-fx-text">Audit Log</span>
               </button>
               <button
+                onClick={() => navigate('/admin/factoring-risk')}
+                className="flex items-center gap-3 px-4 py-3.5 w-full text-left"
+              >
+                <AlertCircle size={16} className="text-amber-400" />
+                <span className="text-sm text-fx-text">Factoring Risk</span>
+              </button>
+              <button
+                onClick={() => navigate('/admin/notifications')}
+                className="flex items-center gap-3 px-4 py-3.5 w-full text-left"
+              >
+                <CheckCircle size={16} className="text-emerald-400" />
+                <span className="text-sm text-fx-text">Notification Health</span>
+              </button>
+              <button
                 onClick={() => void signOut()}
                 className="flex items-center gap-3 px-4 py-3.5 w-full text-left"
               >

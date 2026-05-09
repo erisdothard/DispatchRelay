@@ -1,22 +1,32 @@
-// Simple in-memory cache to avoid redundant Nominatim requests
+// Simple in-memory cache to avoid redundant Mapbox Geocoding requests
 const cache = new Map<string, [number, number] | null>();
 
-async function nominatimQuery(query: string, cacheKey: string): Promise<[number, number] | null> {
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string;
+
+async function mapboxGeocode(query: string, cacheKey: string): Promise<[number, number] | null> {
   if (cache.has(cacheKey)) return cache.get(cacheKey)!;
+
+  if (!MAPBOX_TOKEN) {
+    console.warn('[geocoding] VITE_MAPBOX_TOKEN is not set');
+    cache.set(cacheKey, null);
+    return null;
+  }
 
   try {
     const q = encodeURIComponent(query);
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=us`,
-      { headers: { 'Accept-Language': 'en', 'User-Agent': 'FreightX/1.0' } },
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?country=us&limit=1&access_token=${MAPBOX_TOKEN}`,
     );
     if (!res.ok) {
       cache.set(cacheKey, null);
       return null;
     }
     const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      const coords: [number, number] = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+    const feature = data?.features?.[0];
+    if (feature) {
+      // Mapbox returns [lng, lat] — we store as [lat, lng] for our interface
+      const [lng, lat] = feature.center as [number, number];
+      const coords: [number, number] = [lat, lng];
       cache.set(cacheKey, coords);
       return coords;
     }
@@ -31,7 +41,7 @@ async function nominatimQuery(query: string, cacheKey: string): Promise<[number,
 
 export async function geocodeCity(city: string, state: string): Promise<[number, number] | null> {
   const key = `${city},${state}`.toLowerCase().trim();
-  return nominatimQuery(`${city}, ${state}, USA`, key);
+  return mapboxGeocode(`${city}, ${state}`, key);
 }
 
 /** Geocode a full street address; falls back to city-level if address query returns nothing. */
@@ -41,7 +51,7 @@ export async function geocodeAddress(
   state: string,
 ): Promise<[number, number] | null> {
   const key = `${address},${city},${state}`.toLowerCase().trim();
-  const result = await nominatimQuery(`${address}, ${city}, ${state}, USA`, key);
+  const result = await mapboxGeocode(`${address}, ${city}, ${state}`, key);
   if (result) return result;
   // Fallback to city-level
   return geocodeCity(city, state);

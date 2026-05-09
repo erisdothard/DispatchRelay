@@ -79,7 +79,15 @@ export function useLoads(filters: LoadFilters = {}): UseLoadsResult {
         void queryClient.invalidateQueries({ queryKey: ['loads', filterKey] });
       }
     });
-    const unsub2 = realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, () => {
+    const unsub2 = realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, (payload) => {
+      // Optimistic removal: if load is no longer biddable, remove it instantly
+      const newStatus = (payload.new as Record<string, unknown>)?.status as string | undefined;
+      if (newStatus && ['awarded', 'dispatched', 'cancelled'].includes(newStatus)) {
+        const removedId = (payload.new as Record<string, unknown>)?.id as string | undefined;
+        if (removedId) {
+          setAllLoads((prev) => prev.filter((l) => l.id !== removedId));
+        }
+      }
       if (pageRef.current === 0) {
         void queryClient.invalidateQueries({ queryKey: ['loads', filterKey] });
       }

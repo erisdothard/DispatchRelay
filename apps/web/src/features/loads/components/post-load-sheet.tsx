@@ -25,6 +25,7 @@ import { supabase } from '@/lib/supabase';
 import { getLaneStats, suggestRate } from '@/services/rate-intelligence.service';
 import type { RateSuggestion, LaneStats } from '@/services/rate-intelligence.service';
 import { titleCase } from '@/lib/utils';
+import { HazmatFields } from './hazmat-fields';
 
 const EQUIPMENT_OPTIONS: EquipmentType[] = [
   'van',
@@ -59,8 +60,19 @@ const EMPTY_FORM = {
   weightLbs: '',
   rateUsd: '',
   totalMiles: '',
+  fullPartial: 'full' as 'full' | 'partial',
   hazmat: false,
   tempControlled: false,
+  visibility: 'public' as 'public' | 'preferred_only' | 'invited_only',
+  // Hazmat PHMSA fields
+  properShippingName: '',
+  hazmatClass: '',
+  unNumber: '',
+  packingGroup: '',
+  hazmatQuantity: '',
+  emergencyPhone: '',
+  placardRequired: false,
+  reportableQuantity: false,
   assigneeId: null as string | null,
   freightClass: '' as string,
   packagingType: '' as string,
@@ -300,7 +312,8 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         packaging_type: form.packagingType || null,
         po_number: form.poNumber.trim() || null,
         shipper_reference: form.shipperReference.trim() || null,
-        preferred_carriers_only: false,
+        preferred_carriers_only: form.visibility === 'preferred_only',
+        ...(form.visibility !== 'public' ? ({ visibility: form.visibility } as any) : {}),
         // Contact Information
         shipper_name: form.shipperName.trim() || null,
         shipper_contact_name: form.shipperContactName.trim() || null,
@@ -322,9 +335,23 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         width_in: form.widthIn ? parseInt(form.widthIn) : null,
         height_in: form.heightIn ? parseInt(form.heightIn) : null,
         stackable: form.stackable,
+        full_partial: form.fullPartial,
         special_instructions: form.specialInstructions.trim() || null,
         loading_notes: form.loadingNotes.trim() || null,
         delivery_notes: form.deliveryNotes.trim() || null,
+        // Hazmat PHMSA fields
+        ...(form.hazmat
+          ? {
+              proper_shipping_name: form.properShippingName.trim() || null,
+              hazmat_class: form.hazmatClass || null,
+              un_number: form.unNumber.trim() || null,
+              packing_group: form.packingGroup || null,
+              hazmat_quantity: form.hazmatQuantity.trim() || null,
+              emergency_phone: form.emergencyPhone.trim() || null,
+              placard_required: form.placardRequired,
+              reportable_quantity: form.reportableQuantity,
+            }
+          : {}),
       });
 
       setForm(EMPTY_FORM);
@@ -514,6 +541,41 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                   }
                 >
                   {EQUIPMENT_LABELS[eq] ?? eq}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Full / Partial toggle */}
+        <div>
+          <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+            Load Type
+          </p>
+          <div className="flex gap-2">
+            {(['full', 'partial'] as const).map((opt) => {
+              const selected = form.fullPartial === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => set('fullPartial', opt)}
+                  className="flex-1 h-10 rounded-xl text-[12px] font-semibold transition-all"
+                  style={
+                    selected
+                      ? {
+                          background: 'rgba(232,96,48,0.18)',
+                          border: '1px solid rgba(232,96,48,0.6)',
+                          color: '#E86030',
+                        }
+                      : {
+                          background: '#111',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          color: 'rgba(255,255,255,0.5)',
+                        }
+                  }
+                >
+                  {opt === 'full' ? 'Full Truckload' : 'Partial'}
                 </button>
               );
             })}
@@ -756,6 +818,57 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
             />
             <span className="text-sm font-semibold text-fx-text-muted">Temp Controlled</span>
           </label>
+        </div>
+
+        {/* Hazmat PHMSA fields (49 CFR 172) */}
+        {form.hazmat && (
+          <HazmatFields
+            data={{
+              properShippingName: form.properShippingName,
+              hazmatClass: form.hazmatClass,
+              unNumber: form.unNumber,
+              packingGroup: form.packingGroup,
+              quantity: form.hazmatQuantity,
+              emergencyPhone: form.emergencyPhone,
+              placardRequired: form.placardRequired,
+              reportableQuantity: form.reportableQuantity,
+            }}
+            onChange={(key, val) => {
+              if (key === 'quantity') set('hazmatQuantity', val as string);
+              else set(key as keyof typeof EMPTY_FORM, val as never);
+            }}
+          />
+        )}
+
+        {/* Load Visibility */}
+        <div>
+          <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-2">
+            Visibility
+          </p>
+          <div className="flex gap-2">
+            {(['public', 'preferred_only', 'invited_only'] as const).map((opt) => {
+              const labels: Record<string, string> = {
+                public: 'Public',
+                preferred_only: 'Preferred Only',
+                invited_only: 'Invite Only',
+              };
+              const selected = form.visibility === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => set('visibility', opt)}
+                  className={`flex-1 h-9 rounded-lg text-xs font-semibold border transition-colors ${
+                    selected
+                      ? 'bg-fx-orange/10 border-fx-orange/40 text-fx-orange'
+                      : 'bg-zinc-800 border-zinc-700 text-fx-text-dim hover:border-zinc-600'
+                  }`}
+                >
+                  {labels[opt]}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Assignee (team member) */}

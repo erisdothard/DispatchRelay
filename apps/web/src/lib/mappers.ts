@@ -44,6 +44,8 @@ export function rowToLoad(row: LoadRow): Load {
     postedAt: row.posted_at,
     brokerCreditScore: row.broker_credit_score ?? undefined,
     assignedDriverId: row.assigned_driver_id ?? undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    driverName: (row as any).driver_profile?.full_name ?? undefined,
     secondDriverId: row.second_driver_id ?? undefined,
     assigneeId: row.assignee_id ?? null,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,6 +81,7 @@ export function rowToLoad(row: LoadRow): Load {
     specialInstructions: row.special_instructions ?? undefined,
     loadingNotes: row.loading_notes ?? undefined,
     deliveryNotes: row.delivery_notes ?? undefined,
+    fullPartial: (row.full_partial as 'full' | 'partial') ?? undefined,
   };
 }
 

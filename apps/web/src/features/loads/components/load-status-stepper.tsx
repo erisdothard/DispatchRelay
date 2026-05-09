@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { updateLoad } from '@/services/loads.service';
 import { createDocument } from '@/services/documents.service';
@@ -19,7 +20,7 @@ const STEPS: { status: LoadStatus; label: string }[] = [
 
 // Which role can advance to which statuses
 const ROLE_CAN_ADVANCE: Record<string, LoadStatus[]> = {
-  carrier: ['dispatched', 'in_transit', 'delivered'],
+  carrier: ['dispatched'],
   broker: ['completed'],
   admin: ['dispatched', 'in_transit', 'delivered', 'completed'],
   driver: ['in_transit', 'delivered'],
@@ -32,7 +33,7 @@ const NEXT_STATUS: Partial<Record<LoadStatus, LoadStatus>> = {
   delivered: 'completed',
 };
 
-const REQUIRES_DRIVER: LoadStatus[] = ['in_transit'];
+const REQUIRES_DRIVER: LoadStatus[] = ['dispatched', 'in_transit'];
 
 interface LoadStatusStepperProps {
   loadId: string;
@@ -61,6 +62,7 @@ export function LoadStatusStepper({
   origin = '',
   dest = '',
 }: LoadStatusStepperProps) {
+  const queryClient = useQueryClient();
   const [advancing, setAdvancing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bolSignOpen, setBolSignOpen] = useState(false);
@@ -74,7 +76,10 @@ export function LoadStatusStepper({
     (ROLE_CAN_ADVANCE[role] ?? []).includes(nextStatus) &&
     !gatedByRateCon;
   const needsDriver =
-    nextStatus !== undefined && REQUIRES_DRIVER.includes(nextStatus) && !hasDriverAssigned;
+    role !== 'driver' &&
+    nextStatus !== undefined &&
+    REQUIRES_DRIVER.includes(nextStatus) &&
+    !hasDriverAssigned;
 
   async function handleAdvance() {
     if (!nextStatus) return;
@@ -116,6 +121,7 @@ export function LoadStatusStepper({
     setError(null);
     try {
       await updateLoad(loadId, { status: nextStatus });
+      void queryClient.invalidateQueries({ queryKey: ['loads'] });
       onStatusAdvanced?.(nextStatus);
       if (nextStatus === 'dispatched') onDispatched?.();
     } catch (e) {
@@ -130,6 +136,7 @@ export function LoadStatusStepper({
     setAdvancing(true);
     try {
       await updateLoad(loadId, { status: 'delivered' });
+      void queryClient.invalidateQueries({ queryKey: ['loads'] });
       onStatusAdvanced?.('delivered');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to mark as delivered');
@@ -204,29 +211,30 @@ export function LoadStatusStepper({
         </div>
 
         {/* Advance button */}
-        {canAdvance && (
-          <div className="pt-1">
-            {error && (
-              <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-3 py-2 mb-3">
-                {error}
-              </p>
-            )}
-            <button
-              onClick={handleAdvance}
-              disabled={advancing}
-              className="w-full h-11 bg-fx-orange rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-white disabled:opacity-50 transition-opacity"
-            >
-              {advancing ? (
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <ArrowRight size={15} />
-                  Mark as {STEPS.find((s) => s.status === nextStatus)?.label}
-                </>
+        {canAdvance &&
+          !(role === 'carrier' && (nextStatus === 'in_transit' || nextStatus === 'delivered')) && (
+            <div className="pt-1">
+              {error && (
+                <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-3 py-2 mb-3">
+                  {error}
+                </p>
               )}
-            </button>
-          </div>
-        )}
+              <button
+                onClick={handleAdvance}
+                disabled={advancing}
+                className="w-full h-11 bg-fx-orange rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-white disabled:opacity-50 transition-opacity"
+              >
+                {advancing ? (
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <ArrowRight size={15} />
+                    Mark as {STEPS.find((s) => s.status === nextStatus)?.label}
+                  </>
+                )}
+              </button>
+            </div>
+          )}
       </div>
 
       {/* BOL Signature Sheet */}

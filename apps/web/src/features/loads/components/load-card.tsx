@@ -1,4 +1,4 @@
-import { ArrowRight, Scale, Calendar, Zap, Clock, Shield } from 'lucide-react';
+import { ArrowRight, Scale, Calendar, Zap, Clock, Shield, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
 import {
@@ -87,10 +87,21 @@ interface LoadCardProps {
   onBid?: (load: Load) => void;
   onPress?: (load: Load) => void;
   showBidButton?: boolean;
+  /** When false, bid button shows disabled with tooltip */
+  carrierEligible?: boolean;
+  carrierEligibleReason?: string | null;
   className?: string;
 }
 
-export function LoadCard({ load, onBid, onPress, showBidButton = true, className }: LoadCardProps) {
+export function LoadCard({
+  load,
+  onBid,
+  onPress,
+  showBidButton = true,
+  carrierEligible = true,
+  carrierEligibleReason,
+  className,
+}: LoadCardProps) {
   const rate = analyzeRate(load);
   const age = getLoadAge(load.postedAt);
   const credit = getBrokerCreditLabel(load.brokerCreditScore);
@@ -289,18 +300,35 @@ export function LoadCard({ load, onBid, onPress, showBidButton = true, className
               <span className="text-[10px] text-fx-text-dim font-medium">{age}</span>
             </div>
           )}
-          {showBidButton && (load.status === 'posted' || load.status === 'bid_received') && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onBid?.(load);
-              }}
-              className="h-9 px-5 rounded-full text-[13px] font-bold text-white active-scale transition-all bg-orange-gradient"
-              style={{ boxShadow: '0 2px 12px rgba(232,96,48,0.35)' }}
-            >
-              Bid Now
-            </button>
-          )}
+          {showBidButton &&
+            (load.status === 'posted' || load.status === 'bid_received') &&
+            (carrierEligible ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBid?.(load);
+                }}
+                className="h-9 px-5 rounded-full text-[13px] font-bold text-white active-scale transition-all bg-orange-gradient"
+                style={{ boxShadow: '0 2px 12px rgba(232,96,48,0.35)' }}
+              >
+                Bid Now
+              </button>
+            ) : (
+              <div className="flex flex-col items-end gap-1">
+                <button
+                  disabled
+                  className="h-9 px-5 rounded-full text-[13px] font-bold text-white/40 bg-fx-surface-2 border border-fx-border cursor-not-allowed"
+                >
+                  Bid Now
+                </button>
+                {carrierEligibleReason && (
+                  <span className="flex items-center gap-1 text-[9px] text-amber-400 max-w-[140px] text-right leading-tight">
+                    <AlertCircle size={9} className="shrink-0" />
+                    {carrierEligibleReason}
+                  </span>
+                )}
+              </div>
+            ))}
         </div>
       </div>
     </div>

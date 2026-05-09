@@ -144,6 +144,39 @@ export async function suggestRate(params: {
   }
 }
 
+export interface RateFairness {
+  rate_per_mile: number;
+  market_avg: number;
+  market_min: number;
+  market_max: number;
+  percentile: number;
+  sample_count: number;
+  fairness_label: 'Excellent' | 'Above Average' | 'Fair' | 'Below Market';
+  confidence: 'high' | 'medium' | 'low';
+}
+
+export async function getRateFairness(loadId: string): Promise<RateFairness | null> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc('get_rate_fairness', { p_load_id: loadId });
+
+  if (error || !data) return null;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const row = Array.isArray(data) ? (data as any[])[0] : data;
+  if (!row) return null;
+
+  return {
+    rate_per_mile: Number(row.rate_per_mile),
+    market_avg: Number(row.market_avg),
+    market_min: Number(row.market_min),
+    market_max: Number(row.market_max),
+    percentile: Number(row.percentile),
+    sample_count: Number(row.sample_count),
+    fairness_label: row.fairness_label as RateFairness['fairness_label'],
+    confidence: row.confidence as RateFairness['confidence'],
+  };
+}
+
 export interface PopularLane {
   origin_state: string;
   dest_state: string;

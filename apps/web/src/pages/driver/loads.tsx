@@ -11,7 +11,7 @@ import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Load } from '@freightx/shared';
 
-const STATUS_FILTERS = ['active', 'delivered', 'All'];
+const STATUS_FILTERS = ['active', 'delivered', 'completed', 'All'];
 const STATUS_LABELS: Record<string, string> = {
   active: 'Active',
   All: 'All Loads',
@@ -19,12 +19,14 @@ const STATUS_LABELS: Record<string, string> = {
   awarded: 'Awarded',
   in_transit: 'In Transit',
   delivered: 'Delivered',
+  completed: 'Completed',
 };
 const STATUS_BADGE: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
   dispatched: 'blue',
   awarded: 'blue',
   in_transit: 'orange',
   delivered: 'green',
+  completed: 'green',
 };
 
 export default function DriverLoadsPage() {
@@ -56,6 +58,13 @@ export default function DriverLoadsPage() {
     });
   }, [user?.id, fetchLoads]);
 
+  // Keep selectedLoad in sync with realtime updates
+  useEffect(() => {
+    if (!selectedLoad) return;
+    const updated = loads.find((l) => l.id === selectedLoad.id);
+    if (updated) setSelectedLoad(updated);
+  }, [loads]);
+
   const STATUS_ORDER: Record<string, number> = {
     in_transit: 0,
     dispatched: 1,
@@ -67,6 +76,10 @@ export default function DriverLoadsPage() {
     .filter((l) => {
       if (statusFilter === 'active') {
         if (!['dispatched', 'in_transit', 'awarded'].includes(l.status)) return false;
+      } else if (statusFilter === 'delivered') {
+        if (l.status !== 'delivered') return false;
+      } else if (statusFilter === 'completed') {
+        if (l.status !== 'completed') return false;
       } else if (statusFilter !== 'All' && l.status !== statusFilter) return false;
       if (search) {
         const s = search.toLowerCase();

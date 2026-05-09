@@ -126,6 +126,87 @@ export type Database = {
           },
         ];
       };
+      broker_reviews: {
+        Row: {
+          id: string;
+          carrier_company_id: string;
+          broker_company_id: string;
+          load_id: string;
+          reviewer_id: string;
+          overall: number;
+          payment_speed: number | null;
+          payment_reliability: number | null;
+          communication: number | null;
+          rate_fairness: number | null;
+          comment: string | null;
+          would_work_again: boolean | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          carrier_company_id: string;
+          broker_company_id: string;
+          load_id: string;
+          reviewer_id: string;
+          overall: number;
+          payment_speed?: number | null;
+          payment_reliability?: number | null;
+          communication?: number | null;
+          rate_fairness?: number | null;
+          comment?: string | null;
+          would_work_again?: boolean | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          carrier_company_id?: string;
+          broker_company_id?: string;
+          load_id?: string;
+          reviewer_id?: string;
+          overall?: number;
+          payment_speed?: number | null;
+          payment_reliability?: number | null;
+          communication?: number | null;
+          rate_fairness?: number | null;
+          comment?: string | null;
+          would_work_again?: boolean | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      broker_relationships: {
+        Row: {
+          id: string;
+          carrier_company_id: string;
+          broker_company_id: string;
+          status: string;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          carrier_company_id: string;
+          broker_company_id: string;
+          status?: string;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          carrier_company_id?: string;
+          broker_company_id?: string;
+          status?: string;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       bids: {
         Row: {
           amount_usd: number;
@@ -133,6 +214,7 @@ export type Database = {
           company_id: string | null;
           company_name: string;
           created_at: string;
+          deleted_at: string | null;
           expires_at: string;
           id: string;
           load_id: string;
@@ -151,6 +233,7 @@ export type Database = {
           company_id?: string | null;
           company_name?: string;
           created_at?: string;
+          deleted_at?: string | null;
           expires_at?: string;
           id?: string;
           load_id: string;
@@ -169,6 +252,7 @@ export type Database = {
           company_id?: string | null;
           company_name?: string;
           created_at?: string;
+          deleted_at?: string | null;
           expires_at?: string;
           id?: string;
           load_id?: string;
@@ -343,6 +427,45 @@ export type Database = {
           },
         ];
       };
+      carrier_lane_preferences: {
+        Row: {
+          id: string;
+          carrier_company_id: string;
+          origin_state: string;
+          dest_state: string;
+          equipment: string | null;
+          min_rate_per_mile: number | null;
+          max_deadhead_miles: number | null;
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          carrier_company_id: string;
+          origin_state: string;
+          dest_state: string;
+          equipment?: string | null;
+          min_rate_per_mile?: number | null;
+          max_deadhead_miles?: number | null;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          carrier_company_id?: string;
+          origin_state?: string;
+          dest_state?: string;
+          equipment?: string | null;
+          min_rate_per_mile?: number | null;
+          max_deadhead_miles?: number | null;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       carrier_verifications: {
         Row: {
           company_id: string;
@@ -368,6 +491,9 @@ export type Database = {
           status: Database['public']['Enums']['verification_status'];
           updated_at: string;
           verified_at: string | null;
+          hazmat_certified: boolean;
+          hazmat_permit_expires: string | null;
+          hazmat_permit_number: string | null;
           w9_uploaded_at: string | null;
           w9_url: string | null;
         };
@@ -378,6 +504,9 @@ export type Database = {
           dot_number?: string | null;
           fmcsa_status?: string | null;
           fmcsa_verified_at?: string | null;
+          hazmat_certified?: boolean;
+          hazmat_permit_expires?: string | null;
+          hazmat_permit_number?: string | null;
           id?: string;
           insurance_amount_usd?: number | null;
           insurance_carrier?: string | null;
@@ -405,6 +534,9 @@ export type Database = {
           dot_number?: string | null;
           fmcsa_status?: string | null;
           fmcsa_verified_at?: string | null;
+          hazmat_certified?: boolean;
+          hazmat_permit_expires?: string | null;
+          hazmat_permit_number?: string | null;
           id?: string;
           insurance_amount_usd?: number | null;
           insurance_carrier?: string | null;
@@ -439,6 +571,9 @@ export type Database = {
         Row: {
           address: string | null;
           broker_authority: string | null;
+          broker_bond_amount: number | null;
+          broker_bond_expires_at: string | null;
+          broker_bond_verified: boolean;
           city: string | null;
           created_at: string;
           dot_number: string | null;
@@ -462,6 +597,9 @@ export type Database = {
         Insert: {
           address?: string | null;
           broker_authority?: string | null;
+          broker_bond_amount?: number | null;
+          broker_bond_expires_at?: string | null;
+          broker_bond_verified?: boolean;
           city?: string | null;
           created_at?: string;
           dot_number?: string | null;
@@ -485,6 +623,9 @@ export type Database = {
         Update: {
           address?: string | null;
           broker_authority?: string | null;
+          broker_bond_amount?: number | null;
+          broker_bond_expires_at?: string | null;
+          broker_bond_verified?: boolean;
           city?: string | null;
           created_at?: string;
           dot_number?: string | null;
@@ -677,6 +818,7 @@ export type Database = {
           bol_number: string | null;
           company_id: string | null;
           created_at: string;
+          deleted_at: string | null;
           file_name: string;
           file_size: number | null;
           file_url: string;
@@ -693,6 +835,7 @@ export type Database = {
           bol_number?: string | null;
           company_id?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           file_name: string;
           file_size?: number | null;
           file_url: string;
@@ -709,6 +852,7 @@ export type Database = {
           bol_number?: string | null;
           company_id?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           file_name?: string;
           file_size?: number | null;
           file_url?: string;
@@ -1015,6 +1159,91 @@ export type Database = {
           },
         ];
       };
+      load_exception_alerts: {
+        Row: {
+          id: string;
+          load_id: string;
+          alert_type: string;
+          severity: string;
+          message: string;
+          acknowledged: boolean;
+          acknowledged_by: string | null;
+          acknowledged_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          load_id: string;
+          alert_type: string;
+          severity?: string;
+          message: string;
+          acknowledged?: boolean;
+          acknowledged_by?: string | null;
+          acknowledged_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          load_id?: string;
+          alert_type?: string;
+          severity?: string;
+          message?: string;
+          acknowledged?: boolean;
+          acknowledged_by?: string | null;
+          acknowledged_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'load_exception_alerts_load_id_fkey';
+            columns: ['load_id'];
+            isOneToOne: false;
+            referencedRelation: 'loads';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      load_invitations: {
+        Row: {
+          id: string;
+          load_id: string;
+          carrier_company_id: string;
+          invited_by: string;
+          status: string;
+          message: string | null;
+          expires_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          load_id: string;
+          carrier_company_id: string;
+          invited_by: string;
+          status?: string;
+          message?: string | null;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          load_id?: string;
+          carrier_company_id?: string;
+          invited_by?: string;
+          status?: string;
+          message?: string | null;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'load_invitations_load_id_fkey';
+            columns: ['load_id'];
+            isOneToOne: false;
+            referencedRelation: 'loads';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       loads: {
         Row: {
           assigned_driver_id: string | null;
@@ -1025,6 +1254,7 @@ export type Database = {
           company_id: string | null;
           company_name: string;
           created_at: string;
+          deleted_at: string | null;
           delivery_appt_end: string | null;
           delivery_appt_start: string | null;
           delivery_date: string;
@@ -1039,6 +1269,7 @@ export type Database = {
           dest_zip: string | null;
           equipment: string;
           freight_class: string | null;
+          full_partial: string | null;
           hazmat: boolean;
           height_in: number | null;
           id: string;
@@ -1081,6 +1312,15 @@ export type Database = {
           status: string;
           temp_controlled: boolean;
           total_miles: number | null;
+          visibility: string;
+          hazmat_proper_shipping_name: string | null;
+          hazmat_class: string | null;
+          hazmat_un_number: string | null;
+          hazmat_packing_group: string | null;
+          hazmat_quantity: string | null;
+          hazmat_emergency_phone: string | null;
+          hazmat_placard_required: boolean;
+          hazmat_reportable_quantity: boolean;
           weight_lbs: number;
           width_in: number | null;
         };
@@ -1093,6 +1333,7 @@ export type Database = {
           company_id?: string | null;
           company_name: string;
           created_at?: string;
+          deleted_at?: string | null;
           delivery_appt_end?: string | null;
           delivery_appt_start?: string | null;
           delivery_date: string;
@@ -1107,6 +1348,7 @@ export type Database = {
           dest_zip?: string | null;
           equipment: string;
           freight_class?: string | null;
+          full_partial?: string | null;
           hazmat?: boolean;
           height_in?: number | null;
           id?: string;
@@ -1149,6 +1391,15 @@ export type Database = {
           status?: string;
           temp_controlled?: boolean;
           total_miles?: number | null;
+          visibility?: string;
+          hazmat_proper_shipping_name?: string | null;
+          hazmat_class?: string | null;
+          hazmat_un_number?: string | null;
+          hazmat_packing_group?: string | null;
+          hazmat_quantity?: string | null;
+          hazmat_emergency_phone?: string | null;
+          hazmat_placard_required?: boolean;
+          hazmat_reportable_quantity?: boolean;
           weight_lbs: number;
           width_in?: number | null;
         };
@@ -1161,6 +1412,7 @@ export type Database = {
           company_id?: string | null;
           company_name?: string;
           created_at?: string;
+          deleted_at?: string | null;
           delivery_appt_end?: string | null;
           delivery_appt_start?: string | null;
           delivery_date?: string;
@@ -1175,6 +1427,7 @@ export type Database = {
           dest_zip?: string | null;
           equipment?: string;
           freight_class?: string | null;
+          full_partial?: string | null;
           hazmat?: boolean;
           height_in?: number | null;
           id?: string;
@@ -1217,6 +1470,15 @@ export type Database = {
           status?: string;
           temp_controlled?: boolean;
           total_miles?: number | null;
+          visibility?: string;
+          hazmat_proper_shipping_name?: string | null;
+          hazmat_class?: string | null;
+          hazmat_un_number?: string | null;
+          hazmat_packing_group?: string | null;
+          hazmat_quantity?: string | null;
+          hazmat_emergency_phone?: string | null;
+          hazmat_placard_required?: boolean;
+          hazmat_reportable_quantity?: boolean;
           weight_lbs?: number;
           width_in?: number | null;
         };
@@ -1536,7 +1798,11 @@ export type Database = {
           last_location_update: string | null;
           onboarding_complete: boolean;
           phone: string | null;
+          phone_verified_at: string | null;
+          phone_carrier_type: string | null;
+          last_synced_at: string | null;
           role: string;
+          theme: string;
           updated_at: string;
         };
         Insert: {
@@ -1551,7 +1817,11 @@ export type Database = {
           last_location_update?: string | null;
           onboarding_complete?: boolean;
           phone?: string | null;
+          phone_verified_at?: string | null;
+          phone_carrier_type?: string | null;
+          last_synced_at?: string | null;
           role?: string;
+          theme?: string;
           updated_at?: string;
         };
         Update: {
@@ -1566,7 +1836,11 @@ export type Database = {
           last_location_update?: string | null;
           onboarding_complete?: boolean;
           phone?: string | null;
+          phone_verified_at?: string | null;
+          phone_carrier_type?: string | null;
+          last_synced_at?: string | null;
           role?: string;
+          theme?: string;
           updated_at?: string;
         };
         Relationships: [];
@@ -1785,6 +2059,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      tier_feature_limits: {
+        Row: {
+          tier: string;
+          max_active_loads: number | null;
+          max_saved_searches: number | null;
+          load_alerts: boolean;
+          rate_analytics: boolean;
+          api_access: boolean;
+          priority_support: boolean;
+          white_label: boolean;
+          factoring_rate: number | null;
+        };
+        Insert: {
+          tier: string;
+          max_active_loads?: number | null;
+          max_saved_searches?: number | null;
+          load_alerts?: boolean;
+          rate_analytics?: boolean;
+          api_access?: boolean;
+          priority_support?: boolean;
+          white_label?: boolean;
+          factoring_rate?: number | null;
+        };
+        Update: {
+          tier?: string;
+          max_active_loads?: number | null;
+          max_saved_searches?: number | null;
+          load_alerts?: boolean;
+          rate_analytics?: boolean;
+          api_access?: boolean;
+          priority_support?: boolean;
+          white_label?: boolean;
+          factoring_rate?: number | null;
+        };
+        Relationships: [];
+      };
       tracking_milestones: {
         Row: {
           completed: boolean;
@@ -1950,6 +2260,1149 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      // ── Phase 3 tables ──────────────────────────────────────────────────
+      // ── Phase 4 tables ──────────────────────────────────────────────────
+      mobile_devices: {
+        Row: {
+          id: string;
+          user_id: string;
+          device_id: string;
+          platform: string;
+          app_version: string | null;
+          os_version: string | null;
+          device_model: string | null;
+          push_token: string | null;
+          push_enabled: boolean;
+          locale: string;
+          timezone: string;
+          last_active_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          device_id: string;
+          platform: string;
+          app_version?: string | null;
+          os_version?: string | null;
+          device_model?: string | null;
+          push_token?: string | null;
+          push_enabled?: boolean;
+          locale?: string;
+          timezone?: string;
+          last_active_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          device_id?: string;
+          platform?: string;
+          app_version?: string | null;
+          os_version?: string | null;
+          device_model?: string | null;
+          push_token?: string | null;
+          push_enabled?: boolean;
+          locale?: string;
+          timezone?: string;
+          last_active_at?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      fuel_cards: {
+        Row: {
+          id: string;
+          company_id: string;
+          card_number_masked: string;
+          provider: string;
+          assigned_driver: string | null;
+          assigned_truck: string | null;
+          spending_limit_usd: number | null;
+          daily_limit_usd: number | null;
+          discount_cents_per_gallon: number;
+          status: string;
+          activated_at: string;
+          cancelled_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          company_id: string;
+          card_number_masked: string;
+          provider: string;
+          assigned_driver?: string | null;
+          assigned_truck?: string | null;
+          spending_limit_usd?: number | null;
+          daily_limit_usd?: number | null;
+          discount_cents_per_gallon?: number;
+          status?: string;
+          activated_at?: string;
+          cancelled_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          company_id?: string;
+          card_number_masked?: string;
+          provider?: string;
+          assigned_driver?: string | null;
+          assigned_truck?: string | null;
+          spending_limit_usd?: number | null;
+          daily_limit_usd?: number | null;
+          discount_cents_per_gallon?: number;
+          status?: string;
+          activated_at?: string;
+          cancelled_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      fuel_transactions: {
+        Row: {
+          id: string;
+          fuel_card_id: string;
+          company_id: string;
+          driver_id: string | null;
+          load_id: string | null;
+          truck_id: string | null;
+          transaction_date: string;
+          gallons: number;
+          price_per_gallon: number;
+          discount_applied: number;
+          total_usd: number | null;
+          retail_price: number | null;
+          savings_usd: number | null;
+          fuel_type: string;
+          location_name: string | null;
+          location_city: string | null;
+          location_state: string | null;
+          odometer_miles: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          fuel_card_id: string;
+          company_id: string;
+          driver_id?: string | null;
+          load_id?: string | null;
+          truck_id?: string | null;
+          transaction_date?: string;
+          gallons: number;
+          price_per_gallon: number;
+          discount_applied?: number;
+          retail_price?: number | null;
+          fuel_type?: string;
+          location_name?: string | null;
+          location_city?: string | null;
+          location_state?: string | null;
+          odometer_miles?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          fuel_card_id?: string;
+          company_id?: string;
+          driver_id?: string | null;
+          load_id?: string | null;
+          truck_id?: string | null;
+          transaction_date?: string;
+          gallons?: number;
+          price_per_gallon?: number;
+          discount_applied?: number;
+          retail_price?: number | null;
+          fuel_type?: string;
+          location_name?: string | null;
+          location_city?: string | null;
+          location_state?: string | null;
+          odometer_miles?: number | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      factoring_risk_assessments: {
+        Row: {
+          id: string;
+          factoring_request_id: string;
+          carrier_company_id: string;
+          broker_company_id: string | null;
+          load_id: string;
+          carrier_history_score: number;
+          broker_credit_score: number;
+          load_risk_score: number;
+          verification_score: number;
+          relationship_score: number;
+          overall_risk_score: number;
+          risk_level: string;
+          decision: string;
+          decision_reasons: Json;
+          base_fee_pct: number;
+          adjusted_fee_pct: number;
+          assessed_at: string;
+          assessed_by: string;
+        };
+        Insert: {
+          id?: string;
+          factoring_request_id: string;
+          carrier_company_id: string;
+          broker_company_id?: string | null;
+          load_id: string;
+          carrier_history_score?: number;
+          broker_credit_score?: number;
+          load_risk_score?: number;
+          verification_score?: number;
+          relationship_score?: number;
+          overall_risk_score?: number;
+          risk_level?: string;
+          decision?: string;
+          decision_reasons?: Json;
+          base_fee_pct?: number;
+          adjusted_fee_pct?: number;
+          assessed_at?: string;
+          assessed_by?: string;
+        };
+        Update: {
+          id?: string;
+          factoring_request_id?: string;
+          carrier_company_id?: string;
+          broker_company_id?: string | null;
+          load_id?: string;
+          carrier_history_score?: number;
+          broker_credit_score?: number;
+          load_risk_score?: number;
+          verification_score?: number;
+          relationship_score?: number;
+          overall_risk_score?: number;
+          risk_level?: string;
+          decision?: string;
+          decision_reasons?: Json;
+          base_fee_pct?: number;
+          adjusted_fee_pct?: number;
+          assessed_at?: string;
+          assessed_by?: string;
+        };
+        Relationships: [];
+      };
+      factoring_exposure_limits: {
+        Row: {
+          id: string;
+          company_id: string;
+          max_outstanding_usd: number;
+          max_single_invoice_usd: number;
+          min_risk_score: number;
+          auto_approve_above: number;
+          updated_by: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          company_id: string;
+          max_outstanding_usd?: number;
+          max_single_invoice_usd?: number;
+          min_risk_score?: number;
+          auto_approve_above?: number;
+          updated_by?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          company_id?: string;
+          max_outstanding_usd?: number;
+          max_single_invoice_usd?: number;
+          min_risk_score?: number;
+          auto_approve_above?: number;
+          updated_by?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      identity_verifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          company_id: string | null;
+          check_type: string;
+          status: string;
+          confidence: number | null;
+          provider: string | null;
+          provider_ref: string | null;
+          failure_reason: string | null;
+          metadata: Json;
+          expires_at: string | null;
+          verified_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          company_id?: string | null;
+          check_type: string;
+          status?: string;
+          confidence?: number | null;
+          provider?: string | null;
+          provider_ref?: string | null;
+          failure_reason?: string | null;
+          metadata?: Json;
+          expires_at?: string | null;
+          verified_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          company_id?: string | null;
+          check_type?: string;
+          status?: string;
+          confidence?: number | null;
+          provider?: string | null;
+          provider_ref?: string | null;
+          failure_reason?: string | null;
+          metadata?: Json;
+          expires_at?: string | null;
+          verified_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      phone_verifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          phone_number: string;
+          country_code: string;
+          carrier_name: string | null;
+          carrier_type: string | null;
+          is_voip: boolean | null;
+          is_prepaid: boolean | null;
+          is_ported: boolean | null;
+          risk_score: number | null;
+          risk_flags: Json;
+          provider: string | null;
+          verified_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          phone_number: string;
+          country_code?: string;
+          carrier_name?: string | null;
+          carrier_type?: string | null;
+          is_voip?: boolean | null;
+          is_prepaid?: boolean | null;
+          is_ported?: boolean | null;
+          risk_score?: number | null;
+          risk_flags?: Json;
+          provider?: string | null;
+          verified_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          phone_number?: string;
+          country_code?: string;
+          carrier_name?: string | null;
+          carrier_type?: string | null;
+          is_voip?: boolean | null;
+          is_prepaid?: boolean | null;
+          is_ported?: boolean | null;
+          risk_score?: number | null;
+          risk_flags?: Json;
+          provider?: string | null;
+          verified_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      sync_queue: {
+        Row: {
+          id: string;
+          user_id: string;
+          device_id: string | null;
+          entity_type: string;
+          operation: string;
+          entity_id: string | null;
+          payload: Json;
+          client_timestamp: string;
+          status: string;
+          error_message: string | null;
+          attempt_count: number;
+          max_attempts: number;
+          processed_at: string | null;
+          server_entity_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          device_id?: string | null;
+          entity_type: string;
+          operation: string;
+          entity_id?: string | null;
+          payload: Json;
+          client_timestamp: string;
+          status?: string;
+          error_message?: string | null;
+          attempt_count?: number;
+          max_attempts?: number;
+          processed_at?: string | null;
+          server_entity_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          device_id?: string | null;
+          entity_type?: string;
+          operation?: string;
+          entity_id?: string | null;
+          payload?: Json;
+          client_timestamp?: string;
+          status?: string;
+          error_message?: string | null;
+          attempt_count?: number;
+          max_attempts?: number;
+          processed_at?: string | null;
+          server_entity_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      sync_conflicts: {
+        Row: {
+          id: string;
+          sync_queue_id: string;
+          user_id: string;
+          entity_type: string;
+          entity_id: string;
+          local_version: Json;
+          server_version: Json;
+          conflict_fields: string[];
+          resolution: string | null;
+          resolved_by: string | null;
+          resolved_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          sync_queue_id: string;
+          user_id: string;
+          entity_type: string;
+          entity_id: string;
+          local_version: Json;
+          server_version: Json;
+          conflict_fields: string[];
+          resolution?: string | null;
+          resolved_by?: string | null;
+          resolved_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          sync_queue_id?: string;
+          user_id?: string;
+          entity_type?: string;
+          entity_id?: string;
+          local_version?: Json;
+          server_version?: Json;
+          conflict_fields?: string[];
+          resolution?: string | null;
+          resolved_by?: string | null;
+          resolved_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      spot_rate_snapshots: {
+        Row: {
+          id: string;
+          snapshot_date: string;
+          origin_state: string;
+          dest_state: string;
+          equipment: string;
+          avg_rate_per_mile: number;
+          median_rate_per_mile: number | null;
+          p25_rate: number | null;
+          p75_rate: number | null;
+          min_rate: number | null;
+          max_rate: number | null;
+          stddev_rate: number | null;
+          sample_count: number;
+          load_count: number;
+          fill_rate_pct: number | null;
+          day_over_day_pct: number | null;
+          week_over_week_pct: number | null;
+          trend_direction: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          snapshot_date: string;
+          origin_state: string;
+          dest_state: string;
+          equipment: string;
+          avg_rate_per_mile: number;
+          median_rate_per_mile?: number | null;
+          p25_rate?: number | null;
+          p75_rate?: number | null;
+          min_rate?: number | null;
+          max_rate?: number | null;
+          stddev_rate?: number | null;
+          sample_count: number;
+          load_count?: number;
+          fill_rate_pct?: number | null;
+          day_over_day_pct?: number | null;
+          week_over_week_pct?: number | null;
+          trend_direction?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          snapshot_date?: string;
+          origin_state?: string;
+          dest_state?: string;
+          equipment?: string;
+          avg_rate_per_mile?: number;
+          median_rate_per_mile?: number | null;
+          p25_rate?: number | null;
+          p75_rate?: number | null;
+          min_rate?: number | null;
+          max_rate?: number | null;
+          stddev_rate?: number | null;
+          sample_count?: number;
+          load_count?: number;
+          fill_rate_pct?: number | null;
+          day_over_day_pct?: number | null;
+          week_over_week_pct?: number | null;
+          trend_direction?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      api_keys: {
+        Row: {
+          id: string;
+          company_id: string;
+          name: string;
+          key_hash: string;
+          key_prefix: string;
+          scopes: string[];
+          rate_limit_rpm: number | null;
+          ip_whitelist: string[] | null;
+          expires_at: string | null;
+          last_used_at: string | null;
+          revoked_at: string | null;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          company_id: string;
+          name: string;
+          key_hash: string;
+          key_prefix: string;
+          scopes?: string[];
+          rate_limit_rpm?: number | null;
+          ip_whitelist?: string[] | null;
+          expires_at?: string | null;
+          last_used_at?: string | null;
+          revoked_at?: string | null;
+          created_by: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          company_id?: string;
+          name?: string;
+          key_hash?: string;
+          key_prefix?: string;
+          scopes?: string[];
+          rate_limit_rpm?: number | null;
+          ip_whitelist?: string[] | null;
+          expires_at?: string | null;
+          last_used_at?: string | null;
+          revoked_at?: string | null;
+          created_by?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      api_key_usage: {
+        Row: {
+          id: string;
+          api_key_id: string;
+          endpoint: string;
+          method: string;
+          response_status: number | null;
+          response_time_ms: number | null;
+          ip_address: string | null;
+          user_agent: string | null;
+          error_message: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          api_key_id: string;
+          endpoint: string;
+          method: string;
+          response_status?: number | null;
+          response_time_ms?: number | null;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          error_message?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          api_key_id?: string;
+          endpoint?: string;
+          method?: string;
+          response_status?: number | null;
+          response_time_ms?: number | null;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          error_message?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      dock_appointments: {
+        Row: {
+          id: string;
+          facility_id: string;
+          dock_slot_id: string;
+          load_id: string | null;
+          appointment_type: string;
+          scheduled_start: string;
+          scheduled_end: string;
+          carrier_company_id: string | null;
+          driver_name: string | null;
+          truck_number: string | null;
+          trailer_number: string | null;
+          status: string;
+          checked_in_at: string | null;
+          loading_started_at: string | null;
+          checked_out_at: string | null;
+          dwell_minutes: number | null;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          facility_id: string;
+          dock_slot_id: string;
+          load_id?: string | null;
+          appointment_type: string;
+          scheduled_start: string;
+          scheduled_end: string;
+          carrier_company_id?: string | null;
+          driver_name?: string | null;
+          truck_number?: string | null;
+          trailer_number?: string | null;
+          status?: string;
+          checked_in_at?: string | null;
+          loading_started_at?: string | null;
+          checked_out_at?: string | null;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          facility_id?: string;
+          dock_slot_id?: string;
+          load_id?: string | null;
+          appointment_type?: string;
+          scheduled_start?: string;
+          scheduled_end?: string;
+          carrier_company_id?: string | null;
+          driver_name?: string | null;
+          truck_number?: string | null;
+          trailer_number?: string | null;
+          status?: string;
+          checked_in_at?: string | null;
+          loading_started_at?: string | null;
+          checked_out_at?: string | null;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      dock_slots: {
+        Row: {
+          id: string;
+          facility_id: string;
+          slot_name: string;
+          slot_type: string;
+          equipment_types: string[] | null;
+          slot_duration_minutes: number;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          facility_id: string;
+          slot_name: string;
+          slot_type?: string;
+          equipment_types?: string[] | null;
+          slot_duration_minutes?: number;
+          active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          facility_id?: string;
+          slot_name?: string;
+          slot_type?: string;
+          equipment_types?: string[] | null;
+          slot_duration_minutes?: number;
+          active?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      eld_devices: {
+        Row: {
+          id: string;
+          company_id: string;
+          device_serial: string;
+          provider: string;
+          vehicle_id: string | null;
+          driver_id: string | null;
+          status: string;
+          last_sync_at: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          company_id: string;
+          device_serial: string;
+          provider: string;
+          vehicle_id?: string | null;
+          driver_id?: string | null;
+          status?: string;
+          last_sync_at?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          company_id?: string;
+          device_serial?: string;
+          provider?: string;
+          vehicle_id?: string | null;
+          driver_id?: string | null;
+          status?: string;
+          last_sync_at?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      facilities: {
+        Row: {
+          id: string;
+          company_id: string;
+          name: string;
+          address: string | null;
+          city: string;
+          state: string;
+          zip: string | null;
+          lat: number | null;
+          lng: number | null;
+          contact_name: string | null;
+          contact_phone: string | null;
+          contact_email: string | null;
+          operating_hours: Json;
+          timezone: string;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          company_id: string;
+          name: string;
+          address?: string | null;
+          city: string;
+          state: string;
+          zip?: string | null;
+          lat?: number | null;
+          lng?: number | null;
+          contact_name?: string | null;
+          contact_phone?: string | null;
+          contact_email?: string | null;
+          operating_hours?: Json;
+          timezone?: string;
+          active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          company_id?: string;
+          name?: string;
+          address?: string | null;
+          city?: string;
+          state?: string;
+          zip?: string | null;
+          lat?: number | null;
+          lng?: number | null;
+          contact_name?: string | null;
+          contact_phone?: string | null;
+          contact_email?: string | null;
+          operating_hours?: Json;
+          timezone?: string;
+          active?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      hos_daily_summary: {
+        Row: {
+          id: string;
+          driver_id: string;
+          log_date: string;
+          driving_minutes: number;
+          on_duty_minutes: number;
+          sleeper_minutes: number;
+          off_duty_minutes: number;
+          total_miles: number | null;
+          violations_count: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          driver_id: string;
+          log_date: string;
+          driving_minutes?: number;
+          on_duty_minutes?: number;
+          sleeper_minutes?: number;
+          off_duty_minutes?: number;
+          total_miles?: number | null;
+          violations_count?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          driver_id?: string;
+          log_date?: string;
+          driving_minutes?: number;
+          on_duty_minutes?: number;
+          sleeper_minutes?: number;
+          off_duty_minutes?: number;
+          total_miles?: number | null;
+          violations_count?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      hos_duty_log: {
+        Row: {
+          id: string;
+          driver_id: string;
+          status: Database['public']['Enums']['hos_duty_status'];
+          started_at: string;
+          ended_at: string | null;
+          duration_minutes: number | null;
+          location_lat: number | null;
+          location_lng: number | null;
+          location_description: string | null;
+          odometer_miles: number | null;
+          vehicle_id: string | null;
+          source: string;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          driver_id: string;
+          status: Database['public']['Enums']['hos_duty_status'];
+          started_at?: string;
+          ended_at?: string | null;
+          location_lat?: number | null;
+          location_lng?: number | null;
+          location_description?: string | null;
+          odometer_miles?: number | null;
+          vehicle_id?: string | null;
+          source?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          driver_id?: string;
+          status?: Database['public']['Enums']['hos_duty_status'];
+          started_at?: string;
+          ended_at?: string | null;
+          location_lat?: number | null;
+          location_lng?: number | null;
+          location_description?: string | null;
+          odometer_miles?: number | null;
+          vehicle_id?: string | null;
+          source?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      hos_violations: {
+        Row: {
+          id: string;
+          driver_id: string;
+          violation_type: string;
+          violation_date: string;
+          description: string | null;
+          duty_log_id: string | null;
+          severity: string;
+          resolved: boolean;
+          resolved_by: string | null;
+          resolved_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          driver_id: string;
+          violation_type: string;
+          violation_date: string;
+          description?: string | null;
+          duty_log_id?: string | null;
+          severity?: string;
+          resolved?: boolean;
+          resolved_by?: string | null;
+          resolved_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          driver_id?: string;
+          violation_type?: string;
+          violation_date?: string;
+          description?: string | null;
+          duty_log_id?: string | null;
+          severity?: string;
+          resolved?: boolean;
+          resolved_by?: string | null;
+          resolved_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      rfps: {
+        Row: {
+          id: string;
+          company_id: string;
+          created_by: string;
+          title: string;
+          description: string | null;
+          contract_start: string;
+          contract_end: string;
+          volume_estimate: string | null;
+          equipment: string | null;
+          requirements: Json;
+          status: string;
+          published_at: string | null;
+          closes_at: string | null;
+          visibility: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          company_id: string;
+          created_by: string;
+          title: string;
+          description?: string | null;
+          contract_start: string;
+          contract_end: string;
+          volume_estimate?: string | null;
+          equipment?: string | null;
+          requirements?: Json;
+          status?: string;
+          published_at?: string | null;
+          closes_at?: string | null;
+          visibility?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          company_id?: string;
+          created_by?: string;
+          title?: string;
+          description?: string | null;
+          contract_start?: string;
+          contract_end?: string;
+          volume_estimate?: string | null;
+          equipment?: string | null;
+          requirements?: Json;
+          status?: string;
+          published_at?: string | null;
+          closes_at?: string | null;
+          visibility?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      rfp_lanes: {
+        Row: {
+          id: string;
+          rfp_id: string;
+          origin_city: string | null;
+          origin_state: string;
+          dest_city: string | null;
+          dest_state: string;
+          equipment: string | null;
+          loads_per_week: number | null;
+          target_rate_usd: number | null;
+          special_requirements: string | null;
+          status: string;
+          awarded_to: string | null;
+          awarded_rate: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          rfp_id: string;
+          origin_city?: string | null;
+          origin_state: string;
+          dest_city?: string | null;
+          dest_state: string;
+          equipment?: string | null;
+          loads_per_week?: number | null;
+          target_rate_usd?: number | null;
+          special_requirements?: string | null;
+          status?: string;
+          awarded_to?: string | null;
+          awarded_rate?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          rfp_id?: string;
+          origin_city?: string | null;
+          origin_state?: string;
+          dest_city?: string | null;
+          dest_state?: string;
+          equipment?: string | null;
+          loads_per_week?: number | null;
+          target_rate_usd?: number | null;
+          special_requirements?: string | null;
+          status?: string;
+          awarded_to?: string | null;
+          awarded_rate?: number | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      rfp_proposals: {
+        Row: {
+          id: string;
+          rfp_id: string;
+          rfp_lane_id: string;
+          carrier_company_id: string;
+          submitted_by: string;
+          proposed_rate_usd: number;
+          capacity_per_week: number | null;
+          transit_days: number | null;
+          equipment_offered: string | null;
+          notes: string | null;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          rfp_id: string;
+          rfp_lane_id: string;
+          carrier_company_id: string;
+          submitted_by: string;
+          proposed_rate_usd: number;
+          capacity_per_week?: number | null;
+          transit_days?: number | null;
+          equipment_offered?: string | null;
+          notes?: string | null;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          rfp_id?: string;
+          rfp_lane_id?: string;
+          carrier_company_id?: string;
+          submitted_by?: string;
+          proposed_rate_usd?: number;
+          capacity_per_week?: number | null;
+          transit_days?: number | null;
+          equipment_offered?: string | null;
+          notes?: string | null;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      shipper_reviews: {
+        Row: {
+          id: string;
+          carrier_company_id: string;
+          shipper_company_id: string;
+          load_id: string;
+          reviewer_id: string;
+          overall: number;
+          loading_efficiency: number | null;
+          dock_wait_time: number | null;
+          communication: number | null;
+          facility_quality: number | null;
+          accuracy: number | null;
+          comment: string | null;
+          detention_occurred: boolean | null;
+          detention_minutes: number | null;
+          would_work_again: boolean | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          carrier_company_id: string;
+          shipper_company_id: string;
+          load_id: string;
+          reviewer_id: string;
+          overall: number;
+          loading_efficiency?: number | null;
+          dock_wait_time?: number | null;
+          communication?: number | null;
+          facility_quality?: number | null;
+          accuracy?: number | null;
+          comment?: string | null;
+          detention_occurred?: boolean | null;
+          detention_minutes?: number | null;
+          would_work_again?: boolean | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          carrier_company_id?: string;
+          shipper_company_id?: string;
+          load_id?: string;
+          reviewer_id?: string;
+          overall?: number;
+          loading_efficiency?: number | null;
+          dock_wait_time?: number | null;
+          communication?: number | null;
+          facility_quality?: number | null;
+          accuracy?: number | null;
+          comment?: string | null;
+          detention_occurred?: boolean | null;
+          detention_minutes?: number | null;
+          would_work_again?: boolean | null;
+          created_at?: string;
+        };
+        Relationships: [];
       };
     };
     Views: {
@@ -3168,9 +4621,613 @@ export type Database = {
         };
         Returns: string;
       };
+      check_broker_verified: {
+        Args: {
+          p_company_id: string;
+        };
+        Returns: boolean;
+      };
+      get_broker_payment_summary: {
+        Args: {
+          p_company_id: string;
+        };
+        Returns: Json;
+      };
+      check_late_pickups: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      check_delivery_delays: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      acknowledge_alert: {
+        Args: {
+          p_alert_id: string;
+        };
+        Returns: undefined;
+      };
+      get_carrier_scorecards: {
+        Args: {
+          p_shipper_company_id: string;
+          p_lane?: string | null;
+        };
+        Returns: {
+          carrier_company_id: string;
+          carrier_name: string;
+          lane: string;
+          total_loads: number;
+          completed_loads: number;
+          on_time_pct: number;
+          avg_transit_days: number;
+          avg_rate_per_mile: number;
+          last_shipment_at: string;
+          reliability_grade: string;
+        }[];
+      };
+      refresh_carrier_scorecards: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
+      check_feature_access: {
+        Args: {
+          p_company_id: string;
+          p_feature: string;
+        };
+        Returns: Json;
+      };
+      get_company_tier: {
+        Args: {
+          p_company_id: string;
+        };
+        Returns: Json;
+      };
+      grant_gps_consent: {
+        Args: {
+          p_consent_text: string;
+          p_ip_address?: string | null;
+          p_user_agent?: string | null;
+        };
+        Returns: string;
+      };
+      revoke_gps_consent: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
+      has_gps_consent: {
+        Args: {
+          p_user_id?: string | null;
+        };
+        Returns: boolean;
+      };
+      validate_bol_requirements: {
+        Args: {
+          p_load_id: string;
+        };
+        Returns: Json;
+      };
+      check_hazmat_eligible: {
+        Args: {
+          p_company_id: string;
+        };
+        Returns: boolean;
+      };
+      check_insurance_adequate: {
+        Args: {
+          p_company_id: string;
+          p_hazmat?: boolean;
+        };
+        Returns: boolean;
+      };
+      soft_delete_load: {
+        Args: {
+          p_load_id: string;
+        };
+        Returns: undefined;
+      };
+      send_notification: {
+        Args: {
+          p_user_id: string;
+          p_type: string;
+          p_title: string;
+          p_body?: string | null;
+          p_load_id?: string | null;
+        };
+        Returns: string;
+      };
+      notify_carriers_new_load: {
+        Args: {
+          p_load_id: string;
+        };
+        Returns: undefined;
+      };
+      submit_broker_review: {
+        Args: {
+          p_load_id: string;
+          p_overall: number;
+          p_payment_speed?: number | null;
+          p_payment_reliability?: number | null;
+          p_communication?: number | null;
+          p_rate_fairness?: number | null;
+          p_comment?: string | null;
+          p_would_work_again?: boolean | null;
+        };
+        Returns: string;
+      };
+      get_broker_trust_profile: {
+        Args: {
+          p_broker_company_id: string;
+        };
+        Returns: Json;
+      };
+      invite_carriers_to_load: {
+        Args: {
+          p_load_id: string;
+          p_carrier_company_ids: string[];
+          p_message?: string | null;
+          p_expires_in_hours?: number | null;
+        };
+        Returns: number;
+      };
+      get_my_load_invitations: {
+        Args: {
+          p_status?: string | null;
+        };
+        Returns: {
+          invitation_id: string;
+          load_id: string;
+          load_number: string;
+          origin: string;
+          destination: string;
+          equipment: string;
+          rate_usd: number;
+          message: string | null;
+          expires_at: string | null;
+          invited_at: string;
+          broker_name: string;
+        }[];
+      };
+      expire_load_invitations: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      match_lane_alerts: {
+        Args: {
+          p_load_id: string;
+        };
+        Returns: number;
+      };
+      forecast_lane_rate: {
+        Args: {
+          p_origin_state: string;
+          p_dest_state: string;
+          p_equipment: string;
+          p_lookback_days?: number | null;
+        };
+        Returns: Json;
+      };
+      get_rate_heatmap: {
+        Args: {
+          p_equipment: string;
+          p_origin_state?: string | null;
+          p_days?: number | null;
+          p_limit?: number | null;
+        };
+        Returns: {
+          origin_state: string;
+          dest_state: string;
+          avg_rate_per_mile: number;
+          load_count: number;
+          trend_direction: string;
+          last_seen: string;
+        }[];
+      };
+      refresh_lane_benchmarks: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      validate_hazmat_shipping_paper: {
+        Args: {
+          p_load_id: string;
+        };
+        Returns: Json;
+      };
+      request_factoring: {
+        Args: {
+          p_load_id: string;
+          p_payment_method?: string | null;
+        };
+        Returns: Json;
+      };
+      approve_factoring: {
+        Args: {
+          p_request_id: string;
+          p_payment_reference?: string | null;
+        };
+        Returns: Json;
+      };
+      fund_factoring: {
+        Args: {
+          p_request_id: string;
+          p_payment_reference: string;
+        };
+        Returns: Json;
+      };
+      get_factoring_stats: {
+        Args: {
+          p_company_id?: string | null;
+        };
+        Returns: Json;
+      };
+      get_lane_suggestions: {
+        Args: {
+          p_carrier_company_id: string;
+          p_limit?: number | null;
+        };
+        Returns: Json;
+      };
+      get_backhaul_opportunities: {
+        Args: {
+          p_current_state: string;
+          p_equipment: string;
+          p_limit?: number | null;
+        };
+        Returns: {
+          load_id: string;
+          load_number: string;
+          origin: string;
+          destination: string;
+          rate_usd: number;
+          rate_per_mile: number;
+          total_miles: number;
+          pickup_date: string;
+          delivery_date: string;
+          posted_at: string;
+        }[];
+      };
+      set_theme_preference: {
+        Args: {
+          p_theme: string;
+        };
+        Returns: undefined;
+      };
+      // ── Phase 3 RPCs ──────────────────────────────────────────────────
+      // ── Phase 4 RPCs ──────────────────────────────────────────────────
+      register_mobile_device: {
+        Args: {
+          p_device_id: string;
+          p_platform: string;
+          p_push_token?: string | null;
+          p_app_version?: string | null;
+          p_os_version?: string | null;
+          p_device_model?: string | null;
+          p_locale?: string;
+          p_timezone?: string;
+        };
+        Returns: string;
+      };
+      deregister_mobile_device: {
+        Args: {
+          p_device_id: string;
+        };
+        Returns: undefined;
+      };
+      get_my_devices: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string;
+          device_id: string;
+          platform: string;
+          app_version: string | null;
+          device_model: string | null;
+          push_enabled: boolean;
+          last_active_at: string;
+        }[];
+      };
+      issue_fuel_card: {
+        Args: {
+          p_company_id: string;
+          p_card_number_last4: string;
+          p_provider: string;
+          p_assigned_driver?: string | null;
+          p_assigned_truck?: string | null;
+          p_spending_limit?: number | null;
+          p_daily_limit?: number | null;
+          p_discount_cpg?: number;
+        };
+        Returns: string;
+      };
+      record_fuel_transaction: {
+        Args: {
+          p_fuel_card_id: string;
+          p_gallons: number;
+          p_price_per_gallon: number;
+          p_fuel_type?: string;
+          p_load_id?: string | null;
+          p_truck_id?: string | null;
+          p_location_name?: string | null;
+          p_location_city?: string | null;
+          p_location_state?: string | null;
+          p_odometer_miles?: number | null;
+        };
+        Returns: string;
+      };
+      get_fuel_summary: {
+        Args: {
+          p_company_id: string;
+          p_days?: number;
+        };
+        Returns: Json;
+      };
+      assess_factoring_risk: {
+        Args: {
+          p_factoring_request_id: string;
+        };
+        Returns: Json;
+      };
+      get_factoring_exposure: {
+        Args: {
+          p_company_id: string;
+        };
+        Returns: Json;
+      };
+      set_factoring_exposure_limit: {
+        Args: {
+          p_company_id: string;
+          p_max_outstanding?: number;
+          p_max_single_invoice?: number;
+          p_min_risk_score?: number;
+          p_auto_approve_above?: number;
+        };
+        Returns: undefined;
+      };
+      submit_identity_verification: {
+        Args: {
+          p_user_id: string;
+          p_check_type: string;
+          p_status: string;
+          p_confidence?: number | null;
+          p_provider?: string | null;
+          p_provider_ref?: string | null;
+          p_failure_reason?: string | null;
+          p_metadata?: Json;
+          p_expires_in_days?: number;
+        };
+        Returns: string;
+      };
+      submit_phone_verification: {
+        Args: {
+          p_user_id: string;
+          p_phone_number: string;
+          p_carrier_name?: string | null;
+          p_carrier_type?: string;
+          p_is_voip?: boolean | null;
+          p_is_prepaid?: boolean | null;
+          p_is_ported?: boolean | null;
+          p_risk_score?: number | null;
+          p_risk_flags?: Json;
+          p_provider?: string | null;
+        };
+        Returns: Json;
+      };
+      get_identity_risk_profile: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: Json;
+      };
+      process_sync_queue: {
+        Args: {
+          p_batch_size?: number;
+        };
+        Returns: Json;
+      };
+      resolve_sync_conflict: {
+        Args: {
+          p_conflict_id: string;
+          p_resolution: string;
+        };
+        Returns: Json;
+      };
+      get_sync_status: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      compute_spot_rate_index: {
+        Args: {
+          p_snapshot_date?: string;
+        };
+        Returns: Json;
+      };
+      get_spot_rate_index: {
+        Args: {
+          p_origin_state: string;
+          p_dest_state: string;
+          p_equipment?: string;
+          p_days?: number;
+        };
+        Returns: Json;
+      };
+      get_shipper_rate_recommendation: {
+        Args: {
+          p_origin_state: string;
+          p_dest_state: string;
+          p_equipment?: string;
+          p_urgency?: string;
+        };
+        Returns: Json;
+      };
+      score_carrier_for_load: {
+        Args: {
+          p_load_id: string;
+          p_carrier_company_id: string;
+        };
+        Returns: Json;
+      };
+      rank_carriers_for_load: {
+        Args: {
+          p_load_id: string;
+          p_limit?: number;
+        };
+        Returns: Json;
+      };
+      get_driver_hos_status: {
+        Args: {
+          p_driver_id: string;
+        };
+        Returns: Json;
+      };
+      log_duty_transition: {
+        Args: {
+          p_new_status: string;
+          p_location_lat?: number | null;
+          p_location_lng?: number | null;
+          p_location_description?: string | null;
+          p_odometer_miles?: number | null;
+          p_vehicle_id?: string | null;
+          p_source?: string;
+          p_notes?: string | null;
+        };
+        Returns: Json;
+      };
+      aggregate_hos_daily: {
+        Args: {
+          p_driver_id: string;
+          p_log_date: string;
+        };
+        Returns: undefined;
+      };
+      submit_shipper_review: {
+        Args: {
+          p_load_id: string;
+          p_overall: number;
+          p_loading_efficiency?: number | null;
+          p_dock_wait_time?: number | null;
+          p_communication?: number | null;
+          p_facility_quality?: number | null;
+          p_accuracy?: number | null;
+          p_comment?: string | null;
+          p_detention_occurred?: boolean | null;
+          p_detention_minutes?: number | null;
+          p_would_work_again?: boolean | null;
+        };
+        Returns: string;
+      };
+      get_shipper_trust_profile: {
+        Args: {
+          p_shipper_company_id: string;
+        };
+        Returns: Json;
+      };
+      get_marketplace_trust_summary: {
+        Args: {
+          p_company_id: string;
+        };
+        Returns: Json;
+      };
+      generate_api_key: {
+        Args: {
+          p_company_id: string;
+          p_name: string;
+          p_scopes?: string[];
+          p_rate_limit?: number | null;
+          p_ip_whitelist?: string[] | null;
+          p_expires_in_days?: number | null;
+        };
+        Returns: Json;
+      };
+      validate_api_key: {
+        Args: {
+          p_key_raw: string;
+          p_scope?: string | null;
+          p_ip_address?: string | null;
+        };
+        Returns: Json;
+      };
+      revoke_api_key: {
+        Args: {
+          p_key_id: string;
+        };
+        Returns: undefined;
+      };
+      get_api_usage_stats: {
+        Args: {
+          p_company_id: string;
+          p_days?: number;
+        };
+        Returns: Json;
+      };
+      get_available_dock_slots: {
+        Args: {
+          p_facility_id: string;
+          p_date: string;
+          p_appointment_type?: string;
+          p_equipment?: string | null;
+        };
+        Returns: {
+          slot_id: string;
+          slot_name: string;
+          slot_type: string;
+          time_start: string;
+          time_end: string;
+          available: boolean;
+        }[];
+      };
+      book_dock_appointment: {
+        Args: {
+          p_dock_slot_id: string;
+          p_load_id: string;
+          p_scheduled_start: string;
+          p_scheduled_end: string;
+          p_appointment_type: string;
+          p_driver_name?: string | null;
+          p_truck_number?: string | null;
+          p_notes?: string | null;
+        };
+        Returns: Json;
+      };
+      dock_check_in: {
+        Args: {
+          p_appointment_id: string;
+        };
+        Returns: undefined;
+      };
+      dock_check_out: {
+        Args: {
+          p_appointment_id: string;
+        };
+        Returns: Json;
+      };
+      submit_rfp_proposal: {
+        Args: {
+          p_rfp_lane_id: string;
+          p_proposed_rate_usd: number;
+          p_capacity_per_week?: number | null;
+          p_transit_days?: number | null;
+          p_equipment_offered?: string | null;
+          p_notes?: string | null;
+        };
+        Returns: Json;
+      };
+      award_rfp_lane: {
+        Args: {
+          p_rfp_lane_id: string;
+          p_carrier_company_id: string;
+          p_awarded_rate: number;
+        };
+        Returns: Json;
+      };
+      get_rfp_summary: {
+        Args: {
+          p_rfp_id: string;
+        };
+        Returns: Json;
+      };
     };
     Enums: {
       duty_status: 'on_duty' | 'off_duty' | 'sleeper' | 'driving';
+      hos_duty_status: 'off_duty' | 'sleeper_berth' | 'driving' | 'on_duty_not_driving';
+      load_visibility: 'public' | 'preferred_only' | 'invited_only';
       verification_status: 'pending' | 'verified' | 'failed' | 'expired';
     };
     CompositeTypes: {
@@ -3306,6 +5363,8 @@ export const Constants = {
   public: {
     Enums: {
       duty_status: ['on_duty', 'off_duty', 'sleeper', 'driving'],
+      hos_duty_status: ['off_duty', 'sleeper_berth', 'driving', 'on_duty_not_driving'],
+      load_visibility: ['public', 'preferred_only', 'invited_only'],
       verification_status: ['pending', 'verified', 'failed', 'expired'],
     },
   },

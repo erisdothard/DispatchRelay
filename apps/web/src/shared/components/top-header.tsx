@@ -1,6 +1,7 @@
 import { Bell, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/shared/lib/utils';
+import { SyncIndicator } from '@/features/loads/components/sync-indicator';
 
 interface TopHeaderProps {
   greeting?: boolean;
@@ -61,20 +62,23 @@ export function TopHeader({
         </div>
       </div>
 
-      {right ??
-        (showNotification && (
-          <button
-            onClick={onNotificationClick}
-            className="relative w-10 h-10 rounded-xl bg-fx-surface border border-fx-border flex items-center justify-center text-fx-text-muted hover:text-fx-orange hover:border-fx-orange/40 transition-all duration-200"
-          >
-            <Bell size={18} />
-            {notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-fx-orange rounded-full text-[10px] font-bold text-white flex items-center justify-center">
-                {notificationCount > 9 ? '9+' : notificationCount}
-              </span>
-            )}
-          </button>
-        ))}
+      <div className="flex items-center gap-2">
+        <SyncIndicator />
+        {right ??
+          (showNotification && (
+            <button
+              onClick={onNotificationClick}
+              className="relative w-10 h-10 rounded-xl bg-fx-surface border border-fx-border flex items-center justify-center text-fx-text-muted hover:text-fx-orange hover:border-fx-orange/40 transition-all duration-200"
+            >
+              <Bell size={18} />
+              {notificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-fx-orange rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+                  {notificationCount > 9 ? '9+' : notificationCount}
+                </span>
+              )}
+            </button>
+          ))}
+      </div>
     </header>
   );
 }

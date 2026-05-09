@@ -15,6 +15,7 @@ import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
 import { useGpsConsent } from '@/features/loads/hooks/use-gps-consent';
 import { GpsConsentModal } from '@/features/loads/components/gps-consent-modal';
 import { canSendGps } from '@/lib/permissions';
+import { supabase } from '@/lib/supabase';
 import type { Load } from '@freightx/shared';
 
 /** Renders nothing — just activates GPS pinging for a single load */
@@ -23,11 +24,18 @@ function GpsPinger({ loadNumber }: { loadNumber: string }) {
   return null;
 }
 
+/** Renders nothing — activates GPS pinging without a specific load (manual share / idle) */
+function IdleGpsPinger() {
+  useDriverLocation({ loadNumber: '__idle__', active: true });
+  return null;
+}
+
 const statusBadge: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
   in_transit: 'orange',
   dispatched: 'blue',
   awarded: 'blue',
   delivered: 'green',
+  completed: 'green',
 };
 
 const statusLabel: Record<string, string> = {
@@ -35,11 +43,13 @@ const statusLabel: Record<string, string> = {
   dispatched: 'Dispatched',
   awarded: 'Awarded',
   delivered: 'Delivered',
+  completed: 'Completed',
 };
 
 export default function DriverDashboard() {
   const navigate = useNavigate();
   const { profile, user } = useAuth();
+  const [allLoads, setAllLoads] = useState<Load[]>([]);
   const [loads, setLoads] = useState<Load[]>([]);
   const [activeLoads, setActiveLoads] = useState<Load[]>([]);
   const [notifsOpen, setNotifsOpen] = useState(false);
@@ -59,6 +69,22 @@ export default function DriverDashboard() {
   const { notifications, unreadCount, markAllRead } = useNotifications();
   const { hasConsented, grantConsent } = useGpsConsent();
   const [consentModalOpen, setConsentModalOpen] = useState(false);
+  const [gpsRequestModalOpen, setGpsRequestModalOpen] = useState(false);
+
+  // Watch for GPS request notifications from carrier
+  useEffect(() => {
+    const gpsReq = notifications.find((n) => n.type === 'gps_request' && !n.read);
+    if (gpsReq && !manualGpsToggle) {
+      if (hasConsented) {
+        // Already consented — auto-enable GPS and mark read
+        setManualGpsToggle(true);
+        supabase.from('notifications').update({ read: true }).eq('id', gpsReq.id).then();
+      } else {
+        // Need consent first
+        setGpsRequestModalOpen(true);
+      }
+    }
+  }, [notifications, manualGpsToggle, hasConsented]);
 
   // Check GPS send permission on mount
   useEffect(() => {
@@ -95,8 +121,10 @@ export default function DriverDashboard() {
       delivered: 3,
       completed: 4,
     };
+    // Fetch driver loads (pre-dispatch statuses always excluded at service layer)
     getDriverLoads(user.id)
       .then((all) => {
+        setAllLoads(all);
         const sorted = [...all].sort(
           (a, b) => (priority[a.status] ?? 5) - (priority[b.status] ?? 5),
         );
@@ -115,9 +143,17 @@ export default function DriverDashboard() {
     return realtimeSubscribe({ table: 'loads', event: 'UPDATE' }, fetchLoads);
   }, [user?.id, fetchLoads]);
 
-  const inTransitCount = loads.filter((l) => l.status === 'in_transit').length;
-  const deliveredCount = loads.filter((l) => l.status === 'delivered').length;
-  const completedCount = loads.filter((l) => l.status === 'completed').length;
+  // Keep selectedLoad in sync with realtime updates
+  useEffect(() => {
+    if (!selectedLoad) return;
+    const updated = loads.find((l) => l.id === selectedLoad.id);
+    if (updated) setSelectedLoad(updated);
+  }, [loads]);
+
+  const inTransitCount = allLoads.filter((l) => l.status === 'in_transit').length;
+  const deliveredCount = allLoads.filter((l) => l.status === 'delivered').length;
+  const completedCount = allLoads.filter((l) => l.status === 'completed').length;
+  const deliveredLoads = allLoads.filter((l) => l.status === 'delivered');
 
   const name = profile?.full_name ?? 'Driver';
 
@@ -147,6 +183,8 @@ export default function DriverDashboard() {
         .map((l) => (
           <GpsPinger key={l.loadNumber} loadNumber={l.loadNumber} />
         ))}
+      {/* Idle GPS pinger — when sharing location but no active loads to attach to */}
+      {sharingLocation && activeLoads.length === 0 && <IdleGpsPinger />}
 
       <div className="flex-1 overflow-y-auto px-5 space-y-6">
         {/* Share Location banner */}
@@ -258,6 +296,43 @@ export default function DriverDashboard() {
             </button>
           );
         })()}
+
+        {/* Waiting on Broker — Delivered loads pending completion */}
+        {deliveredLoads.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
+                Waiting on Broker
+              </h2>
+              <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-green-500 text-white text-[10px] font-bold flex items-center justify-center">
+                {deliveredLoads.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {deliveredLoads.map((load) => (
+                <button
+                  key={load.id}
+                  onClick={() => setSelectedLoad(load)}
+                  className="w-full text-left p-4 rounded-2xl border bg-green-500/[0.06] border-green-500/20"
+                  style={{ boxShadow: 'inset 3px 0 0 rgba(34, 197, 94, 0.65)' }}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/20 text-green-400">
+                      DELIVERED
+                    </span>
+                  </div>
+                  <p className="text-sm font-bold text-fx-text">
+                    {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
+                  </p>
+                  <p className="text-xs text-fx-text-muted mt-1">
+                    Delivered — waiting on broker to mark complete
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div>
@@ -438,7 +513,10 @@ export default function DriverDashboard() {
 
       <LoadDetailSheet
         load={selectedLoad}
-        onClose={() => setSelectedLoad(null)}
+        onClose={() => {
+          setSelectedLoad(null);
+          fetchLoads();
+        }}
         showBidButton={false}
         role="driver"
       />
@@ -451,6 +529,29 @@ export default function DriverDashboard() {
           setManualGpsToggle(true);
         }}
         onDismiss={() => setConsentModalOpen(false)}
+      />
+
+      {/* GPS Request from Carrier — prompt driver to share */}
+      <GpsConsentModal
+        open={gpsRequestModalOpen}
+        onAllow={() => {
+          grantConsent();
+          setGpsRequestModalOpen(false);
+          setManualGpsToggle(true);
+          // Mark the gps_request notification as read
+          const gpsReq = notifications.find((n) => n.type === 'gps_request' && !n.read);
+          if (gpsReq) {
+            supabase.from('notifications').update({ read: true }).eq('id', gpsReq.id).then();
+          }
+        }}
+        onDismiss={() => {
+          setGpsRequestModalOpen(false);
+          // Mark as read so we don't keep prompting
+          const gpsReq = notifications.find((n) => n.type === 'gps_request' && !n.read);
+          if (gpsReq) {
+            supabase.from('notifications').update({ read: true }).eq('id', gpsReq.id).then();
+          }
+        }}
       />
     </div>
   );

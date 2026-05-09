@@ -21,7 +21,11 @@ import {
 import { supabase } from '@/lib/supabase';
 
 vi.mock('@/lib/supabase', () => ({
-  supabase: { from: vi.fn(), rpc: vi.fn() },
+  supabase: {
+    from: vi.fn(),
+    rpc: vi.fn(),
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }) },
+  },
 }));
 
 // ---------------------------------------------------------------------------
@@ -132,7 +136,7 @@ describe('getMyBids', () => {
 describe('submitBid', () => {
   it('returns the inserted BidRow', async () => {
     mockFrom.mockReturnValue(makeBuilder({ data: RAW_BID, error: null }) as never);
-    mockRpc.mockReturnValue(makeRpc({ data: null, error: null }) as never);
+    mockRpc.mockReturnValue(makeRpc({ data: true, error: null }) as never);
 
     const bid = await submitBid({
       loadId: 'load-1',
@@ -149,12 +153,12 @@ describe('submitBid', () => {
 
   it('calls increment_bid_count RPC with the correct load_id', async () => {
     mockFrom.mockReturnValue(makeBuilder({ data: RAW_BID, error: null }) as never);
-    mockRpc.mockReturnValue(makeRpc({ data: null, error: null }) as never);
+    mockRpc.mockReturnValue(makeRpc({ data: true, error: null }) as never);
 
     await submitBid({
       loadId: 'load-1',
       carrierId: 'carrier-1',
-      companyId: null,
+      companyId: 'co-1',
       companyName: 'Fast Freight LLC',
       amountUsd: 2600,
     });
@@ -163,6 +167,7 @@ describe('submitBid', () => {
   });
 
   it('throws when the insert fails', async () => {
+    mockRpc.mockReturnValue(makeRpc({ data: true, error: null }) as never);
     mockFrom.mockReturnValue(
       makeBuilder({ data: null, error: { message: 'load already booked' } }) as never,
     );
@@ -171,7 +176,7 @@ describe('submitBid', () => {
       submitBid({
         loadId: 'load-1',
         carrierId: 'carrier-1',
-        companyId: null,
+        companyId: 'co-1',
         companyName: 'Fast Freight LLC',
         amountUsd: 2600,
       }),
@@ -180,14 +185,16 @@ describe('submitBid', () => {
 
   it('does NOT throw when increment_bid_count RPC fails (non-critical)', async () => {
     mockFrom.mockReturnValue(makeBuilder({ data: RAW_BID, error: null }) as never);
-    // Simulate RPC failure
-    mockRpc.mockReturnValue(makeRpc({ data: null, error: { message: 'rpc not found' } }) as never);
+    // First RPC call is check_carrier_eligible (returns true), subsequent ones fail
+    mockRpc
+      .mockReturnValueOnce(makeRpc({ data: true, error: null }) as never)
+      .mockReturnValue(makeRpc({ data: null, error: { message: 'rpc not found' } }) as never);
 
     await expect(
       submitBid({
         loadId: 'load-1',
         carrierId: 'carrier-1',
-        companyId: null,
+        companyId: 'co-1',
         companyName: 'Fast Freight LLC',
         amountUsd: 2600,
       }),
@@ -237,13 +244,20 @@ describe('declineBid', () => {
 
 describe('bookNow', () => {
   it('calls book_now RPC with the correct load id', async () => {
-    mockRpc.mockReturnValue(makeRpc({ error: null }) as never);
+    // from('company_members') returns a membership, from('loads') returns load info
+    mockFrom.mockReturnValue(makeBuilder({ data: { company_id: 'co-1' }, error: null }) as never);
+    // check_carrier_eligible returns true, then book_now succeeds
+    mockRpc.mockReturnValue(makeRpc({ data: true, error: null }) as never);
     await bookNow('load-1');
     expect(mockRpc).toHaveBeenCalledWith('book_now', { p_load_id: 'load-1' });
   });
 
   it('throws when the RPC returns an error', async () => {
-    mockRpc.mockReturnValue(makeRpc({ error: { message: 'load not available' } }) as never);
+    mockFrom.mockReturnValue(makeBuilder({ data: { company_id: 'co-1' }, error: null }) as never);
+    // check_carrier_eligible returns true, then book_now fails
+    mockRpc
+      .mockReturnValueOnce(makeRpc({ data: true, error: null }) as never)
+      .mockReturnValue(makeRpc({ error: { message: 'load not available' } }) as never);
     await expect(bookNow('load-1')).rejects.toThrow('load not available');
   });
 });

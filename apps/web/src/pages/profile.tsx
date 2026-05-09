@@ -21,6 +21,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { EditProfileSheet } from '@/features/profile/components/edit-profile-sheet';
 import { EditCompanySheet } from '@/features/profile/components/edit-company-sheet';
 import { CompanyReviewsList } from '@/features/companies/components/company-reviews-list';
+import { ThemeToggle } from '@/features/profile/components/theme-toggle';
+import { DeviceManager } from '@/features/profile/components/device-manager';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -221,6 +223,19 @@ export default function ProfilePage() {
             <CompanyReviewsList companyId={company.id} />
           </div>
         )}
+
+        {/* Theme toggle */}
+        <div className="mx-5 mb-6">
+          <ThemeToggle />
+        </div>
+
+        {/* Registered devices */}
+        <div className="mx-5 mb-6">
+          <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-3 px-1">
+            Registered Devices
+          </p>
+          <DeviceManager />
+        </div>
 
         {/* Menu sections */}
         <div className="px-5 space-y-6 pb-4">
