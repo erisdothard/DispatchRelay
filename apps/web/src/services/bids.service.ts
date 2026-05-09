@@ -65,6 +65,19 @@ export async function getMyActiveBidsWithLoads(carrierId: string): Promise<BidWi
   });
 }
 
+async function assertCarrierEligible(companyId: string | null): Promise<void> {
+  if (!companyId) throw new Error('No company associated — complete your profile to bid.');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: eligible, error } = await (supabase as any).rpc('check_carrier_eligible', {
+    p_company_id: companyId,
+  });
+  if (error) throw new Error('Unable to verify carrier eligibility.');
+  if (!eligible)
+    throw new Error(
+      'Carrier verification required. Ensure FMCSA authority is active and insurance is current.',
+    );
+}
+
 export async function submitBid(params: {
   loadId: string;
   carrierId: string;
@@ -74,6 +87,7 @@ export async function submitBid(params: {
   notes?: string;
 }): Promise<BidRow> {
   SubmitBidInputSchema.parse(params);
+  await assertCarrierEligible(params.companyId);
   const { data, error } = await supabase
     .from('bids')
     .insert({
@@ -115,14 +129,12 @@ export async function submitBid(params: {
   if (load?.posted_by) {
     // In-app notification to broker
     await supabase
-      .from('notifications')
-      .insert({
-        user_id: load.posted_by,
-        type: 'new_bid',
-        title: 'New bid received',
-        body: `${params.companyName} bid $${params.amountUsd.toLocaleString()} on load ${load.load_number}.`,
-        load_id: params.loadId,
-        read: false,
+      .rpc('send_notification', {
+        p_user_id: load.posted_by,
+        p_type: 'new_bid',
+        p_title: 'New bid received',
+        p_body: `${params.companyName} bid $${params.amountUsd.toLocaleString()} on load ${load.load_number}.`,
+        p_load_id: params.loadId,
       })
       .then(
         () => undefined,
@@ -188,13 +200,12 @@ export async function acceptBid(bidId: string): Promise<void> {
     if (load) {
       // In-app notification
       supabase
-        .from('notifications')
-        .insert({
-          user_id: bid.carrier_id,
-          type: 'bid_accepted',
-          title: 'Bid Accepted — Sign Rate Con',
-          body: `Your bid on load ${load.load_number} (${load.origin_city} → ${load.dest_city}) was accepted. Sign the rate confirmation to dispatch.`,
-          load_id: (load as { id?: string }).id ?? null,
+        .rpc('send_notification', {
+          p_user_id: bid.carrier_id,
+          p_type: 'bid_accepted',
+          p_title: 'Bid Accepted — Sign Rate Con',
+          p_body: `Your bid on load ${load.load_number} (${load.origin_city} → ${load.dest_city}) was accepted. Sign the rate confirmation to dispatch.`,
+          p_load_id: (load as { id?: string }).id ?? null,
         })
         .then(
           () => undefined,
@@ -218,6 +229,18 @@ export async function acceptBid(bidId: string): Promise<void> {
 }
 
 export async function bookNow(loadId: string): Promise<void> {
+  // Pre-check carrier eligibility
+  const { data: authData } = await supabase.auth.getUser();
+  if (authData.user?.id) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: membership } = await (supabase as any)
+      .from('company_members')
+      .select('company_id')
+      .eq('user_id', authData.user.id)
+      .maybeSingle();
+    await assertCarrierEligible((membership as { company_id?: string } | null)?.company_id ?? null);
+  }
+
   // Get load info before booking
   const { data: load } = await supabase
     .from('loads')
@@ -330,16 +353,14 @@ export async function declineBid(bidId: string): Promise<void> {
     const loadNumber = (load as { load_number: string })?.load_number ?? '';
     const loadId = (load as { id?: string })?.id ?? null;
 
-    // In-app notification (was missing)
+    // In-app notification
     supabase
-      .from('notifications')
-      .insert({
-        user_id: bid.carrier_id,
-        type: 'bid_declined',
-        title: 'Bid Declined',
-        body: `Your bid on load ${loadNumber} was declined.`,
-        load_id: loadId,
-        read: false,
+      .rpc('send_notification', {
+        p_user_id: bid.carrier_id,
+        p_type: 'bid_declined',
+        p_title: 'Bid Declined',
+        p_body: `Your bid on load ${loadNumber} was declined.`,
+        p_load_id: loadId,
       })
       .then(
         () => undefined,
@@ -406,14 +427,12 @@ export async function counterBid(params: {
   if (load) {
     // In-app notification to carrier
     supabase
-      .from('notifications')
-      .insert({
-        user_id: params.carrierId,
-        type: 'bid_countered',
-        title: 'Counter-Offer Received',
-        body: `Broker countered your $${params.originalAmount.toLocaleString()} bid with $${params.counterAmount.toLocaleString()} on load ${load.load_number}.`,
-        load_id: load.id,
-        read: false,
+      .rpc('send_notification', {
+        p_user_id: params.carrierId,
+        p_type: 'bid_countered',
+        p_title: 'Counter-Offer Received',
+        p_body: `Broker countered your $${params.originalAmount.toLocaleString()} bid with $${params.counterAmount.toLocaleString()} on load ${load.load_number}.`,
+        p_load_id: load.id,
       })
       .then(
         () => undefined,

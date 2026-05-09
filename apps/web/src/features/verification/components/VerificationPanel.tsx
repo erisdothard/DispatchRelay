@@ -5,11 +5,13 @@ const FMCSA_IS_PLACEHOLDER =
   (import.meta.env.VITE_FMCSA_API_KEY as string) === 'PLACEHOLDER_FMCSA_KEY' ||
   !import.meta.env.VITE_FMCSA_API_KEY;
 import { VerifiedBadge } from './VerifiedBadge';
+import { IdentityRiskBadge } from './identity-risk-badge';
 import { startFmcsaLookup, uploadInsuranceCert, uploadW9 } from '@/services/verification.service';
 import type { CarrierVerificationRow } from '@/lib/database.types';
 
 interface Props {
   companyId: string;
+  userId?: string;
   initial?: CarrierVerificationRow | null;
 }
 
@@ -23,7 +25,7 @@ function sectionDone(v: CarrierVerificationRow | null, step: Step) {
   return false;
 }
 
-export function VerificationPanel({ companyId, initial }: Props) {
+export function VerificationPanel({ companyId, userId, initial }: Props) {
   const [verification, setVerification] = useState<CarrierVerificationRow | null>(initial ?? null);
   const [active, setActive] = useState<Step>('fmcsa');
   const [loading, setLoading] = useState(false);
@@ -116,6 +118,9 @@ export function VerificationPanel({ companyId, initial }: Props) {
           )}
         </div>
       </div>
+
+      {/* Identity risk assessment */}
+      {userId && <IdentityRiskBadge userId={userId} />}
 
       {/* Step nav */}
       <div className="flex gap-2">

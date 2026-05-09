@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --fx-bg: #0d0d0d;
+    --fx-surface: #1c1c1e;
+    --fx-surface-2: #2c2c2e;
+    --fx-surface-3: #3a3a3c;
+    --fx-border: #38383a;
+    --fx-border-2: #48484a;
+    --fx-text: #ffffff;
+    --fx-text-muted: #ebebf5;
+    --fx-text-dim: #636366;
+  }
+
   * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
@@ -121,6 +133,34 @@
     z-index: 9999;
     pointer-events: none;
   }
+}
+
+/* Light theme overrides */
+html.light,
+html.light body,
+html.light #root {
+  --fx-bg: #f5f3f0;
+  --fx-surface: #ffffff;
+  --fx-surface-2: #f0ede8;
+  --fx-surface-3: #e8e5e0;
+  --fx-border: rgba(0, 0, 0, 0.08);
+  --fx-border-2: rgba(0, 0, 0, 0.12);
+  --fx-text: #1a1815;
+  --fx-text-muted: #6b6560;
+  --fx-text-dim: #9b9590;
+}
+
+html.light body {
+  background-color: #e8e5e0;
+  color: #1a1815;
+}
+
+html.light #root {
+  background: linear-gradient(175deg, #faf8f5 0%, #f5f3f0 35%, #f0ede8 70%, #ebe8e3 100%);
+}
+
+html.light .ios-blur {
+  background: rgba(255, 255, 255, 0.82);
 }
 
 @keyframes slide-up {

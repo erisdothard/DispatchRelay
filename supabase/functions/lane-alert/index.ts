@@ -54,13 +54,9 @@ Deno.serve(async (req) => {
         user_id: search.user_id,
         type: 'lane_alert',
         title: `Lane Alert: ${load.origin_city}, ${load.origin_state} → ${load.dest_city}, ${load.dest_state}`,
-        message: `New ${load.equipment} load matching "${search.name}" — $${load.rate_usd?.toLocaleString() ?? 'Call'}`,
-        data: {
-          load_id: load.id,
-          load_number: load.load_number,
-          search_id: search.id,
-          search_name: search.name,
-        },
+        body: `New ${load.equipment} load matching "${search.name}" — $${load.rate_usd?.toLocaleString() ?? 'Call'}`,
+        load_id: load.id,
+        read: false,
       });
 
       // Enqueue email

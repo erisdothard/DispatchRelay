@@ -7,7 +7,23 @@ export interface EmbedSignatureParams {
   signedAt: Date; // Timestamp
 }
 
-export async function embedSignatureIntoPdf(params: EmbedSignatureParams): Promise<Blob> {
+export interface EmbedSignatureResult {
+  blob: Blob;
+  docHash: string; // SHA-256 of unsigned PDF
+  signedDocHash: string; // SHA-256 of signed PDF
+}
+
+/** Compute SHA-256 hex digest of an ArrayBuffer using Web Crypto API. */
+async function sha256Hex(buffer: ArrayBuffer): Promise<string> {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+export async function embedSignatureIntoPdf(
+  params: EmbedSignatureParams,
+): Promise<EmbedSignatureResult> {
   const { pdfUrl, signatureDataUrl, signatoryName, signedAt } = params;
 
   // 1. Load original PDF
@@ -15,6 +31,10 @@ export async function embedSignatureIntoPdf(params: EmbedSignatureParams): Promi
     if (!r.ok) throw new Error(`Failed to load PDF (${r.status})`);
     return r.arrayBuffer();
   });
+
+  // 1b. Hash unsigned PDF
+  const docHash = await sha256Hex(pdfBytes);
+
   const pdfDoc = await PDFDocument.load(pdfBytes);
 
   // 2. Embed signature PNG
@@ -93,5 +113,10 @@ export async function embedSignatureIntoPdf(params: EmbedSignatureParams): Promi
 
   // 5. Save merged PDF
   const mergedPdfBytes = await pdfDoc.save();
-  return new Blob([new Uint8Array(mergedPdfBytes)], { type: 'application/pdf' });
+
+  // 5b. Hash signed PDF
+  const signedDocHash = await sha256Hex(new Uint8Array(mergedPdfBytes).buffer as ArrayBuffer);
+
+  const blob = new Blob([new Uint8Array(mergedPdfBytes)], { type: 'application/pdf' });
+  return { blob, docHash, signedDocHash };
 }

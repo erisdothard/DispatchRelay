@@ -272,20 +272,23 @@ export default function BrokerDashboard() {
           </div>
         </div>
 
-        {/* Carrier Network */}
-        <button
-          onClick={() => setCarrierNetworkOpen(true)}
-          className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-4 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200 text-left"
-        >
-          <div className="w-12 h-12 rounded-xl bg-fx-orange/15 flex items-center justify-center shrink-0">
+        {/* Quick Links */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setCarrierNetworkOpen(true)}
+            className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200"
+          >
             <span className="text-2xl">🤝</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-white">Carrier Network</p>
-            <p className="text-[11px] text-fx-text-dim mt-0.5">Manage preferred carriers</p>
-          </div>
-          <span className="text-fx-text-dim text-xs">→</span>
-        </button>
+            <span className="text-xs font-semibold text-fx-text-muted">Carrier Network</span>
+          </button>
+          <button
+            onClick={() => navigate('/broker/api-keys')}
+            className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200"
+          >
+            <span className="text-2xl">🔑</span>
+            <span className="text-xs font-semibold text-fx-text-muted">API Keys</span>
+          </button>
+        </div>
       </div>
 
       <BottomNav role="broker" />

@@ -57,6 +57,17 @@ const AuditLogPage = lazyRetry(() => import('@/pages/admin/audit-log'));
 const LaneIntelligencePage = lazyRetry(() => import('@/pages/lane-intelligence'));
 const CarrierPaymentsPage = lazyRetry(() => import('@/pages/carrier-payments'));
 const NotificationHealthPage = lazyRetry(() => import('@/pages/admin/notification-health'));
+const TrustProfilePage = lazyRetry(() => import('@/pages/profile/trust-profile'));
+const CarrierInvitationsPage = lazyRetry(() => import('@/pages/carrier/invitations'));
+const CarrierAlertsPage = lazyRetry(() => import('@/pages/carrier/alerts'));
+const DriverHosPage = lazyRetry(() => import('@/pages/driver/hos'));
+const ShipperDockSchedulingPage = lazyRetry(() => import('@/pages/shipper/dock-scheduling'));
+const ShipperRfpsPage = lazyRetry(() => import('@/pages/shipper/rfps'));
+const CarrierRfpsPage = lazyRetry(() => import('@/pages/carrier/rfps'));
+const BrokerApiKeysPage = lazyRetry(() => import('@/pages/broker/api-keys'));
+const CarrierFuelCardsPage = lazyRetry(() => import('@/pages/carrier/fuel-cards'));
+const AdminFactoringRiskPage = lazyRetry(() => import('@/pages/admin/factoring-risk'));
+const CarrierSpotRatesPage = lazyRetry(() => import('@/pages/carrier/spot-rates'));
 const NotFound = lazyRetry(() => import('@/pages/not-found'));
 
 export default function App() {
@@ -316,7 +327,115 @@ export default function App() {
             }
           />
 
-          {/* Profile sub-pages */}
+          {/* Trust Profile */}
+          <Route
+            path="/profile/trust/:companyId?"
+            element={
+              <ProtectedRoute>
+                <TrustProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Carrier: Invitations */}
+          <Route
+            path="/carrier/invitations"
+            element={
+              <ProtectedRoute requiredRole={['carrier', 'broker']}>
+                <CarrierInvitationsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Carrier: Alerts & Lane Suggestions */}
+          <Route
+            path="/carrier/alerts"
+            element={
+              <ProtectedRoute requiredRole={['carrier', 'broker']}>
+                <CarrierAlertsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Carrier: RFPs */}
+          <Route
+            path="/carrier/rfps"
+            element={
+              <ProtectedRoute requiredRole={['carrier', 'broker']}>
+                <CarrierRfpsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Carrier: Fuel Cards */}
+          <Route
+            path="/carrier/fuel-cards"
+            element={
+              <ProtectedRoute requiredRole="carrier">
+                <CarrierFuelCardsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Carrier: Spot Rates */}
+          <Route
+            path="/carrier/spot-rates"
+            element={
+              <ProtectedRoute requiredRole={['carrier', 'broker']}>
+                <CarrierSpotRatesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Driver: HOS */}
+          <Route
+            path="/driver/hos"
+            element={
+              <ProtectedRoute requiredRole="driver">
+                <DriverHosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Broker: API Keys */}
+          <Route
+            path="/broker/api-keys"
+            element={
+              <ProtectedRoute requiredRole="broker">
+                <BrokerApiKeysPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Shipper: Dock Scheduling */}
+          <Route
+            path="/shipper/dock-scheduling"
+            element={
+              <ProtectedRoute requiredRole="shipper">
+                <ShipperDockSchedulingPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Shipper: RFPs */}
+          <Route
+            path="/shipper/rfps"
+            element={
+              <ProtectedRoute requiredRole="shipper">
+                <ShipperRfpsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin: Factoring Risk */}
+          <Route
+            path="/admin/factoring-risk"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminFactoringRiskPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Fallback */}
           <Route path="/404" element={<NotFound />} />

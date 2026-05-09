@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, MapPin, Navigation, UserCheck } from 'lucide-react';
+import { ArrowUpRight, MapPin, Navigation, UserCheck, TrendingUp } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { ViewSwitcher } from '@/shared/components/view-switcher';
@@ -31,6 +31,18 @@ const QUICK_ACTIONS = [
     sub: 'Trucks & GPS',
     icon: <MapPin size={20} className="text-fx-orange" />,
     path: '/carrier/fleet',
+  },
+  {
+    label: 'Fuel Cards',
+    sub: 'Cards & savings',
+    icon: <ArrowUpRight size={20} className="text-fx-orange" />,
+    path: '/carrier/fuel-cards',
+  },
+  {
+    label: 'Spot Rates',
+    sub: 'Market index',
+    icon: <TrendingUp size={20} className="text-fx-orange" />,
+    path: '/carrier/spot-rates',
   },
 ];
 

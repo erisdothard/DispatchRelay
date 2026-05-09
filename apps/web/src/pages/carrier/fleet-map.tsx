@@ -558,11 +558,11 @@ export default function CarrierFleetMapPage() {
   async function handleRequestGps(driverId: string) {
     if (gpsRequestSent.has(driverId)) return;
     try {
-      await supabase.from('notifications').insert({
-        user_id: driverId,
-        type: 'gps_request',
-        title: 'GPS Sharing Requested',
-        body: `${company?.name ?? 'Your carrier'} is requesting your live location.`,
+      await supabase.rpc('send_notification', {
+        p_user_id: driverId,
+        p_type: 'gps_request',
+        p_title: 'GPS Sharing Requested',
+        p_body: `${company?.name ?? 'Your carrier'} is requesting your live location.`,
       });
       setGpsRequestSent((prev) => new Set(prev).add(driverId));
     } catch (err) {

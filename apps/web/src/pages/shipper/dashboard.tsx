@@ -242,9 +242,13 @@ export default function ShipperDashboard() {
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Book Shipment', icon: '📦', action: () => navigate('/shipper/loads') },
-              { label: 'View Shipments', icon: '📋', action: () => navigate('/shipper/loads') },
+              {
+                label: 'Dock Schedule',
+                icon: '🚪',
+                action: () => navigate('/shipper/dock-scheduling'),
+              },
+              { label: 'RFPs', icon: '📑', action: () => navigate('/shipper/rfps') },
               { label: 'Track Load', icon: '🔍', action: () => navigate('/track') },
-              { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
             ].map((item) => (
               <button
                 key={item.label}

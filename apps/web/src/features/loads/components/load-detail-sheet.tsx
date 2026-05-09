@@ -24,6 +24,7 @@ import {
   DollarSign,
   Phone,
   Mail,
+  Star,
 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import {
@@ -45,8 +46,11 @@ import { getOrCreateConversation } from '@/services/messages.service';
 import { RateConSignatureSheet } from '@/features/documents/components/rate-con-signature-sheet';
 import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
+import { FairnessRating } from './fairness-rating';
 import { MapView } from '@/shared/components/map-view';
 import { updateLoad, nudgeCarrier, confirmReceipt } from '@/services/loads.service';
+import { ShipperReviewModal } from '@/features/ratings/components/shipper-review-modal';
+import { RecommendedCarriersPanel } from './recommended-carriers-panel';
 import { generateRateCon } from '@/features/bookings/lib/generate-rate-con';
 import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
@@ -142,6 +146,7 @@ export function LoadDetailSheet({
   const [nudgeSent, setNudgeSent] = useState(false);
   const [receiptConfirmed, setReceiptConfirmed] = useState(false);
   const [confirmingReceipt, setConfirmingReceipt] = useState(false);
+  const [reviewShipperOpen, setReviewShipperOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const toggle = (key: string) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
   // Profit estimator
@@ -694,6 +699,16 @@ export function LoadDetailSheet({
               <Users size={15} />
               Review Bids &amp; Award →
             </button>
+          </div>
+        )}
+
+        {/* Broker: recommended carriers (posted loads) */}
+        {isBroker && (liveStatus === 'posted' || liveStatus === 'bid_received') && (
+          <div className="mb-5">
+            <p className="text-xs font-bold text-fx-text-muted uppercase tracking-widest mb-2 px-1">
+              Recommended Carriers
+            </p>
+            <RecommendedCarriersPanel loadId={load.id} />
           </div>
         )}
 
@@ -1431,6 +1446,11 @@ export function LoadDetailSheet({
           </div>
         )}
 
+        {/* Fairness Rating — carrier/driver only, shows market percentile */}
+        {(isCarrier || role === 'driver') && load.ratePerMile > 0 && (
+          <FairnessRating loadId={load.id} />
+        )}
+
         {/* Contact Information - Show for carriers/brokers/drivers on awarded+ loads */}
         {(isCarrier || isBroker || role === 'driver') &&
           ACTIVE_STATUSES.includes(liveStatus) &&
@@ -2136,6 +2156,20 @@ export function LoadDetailSheet({
             </button>
           )}
 
+          {/* Carrier: review shipper on completed loads */}
+          {isCarrier &&
+            (liveStatus === 'completed' || liveStatus === 'delivered') &&
+            load.companyId &&
+            company?.id && (
+              <button
+                onClick={() => setReviewShipperOpen(true)}
+                className="w-full h-11 rounded-2xl border border-fx-border text-sm font-semibold text-fx-text-muted flex items-center justify-center gap-2 hover:border-yellow-400/40 hover:text-yellow-400 transition-colors"
+              >
+                <Star size={14} />
+                Review Shipper
+              </button>
+            )}
+
           {/* Shipper actions */}
           {isShipper && (
             <>
@@ -2236,6 +2270,17 @@ export function LoadDetailSheet({
           setDriverAssigned(true);
         }}
       />
+
+      {reviewShipperOpen && company?.id && load.companyId && (
+        <ShipperReviewModal
+          open={reviewShipperOpen}
+          onClose={() => setReviewShipperOpen(false)}
+          loadId={load.id}
+          reviewerCompanyId={company.id}
+          reviewedCompanyId={load.companyId}
+          reviewedCompanyName={load.companyName ?? 'Shipper'}
+        />
+      )}
 
       {rateConOpen && user && (
         <RateConSignatureSheet

@@ -279,11 +279,14 @@ export default function MessagesPage() {
 
   const role = getNavRole(profile?.role);
 
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+
   // Load conversations, then auto-select if navigated from load detail
   useEffect(() => {
     if (!user) return;
     getConversations(user.id)
-      .then((convos) => {
+      .then(({ data: convos }) => {
         setConversations(convos);
         const incoming = (location.state as { openConversation?: ConversationRow } | null)
           ?.openConversation;
@@ -298,8 +301,29 @@ export default function MessagesPage() {
   }, [user]);
 
   const fetchMessages = useCallback((id: string) => {
-    getMessages(id).then(setMessages).catch(console.error);
+    getMessages(id)
+      .then(({ data, hasMore }) => {
+        setMessages(data);
+        setHasMoreMessages(hasMore);
+      })
+      .catch(console.error);
   }, []);
+
+  const loadOlderMessages = useCallback(async () => {
+    if (!selected || !hasMoreMessages || loadingOlder) return;
+    const oldest = messages[0];
+    if (!oldest) return;
+    setLoadingOlder(true);
+    try {
+      const { data, hasMore } = await getMessages(selected.id, { before: oldest.created_at });
+      setMessages((prev) => [...data, ...prev]);
+      setHasMoreMessages(hasMore);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingOlder(false);
+    }
+  }, [selected, hasMoreMessages, loadingOlder, messages]);
 
   // Load + live-subscribe to messages when a conversation is selected
   useEffect(() => {
@@ -404,6 +428,15 @@ export default function MessagesPage() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          {hasMoreMessages && (
+            <button
+              onClick={loadOlderMessages}
+              disabled={loadingOlder}
+              className="w-full py-2 text-xs text-fx-text-muted hover:text-fx-accent transition-colors"
+            >
+              {loadingOlder ? 'Loading...' : 'Load older messages'}
+            </button>
+          )}
           {messages.length === 0 ? (
             <p className="text-center text-sm text-fx-text-muted py-10">
               No messages yet. Say hello!
@@ -613,7 +646,10 @@ export default function MessagesPage() {
                 setShowNewMessage(false);
                 setNewMessageType(null);
                 // Refresh conversations and open the new one
-                if (user) getConversations(user.id).then(setConversations).catch(console.error);
+                if (user)
+                  getConversations(user.id)
+                    .then(({ data: convos }) => setConversations(convos))
+                    .catch(console.error);
                 setSelected(convo);
               }}
             />

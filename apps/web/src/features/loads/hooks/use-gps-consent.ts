@@ -1,37 +1,55 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 
-const CONSENT_KEY = 'fx-gps-consent';
+const GPS_CONSENT_TEXT =
+  'I consent to FreightX collecting and sharing my live GPS location (latitude, longitude, speed, heading) with my carrier and dispatcher while I am on active loads. I understand I can revoke this consent at any time from my profile settings.';
 
-interface GpsConsent {
-  granted: boolean;
-  timestamp: string;
-}
-
-function readConsent(): GpsConsent | null {
-  try {
-    const raw = localStorage.getItem(CONSENT_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as GpsConsent;
-  } catch {
-    return null;
-  }
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any;
 
 export function useGpsConsent() {
-  const [consent, setConsent] = useState<GpsConsent | null>(readConsent);
+  const { user } = useAuth();
+  const [hasConsented, setHasConsented] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const hasConsented = consent?.granted === true;
+  // Check server-side consent on mount
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-  const grantConsent = useCallback(() => {
-    const c: GpsConsent = { granted: true, timestamp: new Date().toISOString() };
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(c));
-    setConsent(c);
+    db.from('gps_consent')
+      .select('granted')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }: { data: { granted: boolean } | null }) => {
+        setHasConsented(data?.granted === true);
+        setLoading(false);
+      });
+  }, [user]);
+
+  const grantConsent = useCallback(async () => {
+    const { error } = await db.rpc('grant_gps_consent', {
+      p_consent_text: GPS_CONSENT_TEXT,
+      p_user_agent: navigator.userAgent,
+    });
+    if (error) {
+      console.error('[gps-consent] Grant failed:', error);
+      return;
+    }
+    setHasConsented(true);
   }, []);
 
-  const revokeConsent = useCallback(() => {
-    localStorage.removeItem(CONSENT_KEY);
-    setConsent(null);
+  const revokeConsent = useCallback(async () => {
+    const { error } = await db.rpc('revoke_gps_consent');
+    if (error) {
+      console.error('[gps-consent] Revoke failed:', error);
+      return;
+    }
+    setHasConsented(false);
   }, []);
 
-  return { hasConsented, grantConsent, revokeConsent };
+  return { hasConsented, grantConsent, revokeConsent, loading };
 }

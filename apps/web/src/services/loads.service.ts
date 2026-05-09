@@ -151,7 +151,22 @@ export async function getLoadById(id: string): Promise<Load | null> {
 }
 
 export async function createLoad(
-  load: Omit<LoadRow, 'id' | 'created_at' | 'search_vector'>,
+  load: Omit<
+    LoadRow,
+    | 'id'
+    | 'created_at'
+    | 'search_vector'
+    | 'deleted_at'
+    | 'visibility'
+    | 'hazmat_proper_shipping_name'
+    | 'hazmat_class'
+    | 'hazmat_un_number'
+    | 'hazmat_packing_group'
+    | 'hazmat_quantity'
+    | 'hazmat_emergency_phone'
+    | 'hazmat_placard_required'
+    | 'hazmat_reportable_quantity'
+  >,
 ): Promise<Load> {
   CreateLoadInputSchema.parse(load);
   const { data, error } = await supabase.from('loads').insert(load).select().single();
@@ -167,27 +182,7 @@ export async function createLoad(
  * Notify all carriers when a new load is posted
  */
 async function notifyCarriersOfNewLoad(load: LoadRow) {
-  const { data: carriers } = await supabase.from('profiles').select('id').eq('role', 'carrier');
-  if (!carriers || carriers.length === 0) return;
-
-  const notifications = carriers.map((carrier) => ({
-    user_id: carrier.id,
-    type: 'new_load',
-    title: 'New Load Available',
-    message: `New ${load.equipment} load from ${load.origin_city} to ${load.dest_city} - $${load.rate_usd?.toLocaleString() ?? 'Call for rate'}`,
-    data: {
-      load_id: load.id,
-      load_number: load.load_number,
-      equipment: load.equipment,
-      origin_city: load.origin_city,
-      origin_state: load.origin_state,
-      dest_city: load.dest_city,
-      dest_state: load.dest_state,
-      rate: load.rate_usd,
-    },
-  }));
-
-  await supabase.from('notifications').insert(notifications);
+  await supabase.rpc('notify_carriers_new_load', { p_load_id: load.id });
 }
 
 export async function updateLoad(id: string, updates: Partial<LoadRow>): Promise<Load> {
@@ -352,12 +347,12 @@ export async function assignDriver(loadId: string, driverId: string): Promise<Lo
   }
 
   // In-app notification to driver
-  await supabase.from('notifications').insert({
-    user_id: driverId,
-    type: 'load_assigned',
-    title: 'New Load Assigned',
-    body: `You have been assigned load ${data.load_number}: ${data.origin_city}, ${data.origin_state} → ${data.dest_city}, ${data.dest_state}`,
-    load_id: data.id,
+  await supabase.rpc('send_notification', {
+    p_user_id: driverId,
+    p_type: 'load_assigned',
+    p_title: 'New Load Assigned',
+    p_body: `You have been assigned load ${data.load_number}: ${data.origin_city}, ${data.origin_state} → ${data.dest_city}, ${data.dest_state}`,
+    p_load_id: data.id,
   });
 
   // Email driver (non-fatal)
@@ -395,12 +390,12 @@ export async function assignCoDriver(loadId: string, driverId: string | null): P
   if (error) throw error;
 
   if (driverId) {
-    await supabase.from('notifications').insert({
-      user_id: driverId,
-      type: 'load_assigned',
-      title: 'Co-Driver Assignment',
-      body: `You have been assigned as co-driver on load ${data.load_number}: ${data.origin_city}, ${data.origin_state} → ${data.dest_city}, ${data.dest_state}`,
-      load_id: data.id,
+    await supabase.rpc('send_notification', {
+      p_user_id: driverId,
+      p_type: 'load_assigned',
+      p_title: 'Co-Driver Assignment',
+      p_body: `You have been assigned as co-driver on load ${data.load_number}: ${data.origin_city}, ${data.origin_state} → ${data.dest_city}, ${data.dest_state}`,
+      p_load_id: data.id,
     });
   }
 
@@ -468,12 +463,12 @@ export async function nudgeCarrier(
   carrierId: string,
   loadNumber: string,
 ): Promise<void> {
-  const { error } = await supabase.from('notifications').insert({
-    user_id: carrierId,
-    type: 'load_reminder',
-    title: 'Load Awaiting Dispatch',
-    body: `Load ${loadNumber} has been awarded and is waiting for you to sign the rate confirmation and dispatch.`,
-    load_id: loadId,
+  const { error } = await supabase.rpc('send_notification', {
+    p_user_id: carrierId,
+    p_type: 'load_reminder',
+    p_title: 'Load Awaiting Dispatch',
+    p_body: `Load ${loadNumber} has been awarded and is waiting for you to sign the rate confirmation and dispatch.`,
+    p_load_id: loadId,
   });
   if (error) throw error;
 }
@@ -483,12 +478,12 @@ export async function confirmReceipt(
   brokerId: string,
   loadNumber: string,
 ): Promise<void> {
-  const { error } = await supabase.from('notifications').insert({
-    user_id: brokerId,
-    type: 'receipt_confirmed',
-    title: 'Delivery Confirmed by Shipper',
-    body: `Shipper has confirmed receipt of Load ${loadNumber}. Ready to close out.`,
-    load_id: loadId,
+  const { error } = await supabase.rpc('send_notification', {
+    p_user_id: brokerId,
+    p_type: 'receipt_confirmed',
+    p_title: 'Delivery Confirmed by Shipper',
+    p_body: `Shipper has confirmed receipt of Load ${loadNumber}. Ready to close out.`,
+    p_load_id: loadId,
   });
   if (error) throw error;
 }

@@ -16,6 +16,33 @@ interface RateConSignatureSheetProps {
   onSigned: () => void;
 }
 
+/** Fetch server-side timestamp via Supabase REST response header to avoid device clock spoofing. */
+async function getNetworkTimestamp(): Promise<string> {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/`, {
+      method: 'HEAD',
+      headers: { apikey: import.meta.env.VITE_SUPABASE_ANON_KEY },
+    });
+    const dateHeader = res.headers.get('date');
+    if (dateHeader) return new Date(dateHeader).toISOString();
+  } catch {
+    // fallback
+  }
+  return new Date().toISOString();
+}
+
+/** Request GPS coordinates (non-blocking — returns null on failure). */
+function getGpsCoords(): Promise<{ lat: number; lng: number } | null> {
+  return new Promise((resolve) => {
+    if (!('geolocation' in navigator)) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
+    );
+  });
+}
+
 /**
  * Carrier signs the rate confirmation before dispatch.
  * Generates the rate con PDF, captures an e-signature, embeds it,
@@ -34,12 +61,14 @@ export function RateConSignatureSheet({
   const [drawing, setDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
   const [signatoryName, setSignatoryName] = useState('');
+  const [consentChecked, setConsentChecked] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!open) return;
     setHasSignature(false);
+    setConsentChecked(false);
     setError('');
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -108,12 +137,26 @@ export function RateConSignatureSheet({
   }
 
   async function handleSign() {
-    if (!hasSignature || !signatoryName.trim()) return;
+    if (!hasSignature || !signatoryName.trim() || !consentChecked) return;
     const canvas = canvasRef.current!;
     setSaving(true);
     setError('');
 
     try {
+      // Capture metadata in parallel + attestation hash for chain of custody
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const [gps, networkTs, attestationResult] = await Promise.all([
+        getGpsCoords(),
+        getNetworkTimestamp(),
+        (supabase as any)
+          .from('carrier_attestations')
+          .select('attestation_hash')
+          .eq('load_id', load.id)
+          .maybeSingle(),
+      ]);
+      const attestationHash: string | null = attestationResult?.data?.attestation_hash ?? null;
+      const consentGivenAt = new Date().toISOString();
+
       // 1. Generate unsigned rate con PDF as Blob
       const unsignedBlob = generateRateConBlob({ load, carrierName, brokerName });
 
@@ -130,8 +173,8 @@ export function RateConSignatureSheet({
       // 3. Capture signature PNG
       const signatureDataUrl = canvas.toDataURL('image/png', 0.95);
 
-      // 4. Embed signature into PDF
-      const signedBlob = await embedSignatureIntoPdf({
+      // 4. Embed signature into PDF (now returns hashes)
+      const result = await embedSignatureIntoPdf({
         pdfUrl: unsignedUrlData.publicUrl,
         signatureDataUrl,
         signatoryName: signatoryName.trim(),
@@ -142,7 +185,7 @@ export function RateConSignatureSheet({
       const signedPath = `${load.id}/rate_confirmation-signed-${Date.now()}.pdf`;
       const { error: signedUploadErr } = await supabase.storage
         .from('documents')
-        .upload(signedPath, signedBlob, { contentType: 'application/pdf', upsert: true });
+        .upload(signedPath, result.blob, { contentType: 'application/pdf', upsert: true });
       if (signedUploadErr) throw signedUploadErr;
       const { data: signedUrlData } = supabase.storage.from('documents').getPublicUrl(signedPath);
 
@@ -154,7 +197,7 @@ export function RateConSignatureSheet({
         .upload(sigPngPath, sigBlob, { contentType: 'image/png', upsert: true });
       const { data: sigUrlData } = supabase.storage.from('documents').getPublicUrl(sigPngPath);
 
-      // 7. Save document record
+      // 7. Save document record with hashes + metadata + chain of custody link
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: dbErr } = await (supabase as any).from('documents').insert({
         load_id: load.id,
@@ -162,13 +205,38 @@ export function RateConSignatureSheet({
         type: 'rate_confirmation',
         file_name: `RateCon-${load.loadNumber}.pdf`,
         file_url: signedUrlData.publicUrl,
-        file_size: signedBlob.size,
+        file_size: result.blob.size,
         mime_type: 'application/pdf',
         signed_at: new Date().toISOString(),
         signature_url: sigUrlData.publicUrl,
         signatory_name: signatoryName.trim(),
+        doc_hash: result.docHash,
+        signed_doc_hash: result.signedDocHash,
+        sign_lat: gps?.lat ?? null,
+        sign_lng: gps?.lng ?? null,
+        sign_network_ts: networkTs,
+        consent_given_at: consentGivenAt,
+        attestation_hash: attestationHash,
       });
       if (dbErr) throw new Error(dbErr.message);
+
+      // Log consent event to audit_log (includes chain of custody link)
+      await supabase
+        .rpc('write_audit_log', {
+          p_action: 'consent_given',
+          p_entity_type: 'document',
+          p_entity_id: load.id,
+          p_diff: {
+            consent_text:
+              'I confirm my intent to electronically sign this document. This signature carries the same legal weight as a handwritten signature.',
+            consent_given_at: consentGivenAt,
+            sign_lat: gps?.lat ?? null,
+            sign_lng: gps?.lng ?? null,
+            sign_network_ts: networkTs,
+            attestation_hash: attestationHash,
+          },
+        })
+        .then(undefined, () => undefined);
 
       // 8. Notify broker by email + in-app notification (non-fatal)
       if (load.postedBy) {
@@ -292,6 +360,20 @@ export function RateConSignatureSheet({
           />
         </div>
 
+        {/* Click-wrap consent checkbox */}
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={consentChecked}
+            onChange={(e) => setConsentChecked(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-fx-border accent-fx-orange flex-shrink-0"
+          />
+          <span className="text-xs text-fx-text-muted leading-relaxed">
+            I confirm my intent to electronically sign this document. This signature carries the
+            same legal weight as a handwritten signature.
+          </span>
+        </label>
+
         {error && <p className="text-sm text-red-400">{error}</p>}
 
         <div className="flex gap-3">
@@ -303,7 +385,7 @@ export function RateConSignatureSheet({
           </button>
           <button
             onClick={handleSign}
-            disabled={!hasSignature || !signatoryName.trim() || saving}
+            disabled={!hasSignature || !signatoryName.trim() || !consentChecked || saving}
             className="flex-1 h-12 rounded-2xl font-bold text-sm bg-fx-orange text-white disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {saving ? (

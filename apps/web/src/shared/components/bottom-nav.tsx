@@ -9,6 +9,8 @@ import {
   DollarSign,
   MapPin,
   PlusCircle,
+  Bell,
+  Clock,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useLoadActionCounts } from '@/features/loads/hooks/use-load-action-counts';
@@ -25,7 +27,7 @@ interface NavItem {
 const carrierNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/carrier' },
   { label: 'Load Board', icon: <Search size={22} />, path: '/carrier/loads' },
-  { label: 'Map', icon: <MapPin size={22} />, path: '/carrier/map' },
+  { label: 'Alerts', icon: <Bell size={22} />, path: '/carrier/alerts' },
   { label: 'Messages', icon: <MessageSquare size={22} />, path: '/messages' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];
@@ -41,7 +43,7 @@ const brokerNav: NavItem[] = [
 const driverNav: NavItem[] = [
   { label: 'Home', icon: <Home size={22} />, path: '/driver' },
   { label: 'My Loads', icon: <Package size={22} />, path: '/driver/loads' },
-  { label: 'Documents', icon: <FileText size={22} />, path: '/driver/documents' },
+  { label: 'HOS', icon: <Clock size={22} />, path: '/driver/hos' },
   { label: 'Expenses', icon: <DollarSign size={22} />, path: '/driver/expenses' },
   { label: 'Profile', icon: <User size={22} />, path: '/profile' },
 ];

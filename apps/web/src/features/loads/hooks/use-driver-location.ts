@@ -11,6 +11,8 @@ import type { Geofence } from '@freightx/shared';
 const PING_INTERVAL_MS = 30_000; // 30 seconds
 const MOVEMENT_THRESHOLD_M = 50; // 50 metres
 const HEARTBEAT_MS = 30_000; // backup heartbeat interval
+const AUTO_STATUS_DWELL_MS = 180_000; // 3 minutes dwell before auto-status
+const AUTO_ACCEPT_TIMEOUT_MS = 60_000; // 60s auto-accept for dispatcher confirmation
 
 /** Haversine distance in metres between two lat/lng pairs. */
 function distanceM(lat1: number, lng1: number, lat2: number, lng2: number) {
@@ -33,7 +35,7 @@ interface UseDriverLocationOptions {
  * Watches the driver's position using the Web Geolocation API.
  * Writes a ping to Supabase whenever:
  *   - 30 seconds have elapsed, OR
- *   - the driver has moved ≥50 m since the last ping
+ *   - the driver has moved >=50 m since the last ping
  *
  * Resilience features:
  *   - Re-initialises watchPosition when the tab returns to the foreground
@@ -42,9 +44,11 @@ interface UseDriverLocationOptions {
  *   - Failed pings are queued and retried automatically (see location.ts)
  *
  * Post-ping checks:
- *   - Geofence enter/exit → alert dispatcher (NEVER changes load status)
- *   - Anomaly detection → alert dispatcher on suspicious movement
- *   - Dwell time → start/end tracking at geofence boundaries
+ *   - Geofence enter/exit -> alert dispatcher
+ *   - Auto-status: after 3 min dwell in geofence, auto-update load status
+ *     with dispatcher confirmation (60s auto-accept)
+ *   - Anomaly detection -> alert dispatcher on suspicious movement
+ *   - Dwell time -> start/end tracking at geofence boundaries
  */
 export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptions) {
   const { profile } = useAuth();
@@ -61,6 +65,13 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
     recorded_at: string;
   } | null>(null);
 
+  // Track dwell timers for auto-status per geofence
+  const dwellTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  // Track which geofences have already had auto-status applied (prevent re-firing)
+  const autoStatusAppliedRef = useRef<Set<string>>(new Set());
+  // Notification debounce: prevents duplicate alerts when flushing queued pings
+  const notificationDebounceRef = useRef<Map<string, number>>(new Map());
+
   // Load geofences when the hook activates
   useEffect(() => {
     if (active && loadNumber) {
@@ -72,10 +83,29 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
     }
   }, [active, loadNumber]);
 
-  /** Notify dispatcher via in-app notification (non-blocking). */
+  // Cleanup dwell timers on unmount
+  useEffect(() => {
+    return () => {
+      dwellTimersRef.current.forEach((timer) => clearTimeout(timer));
+      dwellTimersRef.current.clear();
+    };
+  }, []);
+
+  /**
+   * Notify dispatcher via in-app notification (non-blocking).
+   * Debounced: same notification type won't fire more than once per 60s
+   * to prevent alert storms when flushing queued pings after a dead zone.
+   */
   const notifyDispatcher = useCallback(
     async (type: string, title: string, body: string) => {
       if (!loadNumber) return;
+
+      // Debounce: skip if same type fired within 60s
+      const debounceKey = `${loadNumber}:${type}`;
+      const lastFired = notificationDebounceRef.current.get(debounceKey) ?? 0;
+      if (Date.now() - lastFired < 60_000) return;
+      notificationDebounceRef.current.set(debounceKey, Date.now());
+
       // Find load poster to notify
       const { data: load } = await supabase
         .from('loads')
@@ -95,6 +125,71 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
         .then(undefined, () => undefined);
     },
     [loadNumber],
+  );
+
+  /** Apply auto-status update after dwell threshold. Sends dispatcher confirmation with auto-accept. */
+  const applyAutoStatus = useCallback(
+    async (fence: Geofence) => {
+      if (autoStatusAppliedRef.current.has(fence.id)) return;
+      autoStatusAppliedRef.current.add(fence.id);
+
+      const targetStatus = fence.stopType === 'pickup' ? 'at_pickup' : 'at_delivery';
+      const confirmationType = fence.stopType === 'pickup' ? 'arrival_pickup' : 'arrival_delivery';
+
+      // Send dispatcher confirmation notification
+      const { data: load } = await supabase
+        .from('loads')
+        .select('posted_by, id')
+        .eq('load_number', loadNumber)
+        .single();
+
+      if (!load?.posted_by) return;
+
+      // Notify dispatcher: "Confirm arrival?" — auto-accept in 60s
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: load.posted_by,
+          type: confirmationType,
+          title: `Confirm ${fence.stopType === 'pickup' ? 'Pickup' : 'Delivery'} Arrival?`,
+          body: `Driver has been at ${fence.label} for 3+ minutes. Status will auto-update to "${targetStatus}" in 60 seconds. (Load ${loadNumber})`,
+          load_id: load.id,
+        })
+        .then(undefined, () => undefined);
+
+      // Auto-accept after 60s — update load status
+      setTimeout(async () => {
+        try {
+          await supabase
+            .from('loads')
+            .update({ status: targetStatus })
+            .eq('load_number', loadNumber);
+
+          // Record auto-status on the geofence event
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any)
+            .from('geofence_events')
+            .update({
+              dwell_seconds: Math.round(AUTO_STATUS_DWELL_MS / 1000),
+              auto_status_applied: targetStatus,
+            })
+            .eq('geofence_id', fence.id)
+            .eq('load_number', loadNumber)
+            .eq('event_type', 'enter')
+            .order('recorded_at', { ascending: false })
+            .limit(1);
+
+          notifyDispatcher(
+            'load_status_change',
+            'Auto-Status Applied',
+            `Load ${loadNumber} status updated to "${targetStatus}" after 3-min dwell at ${fence.label}.`,
+          ).catch(() => undefined);
+        } catch {
+          // Non-fatal
+        }
+      }, AUTO_ACCEPT_TIMEOUT_MS);
+    },
+    [loadNumber, notifyDispatcher],
   );
 
   /** Send a ping if the time/distance threshold is met. Pass `force` to skip threshold checks. */
@@ -164,7 +259,7 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
             lng: longitude,
           }).catch(() => undefined);
 
-          // Notify dispatcher — NEVER auto-change status
+          // Notify dispatcher
           notifyDispatcher(
             'geofence_enter',
             'Driver Entered Zone',
@@ -178,6 +273,15 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
             stopType: fence.stopType as 'pickup' | 'delivery',
             label: fence.label,
           }).catch(() => undefined);
+
+          // Start auto-status dwell timer (3 min)
+          if (!autoStatusAppliedRef.current.has(fence.id)) {
+            const timer = setTimeout(() => {
+              applyAutoStatus(fence).catch(() => undefined);
+              dwellTimersRef.current.delete(fence.id);
+            }, AUTO_STATUS_DWELL_MS);
+            dwellTimersRef.current.set(fence.id, timer);
+          }
         }
 
         for (const fence of exited) {
@@ -197,6 +301,13 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
             `Driver left ${fence.stopType} zone "${fence.label}" (Load ${loadNumber})`,
           ).catch(() => undefined);
 
+          // Cancel auto-status timer if driver leaves before dwell threshold
+          const timer = dwellTimersRef.current.get(fence.id);
+          if (timer) {
+            clearTimeout(timer);
+            dwellTimersRef.current.delete(fence.id);
+          }
+
           // End dwell tracking — may auto-flag detention
           findOpenDwell(fence.id)
             .then(async (dwell) => {
@@ -215,7 +326,7 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
         }
       }
     },
-    [loadNumber, profile?.id, notifyDispatcher],
+    [loadNumber, profile?.id, notifyDispatcher, applyAutoStatus],
   );
 
   const handlePosition = useCallback((pos: GeolocationPosition) => void sendPing(pos), [sendPing]);
