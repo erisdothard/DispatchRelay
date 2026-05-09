@@ -12,7 +12,11 @@ import { getLoads, getLoadByNumber, createLoad, updateLoad } from '@/services/lo
 import { supabase } from '@/lib/supabase';
 
 vi.mock('@/lib/supabase', () => ({
-  supabase: { from: vi.fn(), rpc: vi.fn() },
+  supabase: {
+    from: vi.fn(),
+    rpc: vi.fn(),
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }) },
+  },
 }));
 
 // ---------------------------------------------------------------------------
@@ -72,7 +76,16 @@ const RAW_LOAD = {
   created_at: '2026-03-01T00:00:00Z',
 };
 
+/** Creates a thenable that resolves/rejects for supabase.rpc() */
+function makeRpc(result: unknown) {
+  return {
+    then: (onfulfilled: (v: unknown) => unknown, onrejected: (v: unknown) => unknown) =>
+      Promise.resolve(result).then(onfulfilled, onrejected),
+  };
+}
+
 const mockFrom = vi.mocked(supabase.from);
+const mockRpc = vi.mocked(supabase.rpc);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -195,10 +208,8 @@ describe('updateLoad', () => {
 
 describe('createLoad', () => {
   it('returns a mapped Load after a successful insert', async () => {
-    mockFrom
-      .mockReturnValueOnce(makeBuilder({ data: RAW_LOAD, error: null }) as never) // loads.insert
-      .mockReturnValueOnce(makeBuilder({ data: [], error: null }) as never) // profiles.select (notify carriers)
-      .mockReturnValueOnce(makeBuilder({ data: null, error: null }) as never); // notifications.insert
+    mockFrom.mockReturnValue(makeBuilder({ data: RAW_LOAD, error: null }) as never);
+    mockRpc.mockReturnValue(makeRpc({ data: null, error: null }) as never);
 
     const { id: _, created_at: __, ...payload } = RAW_LOAD;
     const load = await createLoad(payload as never);
@@ -215,35 +226,23 @@ describe('createLoad', () => {
   });
 
   it('sends a notification for every carrier when load is created', async () => {
-    const carriers = [{ id: 'carrier-a' }, { id: 'carrier-b' }];
-    const notifyBuilder = makeBuilder({ data: null, error: null });
-
-    mockFrom
-      .mockReturnValueOnce(makeBuilder({ data: RAW_LOAD, error: null }) as never)
-      .mockReturnValueOnce(makeBuilder({ data: carriers, error: null }) as never)
-      .mockReturnValueOnce(notifyBuilder as never);
+    mockFrom.mockReturnValue(makeBuilder({ data: RAW_LOAD, error: null }) as never);
+    mockRpc.mockReturnValue(makeRpc({ data: null, error: null }) as never);
 
     const { id: _, created_at: __, ...payload } = RAW_LOAD;
     await createLoad(payload as never);
 
-    expect(notifyBuilder.insert).toHaveBeenCalledWith(
-      expect.arrayContaining([
-        expect.objectContaining({ user_id: 'carrier-a', type: 'new_load' }),
-        expect.objectContaining({ user_id: 'carrier-b', type: 'new_load' }),
-      ]),
-    );
+    expect(mockRpc).toHaveBeenCalledWith('notify_carriers_new_load', { p_load_id: 'load-1' });
   });
 
-  it('does not attempt notification insert when no carriers exist', async () => {
-    const notifyBuilder = makeBuilder({ data: null, error: null });
-
-    mockFrom
-      .mockReturnValueOnce(makeBuilder({ data: RAW_LOAD, error: null }) as never)
-      .mockReturnValueOnce(makeBuilder({ data: [], error: null }) as never)
-      .mockReturnValueOnce(notifyBuilder as never);
+  it('delegates notification to notify_carriers_new_load RPC (server-side)', async () => {
+    mockFrom.mockReturnValue(makeBuilder({ data: RAW_LOAD, error: null }) as never);
+    mockRpc.mockReturnValue(makeRpc({ data: null, error: null }) as never);
 
     const { id: _, created_at: __, ...payload } = RAW_LOAD;
     await createLoad(payload as never);
-    expect(notifyBuilder.insert).not.toHaveBeenCalled();
+
+    // Notification is handled server-side via RPC, not client-side insert
+    expect(mockRpc).toHaveBeenCalledWith('notify_carriers_new_load', { p_load_id: 'load-1' });
   });
 });
