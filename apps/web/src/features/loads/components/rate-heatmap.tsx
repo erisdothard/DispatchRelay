@@ -9,13 +9,13 @@ interface RateHeatmapProps {
 // Placeholder lane data for the heatmap grid
 const SAMPLE_LANES = [
   { origin: 'ATL', destination: 'DFW', rate: 2.85, intensity: 'high' },
-  { origin: 'CHI', destination: 'LAX', rate: 2.40, intensity: 'medium' },
+  { origin: 'CHI', destination: 'LAX', rate: 2.4, intensity: 'medium' },
   { origin: 'ATL', destination: 'CHI', rate: 2.15, intensity: 'medium' },
-  { origin: 'DFW', destination: 'MIA', rate: 3.10, intensity: 'high' },
+  { origin: 'DFW', destination: 'MIA', rate: 3.1, intensity: 'high' },
   { origin: 'LAX', destination: 'SEA', rate: 1.95, intensity: 'low' },
   { origin: 'CHI', destination: 'ATL', rate: 2.55, intensity: 'medium' },
-  { origin: 'MIA', destination: 'ATL', rate: 1.80, intensity: 'low' },
-  { origin: 'SEA', destination: 'DFW', rate: 2.70, intensity: 'high' },
+  { origin: 'MIA', destination: 'ATL', rate: 1.8, intensity: 'low' },
+  { origin: 'SEA', destination: 'DFW', rate: 2.7, intensity: 'high' },
 ] as const;
 
 const intensityStyles = {
@@ -27,10 +27,7 @@ const intensityStyles = {
 export function RateHeatmap({ equipment: _equipment, className }: RateHeatmapProps) {
   return (
     <div
-      className={cn(
-        'rounded-2xl border border-fx-border bg-fx-surface p-4 space-y-3',
-        className,
-      )}
+      className={cn('rounded-2xl border border-fx-border bg-fx-surface p-4 space-y-3', className)}
     >
       <div className="flex items-center gap-2 mb-1">
         <Map size={15} className="text-fx-orange" />
@@ -43,10 +40,7 @@ export function RateHeatmap({ equipment: _equipment, className }: RateHeatmapPro
         {SAMPLE_LANES.map((lane) => (
           <div
             key={`${lane.origin}-${lane.destination}`}
-            className={cn(
-              'rounded-xl p-2.5 border text-center',
-              intensityStyles[lane.intensity],
-            )}
+            className={cn('rounded-xl p-2.5 border text-center', intensityStyles[lane.intensity])}
           >
             <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">
               {lane.origin} &rarr; {lane.destination}

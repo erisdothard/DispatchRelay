@@ -68,13 +68,7 @@ interface TabsListProps {
 
 export function TabsList({ children, className }: TabsListProps) {
   return (
-    <div
-      role="tablist"
-      className={cn(
-        'inline-flex items-center gap-1 rounded-xl p-1',
-        className,
-      )}
-    >
+    <div role="tablist" className={cn('inline-flex items-center gap-1 rounded-xl p-1', className)}>
       {children}
     </div>
   );
@@ -107,9 +101,7 @@ export function TabsTrigger({ value, children, className, disabled = false }: Ta
         'inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5',
         'text-sm font-semibold transition-all duration-150',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fx-orange/40',
-        isActive
-          ? 'bg-fx-surface text-fx-text shadow-sm'
-          : 'text-fx-text-muted hover:text-fx-text',
+        isActive ? 'bg-fx-surface text-fx-text shadow-sm' : 'text-fx-text-muted hover:text-fx-text',
         disabled && 'pointer-events-none opacity-50',
         className,
       )}

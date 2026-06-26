@@ -40,7 +40,9 @@ export function BidButtonAnimated({
         'relative flex items-center justify-center gap-2 rounded-xl px-5 py-2.5',
         'text-sm font-bold tracking-wide transition-all duration-200',
         'active:scale-95',
-        state === 'idle' && !disabled && 'bg-fx-orange text-white hover:bg-fx-orange/90 shadow-lg shadow-fx-orange/20',
+        state === 'idle' &&
+          !disabled &&
+          'bg-fx-orange text-white hover:bg-fx-orange/90 shadow-lg shadow-fx-orange/20',
         state === 'loading' && 'bg-fx-orange/70 text-white cursor-wait',
         state === 'success' && 'bg-green-500 text-white',
         disabled && 'bg-fx-surface-2 text-fx-text-dim cursor-not-allowed border border-fx-border',

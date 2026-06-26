@@ -24,18 +24,11 @@ export function BrokerPaymentCard({
   const { paymentTerms, avgDaysToPay, quickPay, quickPayFee, factoringAccepted } = PLACEHOLDER;
 
   const daysColor =
-    avgDaysToPay <= 14
-      ? 'text-green-400'
-      : avgDaysToPay <= 30
-        ? 'text-yellow-400'
-        : 'text-red-400';
+    avgDaysToPay <= 14 ? 'text-green-400' : avgDaysToPay <= 30 ? 'text-yellow-400' : 'text-red-400';
 
   return (
     <div
-      className={cn(
-        'rounded-2xl border border-fx-border bg-fx-surface p-4 space-y-3',
-        className,
-      )}
+      className={cn('rounded-2xl border border-fx-border bg-fx-surface p-4 space-y-3', className)}
     >
       <div className="flex items-center gap-2">
         <CreditCard size={15} className="text-fx-orange" />

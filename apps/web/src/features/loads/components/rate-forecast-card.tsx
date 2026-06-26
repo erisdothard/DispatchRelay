@@ -37,10 +37,7 @@ export function RateForecastCard({
 
   return (
     <div
-      className={cn(
-        'rounded-2xl border border-fx-border bg-fx-surface p-4 space-y-3',
-        className,
-      )}
+      className={cn('rounded-2xl border border-fx-border bg-fx-surface p-4 space-y-3', className)}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -74,7 +71,8 @@ export function RateForecastCard({
       <div className="flex items-center gap-1.5">
         <TrendIcon size={13} className={trendColor} />
         <span className={cn('text-xs font-semibold', trendColor)}>
-          {trend === 'up' ? '+' : trend === 'down' ? '-' : ''}{weeklyChange}% this week
+          {trend === 'up' ? '+' : trend === 'down' ? '-' : ''}
+          {weeklyChange}% this week
         </span>
       </div>
     </div>

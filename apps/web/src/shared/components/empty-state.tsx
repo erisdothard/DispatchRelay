@@ -9,14 +9,18 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ icon, title, description, subtitle, action, className }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  description,
+  subtitle,
+  action,
+  className,
+}: EmptyStateProps) {
   const text = description ?? subtitle;
   return (
     <div
-      className={cn(
-        'flex flex-col items-center justify-center text-center py-12 px-6',
-        className,
-      )}
+      className={cn('flex flex-col items-center justify-center text-center py-12 px-6', className)}
     >
       <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-fx-surface-2 border border-fx-border mb-4 text-fx-text-dim">
         {icon}

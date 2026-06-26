@@ -7,12 +7,7 @@ interface VerificationSealProps {
   className?: string;
 }
 
-export function VerificationSeal({
-  verified = true,
-  label,
-  className,
-}: VerificationSealProps) {
-
+export function VerificationSeal({ verified = true, label, className }: VerificationSealProps) {
   return (
     <div
       className={cn(

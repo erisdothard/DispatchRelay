@@ -5,14 +5,7 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ className }: SkeletonProps) {
-  return (
-    <div
-      className={cn(
-        'animate-pulse rounded-lg bg-fx-surface-2',
-        className,
-      )}
-    />
-  );
+  return <div className={cn('animate-pulse rounded-lg bg-fx-surface-2', className)} />;
 }
 
 export function SkeletonList({ count = 3, className }: { count?: number; className?: string }) {

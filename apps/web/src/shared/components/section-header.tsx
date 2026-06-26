@@ -1,4 +1,14 @@
-export function SectionHeader({ title, label, action, badge }: { title: string; label?: string; action?: React.ReactNode; badge?: React.ReactNode }) {
+export function SectionHeader({
+  title,
+  label,
+  action,
+  badge,
+}: {
+  title: string;
+  label?: string;
+  action?: React.ReactNode;
+  badge?: React.ReactNode;
+}) {
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-2">
