@@ -28,10 +28,7 @@ interface AuthActions {
     fullName: string,
     role: UserRole,
   ) => Promise<{ error: string | null }>;
-  signInWithGoogle: (
-    role?: UserRole,
-    inviteToken?: string,
-  ) => Promise<{ error: string | null }>;
+  signInWithGoogle: (role?: UserRole, inviteToken?: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   createCompany: (data: CompanyInput) => Promise<{ error: string | null }>;
   updateProfile: (data: Partial<ProfileRow>) => Promise<{ error: string | null }>;
@@ -161,23 +158,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Sign in with Google OAuth. Persists role + invite token to localStorage
    * before the redirect so auth-callback.tsx can pick them up.
    */
-  const signInWithGoogle = useCallback(
-    async (role?: UserRole, inviteToken?: string) => {
-      if (role) localStorage.setItem('fx_oauth_role', role);
-      else localStorage.removeItem('fx_oauth_role');
-      if (inviteToken) localStorage.setItem('fx_oauth_invite_token', inviteToken);
-      else localStorage.removeItem('fx_oauth_invite_token');
+  const signInWithGoogle = useCallback(async (role?: UserRole, inviteToken?: string) => {
+    if (role) localStorage.setItem('fx_oauth_role', role);
+    else localStorage.removeItem('fx_oauth_role');
+    if (inviteToken) localStorage.setItem('fx_oauth_invite_token', inviteToken);
+    else localStorage.removeItem('fx_oauth_invite_token');
 
-      const redirectTo = `${import.meta.env.VITE_APP_URL ?? window.location.origin}/auth/callback`;
+    const redirectTo = `${import.meta.env.VITE_APP_URL ?? window.location.origin}/auth/callback`;
 
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo },
-      });
-      return { error: error?.message ?? null };
-    },
-    [],
-  );
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo },
+    });
+    return { error: error?.message ?? null };
+  }, []);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
