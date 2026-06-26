@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, X, WifiOff, Settings2, Sparkles, Truck, ArrowRight } from 'lucide-react';
+import { Search, X, WifiOff, Settings2, Sparkles, Truck, ArrowRight, LayoutList, LayoutGrid, FileText } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
+import { EmptyState } from '@/shared/components/empty-state';
+import { RivePulse } from '@/shared/components/rive-pulse';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/components/ui/tabs';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
 import { LoadCard } from '@/features/loads/components/load-card';
 import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
 import { MatchBadge } from '@/features/loads/components/match-badge';
@@ -35,6 +39,9 @@ export default function CarrierLoadsPage() {
   const [aiFilters, setAiFilters] = useState<LoadFilters>({});
   const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
   const [prefsOpen, setPrefsOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'full' | 'compact'>(() =>
+    (localStorage.getItem('fx_load_view') as 'full' | 'compact') || 'full',
+  );
 
   // My Loads tab
   const [myLoads, setMyLoads] = useState<Load[]>([]);
@@ -146,12 +153,28 @@ export default function CarrierLoadsPage() {
         title={isRecentFilter ? 'Recent Loads (Last 7 Days)' : 'Load Board'}
         showBack
         right={
-          <button
-            onClick={() => setPrefsOpen(true)}
-            className="w-9 h-9 rounded-full bg-fx-surface border border-fx-border flex items-center justify-center hover:border-fx-orange/50 transition-colors"
-          >
-            <Settings2 size={15} className="text-fx-text-muted" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const next = viewMode === 'full' ? 'compact' : 'full';
+                setViewMode(next);
+                localStorage.setItem('fx_load_view', next);
+              }}
+              className="w-9 h-9 rounded-full bg-fx-surface border border-fx-border flex items-center justify-center hover:border-fx-orange/50 transition-colors"
+            >
+              {viewMode === 'full' ? (
+                <LayoutList size={15} className="text-fx-text-muted" />
+              ) : (
+                <LayoutGrid size={15} className="text-fx-text-muted" />
+              )}
+            </button>
+            <button
+              onClick={() => setPrefsOpen(true)}
+              className="w-9 h-9 rounded-full bg-fx-surface border border-fx-border flex items-center justify-center hover:border-fx-orange/50 transition-colors"
+            >
+              <Settings2 size={15} className="text-fx-text-muted" />
+            </button>
+          </div>
         }
       />
 
@@ -168,53 +191,55 @@ export default function CarrierLoadsPage() {
       )}
 
       {/* Tabs */}
-      <div
-        className="px-5 pt-3 pb-1 flex gap-1"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        {(['my_loads', 'matches', 'all', 'history'] as Tab[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={cn(
-              'flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all',
-              tab === t ? 'bg-fx-orange text-white' : 'text-fx-text-muted hover:text-fx-text',
-            )}
-          >
-            {t === 'my_loads' && <Truck size={12} />}
-            {t === 'matches' && <Sparkles size={12} />}
-            {t === 'my_loads'
-              ? 'My Loads'
-              : t === 'matches'
-                ? 'Best Matches'
-                : t === 'all'
-                  ? 'All Loads'
-                  : 'History'}
-            {t === 'my_loads' &&
-              myAwarded.length + myInProgress.length + myDelivered.length + myBids.length > 0 && (
-                <span className="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+      <div className="px-5 pt-3 pb-1 border-b border-fx-divider">
+        <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>
+          <TabsList className="w-full bg-fx-surface-2">
+            <TabsTrigger
+              value="my_loads"
+              className={cn('flex-1 gap-1.5', tab === 'my_loads' && 'bg-fx-orange text-white data-[state=active]:bg-fx-orange data-[state=active]:text-white')}
+            >
+              <Truck size={12} />
+              My Loads
+              {myAwarded.length + myInProgress.length + myDelivered.length + myBids.length > 0 && (
+                <span className="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1">
                   {myAwarded.length + myInProgress.length + myDelivered.length + myBids.length}
                 </span>
               )}
-            {t === 'matches' && topMatches.length > 0 && (
-              <span className="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                {topMatches.length}
-              </span>
-            )}
-            {t === 'history' && myHistory.length > 0 && (
-              <span
-                className={cn(
-                  'text-[10px] font-bold px-1.5 py-0.5 rounded-full',
-                  tab === 'history'
-                    ? 'bg-white/20 text-white'
-                    : 'bg-fx-surface-2 text-fx-text-muted',
-                )}
-              >
-                {myHistory.length}
-              </span>
-            )}
-          </button>
-        ))}
+            </TabsTrigger>
+            <TabsTrigger
+              value="matches"
+              className={cn('flex-1 gap-1.5', tab === 'matches' && 'bg-fx-orange text-white data-[state=active]:bg-fx-orange data-[state=active]:text-white')}
+            >
+              <Sparkles size={12} />
+              Matches
+              {topMatches.length > 0 && (
+                <span className="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                  {topMatches.length}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger
+              value="all"
+              className={cn('flex-1', tab === 'all' && 'bg-fx-orange text-white data-[state=active]:bg-fx-orange data-[state=active]:text-white')}
+            >
+              All
+            </TabsTrigger>
+            <TabsTrigger
+              value="history"
+              className={cn('flex-1', tab === 'history' && 'bg-fx-orange text-white data-[state=active]:bg-fx-orange data-[state=active]:text-white')}
+            >
+              History
+              {myHistory.length > 0 && (
+                <span className={cn(
+                  'text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1',
+                  tab === 'history' ? 'bg-white/20 text-white' : 'bg-fx-surface-3 text-fx-text-muted',
+                )}>
+                  {myHistory.length}
+                </span>
+              )}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       <div className="px-5 py-3 space-y-3">
@@ -341,42 +366,37 @@ export default function CarrierLoadsPage() {
       {/* Load list */}
       <div className="flex-1 overflow-y-auto px-5 space-y-3">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <span className="w-8 h-8 border-2 border-fx-border border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={4} />
         ) : error ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <WifiOff size={36} className="text-fx-text-dim mb-4" />
-            <p className="font-bold text-fx-text">Couldn't load the board</p>
-            <p className="text-sm text-fx-text-muted mt-1 mb-4">{error}</p>
-            <button
-              onClick={refresh}
-              className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
+          <EmptyState
+            icon={<WifiOff size={28} className="text-fx-text-dim" />}
+            title="Couldn't load the board"
+            subtitle={error}
+            action={
+              <button
+                onClick={refresh}
+                className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
+              >
+                Try Again
+              </button>
+            }
+          />
         ) : tab === 'my_loads' ? (
           myAwarded.length + myInProgress.length + myDelivered.length + myBids.length === 0 &&
           myHistory.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Truck size={36} className="text-fx-text-dim mb-4" />
-              <p className="font-bold text-fx-text">No active loads</p>
-              <p className="text-sm text-fx-text-muted mt-1">
-                Bid on or book a load to see it here
-              </p>
-            </div>
+            <EmptyState
+              icon={<Truck size={28} />}
+              title="No active loads"
+              subtitle="Bid on or book a load to see it here"
+              action={<button onClick={() => setTab('all')} className="text-sm font-semibold text-fx-orange">Browse Load Board →</button>}
+            />
           ) : myAwarded.length + myInProgress.length + myDelivered.length + myBids.length === 0 ? (
-            <div className="py-10 text-center">
-              <div className="text-4xl mb-3">🗂️</div>
-              <p className="font-bold text-fx-text mb-1">No active loads right now</p>
-              <p className="text-xs text-fx-text-dim">
-                Past loads are in{' '}
-                <button onClick={() => setTab('history')} className="text-fx-orange font-semibold">
-                  History →
-                </button>
-              </p>
-            </div>
+            <EmptyState
+              icon={<Truck size={28} />}
+              title="No active loads right now"
+              subtitle="Past loads are in History"
+              action={<button onClick={() => setTab('history')} className="text-sm font-semibold text-fx-orange">View History →</button>}
+            />
           ) : (
             <>
               {/* Status summary rail */}
@@ -510,9 +530,12 @@ export default function CarrierLoadsPage() {
               {myAwarded.length > 0 && (
                 <div className="space-y-3 mb-6">
                   <div style={{ borderLeft: '3px solid #F59E0B', paddingLeft: '12px' }}>
-                    <p className="text-[17px] font-bold text-amber-400 leading-tight">
-                      Needs Dispatch
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-[17px] font-bold text-amber-400 leading-tight">
+                        Needs Dispatch
+                      </p>
+                      <RivePulse className="w-4 h-4" />
+                    </div>
                     <p className="text-[11px] text-fx-text-dim mt-0.5">
                       Assign a driver to get rolling
                     </p>
@@ -589,13 +612,11 @@ export default function CarrierLoadsPage() {
           )
         ) : tab === 'history' ? (
           myHistory.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="text-5xl mb-4">🗂️</div>
-              <p className="font-bold text-fx-text">No past loads yet</p>
-              <p className="text-sm text-fx-text-muted mt-1">
-                Completed, cancelled, and expired loads will appear here
-              </p>
-            </div>
+            <EmptyState
+              icon={<FileText size={28} className="text-fx-text-dim" />}
+              title="No past loads yet"
+              subtitle="Completed, cancelled, and expired loads will appear here"
+            />
           ) : (
             <div className="space-y-3">
               {myHistory.map((load) => (
@@ -610,48 +631,49 @@ export default function CarrierLoadsPage() {
           )
         ) : tab === 'matches' ? (
           matchList.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <Sparkles size={36} className="text-fx-text-dim mb-4" />
-              <p className="font-bold text-fx-text">No strong matches yet</p>
-              <p className="text-sm text-fx-text-muted mt-1">
-                Update your preferences or check All Loads
-              </p>
-            </div>
+            <EmptyState
+              icon={<Sparkles size={28} />}
+              title="No strong matches yet"
+              subtitle="Update your preferences or check All Loads"
+              action={<button onClick={() => setPrefsOpen(true)} className="text-sm font-semibold text-fx-orange">Set Preferences →</button>}
+            />
           ) : (
             matchList.map((load) => (
               <div key={load.id} className="relative">
                 <div className="absolute -top-1 right-0 z-10">
                   <MatchBadge score={load.matchScore} />
                 </div>
-                <LoadCard load={load} onPress={setSelectedLoad} onBid={setSelectedLoad} />
+                <LoadCard load={load} onPress={setSelectedLoad} onBid={setSelectedLoad} variant={viewMode} />
               </div>
             ))
           )
         ) : loads.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="text-5xl mb-4">🔍</div>
-            <p className="font-bold text-fx-text">No loads found</p>
-            <p className="text-sm text-fx-text-muted mt-1 mb-4">
-              {aiFilters.equipment
+          <EmptyState
+            icon={<Search size={28} className="text-fx-text-dim" />}
+            title="No loads found"
+            subtitle={
+              aiFilters.equipment
                 ? `No ${EQUIPMENT_LABELS[aiFilters.equipment as keyof typeof EQUIPMENT_LABELS] ?? aiFilters.equipment} loads available right now`
-                : 'Try adjusting your filters'}
-            </p>
-            {Object.keys(aiFilters).length > 0 && (
-              <button
-                onClick={() => {
-                  setAiFilters({});
-                  setEquipFilter('All');
-                  setSearch('');
-                }}
-                className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
-              >
-                Clear search — show all loads
-              </button>
-            )}
-          </div>
+                : 'Try adjusting your filters'
+            }
+            action={
+              Object.keys(aiFilters).length > 0 ? (
+                <button
+                  onClick={() => {
+                    setAiFilters({});
+                    setEquipFilter('All');
+                    setSearch('');
+                  }}
+                  className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
+                >
+                  Clear search — show all loads
+                </button>
+              ) : undefined
+            }
+          />
         ) : (
           loads.map((load) => (
-            <LoadCard key={load.id} load={load} onPress={setSelectedLoad} onBid={setSelectedLoad} />
+            <LoadCard key={load.id} load={load} onPress={setSelectedLoad} onBid={setSelectedLoad} variant={viewMode} />
           ))
         )}
       </div>

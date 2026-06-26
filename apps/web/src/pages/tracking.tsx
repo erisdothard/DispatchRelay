@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, MoreVertical, Phone, Search, MapPin, Navigation, Radio } from 'lucide-react';
+import { EmptyState } from '@/shared/components/empty-state';
 import { MapView } from '@/shared/components/map-view';
 import { useParams, useNavigate } from 'react-router-dom';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
@@ -169,22 +170,20 @@ export default function TrackingPage() {
 
         {/* Not found */}
         {notFound && (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="text-4xl mb-4">🔍</div>
-            <p className="font-bold text-fx-text">Load not found</p>
-            <p className="text-sm text-fx-text-muted mt-1">Check the load number and try again</p>
-          </div>
+          <EmptyState
+            icon={<Search size={28} className="text-fx-text-dim" />}
+            title="Load not found"
+            subtitle="Check the load number and try again"
+          />
         )}
 
         {/* Empty state — no search yet */}
         {!load && !notFound && !loading && !loadId && (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="text-4xl mb-4">📍</div>
-            <p className="font-bold text-fx-text">Track a shipment</p>
-            <p className="text-sm text-fx-text-muted mt-1">
-              Enter a load number above to get started
-            </p>
-          </div>
+          <EmptyState
+            icon={<MapPin size={28} className="text-fx-text-dim" />}
+            title="Track a shipment"
+            subtitle="Enter a load number above to get started"
+          />
         )}
 
         {load && (

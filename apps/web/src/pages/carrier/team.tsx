@@ -14,7 +14,11 @@ import {
   Calculator,
   Eye,
   Mail,
+  UserCheck,
+  Copy,
+  Check,
 } from 'lucide-react';
+import { EmptyState } from '@/shared/components/empty-state';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
@@ -323,9 +327,15 @@ const ROLE_META: Record<
     icon: Eye,
     color: 'text-fx-text-dim',
   },
+  driver: {
+    label: 'Driver',
+    desc: 'View assigned loads, GPS tracking, and document uploads',
+    icon: UserCheck,
+    color: 'text-green-300',
+  },
 };
 
-const INVITE_ROLES: MemberRole[] = ['admin', 'dispatcher', 'accounting', 'viewer'];
+const INVITE_ROLES: MemberRole[] = ['driver', 'dispatcher', 'admin', 'accounting', 'viewer'];
 
 /* ── Members Tab Content ───────────────────────────────────────── */
 
@@ -336,10 +346,14 @@ function MembersTabContent() {
   const [invites, setInvites] = useState<CompanyInvite[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<MemberRole>('dispatcher');
+  const [inviteFullName, setInviteFullName] = useState('');
+  const [invitePhone, setInvitePhone] = useState('');
+  const [inviteRole, setInviteRole] = useState<MemberRole>('driver');
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState('');
   const [inviteSuccess, setInviteSuccess] = useState('');
+  const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const companyId = company?.id;
   const myRole = members.find((m) => m.user_id === profile?.id)?.role;
@@ -365,12 +379,41 @@ function MembersTabContent() {
     setInviting(true);
     setInviteError('');
     setInviteSuccess('');
+    setLastInviteLink(null);
+    setCopied(false);
     try {
-      await inviteMember({ companyId, email: inviteEmail.trim(), role: inviteRole });
-      setInviteSuccess(`Invite sent to ${inviteEmail}`);
-      setInviteEmail('');
-      const updated = await getCompanyInvites(companyId);
-      setInvites(updated);
+      if (inviteRole === 'driver') {
+        // Admin-provisioned driver flow via edge function
+        const { data, error } = await supabase.functions.invoke('invite-driver', {
+          body: {
+            email: inviteEmail.trim(),
+            full_name: inviteFullName.trim() || undefined,
+            phone: invitePhone.trim() || undefined,
+          },
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        setInviteSuccess(`Driver invite sent to ${inviteEmail}`);
+        setLastInviteLink(data.signup_link);
+        setInviteEmail('');
+        setInviteFullName('');
+        setInvitePhone('');
+      } else {
+        // Existing flow for non-driver roles
+        const invite = await inviteMember({
+          companyId,
+          email: inviteEmail.trim(),
+          role: inviteRole,
+          inviterName: profile?.full_name ?? undefined,
+          companyName: company?.name ?? undefined,
+        });
+        setInviteSuccess(`Invite sent to ${inviteEmail}`);
+        const appUrl = import.meta.env.VITE_APP_URL ?? window.location.origin;
+        setLastInviteLink(`${appUrl}/invite/${invite.token}`);
+        setInviteEmail('');
+        const updated = await getCompanyInvites(companyId);
+        setInvites(updated);
+      }
     } catch (err) {
       setInviteError(err instanceof Error ? err.message : 'Failed to send invite');
     } finally {
@@ -433,6 +476,24 @@ function MembersTabContent() {
               required
               className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
             />
+            {inviteRole === 'driver' && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Driver's full name (optional)"
+                  value={inviteFullName}
+                  onChange={(e) => setInviteFullName(e.target.value)}
+                  className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone number (optional)"
+                  value={invitePhone}
+                  onChange={(e) => setInvitePhone(e.target.value)}
+                  className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
+                />
+              </>
+            )}
             <div className="flex gap-2">
               <select
                 value={inviteRole}
@@ -463,6 +524,30 @@ function MembersTabContent() {
             </p>
             {inviteError && <p className="text-xs text-red-400">{inviteError}</p>}
             {inviteSuccess && <p className="text-xs text-green-400">{inviteSuccess}</p>}
+            {lastInviteLink && (
+              <div className="bg-fx-surface-2 border border-fx-border rounded-xl p-3 space-y-2">
+                <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest">
+                  Share this link with your driver
+                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-fx-text-muted flex-1 truncate font-mono select-all">
+                    {lastInviteLink}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(lastInviteLink);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="shrink-0 px-3 h-8 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-fx-orange/20 text-fx-orange transition-colors"
+                  >
+                    {copied ? <Check size={12} /> : <Copy size={12} />}
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+            )}
           </form>
         </div>
       )}
@@ -705,13 +790,11 @@ export default function CarrierTeamPage() {
 
             {/* Driver cards */}
             {driverProfiles.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <Users size={40} className="text-fx-text-dim mb-3" />
-                <p className="font-bold text-fx-text">No drivers on your team</p>
-                <p className="text-sm text-fx-text-muted mt-1">
-                  Switch to the Members tab to invite drivers
-                </p>
-              </div>
+              <EmptyState
+                icon={<Users size={28} className="text-fx-text-dim" />}
+                title="No drivers on your team"
+                subtitle="Switch to the Members tab to invite drivers"
+              />
             ) : (
               <div className="space-y-3">
                 {driverProfiles.map((driver) => (

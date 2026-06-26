@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Search, X, SlidersHorizontal, WifiOff } from 'lucide-react';
+import { Plus, Search, X, SlidersHorizontal, WifiOff, LayoutList, LayoutGrid } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { LoadCard } from '@/features/loads/components/load-card';
@@ -10,6 +10,9 @@ import { useLoads } from '@/features/loads/hooks/use-loads';
 import { useLoadActionCounts } from '@/features/loads/hooks/use-load-action-counts';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/shared/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import type { Load } from '@freightx/shared';
 import type { LoadStatus } from '@/lib/database.types';
 
@@ -66,6 +69,9 @@ export default function BrokerLoadsPage() {
   const [sortBy, setSortBy] = useState<SortKey>('newest');
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [tab, setTab] = useState<PageTab>('active');
+  const [viewMode, setViewMode] = useState<'full' | 'compact'>(() =>
+    (localStorage.getItem('fx_broker_load_view') as 'full' | 'compact') || 'full',
+  );
 
   // Open post sheet when navigated here via "Post Load" nav tab
   useEffect(() => {
@@ -171,36 +177,53 @@ export default function BrokerLoadsPage() {
 
   return (
     <div className="min-h-dvh flex flex-col pb-[84px]">
-      <TopHeader title="My Loads" showBack />
-
-      {/* Tab bar */}
-      <div className="px-5 pt-3 pb-1 flex gap-2">
-        {(['active', 'history'] as const).map((t) => (
+      <TopHeader
+        title="My Loads"
+        showBack
+        right={
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={cn(
-              'flex-1 h-10 rounded-xl text-sm font-bold transition-colors',
-              tab === t
-                ? 'bg-fx-orange text-white'
-                : 'bg-fx-surface border border-fx-border text-fx-text-muted',
-            )}
+            onClick={() => {
+              const next = viewMode === 'full' ? 'compact' : 'full';
+              setViewMode(next);
+              localStorage.setItem('fx_broker_load_view', next);
+            }}
+            className="w-9 h-9 rounded-full bg-fx-surface border border-fx-border flex items-center justify-center hover:border-fx-orange/50 transition-colors"
           >
-            {t === 'active' ? 'Active' : 'History'}
-            {t === 'history' && historyLoads.length > 0 && (
-              <span
-                className={cn(
-                  'ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full',
-                  tab === 'history'
-                    ? 'bg-white/20 text-white'
-                    : 'bg-fx-surface-2 text-fx-text-muted',
-                )}
-              >
-                {historyLoads.length}
-              </span>
+            {viewMode === 'full' ? (
+              <LayoutList size={15} className="text-fx-text-muted" />
+            ) : (
+              <LayoutGrid size={15} className="text-fx-text-muted" />
             )}
           </button>
-        ))}
+        }
+      />
+
+      {/* Tab bar */}
+      <div className="px-5 pt-3 pb-1 border-b border-fx-divider">
+        <Tabs value={tab} onValueChange={(v) => setTab(v as PageTab)}>
+          <TabsList className="w-full bg-fx-surface-2">
+            <TabsTrigger
+              value="active"
+              className={cn('flex-1', tab === 'active' && 'bg-fx-orange text-white data-[state=active]:bg-fx-orange data-[state=active]:text-white')}
+            >
+              Active
+            </TabsTrigger>
+            <TabsTrigger
+              value="history"
+              className={cn('flex-1', tab === 'history' && 'bg-fx-orange text-white data-[state=active]:bg-fx-orange data-[state=active]:text-white')}
+            >
+              History
+              {historyLoads.length > 0 && (
+                <span className={cn(
+                  'ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full',
+                  tab === 'history' ? 'bg-white/20 text-white' : 'bg-fx-surface-3 text-fx-text-muted',
+                )}>
+                  {historyLoads.length}
+                </span>
+              )}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       <div className="px-5 py-3 space-y-3">
@@ -320,37 +343,45 @@ export default function BrokerLoadsPage() {
         onScroll={() => showSortMenu && setShowSortMenu(false)}
       >
         {loading ? (
-          <div className="flex justify-center py-20">
-            <span className="w-8 h-8 border-2 border-fx-border border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={4} />
         ) : error ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <WifiOff size={36} className="text-fx-text-dim mb-4" />
-            <p className="font-bold text-fx-text">Couldn't load your loads</p>
-            <p className="text-sm text-fx-text-muted mt-1 mb-4">{error}</p>
-            <button
-              onClick={refresh}
-              className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
+          <EmptyState
+            icon={<WifiOff size={36} className="text-fx-text-dim" />}
+            title="Couldn't load your loads"
+            subtitle={error}
+            action={
+              <button
+                onClick={refresh}
+                className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
+              >
+                Try Again
+              </button>
+            }
+          />
         ) : sortedLoads.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="text-5xl mb-4">{tab === 'history' ? '🗂️' : '📦'}</div>
-            <p className="font-bold text-fx-text">
-              {tab === 'history' ? 'No past loads yet' : 'No loads found'}
-            </p>
-            <p className="text-sm text-fx-text-muted mt-1">
-              {tab === 'history'
+          <EmptyState
+            icon={<span className="text-5xl">{tab === 'history' ? '\ud83d\uddc2\ufe0f' : '\ud83d\udce6'}</span>}
+            title={tab === 'history' ? 'No past loads yet' : 'No loads found'}
+            subtitle={
+              tab === 'history'
                 ? 'Completed, cancelled, and expired loads will appear here'
-                : 'Try adjusting your filters'}
-            </p>
-          </div>
+                : 'Try adjusting your filters'
+            }
+            action={
+              tab === 'active' ? (
+                <button
+                  onClick={() => setShowPost(true)}
+                  className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
+                >
+                  Post a Load
+                </button>
+              ) : undefined
+            }
+          />
         ) : tab === 'history' ? (
           <div className="space-y-3">
             {sortedLoads.map((load) => (
-              <LoadCard key={load.id} load={load} showBidButton={false} onPress={setSelectedLoad} />
+              <LoadCard key={load.id} load={load} showBidButton={false} onPress={setSelectedLoad} variant={viewMode} />
             ))}
           </div>
         ) : statusFilter === 'All' ? (
@@ -374,6 +405,7 @@ export default function BrokerLoadsPage() {
                       load={load}
                       showBidButton={false}
                       onPress={setSelectedLoad}
+                      variant={viewMode}
                     />
                   ))}
                 </div>
@@ -382,7 +414,7 @@ export default function BrokerLoadsPage() {
           </div>
         ) : (
           sortedLoads.map((load) => (
-            <LoadCard key={load.id} load={load} showBidButton={false} onPress={setSelectedLoad} />
+            <LoadCard key={load.id} load={load} showBidButton={false} onPress={setSelectedLoad} variant={viewMode} />
           ))
         )}
       </div>

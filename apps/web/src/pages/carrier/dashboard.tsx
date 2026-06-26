@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, MapPin, Navigation, UserCheck, TrendingUp } from 'lucide-react';
+import { ArrowUpRight, MapPin, Navigation, UserCheck, TrendingUp, Package } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { ViewSwitcher } from '@/shared/components/view-switcher';
@@ -18,6 +18,8 @@ import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
 
 import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
+import { EmptyState } from '@/shared/components/empty-state';
+import { SectionHeader } from '@/shared/components/section-header';
 
 const QUICK_ACTIONS = [
   {
@@ -173,17 +175,15 @@ export default function CarrierDashboard() {
         {/* Bidding On — active bids waiting for broker response */}
         {myBids.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
-                  Negotiating
-                </p>
-                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">Bidding On</p>
-              </div>
-              <span className="text-[11px] font-bold text-white bg-blue-500 px-2.5 py-1 rounded-full">
-                {myBids.length}
-              </span>
-            </div>
+            <SectionHeader
+              label="Negotiating"
+              title="Bidding On"
+              badge={
+                <span className="text-[11px] font-bold text-white bg-blue-500 px-2.5 py-1 rounded-full">
+                  {myBids.length}
+                </span>
+              }
+            />
             <div className="space-y-3">
               {myBids.slice(0, 3).map((bid) => {
                 const l = bid.load;
@@ -253,19 +253,15 @@ export default function CarrierDashboard() {
         {/* Action Required — Awarded loads needing dispatch */}
         {awardedLoads.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
-                  Pending
-                </p>
-                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
-                  Action Required
-                </p>
-              </div>
-              <span className="text-[11px] font-bold text-amber-900 bg-amber-400 px-2.5 py-1 rounded-full">
-                {awardedLoads.length}
-              </span>
-            </div>
+            <SectionHeader
+              label="Pending"
+              title="Action Required"
+              badge={
+                <span className="text-[11px] font-bold text-amber-900 bg-amber-400 px-2.5 py-1 rounded-full">
+                  {awardedLoads.length}
+                </span>
+              }
+            />
             <div className="space-y-3">
               {awardedLoads.map((load) => (
                 <button
@@ -313,19 +309,15 @@ export default function CarrierDashboard() {
         {/* Waiting on Broker — Delivered loads pending completion */}
         {deliveredLoads.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
-                  Waiting
-                </p>
-                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
-                  Pending Broker Close-Out
-                </p>
-              </div>
-              <span className="text-[11px] font-bold text-green-900 bg-green-400 px-2.5 py-1 rounded-full">
-                {deliveredLoads.length}
-              </span>
-            </div>
+            <SectionHeader
+              label="Waiting"
+              title="Pending Broker Close-Out"
+              badge={
+                <span className="text-[11px] font-bold text-green-900 bg-green-400 px-2.5 py-1 rounded-full">
+                  {deliveredLoads.length}
+                </span>
+              }
+            />
             <div className="space-y-3">
               {deliveredLoads.map((load) => (
                 <button
@@ -367,19 +359,15 @@ export default function CarrierDashboard() {
         {/* Current Shipping — Carousel */}
         {inProgressLoads.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
-                  Live
-                </p>
-                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
-                  Current Shipping
-                </p>
-              </div>
-              <span className="text-[11px] font-semibold text-white bg-fx-orange px-2.5 py-1 rounded-full">
-                {inProgressLoads.length} Active
-              </span>
-            </div>
+            <SectionHeader
+              label="Live"
+              title="Current Shipping"
+              badge={
+                <span className="text-[11px] font-semibold text-white bg-fx-orange px-2.5 py-1 rounded-full">
+                  {inProgressLoads.length} Active
+                </span>
+              }
+            />
 
             <div
               ref={inProgressLoads.length > 1 ? carouselRef : undefined}
@@ -520,27 +508,27 @@ export default function CarrierDashboard() {
         {/* Recent Loads */}
         {loads.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
-                  Last 7 Days
-                </p>
-                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">Recent Loads</p>
-              </div>
-              {recentLoads.length > 0 && (
-                <button
-                  onClick={() => navigate('/carrier/loads?filter=recent')}
-                  className="text-[13px] font-semibold text-fx-orange flex items-center gap-1"
-                >
-                  See All <ArrowUpRight size={13} />
-                </button>
-              )}
-            </div>
+            <SectionHeader
+              label="Last 7 Days"
+              title="Recent Loads"
+              action={
+                recentLoads.length > 0 ? (
+                  <button
+                    onClick={() => navigate('/carrier/loads?filter=recent')}
+                    className="text-[13px] font-semibold text-fx-orange flex items-center gap-1"
+                  >
+                    See All <ArrowUpRight size={13} />
+                  </button>
+                ) : undefined
+              }
+            />
 
             {recentLoads.length === 0 ? (
-              <div className="text-center py-8 bg-fx-surface rounded-ios p-5">
-                <p className="text-sm text-fx-text-dim">No loads posted in the last 7 days</p>
-              </div>
+              <EmptyState
+                icon={<Package size={28} className="text-fx-text-dim" />}
+                title="No loads in the last 7 days"
+                subtitle="Browse the load board to find opportunities"
+              />
             ) : (
               <div className="space-y-3">
                 {recentLoads.map((load, i) => {
@@ -613,13 +601,19 @@ export default function CarrierDashboard() {
 
         {/* Empty state */}
         {loads.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-14 h-14 rounded-full bg-fx-surface border border-white/[0.06] flex items-center justify-center mb-4">
-              <Navigation size={22} className="text-fx-text-dim" />
-            </div>
-            <p className="font-bold text-fx-text">No active loads</p>
-            <p className="text-sm text-fx-text-dim mt-1">Browse the load board to get started</p>
-          </div>
+          <EmptyState
+            icon={<Navigation size={28} className="text-fx-text-dim" />}
+            title="No active loads"
+            subtitle="Browse the load board to get started"
+            action={
+              <button
+                onClick={() => navigate('/carrier/loads')}
+                className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
+              >
+                Browse Load Board
+              </button>
+            }
+          />
         )}
       </div>
 

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Send, ArrowLeft, Plus, X, Package, User, Loader2, Trash2 } from 'lucide-react';
+import { Search, Send, ArrowLeft, Plus, X, Package, User, Loader2, Trash2, MapPin, MessageSquare } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
-import { cn, getInitials, getNavRole } from '@/shared/lib/utils';
+import { cn, getInitials, getNavRole, formatCurrency } from '@/shared/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import {
@@ -14,9 +15,35 @@ import {
   getOrCreateConversation,
   searchUsers,
 } from '@/services/messages.service';
-import { getMyActiveLoads } from '@/services/loads.service';
+import { getMyActiveLoads, getLoadByNumber } from '@/services/loads.service';
 import type { ConversationRow, MessageRow } from '@/lib/database.types';
 import type { Load } from '@freightx/shared';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
+
+/* ── Message Load Context Banner ────────────────────────────────── */
+function MessageLoadContext({ loadNumber }: { loadNumber: string }) {
+  const { data: load } = useQuery({
+    queryKey: ['load-by-number', loadNumber],
+    queryFn: () => getLoadByNumber(loadNumber),
+    staleTime: 5 * 60_000,
+  });
+
+  if (!load) return null;
+
+  return (
+    <div className="sticky top-[60px] z-10 bg-fx-surface/90 backdrop-blur-sm border-b border-fx-divider px-4 py-2 flex items-center gap-2">
+      <MapPin size={12} className="text-fx-orange shrink-0" />
+      <span className="text-[11px] font-bold text-fx-orange">{loadNumber}</span>
+      <span className="text-[11px] text-fx-text-dim">
+        {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
+      </span>
+      <span className="ml-auto text-[11px] font-semibold text-fx-text">
+        {formatCurrency(load.rateUsd)}
+      </span>
+    </div>
+  );
+}
 
 /* ── New Message Sub-Component ─────────────────────────────────── */
 
@@ -154,14 +181,13 @@ function NewMessageContent({
         </button>
         <p className="text-sm text-fx-text-muted">Select a load to start a conversation about:</p>
         {loadingLoads ? (
-          <div className="flex justify-center py-10">
-            <Loader2 size={22} className="text-fx-orange animate-spin" />
-          </div>
+          <SkeletonList count={3} />
         ) : myLoads.length === 0 ? (
-          <div className="bg-fx-surface border border-fx-border rounded-2xl p-6 text-center">
-            <Package size={28} className="text-fx-text-dim mx-auto mb-2" />
-            <p className="text-sm text-fx-text-muted">No active loads found</p>
-          </div>
+          <EmptyState
+            icon={<Package size={28} className="text-fx-text-dim" />}
+            title="No active loads found"
+            subtitle="Post or accept a load to start messaging"
+          />
         ) : (
           <div className="max-h-64 overflow-y-auto space-y-2 scrollbar-hide">
             {myLoads.map((load) => (
@@ -222,9 +248,7 @@ function NewMessageContent({
         />
       </div>
       {searchingUsers ? (
-        <div className="flex justify-center py-6">
-          <Loader2 size={22} className="text-fx-orange animate-spin" />
-        </div>
+        <SkeletonList count={3} />
       ) : userResults.length > 0 ? (
         <div className="max-h-64 overflow-y-auto space-y-2 scrollbar-hide">
           {userResults.map((u) => (
@@ -250,10 +274,11 @@ function NewMessageContent({
           ))}
         </div>
       ) : userQuery.trim() ? (
-        <div className="bg-fx-surface border border-fx-border rounded-2xl p-6 text-center">
-          <User size={28} className="text-fx-text-dim mx-auto mb-2" />
-          <p className="text-sm text-fx-text-muted">No users found</p>
-        </div>
+        <EmptyState
+          icon={<User size={28} className="text-fx-text-dim" />}
+          title="No users found"
+          subtitle="Try a different name or email"
+        />
       ) : null}
     </div>
   );
@@ -426,6 +451,11 @@ export default function MessagesPage() {
           </div>
         </div>
 
+        {/* Load context banner */}
+        {selected.load_number && (
+          <MessageLoadContext loadNumber={selected.load_number} />
+        )}
+
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
           {hasMoreMessages && (
@@ -438,9 +468,11 @@ export default function MessagesPage() {
             </button>
           )}
           {messages.length === 0 ? (
-            <p className="text-center text-sm text-fx-text-muted py-10">
-              No messages yet. Say hello!
-            </p>
+            <EmptyState
+              icon={<Send size={24} className="text-fx-text-dim" />}
+              title="No messages yet"
+              subtitle="Say hello!"
+            />
           ) : (
             messages.map((msg) => {
               const isSelected = selectedMsgId === msg.id;
@@ -546,11 +578,11 @@ export default function MessagesPage() {
       {/* List */}
       <div className="flex-1 overflow-y-auto">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center px-5">
-            <div className="text-5xl mb-4">💬</div>
-            <p className="font-bold text-fx-text">No messages yet</p>
-            <p className="text-sm text-fx-text-muted mt-1">Your conversations will appear here</p>
-          </div>
+          <EmptyState
+            icon={<MessageSquare size={36} className="text-fx-text-dim" />}
+            title="No messages yet"
+            subtitle="Your conversations will appear here"
+          />
         ) : (
           <div className="divide-y divide-fx-border">
             {filtered.map((convo) => (

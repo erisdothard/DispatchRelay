@@ -19,6 +19,11 @@
   "dependencies": {
     "@freightx/shared": "workspace:*",
     "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-toggle-group": "^1.1.11",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@rive-app/react-canvas": "^4.28.4",
     "@sentry/react": "^10.39.0",
     "@stripe/stripe-js": "^8.7.0",
     "@supabase/supabase-js": "^2.97.0",

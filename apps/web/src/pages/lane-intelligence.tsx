@@ -5,6 +5,11 @@ import { getLaneStats, getLaneTrend, suggestRate } from '@/services/rate-intelli
 import type { RateSuggestion, PopularLane } from '@/services/rate-intelligence.service';
 import { LaneTrendChart } from '@/features/loads/components/lane-trend-chart';
 import { PopularLanesCard } from '@/features/loads/components/popular-lanes-card';
+import { RateForecastCard } from '@/features/loads/components/rate-forecast-card';
+import { RateHeatmap } from '@/features/loads/components/rate-heatmap';
+import { FeatureGate } from '@/shared/components/feature-gate';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { cn } from '@/shared/lib/utils';
 
 const US_STATES = [
@@ -240,17 +245,15 @@ export default function LaneIntelligencePage() {
           </div>
 
           {statsLoading ? (
-            <div className="space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-8 bg-fx-surface-2 rounded animate-pulse" />
-              ))}
-            </div>
+            <SkeletonList count={3} />
           ) : stats ? (
             <>
               {stats.sample_count === 0 ? (
-                <p className="text-fx-text-dim text-sm text-center py-4">
-                  No data for this lane yet. Be the first to book it!
-                </p>
+                <EmptyState
+                  icon={<BarChart2 size={28} className="text-fx-text-dim" />}
+                  title="No data for this lane"
+                  subtitle="Be the first to book it!"
+                />
               ) : (
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   {[
@@ -347,6 +350,26 @@ export default function LaneIntelligencePage() {
           )}
         </div>
       )}
+
+      {/* Rate Forecast — shows when a lane is searched */}
+      {searched && (
+        <FeatureGate feature="rate_analytics">
+          <div className="mb-4">
+            <RateForecastCard
+              originState={searched.originState}
+              destState={searched.destState}
+              equipment={searched.equipment}
+            />
+          </div>
+        </FeatureGate>
+      )}
+
+      {/* Rate Heatmap — always visible for current equipment */}
+      <FeatureGate feature="rate_analytics">
+        <div className="mb-4">
+          <RateHeatmap equipment={params.equipment} />
+        </div>
+      </FeatureGate>
 
       {/* Popular lanes widget */}
       <PopularLanesCard onSelect={handlePopularLaneSelect} />

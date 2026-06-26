@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Clock, LogIn, LogOut } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { FacilityManager } from '@/features/loads/components/facility-manager';
@@ -35,9 +36,7 @@ export default function ShipperDockSchedulingPage() {
             Facilities
           </p>
           {facilitiesLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <span className="w-5 h-5 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-            </div>
+            <SkeletonList count={2} />
           ) : (
             <FacilityManager
               facilities={facilities}
@@ -66,9 +65,7 @@ export default function ShipperDockSchedulingPage() {
               Today's Schedule
             </p>
             {apptLoading ? (
-              <div className="flex items-center justify-center py-6">
-                <span className="w-5 h-5 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-              </div>
+              <SkeletonList count={2} />
             ) : appointments.length === 0 ? (
               <p className="text-center py-6 text-fx-text-dim text-xs">No appointments today</p>
             ) : (

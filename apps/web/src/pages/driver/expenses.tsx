@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -151,9 +152,7 @@ export default function ExpensesPage() {
 
       <div className="flex-1 overflow-y-auto px-5 space-y-4">
         {loading ? (
-          <div className="flex justify-center py-16">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={3} />
         ) : (
           <>
             {/* Stat cards */}

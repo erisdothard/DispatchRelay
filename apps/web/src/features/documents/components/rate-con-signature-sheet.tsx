@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { embedSignatureIntoPdf } from '@/services/pdf-signature-embed.service';
 import { generateRateConBlob } from '@/features/bookings/lib/generate-rate-con';
 import { notifyRateConSigned } from '@/services/email-notifications.service';
+import { VerificationSeal } from './verification-seal';
 import type { Load } from '@freightx/shared';
 
 interface RateConSignatureSheetProps {
@@ -63,6 +64,7 @@ export function RateConSignatureSheet({
   const [signatoryName, setSignatoryName] = useState('');
   const [consentChecked, setConsentChecked] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -278,8 +280,12 @@ export function RateConSignatureSheet({
         .remove([unsignedPath])
         .catch(() => {});
 
-      onSigned();
-      onClose();
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        onSigned();
+        onClose();
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save rate confirmation');
     } finally {
@@ -288,6 +294,19 @@ export function RateConSignatureSheet({
   }
 
   if (!open) return null;
+
+  if (showSuccess) {
+    return (
+      <div className="fixed inset-0 z-[70] flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative flex flex-col items-center gap-4 animate-scale-in">
+          <VerificationSeal />
+          <p className="text-lg font-bold text-fx-text">Rate Con Signed</p>
+          <p className="text-sm text-fx-text-muted">Document verified & recorded</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center">

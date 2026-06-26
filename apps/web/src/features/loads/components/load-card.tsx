@@ -11,6 +11,8 @@ import { EQUIPMENT_LABELS } from '@freightx/shared';
 import type { Load } from '@freightx/shared';
 import type { LoadStatus } from '@/lib/database.types';
 import { getLaneStats } from '@/services/rate-intelligence.service';
+import { BrokerVerifiedBadge } from './broker-verified-badge';
+import { BidButtonAnimated } from '@/features/bids/components/bid-button-animated';
 
 /** Returns badge variant for a load status */
 function getStatusBadgeVariant(status: LoadStatus): 'blue' | 'orange' | 'green' | 'red' | 'gray' {
@@ -91,6 +93,7 @@ interface LoadCardProps {
   carrierEligible?: boolean;
   carrierEligibleReason?: string | null;
   className?: string;
+  variant?: 'full' | 'compact';
 }
 
 export function LoadCard({
@@ -101,6 +104,7 @@ export function LoadCard({
   carrierEligible = true,
   carrierEligibleReason,
   className,
+  variant = 'full',
 }: LoadCardProps) {
   const rate = analyzeRate(load);
   const age = getLoadAge(load.postedAt);
@@ -108,11 +112,14 @@ export function LoadCard({
   const profit = calcGrossProfit(load);
   const isCancelled = load.status === 'cancelled';
 
+  const isCompact = variant === 'compact';
+
   return (
     <div
       onClick={() => onPress?.(load)}
       className={cn(
-        'bg-fx-surface rounded-ios p-5 card-highlight active-scale transition-colors',
+        'bg-fx-surface rounded-ios card-highlight active-scale transition-colors',
+        isCompact ? 'p-3' : 'p-5',
         onPress ? 'cursor-pointer' : '',
         isCancelled && 'opacity-60 bg-fx-surface/50',
         className,
@@ -152,7 +159,7 @@ export function LoadCard({
         </span>
         {/* Status badge */}
         {(() => {
-          const variant = getStatusBadgeVariant(load.status);
+          const badgeVariant = getStatusBadgeVariant(load.status);
           const label = getStatusLabel(load.status);
           const colors = {
             blue: { text: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' },
@@ -165,7 +172,7 @@ export function LoadCard({
             red: { text: 'text-red-400', bg: 'bg-red-400/10', border: 'border-red-400/20' },
             gray: { text: 'text-gray-400', bg: 'bg-gray-400/10', border: 'border-gray-400/20' },
           };
-          const c = colors[variant];
+          const c = colors[badgeVariant];
           return (
             <span
               className={cn(
@@ -196,35 +203,37 @@ export function LoadCard({
         )}
       </div>
 
-      {/* Stats row */}
-      <div
-        className="flex items-center gap-0 mb-4 rounded-ios-xs overflow-hidden"
-        style={{ border: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        {[
-          { icon: <Scale size={11} />, value: `${(load.weightLbs / 1000).toFixed(0)}k lbs` },
-          {
-            icon: <ArrowRight size={11} />,
-            value: load.totalMiles ? `${load.totalMiles} mi` : '—',
-          },
-          {
-            icon: <Calendar size={11} />,
-            value: new Date(load.pickupDate + 'T12:00:00').toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-            }),
-          },
-        ].map(({ icon, value }, i) => (
-          <div
-            key={i}
-            className="flex-1 flex items-center justify-center gap-1 py-2"
-            style={i < 2 ? { borderRight: '1px solid rgba(255,255,255,0.06)' } : {}}
-          >
-            <span className="text-fx-text-dim">{icon}</span>
-            <span className="text-[11px] text-fx-text-dim font-medium">{value}</span>
-          </div>
-        ))}
-      </div>
+      {/* Stats row — hidden in compact mode */}
+      {!isCompact && (
+        <div
+          className="flex items-center gap-0 mb-4 rounded-ios-xs overflow-hidden"
+          style={{ border: '1px solid rgba(255,255,255,0.06)' }}
+        >
+          {[
+            { icon: <Scale size={11} />, value: `${(load.weightLbs / 1000).toFixed(0)}k lbs` },
+            {
+              icon: <ArrowRight size={11} />,
+              value: load.totalMiles ? `${load.totalMiles} mi` : '—',
+            },
+            {
+              icon: <Calendar size={11} />,
+              value: new Date(load.pickupDate + 'T12:00:00').toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              }),
+            },
+          ].map(({ icon, value }, i) => (
+            <div
+              key={i}
+              className="flex-1 flex items-center justify-center gap-1 py-2"
+              style={i < 2 ? { borderRight: '1px solid rgba(255,255,255,0.06)' } : {}}
+            >
+              <span className="text-fx-text-dim">{icon}</span>
+              <span className="text-[11px] text-fx-text-dim font-medium">{value}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Rate + broker info + action */}
       <div className="flex items-end justify-between">
@@ -234,7 +243,10 @@ export function LoadCard({
             {load.ratePerMile > 0 ? (
               <>
                 <span
-                  className="text-[28px] font-extrabold leading-none tracking-[-0.03em]"
+                  className={cn(
+                    'font-extrabold leading-none tracking-[-0.03em]',
+                    isCompact ? 'text-[20px]' : 'text-[28px]',
+                  )}
                   style={{ color: rate.health === 'low' ? '#F87171' : '#FFFFFF' }}
                 >
                   ${load.ratePerMile.toFixed(2)}
@@ -243,7 +255,10 @@ export function LoadCard({
               </>
             ) : (
               <span
-                className="text-[28px] font-extrabold leading-none tracking-[-0.03em]"
+                className={cn(
+                  'font-extrabold leading-none tracking-[-0.03em]',
+                  isCompact ? 'text-[20px]' : 'text-[28px]',
+                )}
                 style={{ color: rate.health === 'low' ? '#F87171' : '#FFFFFF' }}
               >
                 ${load.rateUsd.toLocaleString()}
@@ -282,6 +297,7 @@ export function LoadCard({
                 {credit.label}
               </span>
             )}
+            <BrokerVerifiedBadge companyId={load.companyId} compact />
             {profit && <span className="text-[10px] font-semibold text-fx-text-dim">{profit}</span>}
             {load.assigneeId && (
               <span className="text-[10px] font-semibold text-sky-400 bg-sky-400/10 px-2 py-0.5 rounded-full border border-sky-400/20">
@@ -303,16 +319,7 @@ export function LoadCard({
           {showBidButton &&
             (load.status === 'posted' || load.status === 'bid_received') &&
             (carrierEligible ? (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onBid?.(load);
-                }}
-                className="h-9 px-5 rounded-full text-[13px] font-bold text-white active-scale transition-all bg-orange-gradient"
-                style={{ boxShadow: '0 2px 12px rgba(232,96,48,0.35)' }}
-              >
-                Bid Now
-              </button>
+              <BidButtonAnimated load={load} onBid={(l) => onBid?.(l)} />
             ) : (
               <div className="flex flex-col items-end gap-1">
                 <button

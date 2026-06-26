@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, DollarSign, MapPin } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
@@ -54,17 +56,13 @@ export default function CarrierSpotRatesPage() {
 
         {/* Results */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={4} />
         ) : rates.length === 0 ? (
-          <div className="text-center py-20">
-            <TrendingUp size={24} className="mx-auto text-fx-text-dim mb-2" />
-            <p className="text-fx-text-muted text-sm">No rate data available</p>
-            <p className="text-fx-text-dim text-xs mt-1">
-              Try adjusting your filters or check back later.
-            </p>
-          </div>
+          <EmptyState
+            icon={<TrendingUp size={28} className="text-fx-text-dim" />}
+            title="No rate data available"
+            subtitle="Try adjusting your filters or check back later"
+          />
         ) : (
           <div className="space-y-2">
             {rates.map((rate, i) => {

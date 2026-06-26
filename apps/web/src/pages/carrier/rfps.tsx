@@ -3,6 +3,8 @@ import { FileText, DollarSign, AlertCircle } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { RfpDetailSheet } from '@/features/loads/components/rfp-detail-sheet';
 import { useOpenRfps, useRfpLanes, useSubmitProposal } from '@/features/loads/hooks/use-rfps';
 import { useAuth } from '@/contexts/AuthContext';
@@ -50,14 +52,9 @@ export default function CarrierRfpsPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={3} />
         ) : rfps.length === 0 ? (
-          <div className="text-center py-20">
-            <FileText size={24} className="mx-auto text-fx-text-dim mb-2" />
-            <p className="text-fx-text-muted text-sm">No open RFPs</p>
-          </div>
+          <EmptyState icon={<FileText size={24} />} title="No open RFPs" />
         ) : (
           <div className="space-y-3">
             {rfps.map((rfp) => (

@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { Clock } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { HosDashboard } from '@/features/driver/components/hos-dashboard';
 import { HosLogList } from '@/features/driver/components/hos-log-list';
@@ -51,23 +54,18 @@ export default function DriverHosPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pb-4">
-        {loading && (
-          <div className="flex items-center justify-center py-20">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
-        )}
+        {loading && <SkeletonList count={3} />}
 
         {!loading &&
           tab === 'dashboard' &&
           (status ? (
             <HosDashboard status={status} driverId={user!.id} />
           ) : (
-            <div className="text-center py-20">
-              <p className="text-fx-text-muted text-sm">No HOS data available</p>
-              <p className="text-fx-text-dim text-xs mt-1">
-                Start logging duty transitions to see your dashboard.
-              </p>
-            </div>
+            <EmptyState
+              icon={<Clock size={28} className="text-fx-text-dim" />}
+              title="No HOS data available"
+              subtitle="Start logging duty transitions to see your dashboard"
+            />
           ))}
 
         {!loading && tab === 'log' && <HosLogList log={log} />}

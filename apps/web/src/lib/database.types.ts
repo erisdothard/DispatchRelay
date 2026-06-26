@@ -1801,6 +1801,8 @@ export type Database = {
           phone_verified_at: string | null;
           phone_carrier_type: string | null;
           last_synced_at: string | null;
+          carrier_id: string | null;
+          status: string;
           role: string;
           theme: string;
           updated_at: string;
@@ -1820,6 +1822,8 @@ export type Database = {
           phone_verified_at?: string | null;
           phone_carrier_type?: string | null;
           last_synced_at?: string | null;
+          carrier_id?: string | null;
+          status?: string;
           role?: string;
           theme?: string;
           updated_at?: string;
@@ -1839,6 +1843,8 @@ export type Database = {
           phone_verified_at?: string | null;
           phone_carrier_type?: string | null;
           last_synced_at?: string | null;
+          carrier_id?: string | null;
+          status?: string;
           role?: string;
           theme?: string;
           updated_at?: string;

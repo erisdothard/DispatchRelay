@@ -12,6 +12,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { Badge } from '@/shared/components/ui/badge';
@@ -408,14 +410,13 @@ export default function DriverDocumentsPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={3} />
         ) : loadDocs.length === 0 ? (
-          <div className="text-center py-20">
-            <FileText size={40} className="text-fx-text-dim mx-auto mb-3" />
-            <p className="text-sm text-fx-text-muted">No loads assigned yet</p>
-          </div>
+          <EmptyState
+            icon={<FileText size={28} className="text-fx-text-dim" />}
+            title="No loads assigned yet"
+            subtitle="Documents will appear here when loads are assigned to you"
+          />
         ) : (
           loadDocs.map(({ load, docs }) => {
             const hasBol = docs.some((d) => d.type === 'bill_of_lading');

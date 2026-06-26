@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Truck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
@@ -148,15 +150,13 @@ export default function DriverLoadsPage() {
       {/* Load list */}
       <div className="flex-1 overflow-y-auto px-5 space-y-3">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <span className="w-8 h-8 border-2 border-fx-border border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={4} />
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="text-5xl mb-4">🚛</div>
-            <p className="font-bold text-fx-text">No loads assigned</p>
-            <p className="text-sm text-fx-text-muted mt-1">Your carrier will assign loads to you</p>
-          </div>
+          <EmptyState
+            icon={<Truck size={28} className="text-fx-text-dim" />}
+            title="No loads assigned"
+            subtitle="Your carrier will assign loads to you"
+          />
         ) : (
           filtered.map((load) => (
             <div

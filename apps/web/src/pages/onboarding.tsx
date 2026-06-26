@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Truck,
   Briefcase,
+  Package,
   ChevronLeft,
   ArrowRight,
   CheckCircle2,
@@ -10,12 +11,15 @@ import {
   Lock,
   User,
   Building2,
-  UserCheck,
 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { getPendingInviteByEmail, acceptInvite } from '@/services/company-members.service';
+import {
+  acceptInvite,
+  getInviteByToken,
+} from '@/services/company-members.service';
+import type { InvitePreview } from '@/services/company-members.service';
 import type { UserRole } from '@/lib/database.types';
 
 type Step = 1 | 2 | 3;
@@ -47,12 +51,12 @@ const roles: RoleCard[] = [
     route: '/broker',
   },
   {
-    id: 'driver',
-    label: 'Driver',
-    description: 'I drive trucks',
-    detail: 'View assigned loads, share GPS, update status, and upload documents.',
-    icon: <UserCheck size={28} />,
-    route: '/driver',
+    id: 'shipper',
+    label: 'Shipper',
+    description: 'I ship goods',
+    detail: 'Post loads, get competitive bids, track shipments, manage dock scheduling.',
+    icon: <Package size={28} />,
+    route: '/shipper',
   },
 ];
 
@@ -66,6 +70,11 @@ export default function OnboardingPage() {
   const { token: inviteToken } = useParams<{ token?: string }>();
   const [step, setStep] = useState<Step>(1);
   const [selected, setSelected] = useState<UserRole | null>(null);
+
+  // Invite preview state
+  const [invitePreview, setInvitePreview] = useState<InvitePreview | null>(null);
+  const [inviteLoading, setInviteLoading] = useState(!!inviteToken);
+  const [inviteExpired, setInviteExpired] = useState(false);
 
   // Step 2 fields
   const [fullName, setFullName] = useState('');
@@ -83,12 +92,37 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const { signUp, createCompany } = useAuth();
+  const { signUp, signInWithGoogle, createCompany } = useAuth();
 
   const selectedRole = roles.find((r) => r.id === selected);
 
+  // Invite flows skip Step 3 (company already set)
+  const totalSteps = invitePreview ? 2 : 3;
+  // If arriving via invite, Step 1 is skipped — renumber for display
+  const displayStep = invitePreview ? step - 1 : step;
+
+  // Fetch invite details when arriving via /invite/:token
+  useEffect(() => {
+    if (!inviteToken) return;
+    getInviteByToken(inviteToken).then((preview) => {
+      if (!preview || !preview.is_valid) {
+        setInviteExpired(true);
+      } else {
+        setInvitePreview(preview);
+        setEmail(preview.email);
+        setSelected(preview.role as UserRole);
+        setStep(2); // Skip role selection
+      }
+      setInviteLoading(false);
+    });
+  }, [inviteToken]);
+
   function back() {
     setError(null);
+    if (invitePreview && step === 2) {
+      navigate('/');
+      return;
+    }
     if (step > 1) setStep((s) => (s - 1) as Step);
     else navigate('/');
   }
@@ -117,30 +151,21 @@ export default function OnboardingPage() {
       }
     }
 
-    // Check if there's a pending invite for this email
-    if (selected === 'driver') {
-      try {
-        const invite = await getPendingInviteByEmail(email.trim());
-        if (invite) {
-          await acceptInvite(invite.token);
-          setLoading(false);
-          navigate(selectedRole!.route);
-          return;
-        }
-      } catch {
-        // No invite or acceptance failed
-      }
-
-      // Drivers MUST have an invite — block signup if none found
-      setLoading(false);
-      setError(
-        'No invite found for this email. Ask your carrier to invite you from their Team → Manage page first.',
-      );
-      return;
-    }
-
     setLoading(false);
     setStep(3);
+  }
+
+  // Google OAuth signup handler
+  async function handleGoogleSignUp() {
+    if (!selected) return;
+    setError(null);
+    setLoading(true);
+    const { error } = await signInWithGoogle(selected, inviteToken ?? undefined);
+    if (error) {
+      setLoading(false);
+      setError(error);
+    }
+    // Redirect happens automatically — loading spinner stays on
   }
 
   // Step 3 → create company + mark onboarding complete
@@ -166,6 +191,33 @@ export default function OnboardingPage() {
   const inputClass =
     'w-full h-12 bg-fx-surface rounded-ios-xs px-4 text-[14px] text-white placeholder:text-fx-text-dim focus:ring-1 focus:ring-fx-orange/50 outline-none transition-all card-highlight';
 
+  // Loading state while fetching invite preview
+  if (inviteLoading) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <span className="w-8 h-8 border-2 border-fx-border border-t-fx-orange rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Expired / invalid invite
+  if (inviteExpired) {
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center px-6 text-center gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-2">
+          <Mail size={28} className="text-red-400" />
+        </div>
+        <p className="text-xl font-bold text-fx-text">This invite has expired</p>
+        <p className="text-sm text-fx-text-muted max-w-xs">
+          Ask your carrier admin to send a new invite from the Team page.
+        </p>
+        <Button size="lg" onClick={() => navigate('/')} className="rounded-2xl font-bold mt-4">
+          Go Home
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-dvh flex flex-col px-5 pb-10">
       {/* Header */}
@@ -181,7 +233,7 @@ export default function OnboardingPage() {
         </button>
         <div>
           <p className="text-xs text-fx-text-muted font-semibold tracking-widest uppercase">
-            Step {step} of 3
+            Step {displayStep} of {totalSteps}
           </p>
           <h1 className="text-xl font-bold text-fx-text">{STEP_TITLES[step]}</h1>
         </div>
@@ -191,7 +243,7 @@ export default function OnboardingPage() {
       <div className="h-1 bg-fx-surface rounded-full mb-8">
         <div
           className="h-full bg-fx-orange rounded-full transition-all duration-500"
-          style={{ width: `${(step / 3) * 100}%` }}
+          style={{ width: `${(displayStep / totalSteps) * 100}%` }}
         />
       </div>
 
@@ -263,10 +315,26 @@ export default function OnboardingPage() {
       {/* ── Step 2: Account details ── */}
       {step === 2 && (
         <div className="flex flex-col gap-4 flex-1">
-          <p className="text-fx-text-muted text-sm -mt-2 mb-2">
-            Create your <span className="text-fx-orange font-semibold">{selectedRole?.label}</span>{' '}
-            account.
-          </p>
+          {/* Invite context banner */}
+          {invitePreview && (
+            <div className="bg-fx-orange/10 border border-fx-orange/20 rounded-2xl p-4 -mt-2 mb-1">
+              <p className="text-sm font-bold text-fx-orange">
+                Joining {invitePreview.company_name}
+              </p>
+              <p className="text-xs text-fx-text-muted mt-1">
+                You've been invited as a{' '}
+                <span className="text-fx-text font-semibold capitalize">{invitePreview.role}</span>.
+                Create your account below.
+              </p>
+            </div>
+          )}
+
+          {!invitePreview && (
+            <p className="text-fx-text-muted text-sm -mt-2 mb-2">
+              Create your{' '}
+              <span className="text-fx-orange font-semibold">{selectedRole?.label}</span> account.
+            </p>
+          )}
 
           <div className="relative">
             <User
@@ -292,8 +360,9 @@ export default function OnboardingPage() {
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={`${inputClass} pl-10`}
+              onChange={(e) => !invitePreview && setEmail(e.target.value)}
+              readOnly={!!invitePreview}
+              className={`${inputClass} pl-10 ${invitePreview ? 'opacity-60 cursor-not-allowed' : ''}`}
               autoComplete="email"
             />
           </div>
@@ -330,12 +399,38 @@ export default function OnboardingPage() {
             >
               {loading ? (
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : invitePreview ? (
+                <>
+                  Create Account <ArrowRight size={18} />
+                </>
               ) : (
                 <>
                   Next: Company Info <ArrowRight size={18} />
                 </>
               )}
             </Button>
+
+            {/* Google OAuth divider + button */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-fx-border" />
+              <span className="text-xs text-fx-text-dim">or</span>
+              <div className="flex-1 h-px bg-fx-border" />
+            </div>
+            <button
+              type="button"
+              onClick={handleGoogleSignUp}
+              disabled={loading || !selected}
+              className="w-full h-12 rounded-ios-xs flex items-center justify-center gap-3 bg-fx-surface border border-fx-border text-fx-text text-[14px] font-semibold disabled:opacity-50 hover:border-fx-border-2 transition-colors"
+            >
+              <svg width="18" height="18" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.09 24.09 0 0 0 0 21.56l7.98-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              Continue with Google
+            </button>
+
             <p className="text-center text-xs text-fx-text-dim">
               Already have an account?{' '}
               <button onClick={() => navigate('/login')} className="text-fx-orange font-semibold">
@@ -401,6 +496,13 @@ export default function OnboardingPage() {
               onChange={(e) => setBrokerAuth(e.target.value)}
               className={inputClass}
             />
+          )}
+
+          {/* Shipper hint */}
+          {selected === 'shipper' && (
+            <p className="text-xs text-fx-text-dim px-1">
+              You'll be able to post loads, manage RFPs, and schedule dock appointments once your account is set up.
+            </p>
           )}
 
           {/* Company phone */}

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, FileText } from 'lucide-react';
+import { Mail, FileText, Truck } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { LaneSuggestionsFeed } from '@/features/loads/components/lane-suggestions-feed';
 import { BackhaulCard } from '@/features/loads/components/backhaul-card';
 import {
@@ -65,23 +67,18 @@ export default function CarrierAlertsPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pb-4">
-        {loading && (
-          <div className="flex items-center justify-center py-20">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
-        )}
+        {loading && <SkeletonList count={3} />}
 
         {!loading && tab === 'suggestions' && <LaneSuggestionsFeed suggestions={suggestions} />}
 
         {!loading && tab === 'backhaul' && (
           <div className="space-y-2">
             {opportunities.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-fx-text-muted text-sm">No backhaul opportunities</p>
-                <p className="text-fx-text-dim text-xs mt-1">
-                  Check back after completing a delivery.
-                </p>
-              </div>
+              <EmptyState
+                icon={<Truck size={24} />}
+                title="No backhaul opportunities"
+                subtitle="Check back after completing a delivery."
+              />
             ) : (
               opportunities.map((opp) => <BackhaulCard key={opp.load_id} opportunity={opp} />)
             )}

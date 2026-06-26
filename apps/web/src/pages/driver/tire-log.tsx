@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Plus, AlertTriangle } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -85,19 +87,13 @@ export default function TireLogPage() {
 
       <div className="flex-1 overflow-y-auto px-5 space-y-3">
         {loading ? (
-          <div className="flex justify-center py-16">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={3} />
         ) : incidents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-fx-orange/10 flex items-center justify-center mb-4">
-              <AlertTriangle size={28} className="text-fx-orange" />
-            </div>
-            <p className="font-bold text-fx-text">No incidents logged</p>
-            <p className="text-sm text-fx-text-muted mt-1">
-              Tap the + button to log your first incident
-            </p>
-          </div>
+          <EmptyState
+            icon={<AlertTriangle size={28} className="text-fx-orange" />}
+            title="No incidents logged"
+            subtitle="Tap the + button to log your first incident"
+          />
         ) : (
           incidents.map((incident) => (
             <div

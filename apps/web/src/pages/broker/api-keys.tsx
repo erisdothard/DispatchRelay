@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Key, Plus, Copy, Trash2, AlertCircle, Check, Shield } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
@@ -88,17 +90,13 @@ export default function BrokerApiKeysPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={3} />
         ) : keys.length === 0 ? (
-          <div className="text-center py-20">
-            <Key size={24} className="mx-auto text-fx-text-dim mb-2" />
-            <p className="text-fx-text-muted text-sm">No API keys</p>
-            <p className="text-fx-text-dim text-xs mt-1">
-              Generate one to integrate with your TMS.
-            </p>
-          </div>
+          <EmptyState
+            icon={<Key size={28} className="text-fx-text-dim" />}
+            title="No API keys"
+            subtitle="Generate one to integrate with your TMS"
+          />
         ) : (
           <div className="space-y-3">
             {keys.map((key) => (

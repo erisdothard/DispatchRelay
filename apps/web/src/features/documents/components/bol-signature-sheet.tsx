@@ -3,6 +3,7 @@ import { Loader2, RotateCcw, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { markBolSigned, notifyBolSignedParties } from '@/services/documents.service';
 import { embedSignatureIntoPdf } from '@/services/pdf-signature-embed.service';
+import { VerificationSeal } from './verification-seal';
 
 interface BolSignatureSheetProps {
   open: boolean;
@@ -62,6 +63,7 @@ export function BolSignatureSheet({
   const [signatoryName, setSignatoryName] = useState('');
   const [consentChecked, setConsentChecked] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
   const [bolWarnings, setBolWarnings] = useState<string[]>([]);
 
@@ -275,8 +277,12 @@ export function BolSignatureSheet({
         bolPdfUrl: signedPdfUrl,
       }).catch(console.warn);
 
-      onSigned(signedPdfUrl ?? sigUrlData.publicUrl);
-      onClose();
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        onSigned(signedPdfUrl ?? sigUrlData.publicUrl);
+        onClose();
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save signature');
     } finally {
@@ -285,6 +291,19 @@ export function BolSignatureSheet({
   }
 
   if (!open) return null;
+
+  if (showSuccess) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative flex flex-col items-center gap-4 animate-scale-in">
+          <VerificationSeal />
+          <p className="text-lg font-bold text-fx-text">BOL Signed</p>
+          <p className="text-sm text-fx-text-muted">Document verified & recorded</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Plus, FileText } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { RfpCreateSheet } from '@/features/loads/components/rfp-create-sheet';
@@ -40,17 +42,13 @@ export default function ShipperRfpsPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={3} />
         ) : rfps.length === 0 ? (
-          <div className="text-center py-20">
-            <FileText size={24} className="mx-auto text-fx-text-dim mb-2" />
-            <p className="text-fx-text-muted text-sm">No RFPs created yet</p>
-            <p className="text-fx-text-dim text-xs mt-1">
-              Create one to solicit carrier bids on your lanes.
-            </p>
-          </div>
+          <EmptyState
+            icon={<FileText size={28} className="text-fx-text-dim" />}
+            title="No RFPs created yet"
+            subtitle="Create one to solicit carrier bids on your lanes"
+          />
         ) : (
           <div className="space-y-3">
             {rfps.map((rfp) => (

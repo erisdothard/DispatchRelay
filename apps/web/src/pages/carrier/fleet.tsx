@@ -10,6 +10,8 @@ import {
   Radio,
   Navigation,
 } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { FleetMap } from '@/shared/components/fleet-map';
 import type { TruckPin } from '@/shared/components/fleet-map';
 import { TopHeader } from '@/shared/components/top-header';
@@ -174,29 +176,27 @@ export default function CarrierFleetPage() {
       {/* Truck list */}
       <div className="flex-1 overflow-y-auto px-5 space-y-3">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <span className="w-8 h-8 border-2 border-fx-border border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={4} />
         ) : error ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <WifiOff size={36} className="text-fx-text-dim mb-4" />
-            <p className="font-bold text-fx-text">Couldn't load your fleet</p>
-            <p className="text-sm text-fx-text-muted mt-1 mb-4">{error}</p>
-            <button
-              onClick={refresh}
-              className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
+          <EmptyState
+            icon={<WifiOff size={28} className="text-fx-text-dim" />}
+            title="Couldn't load your fleet"
+            subtitle={error}
+            action={
+              <button
+                onClick={refresh}
+                className="text-sm font-semibold text-fx-orange border border-fx-orange/30 px-5 py-2 rounded-xl hover:bg-fx-orange/10 transition-colors"
+              >
+                Try Again
+              </button>
+            }
+          />
         ) : trucks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="text-5xl mb-4">🚛</div>
-            <p className="font-bold text-fx-text">No trucks posted</p>
-            <p className="text-sm text-fx-text-muted mt-1">
-              Post your first truck to get matched with loads
-            </p>
-          </div>
+          <EmptyState
+            icon={<Truck size={28} className="text-fx-text-dim" />}
+            title="No trucks posted"
+            subtitle="Post your first truck to get matched with loads"
+          />
         ) : (
           trucks.map((truck) => (
             <div key={truck.id} className="bg-fx-surface border border-fx-border rounded-2xl p-4">

@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 
-export type MemberRole = 'owner' | 'admin' | 'dispatcher' | 'accounting' | 'viewer';
+export type MemberRole = 'owner' | 'admin' | 'dispatcher' | 'accounting' | 'viewer' | 'driver';
 
 export interface CompanyMember {
   id: string;
@@ -25,6 +25,14 @@ export interface CompanyInvite {
   expires_at: string;
   accepted_at: string | null;
   created_at: string;
+}
+
+export interface InvitePreview {
+  email: string;
+  role: MemberRole;
+  company_name: string;
+  expires_at: string;
+  is_valid: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,6 +78,8 @@ export async function inviteMember(params: {
   companyId: string;
   email: string;
   role: MemberRole;
+  inviterName?: string;
+  companyName?: string;
 }): Promise<CompanyInvite> {
   const { data: authData } = await supabase.auth.getUser();
   const { data, error } = await db
@@ -84,7 +94,35 @@ export async function inviteMember(params: {
     .single();
 
   if (error) throw new Error(error.message);
-  return data as CompanyInvite;
+  const invite = data as CompanyInvite;
+
+  // Send invite email — fire and forget, non-blocking
+  const appUrl = import.meta.env.VITE_APP_URL ?? window.location.origin;
+  const inviteUrl = `${appUrl}/invite/${invite.token}`;
+  const expiresFormatted = new Date(invite.expires_at).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  supabase.functions
+    .invoke('send-notification-email', {
+      body: {
+        to: invite.email,
+        subject: `You're invited to join ${params.companyName ?? 'a FreightX team'}`,
+        template: 'company_invite',
+        data: {
+          invite_url: inviteUrl,
+          company_name: params.companyName ?? 'your carrier',
+          role: invite.role,
+          invited_by_name: params.inviterName ?? 'Your carrier admin',
+          expires_at: expiresFormatted,
+        },
+      },
+    })
+    .catch((err) => console.warn('[invite-email] non-blocking failure:', err));
+
+  return invite;
 }
 
 export async function revokeInvite(inviteId: string): Promise<void> {
@@ -121,6 +159,17 @@ export async function getPendingInviteByEmail(email: string): Promise<CompanyInv
 
   if (error || !data) return null;
   return data as CompanyInvite;
+}
+
+/**
+ * Fetch invite details by token (pre-auth, SECURITY DEFINER RPC).
+ * Used to pre-fill the onboarding page when a driver clicks an invite link.
+ */
+export async function getInviteByToken(token: string): Promise<InvitePreview | null> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('get_invite_by_token', { p_token: token });
+  if (error || !data || data.length === 0) return null;
+  return data[0] as InvitePreview;
 }
 
 export async function getMyCompanyRole(companyId: string): Promise<MemberRole | null> {

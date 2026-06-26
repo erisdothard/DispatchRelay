@@ -27,6 +27,7 @@ import {
   Star,
 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
+import { InfoRow } from '@/shared/components/info-row';
 import {
   analyzeRate,
   getLoadAge,
@@ -47,6 +48,10 @@ import { RateConSignatureSheet } from '@/features/documents/components/rate-con-
 import type { DocumentRow } from '@/lib/database.types';
 import { AccessorialsSheet } from './accessorials-sheet';
 import { FairnessRating } from './fairness-rating';
+import { RateForecastCard } from './rate-forecast-card';
+import { BrokerVerifiedBadge } from './broker-verified-badge';
+import { BrokerPaymentCard } from './broker-payment-card';
+import { FeatureGate } from '@/shared/components/feature-gate';
 import { MapView } from '@/shared/components/map-view';
 import { updateLoad, nudgeCarrier, confirmReceipt } from '@/services/loads.service';
 import { ShipperReviewModal } from '@/features/ratings/components/shipper-review-modal';
@@ -67,20 +72,7 @@ interface LoadDetailSheetProps {
   role?: UserRole;
 }
 
-function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div
-      className="flex items-center gap-3 py-3"
-      style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-    >
-      <div className="w-8 h-8 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
-        <span className="text-fx-text-muted">{icon}</span>
-      </div>
-      <span className="text-sm text-fx-text-muted flex-1">{label}</span>
-      <span className="text-sm font-semibold text-fx-text">{value}</span>
-    </div>
-  );
-}
+// InfoRow is now imported from @/shared/components/info-row
 
 function formatApptWindow(start?: string, end?: string): string {
   if (!start && !end) return '—';
@@ -1038,6 +1030,7 @@ export function LoadDetailSheet({
                 </div>
               )}
               <span className="text-sm font-semibold text-fx-text">{load.companyName}</span>
+              <BrokerVerifiedBadge companyId={load.companyId} compact />
             </div>
           </div>
           {age && <InfoRow icon={<Clock size={14} />} label="Posted" value={age} />}
@@ -1449,6 +1442,26 @@ export function LoadDetailSheet({
         {/* Fairness Rating — carrier/driver only, shows market percentile */}
         {(isCarrier || role === 'driver') && load.ratePerMile > 0 && (
           <FairnessRating loadId={load.id} />
+        )}
+
+        {/* Rate Forecast — carrier/driver, gated behind rate_analytics */}
+        {(isCarrier || role === 'driver') && (
+          <FeatureGate feature="rate_analytics">
+            <div className="mb-4">
+              <RateForecastCard
+                originState={load.originState}
+                destState={load.destState}
+                equipment={load.equipment}
+              />
+            </div>
+          </FeatureGate>
+        )}
+
+        {/* Broker Payment History — carrier/driver viewing a brokered load */}
+        {(isCarrier || role === 'driver') && load.companyId && (
+          <div className="mb-4">
+            <BrokerPaymentCard companyId={load.companyId} />
+          </div>
         )}
 
         {/* Contact Information - Show for carriers/brokers/drivers on awarded+ loads */}

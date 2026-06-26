@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { MapPin, Navigation, Package } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { MapView } from '@/shared/components/map-view';
 import { useParams } from 'react-router-dom';
 import { getLoadByToken } from '@/services/tracking-tokens.service';
@@ -91,18 +93,14 @@ export default function PublicTrackingPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 space-y-4 pb-8">
-        {loading && (
-          <div className="flex justify-center py-16">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
-        )}
+        {loading && <SkeletonList count={3} />}
 
         {error && (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="text-4xl mb-4">🔗</div>
-            <p className="font-bold text-fx-text">Link Expired</p>
-            <p className="text-sm text-fx-text-muted mt-1">{error}</p>
-          </div>
+          <EmptyState
+            icon={<Navigation size={28} className="text-fx-text-dim" />}
+            title="Link Expired"
+            subtitle={error}
+          />
         )}
 
         {load && (

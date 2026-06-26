@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Shield, AlertTriangle, DollarSign } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import {
@@ -66,14 +68,13 @@ export default function AdminFactoringRiskPage() {
 
         {/* Risk profiles */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <span className="w-6 h-6 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-          </div>
+          <SkeletonList count={3} />
         ) : profiles.length === 0 ? (
-          <div className="text-center py-20">
-            <Shield size={24} className="mx-auto text-fx-text-dim mb-2" />
-            <p className="text-fx-text-muted text-sm">No factoring data available</p>
-          </div>
+          <EmptyState
+            icon={<Shield size={28} className="text-fx-text-dim" />}
+            title="No factoring data available"
+            subtitle="Factoring requests will appear here once submitted"
+          />
         ) : (
           <div className="space-y-3">
             {profiles.map((p) => {

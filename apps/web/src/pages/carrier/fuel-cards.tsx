@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { CreditCard, DollarSign, Fuel, Snowflake, AlertCircle } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { useAuth } from '@/contexts/AuthContext';
 import { getNavRole } from '@/shared/lib/utils';
 import {
@@ -93,14 +95,9 @@ export default function CarrierFuelCardsPage() {
             Your Cards
           </p>
           {isLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <span className="w-5 h-5 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
-            </div>
+            <SkeletonList count={3} />
           ) : cards.length === 0 ? (
-            <div className="text-center py-10">
-              <CreditCard size={24} className="mx-auto text-fx-text-dim mb-2" />
-              <p className="text-fx-text-muted text-sm">No fuel cards issued</p>
-            </div>
+            <EmptyState icon={<CreditCard size={24} />} title="No fuel cards issued" />
           ) : (
             <div className="space-y-2">
               {cards.map((card) => (

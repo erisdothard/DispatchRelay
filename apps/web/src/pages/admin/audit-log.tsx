@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Shield, Loader2, RefreshCw } from 'lucide-react';
+import { SkeletonList } from '@/shared/components/ui/skeleton';
+import { EmptyState } from '@/shared/components/empty-state';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -118,11 +120,13 @@ export default function AuditLogPage() {
         </div>
 
         {loading && entries.length === 0 ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 size={24} className="text-fx-orange animate-spin" />
-          </div>
+          <SkeletonList count={4} />
         ) : entries.length === 0 ? (
-          <p className="text-center text-sm text-fx-text-dim py-8">No audit entries found</p>
+          <EmptyState
+            icon={<Shield size={28} className="text-fx-text-dim" />}
+            title="No audit entries found"
+            subtitle="Actions will appear here as users interact with the system"
+          />
         ) : (
           <div className="space-y-2">
             {entries.map((entry) => {
