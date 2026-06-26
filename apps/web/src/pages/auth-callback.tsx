@@ -24,7 +24,7 @@ export default function AuthCallbackPage() {
 
       // Fetch user profile to determine role-based redirect
       const { data: profile } = await supabase
-        .from('users')
+        .from('profiles')
         .select('role')
         .eq('id', data.session.user.id)
         .single();

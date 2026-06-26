@@ -200,7 +200,7 @@ export default function BrokerLoadsPage() {
 
       {/* Tab bar */}
       <div className="px-5 pt-3 pb-1 border-b border-fx-divider">
-        <Tabs value={tab} onValueChange={(v) => setTab(v as PageTab)}>
+        <Tabs value={tab} onValueChange={(v: string) => setTab(v as PageTab)}>
           <TabsList className="w-full bg-fx-surface-2">
             <TabsTrigger
               value="active"

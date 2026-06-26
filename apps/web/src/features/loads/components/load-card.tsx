@@ -319,7 +319,7 @@ export function LoadCard({
           {showBidButton &&
             (load.status === 'posted' || load.status === 'bid_received') &&
             (carrierEligible ? (
-              <BidButtonAnimated load={load} onBid={(l) => onBid?.(l)} />
+              <BidButtonAnimated loadId={load.id} onBid={() => onBid?.(load)} />
             ) : (
               <div className="flex flex-col items-end gap-1">
                 <button
