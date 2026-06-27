@@ -1,8 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Truck,
+  Briefcase,
+  Package,
+  UserCircle,
+} from 'lucide-react';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { useAuth } from '@/contexts/AuthContext';
+import type { UserRole } from '@/lib/database.types';
 
 const ROLE_ROUTES: Record<string, string> = {
   carrier: '/carrier',
@@ -21,7 +32,7 @@ export default function LoginPage() {
   const [awaitingProfile, setAwaitingProfile] = useState(false);
 
   const navigate = useNavigate();
-  const { signIn, signInWithGoogle, profile } = useAuth();
+  const { signIn, signInWithGoogle, profile, enterDemoMode } = useAuth();
 
   // Once profile loads after sign-in, navigate to the correct dashboard
   useEffect(() => {
@@ -166,6 +177,58 @@ export default function LoginPage() {
           Create one
         </button>
       </p>
+
+      {/* Demo Mode */}
+      <div className="mt-8 pt-6 border-t border-fx-border">
+        <p className="text-xs text-fx-text-dim text-center mb-3 uppercase tracking-widest font-bold">
+          Demo Mode
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          {(
+            [
+              {
+                role: 'carrier' as UserRole,
+                label: 'Carrier',
+                icon: <Truck size={20} />,
+                color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+              },
+              {
+                role: 'broker' as UserRole,
+                label: 'Broker',
+                icon: <Briefcase size={20} />,
+                color: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+              },
+              {
+                role: 'shipper' as UserRole,
+                label: 'Shipper',
+                icon: <Package size={20} />,
+                color: 'text-green-400 bg-green-500/10 border-green-500/20',
+              },
+              {
+                role: 'driver' as UserRole,
+                label: 'Driver',
+                icon: <UserCircle size={20} />,
+                color: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
+              },
+            ] as const
+          ).map(({ role, label, icon, color }) => (
+            <button
+              key={role}
+              onClick={() => {
+                enterDemoMode(role);
+                navigate(ROLE_ROUTES[role], { replace: true });
+              }}
+              className={`flex items-center gap-2.5 rounded-xl border px-3 py-3 text-left transition-all active:scale-95 ${color}`}
+            >
+              {icon}
+              <div>
+                <p className="text-sm font-bold">{label}</p>
+                <p className="text-[10px] opacity-60">Demo</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

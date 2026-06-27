@@ -33,9 +33,24 @@ interface AuthActions {
   createCompany: (data: CompanyInput) => Promise<{ error: string | null }>;
   updateProfile: (data: Partial<ProfileRow>) => Promise<{ error: string | null }>;
   refreshProfile: () => Promise<void>;
+  /** Demo mode — bypass auth with a mock profile for the given role */
+  enterDemoMode: (role: UserRole) => void;
+  isDemo: boolean;
 }
 
 const AuthContext = createContext<(AuthState & AuthActions) | null>(null);
+
+const DEMO_PROFILES: Record<string, { name: string; email: string; company: string }> = {
+  carrier: {
+    name: 'Marcus Rivera',
+    email: 'carrier@freightx.com',
+    company: 'Rivera Transport Inc',
+  },
+  broker: { name: 'Sarah Chen', email: 'broker@freightx.com', company: 'Apex Freight Solutions' },
+  shipper: { name: 'James Park', email: 'shipper@freightx.com', company: 'Park Manufacturing Co' },
+  driver: { name: 'Carlos Mendez', email: 'driver@freightx.com', company: 'Rivera Transport Inc' },
+  admin: { name: 'Admin User', email: 'admin@freightx.com', company: 'FreightX Platform' },
+};
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -43,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [company, setCompany] = useState<CompanyRow | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDemo, setIsDemo] = useState(false);
 
   const fetchCompany = useCallback(async (profileId: string, role?: string) => {
     // 1. For non-drivers, check owned company first
@@ -174,9 +190,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
+    if (!isDemo) await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
     setProfile(null);
     setCompany(null);
+    setIsDemo(false);
+  }, [isDemo]);
+
+  const enterDemoMode = useCallback((role: UserRole) => {
+    const demo = DEMO_PROFILES[role] ?? DEMO_PROFILES.carrier;
+    const fakeId = `demo-${role}-${Date.now()}`;
+
+    setUser({ id: fakeId, email: demo.email } as User);
+    setSession({ access_token: 'demo' } as Session);
+    setProfile({
+      id: fakeId,
+      email: demo.email,
+      full_name: demo.name,
+      role,
+      status: 'active',
+      onboarding_complete: true,
+      avatar_url: null,
+      phone: null,
+      phone_verified_at: null,
+      phone_carrier_type: null,
+      carrier_id: null,
+      theme: 'dark',
+      last_known_location: null,
+      last_location_update: null,
+      last_synced_at: null,
+      current_duty_status: null,
+      duty_status_updated_at: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as ProfileRow);
+    setCompany({
+      id: `demo-company-${role}`,
+      owner_id: fakeId,
+      name: demo.company,
+      type: role === 'driver' ? 'carrier' : role,
+      mc_number: 'MC-123456',
+      dot_number: 'DOT-789012',
+      status: 'active',
+    } as unknown as CompanyRow);
+    setIsDemo(true);
+    setLoading(false);
   }, []);
 
   /**
@@ -238,6 +297,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         createCompany,
         updateProfile,
         refreshProfile,
+        enterDemoMode,
+        isDemo,
       }}
     >
       {children}
