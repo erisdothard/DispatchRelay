@@ -92,6 +92,17 @@ export interface BolStatus {
 
 export async function getBolStatusForLoads(loadIds: string[]): Promise<BolStatus[]> {
   if (loadIds.length === 0) return [];
+  if (loadIds[0]?.startsWith('load-')) {
+    const { DEMO_BOL_STATUS } = await import('@/lib/demo-data');
+    return loadIds.map(
+      (id) =>
+        DEMO_BOL_STATUS.find((b) => b.loadId === id) ?? {
+          loadId: id,
+          hasBol: false,
+          signed: false,
+        },
+    );
+  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('documents')

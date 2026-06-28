@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { realtimeSubscribe } from '@/lib/realtime-manager';
+import { DEMO_LOADS, DEMO_BIDS } from '@/lib/demo-data';
 
 /**
  * Returns the number of loads requiring action for the current user's role.
@@ -18,6 +19,22 @@ export function useLoadActionCounts(): number {
 
   const fetchCount = useCallback(async () => {
     if (!user?.id || !user?.role) return;
+
+    if (user.id.startsWith('demo-')) {
+      const role = user.id.split('-')[1];
+      if (role === 'broker') setCount(DEMO_LOADS.filter((l) => l.status === 'bid_received').length);
+      else if (role === 'carrier')
+        setCount(DEMO_LOADS.filter((l) => l.status === 'awarded').length);
+      else if (role === 'driver')
+        setCount(
+          DEMO_LOADS.filter(
+            (l) => l.status === 'dispatched' && l.assignedDriverId?.startsWith('demo-driver'),
+          ).length,
+        );
+      else setCount(0);
+      void DEMO_BIDS; // suppress unused
+      return;
+    }
 
     try {
       if (user.role === 'broker') {
