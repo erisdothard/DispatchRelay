@@ -34,7 +34,7 @@ const TABLE_DEFAULTS: Record<string, (now: string) => Row> = {
   loads: (now) => {
     loadNumberSeq += 1;
     return {
-      load_number: `FX-${loadNumberSeq}`,
+      load_number: `DR-${loadNumberSeq}`,
       status: 'posted',
       bid_count: 0,
       posted_at: now,

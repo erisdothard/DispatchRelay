@@ -3,9 +3,9 @@ import { Check, MapPin, DollarSign } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import { saveCarrierPreferences } from '../lib/preferences';
 import { cn } from '@/shared/lib/utils';
-import { EQUIPMENT_LABELS, US_STATES } from '@freightx/shared';
+import { EQUIPMENT_LABELS, US_STATES } from '@dispatchrelay/shared';
 import type { CarrierPreferences } from '../lib/match-score';
-import type { EquipmentType } from '@freightx/shared';
+import type { EquipmentType } from '@dispatchrelay/shared';
 
 const ALL_EQUIPMENT = Object.keys(EQUIPMENT_LABELS) as EquipmentType[];
 

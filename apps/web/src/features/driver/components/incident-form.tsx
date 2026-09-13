@@ -5,7 +5,7 @@ import type { IncidentType, IncidentSeverity } from '@/services/driver-incidents
 import { getDriverLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { isDemoActive } from '@/lib/demo/demo-session';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 interface IncidentFormProps {
   open: boolean;

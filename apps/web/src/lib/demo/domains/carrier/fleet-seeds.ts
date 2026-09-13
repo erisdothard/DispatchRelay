@@ -1,8 +1,8 @@
 /**
  * Rivera Transport's fleet: back-office team, pending invites, posted trucks, fuel cards and
  * GPS for drivers who aren't on a load. Core seeds the owner and the three road drivers:
- * Carlos Mendez (FX-1042, near Longview TX), Mike Johnson (FX-1051, east of Beaumont TX; next
- * FX-1048 out of Denver in 2 days) and Luis Ortega (delivered FX-1045 in Charlotte, off duty).
+ * Carlos Mendez (DR-1042, near Longview TX), Mike Johnson (DR-1051, east of Beaumont TX; next
+ * DR-1048 out of Denver in 2 days) and Luis Ortega (delivered DR-1045 in Charlotte, off duty).
  */
 import { DEMO_IDS } from '../../identities';
 import { daysFromNow, hoursAgo, hoursFromNow } from '../../time';
@@ -122,7 +122,7 @@ function companyInvites(): Row[] {
 
 /**
  * Drivers off a load still share background GPS: Darnell at the Nashville yard, Luis parked
- * at a Charlotte truck stop after delivering FX-1045.
+ * at a Charlotte truck stop after delivering DR-1045.
  */
 function offLoadDriverPings(): Row[] {
   const ping = (id: string, driverId: string, lat: number, lng: number, hoursOld: number): Row => ({
@@ -329,7 +329,7 @@ type FuelStop = [
 ];
 
 const FUEL_STOPS: FuelStop[] = [
-  // Carlos — FX-1042 Atlanta → Dallas
+  // Carlos — DR-1042 Atlanta → Dallas
   [
     'fc-rt-4821',
     DEMO_IDS.driver,
@@ -369,7 +369,7 @@ const FUEL_STOPS: FuelStop[] = [
     'TN',
     410_620,
   ],
-  // Mike — FX-1051 San Antonio → New Orleans
+  // Mike — DR-1051 San Antonio → New Orleans
   [
     'fc-rt-7735',
     DEMO_IDS.driver2,
@@ -409,7 +409,7 @@ const FUEL_STOPS: FuelStop[] = [
     'CO',
     286_720,
   ],
-  // Luis — FX-1045 Miami → Charlotte
+  // Luis — DR-1045 Miami → Charlotte
   [
     'fc-rt-5518',
     DEMO_IDS.driver3,

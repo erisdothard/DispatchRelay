@@ -14,7 +14,7 @@ import { RouteReplaySlider } from '@/features/loads/components/route-replay-slid
 import { usePredictiveETA } from '@/features/loads/hooks/use-predictive-eta';
 import { supabase } from '@/lib/supabase';
 import { createTrackingToken } from '@/services/tracking-tokens.service';
-import type { Load, TrackingMilestone } from '@freightx/shared';
+import type { Load, TrackingMilestone } from '@dispatchrelay/shared';
 
 export default function TrackingPage() {
   const { loadId } = useParams();
@@ -151,7 +151,7 @@ export default function TrackingPage() {
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="Enter load # (e.g. FX-20260217-0042)"
+            placeholder="Enter load # (e.g. DR-20260217-0042)"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchTracking(query)}

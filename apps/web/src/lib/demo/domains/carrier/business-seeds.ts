@@ -43,26 +43,26 @@ function factoringRequests(): Row[] {
     updated_at: hoursAgo(hoursOld),
     ...extra,
   });
-  // FX-1045 (delivered, POD on file) is intentionally left un-factored so the demo can request it.
+  // DR-1045 (delivered, POD on file) is intentionally left un-factored so the demo can request it.
   return [
-    request('fr-rt-1041', null, 'FX-1041', 1850, 3, 'requested', 5, {
+    request('fr-rt-1041', null, 'DR-1041', 1850, 3, 'requested', 5, {
       notes: 'Signed POD attached — Memphis receiver',
     }),
-    request('fr-rt-1049', 'load-008', 'FX-1049', 1100, 4, 'funded', 110, {
+    request('fr-rt-1049', 'load-008', 'DR-1049', 1100, 4, 'funded', 110, {
       approved_at: hoursAgo(108),
       funded_at: hoursAgo(101),
     }),
-    request('fr-rt-1039', null, 'FX-1039', 1980, 3, 'approved', 30, {
+    request('fr-rt-1039', null, 'DR-1039', 1980, 3, 'approved', 30, {
       approved_at: hoursAgo(26),
     }),
-    request('fr-rt-1036', null, 'FX-1036', 2750, 3, 'funded', DAY * 12, {
+    request('fr-rt-1036', null, 'DR-1036', 2750, 3, 'funded', DAY * 12, {
       approved_at: hoursAgo(DAY * 12 - 3),
       funded_at: hoursAgo(DAY * 11),
     }),
-    request('fr-rt-1027', null, 'FX-1027', 3100, 3, 'denied', DAY * 18, {
+    request('fr-rt-1027', null, 'DR-1027', 3100, 3, 'denied', DAY * 18, {
       notes: 'Broker on credit hold — resubmit once cleared',
     }),
-    request('fr-rt-1022', null, 'FX-1022', 2250, 5, 'funded', DAY * 26, {
+    request('fr-rt-1022', null, 'DR-1022', 2250, 5, 'funded', DAY * 26, {
       approved_at: hoursAgo(DAY * 26 - 2),
       funded_at: hoursAgo(DAY * 26 - 6),
     }),

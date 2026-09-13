@@ -3,7 +3,7 @@ import { DollarSign, FileText, Zap } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import { submitBid } from '@/services/bids.service';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 interface BidSheetProps {
   open: boolean;

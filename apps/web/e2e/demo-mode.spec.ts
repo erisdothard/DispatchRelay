@@ -5,7 +5,7 @@ import { isDemoBuild, signInAsDemo, watchForProblems, type DemoRole } from './he
 const SHARED_ROUTES = [
   '/messages',
   '/track',
-  '/track/FX-1042',
+  '/track/DR-1042',
   '/profile',
   '/profile/help',
   '/profile/notifications',

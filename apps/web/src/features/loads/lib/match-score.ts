@@ -1,5 +1,5 @@
 import { analyzeRate } from '@/shared/lib/freight';
-import type { Load, EquipmentType } from '@freightx/shared';
+import type { Load, EquipmentType } from '@dispatchrelay/shared';
 
 export interface CarrierPreferences {
   userId: string;

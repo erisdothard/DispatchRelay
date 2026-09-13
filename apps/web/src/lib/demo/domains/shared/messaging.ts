@@ -28,9 +28,9 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: carrier,
     otherName: 'Rivera Transport Inc',
     otherRole: 'carrier',
-    loadNumber: 'FX-1042',
+    loadNumber: 'DR-1042',
     messages: [
-      [broker, 'Morning Marcus — confirming Carlos picked up FX-1042 in Atlanta?', 20],
+      [broker, 'Morning Marcus — confirming Carlos picked up DR-1042 in Atlanta?', 20],
       [carrier, 'Yes ma’am, loaded and rolling at 6:40. 38k lbs, seal #448120.', 19.6],
       [broker, 'Perfect. Receiver in Dallas wants a call 1 hour out, dock 4.', 19.5],
       [carrier, 'Noted, I’ll pass it to Carlos.', 19.4],
@@ -54,7 +54,7 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: driver,
     otherName: 'Carlos Mendez',
     otherRole: 'driver',
-    loadNumber: 'FX-1042',
+    loadNumber: 'DR-1042',
     messages: [
       [
         carrier,
@@ -73,9 +73,9 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: driver2,
     otherName: 'Mike Johnson',
     otherRole: 'driver',
-    loadNumber: 'FX-1051',
+    loadNumber: 'DR-1051',
     messages: [
-      [carrier, 'Mike, FX-1051 picks up 8 AM at San Antonio DC. 24 pallets of auto parts.', 30],
+      [carrier, 'Mike, DR-1051 picks up 8 AM at San Antonio DC. 24 pallets of auto parts.', 30],
       [driver2, 'Got it. I’ll be there by 7:30.', 29],
       [driver2, 'Loaded. BOL uploaded to the app.', 8],
       [carrier, 'Thanks. Park Manufacturing wants updates every 4 hrs on this one.', 7.5],
@@ -88,7 +88,7 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: broker,
     otherName: 'Apex Freight Solutions',
     otherRole: 'broker',
-    loadNumber: 'FX-1050',
+    loadNumber: 'DR-1050',
     messages: [
       [carrier, 'Hi Sarah, saw your counter at $920 on the Jacksonville → Savannah flatbed.', 2.5],
       [broker, 'Hey Marcus! Shipper is firm around there — 140 miles, straight shot.', 2.2],
@@ -101,7 +101,7 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: carrier,
     otherName: 'Rivera Transport Inc',
     otherRole: 'carrier',
-    loadNumber: 'FX-1045',
+    loadNumber: 'DR-1045',
     messages: [
       [shipper, 'Marcus, dock appointment confirmed for 8 AM at the Charlotte DC.', 30],
       [carrier, 'Thanks James. Luis will check in at the guard shack.', 29.5],
@@ -115,7 +115,7 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: driver3,
     otherName: 'Luis Ortega',
     otherRole: 'driver',
-    loadNumber: 'FX-1045',
+    loadNumber: 'DR-1045',
     messages: [
       [carrier, 'Luis, Charlotte DC has you at 8 AM, dock 12. Check in at the guard shack.', 30],
       [driver3, 'Copy. Parked at the Petro in Rock Hill, rolling at 7.', 12],
@@ -130,9 +130,9 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: carrier,
     otherName: 'Rivera Transport Inc',
     otherRole: 'carrier',
-    loadNumber: 'FX-1051',
+    loadNumber: 'DR-1051',
     messages: [
-      [shipper, 'Any update on FX-1051? New Orleans is asking.', 3.5],
+      [shipper, 'Any update on DR-1051? New Orleans is asking.', 3.5],
       [
         carrier,
         'Mike cleared Houston, just east of Beaumont now. On schedule for tomorrow AM.',
@@ -170,7 +170,7 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: broker,
     otherName: 'Sarah Chen',
     otherRole: 'broker',
-    loadNumber: 'FX-1046',
+    loadNumber: 'DR-1046',
     messages: [
       [
         carrier2,
@@ -191,7 +191,7 @@ const CONVERSATIONS: ConversationSeed[] = [
     other: driver,
     otherName: 'Carlos Mendez',
     otherRole: 'driver',
-    loadNumber: 'FX-1042',
+    loadNumber: 'DR-1042',
     messages: [
       [
         broker,

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getBreadcrumbsForLoad } from '@/services/breadcrumbs.service';
-import type { BreadcrumbPoint } from '@freightx/shared';
+import type { BreadcrumbPoint } from '@dispatchrelay/shared';
 
 interface UseBreadcrumbTrailResult {
   trail: BreadcrumbPoint[];

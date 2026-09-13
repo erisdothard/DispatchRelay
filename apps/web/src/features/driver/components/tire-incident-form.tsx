@@ -6,7 +6,7 @@ import { createTireIncident, uploadTirePhoto } from '@/services/tire-incidents.s
 import { getDriverLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { isDemoActive } from '@/lib/demo/demo-session';
-import type { TirePosition, TireSeverity, TireResolution, Load } from '@freightx/shared';
+import type { TirePosition, TireSeverity, TireResolution, Load } from '@dispatchrelay/shared';
 
 interface TireIncidentFormProps {
   open: boolean;

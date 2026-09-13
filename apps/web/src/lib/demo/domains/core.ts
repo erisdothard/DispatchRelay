@@ -2,7 +2,7 @@
  * Core demo data every role touches: people, companies, loads, bids, documents,
  * notifications and live tracking — plus the booking/bidding Postgres functions.
  */
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 import { DEMO_LOADS } from '@/lib/demo-data';
 import { DEMO_IDS } from '../identities';
 import { daysFromNow, hoursAgo, hoursFromNow } from '../time';
@@ -64,7 +64,7 @@ const PROFILES: Row[] = [
     duty_status_updated_at: hoursAgo(2.5),
     last_location_update: hoursAgo(0.3),
   }),
-  // Delivered FX-1045 in Charlotte this morning; resting before the next dispatch.
+  // Delivered DR-1045 in Charlotte this morning; resting before the next dispatch.
   profile(DEMO_IDS.driver3, 'Luis Ortega', 'driver3@freightx.com', 'driver', {
     carrier_id: DEMO_IDS.carrier,
     phone: '(615) 555-0193',
@@ -515,48 +515,48 @@ const signedBy = (name: string, hours: number): Row => ({
 });
 
 const DOCUMENTS: Row[] = [
-  doc('doc-bol-001', 'load-001', 'bill_of_lading', 'BOL-FX-1042.pdf', {
-    bol_number: 'BOL-FX-1042',
+  doc('doc-bol-001', 'load-001', 'bill_of_lading', 'BOL-DR-1042.pdf', {
+    bol_number: 'BOL-DR-1042',
     uploaded_by: DEMO_IDS.driver,
   }),
-  doc('doc-bol-004', 'load-004', 'bill_of_lading', 'BOL-FX-1045.pdf', {
-    bol_number: 'BOL-FX-1045',
+  doc('doc-bol-004', 'load-004', 'bill_of_lading', 'BOL-DR-1045.pdf', {
+    bol_number: 'BOL-DR-1045',
     uploaded_by: DEMO_IDS.driver3,
     ...signedBy('Luis Ortega', 30),
   }),
-  doc('doc-bol-007', 'load-007', 'bill_of_lading', 'BOL-FX-1048.pdf', {
-    bol_number: 'BOL-FX-1048',
+  doc('doc-bol-007', 'load-007', 'bill_of_lading', 'BOL-DR-1048.pdf', {
+    bol_number: 'BOL-DR-1048',
     uploaded_by: DEMO_IDS.driver2,
   }),
-  doc('doc-bol-008', 'load-008', 'bill_of_lading', 'BOL-FX-1049.pdf', {
-    bol_number: 'BOL-FX-1049',
+  doc('doc-bol-008', 'load-008', 'bill_of_lading', 'BOL-DR-1049.pdf', {
+    bol_number: 'BOL-DR-1049',
     uploaded_by: DEMO_IDS.driver,
     ...signedBy('Carlos Mendez', 70),
   }),
-  doc('doc-bol-010', 'load-010', 'bill_of_lading', 'BOL-FX-1051.pdf', {
-    bol_number: 'BOL-FX-1051',
+  doc('doc-bol-010', 'load-010', 'bill_of_lading', 'BOL-DR-1051.pdf', {
+    bol_number: 'BOL-DR-1051',
     uploaded_by: DEMO_IDS.driver2,
   }),
-  doc('doc-rc-001', 'load-001', 'rate_confirmation', 'RateCon-FX-1042.pdf', {
+  doc('doc-rc-001', 'load-001', 'rate_confirmation', 'RateCon-DR-1042.pdf', {
     company_id: DEMO_IDS.brokerCompany,
     uploaded_by: DEMO_IDS.broker,
     ...signedBy('Marcus Rivera', 44),
   }),
-  doc('doc-rc-002', 'load-002', 'rate_confirmation', 'RateCon-FX-1043.pdf', {
+  doc('doc-rc-002', 'load-002', 'rate_confirmation', 'RateCon-DR-1043.pdf', {
     company_id: DEMO_IDS.brokerCompany,
     uploaded_by: DEMO_IDS.broker,
     created_at: hoursAgo(19),
   }),
-  doc('doc-rc-007', 'load-007', 'rate_confirmation', 'RateCon-FX-1048.pdf', {
+  doc('doc-rc-007', 'load-007', 'rate_confirmation', 'RateCon-DR-1048.pdf', {
     company_id: DEMO_IDS.brokerCompany,
     uploaded_by: DEMO_IDS.broker,
     ...signedBy('Marcus Rivera', 32),
   }),
-  doc('doc-pod-004', 'load-004', 'proof_of_delivery', 'POD-FX-1045.jpg', {
+  doc('doc-pod-004', 'load-004', 'proof_of_delivery', 'POD-DR-1045.jpg', {
     uploaded_by: DEMO_IDS.driver3,
     created_at: hoursAgo(6),
   }),
-  doc('doc-pod-008', 'load-008', 'proof_of_delivery', 'POD-FX-1049.jpg', {
+  doc('doc-pod-008', 'load-008', 'proof_of_delivery', 'POD-DR-1049.jpg', {
     uploaded_by: DEMO_IDS.driver,
     created_at: hoursAgo(66),
   }),
@@ -578,7 +578,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'bid_accepted',
       'Bid Accepted — Sign Rate Con',
-      'Your bid on FX-1043 Nashville → Chicago was accepted. Sign the rate confirmation to dispatch.',
+      'Your bid on DR-1043 Nashville → Chicago was accepted. Sign the rate confirmation to dispatch.',
       'load-002',
       2,
       false,
@@ -586,15 +586,15 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'bid_countered',
       'Counter-Offer Received',
-      'Apex Freight countered your $900 bid with $920 on FX-1050.',
+      'Apex Freight countered your $900 bid with $920 on DR-1050.',
       'load-009',
       3,
       false,
     ],
     [
       'load_status_change',
-      'Load FX-1045 — delivered',
-      'Load FX-1045 (Miami → Charlotte) is now delivered.',
+      'Load DR-1045 — delivered',
+      'Load DR-1045 (Miami → Charlotte) is now delivered.',
       'load-004',
       5,
       false,
@@ -602,18 +602,18 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'load_assigned',
       'Driver Assigned',
-      'Carlos Mendez assigned to FX-1042.',
+      'Carlos Mendez assigned to DR-1042.',
       'load-001',
       12,
       true,
     ],
-    ['bol_signed', 'BOL Signed', 'BOL signed for FX-1045 Miami → Charlotte.', 'load-004', 30, true],
+    ['bol_signed', 'BOL Signed', 'BOL signed for DR-1045 Miami → Charlotte.', 'load-004', 30, true],
   ],
   [DEMO_IDS.broker]: [
     [
       'new_bid',
       'New bid received',
-      'Summit Haulers bid $1,850 on load FX-1046.',
+      'Summit Haulers bid $1,850 on load DR-1046.',
       'load-005',
       7,
       false,
@@ -621,7 +621,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'new_bid',
       'New bid received',
-      'Blue Ridge Logistics bid $1,975 on load FX-1046.',
+      'Blue Ridge Logistics bid $1,975 on load DR-1046.',
       'load-005',
       9,
       false,
@@ -629,15 +629,15 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'new_bid',
       'New bid received',
-      'Summit Haulers bid $940 on load FX-1050.',
+      'Summit Haulers bid $940 on load DR-1050.',
       'load-009',
       5,
       false,
     ],
     [
       'load_status_change',
-      'Load FX-1042 — in transit',
-      'Load FX-1042 (Atlanta → Dallas) is now in transit.',
+      'Load DR-1042 — in transit',
+      'Load DR-1042 (Atlanta → Dallas) is now in transit.',
       'load-001',
       20,
       true,
@@ -645,7 +645,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'rate_con_signed',
       'Rate Con Signed',
-      'Rivera Transport signed the rate confirmation for FX-1048.',
+      'Rivera Transport signed the rate confirmation for DR-1048.',
       'load-007',
       32,
       true,
@@ -654,16 +654,16 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
   [DEMO_IDS.shipper]: [
     [
       'load_status_change',
-      'Load FX-1051 — in transit',
-      'Load FX-1051 (San Antonio → New Orleans) is now in transit.',
+      'Load DR-1051 — in transit',
+      'Load DR-1051 (San Antonio → New Orleans) is now in transit.',
       'load-010',
       4,
       false,
     ],
     [
       'load_status_change',
-      'Load FX-1045 — delivered',
-      'Load FX-1045 (Miami → Charlotte) is now delivered. Confirm receipt to close out.',
+      'Load DR-1045 — delivered',
+      'Load DR-1045 (Miami → Charlotte) is now delivered. Confirm receipt to close out.',
       'load-004',
       6,
       false,
@@ -671,7 +671,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'bol_signed',
       'BOL Signed',
-      'BOL signed at pickup for FX-1049 Detroit → Indianapolis.',
+      'BOL signed at pickup for DR-1049 Detroit → Indianapolis.',
       'load-008',
       70,
       true,
@@ -681,7 +681,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'load_assigned',
       'New Load Assigned',
-      'You have been assigned load FX-1042: Atlanta, GA → Dallas, TX',
+      'You have been assigned load DR-1042: Atlanta, GA → Dallas, TX',
       'load-001',
       30,
       true,
@@ -689,7 +689,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'load_reminder',
       'Delivery Appointment',
-      'FX-1042 delivery window opens tomorrow 7:00 AM at Dallas Receiving.',
+      'DR-1042 delivery window opens tomorrow 7:00 AM at Dallas Receiving.',
       'load-001',
       1,
       false,
@@ -699,7 +699,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'load_reminder',
       'Delivery Appointment',
-      'FX-1051 delivers tomorrow 7:00 AM at New Orleans Receiving.',
+      'DR-1051 delivers tomorrow 7:00 AM at New Orleans Receiving.',
       'load-010',
       2,
       false,
@@ -707,7 +707,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'load_assigned',
       'Next Load Assigned',
-      'After FX-1051: FX-1048 Denver, CO → Kansas City, MO picks up in 2 days.',
+      'After DR-1051: DR-1048 Denver, CO → Kansas City, MO picks up in 2 days.',
       'load-007',
       20,
       true,
@@ -717,7 +717,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'load_status_change',
       'POD Accepted',
-      'Proof of delivery accepted for FX-1045 Miami → Charlotte.',
+      'Proof of delivery accepted for DR-1045 Miami → Charlotte.',
       'load-004',
       5,
       false,
@@ -725,7 +725,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
     [
       'load_assigned',
       'New Load Assigned',
-      'You have been assigned load FX-1045: Miami, FL → Charlotte, NC',
+      'You have been assigned load DR-1045: Miami, FL → Charlotte, NC',
       'load-004',
       40,
       true,
@@ -754,7 +754,7 @@ type Waypoint = [lat: number, lng: number, hoursAgo: number, label: string];
 
 const ROUTES: Array<{ loadNumber: string; driverId: string; points: Waypoint[] }> = [
   {
-    loadNumber: 'FX-1042',
+    loadNumber: 'DR-1042',
     driverId: DEMO_IDS.driver,
     points: [
       [33.749, -84.388, 20, 'Atlanta, GA'],
@@ -765,7 +765,7 @@ const ROUTES: Array<{ loadNumber: string; driverId: string; points: Waypoint[] }
     ],
   },
   {
-    loadNumber: 'FX-1051',
+    loadNumber: 'DR-1051',
     driverId: DEMO_IDS.driver2,
     points: [
       [29.424, -98.494, 8, 'San Antonio, TX'],
@@ -773,7 +773,7 @@ const ROUTES: Array<{ loadNumber: string; driverId: string; points: Waypoint[] }
       [30.08, -94.13, 0.03, 'Beaumont, TX'],
     ],
   },
-  // FX-1048 hasn't picked up yet (Mike's next load), so it has no pings.
+  // DR-1048 hasn't picked up yet (Mike's next load), so it has no pings.
 ];
 
 function buildLocationPings(): Row[] {
@@ -801,23 +801,23 @@ type MilestoneSeed = [
 ];
 
 const MILESTONES: Record<string, MilestoneSeed[]> = {
-  'FX-1042': [
+  'DR-1042': [
     ['Picked up', 'Atlanta, GA', 20, true, false],
     ['In transit', 'Shreveport, LA', 4, true, false],
     ['Near destination', 'Longview, TX', 0.1, false, true],
     ['Delivered', 'Dallas, TX', null, false, false],
   ],
-  'FX-1051': [
+  'DR-1051': [
     ['Picked up', 'San Antonio, TX', 8, true, false],
     ['In transit', 'Houston, TX', 3, false, true],
     ['Delivered', 'New Orleans, LA', null, false, false],
   ],
-  'FX-1048': [
+  'DR-1048': [
     ['Dispatched', 'Denver, CO', 20, true, true],
     ['Picked up', 'Denver, CO', null, false, false],
     ['Delivered', 'Kansas City, MO', null, false, false],
   ],
-  'FX-1045': [
+  'DR-1045': [
     ['Picked up', 'Miami, FL', 30, true, false],
     ['In transit', 'Jacksonville, FL', 20, true, false],
     ['Delivered', 'Charlotte, NC', 6, true, true],

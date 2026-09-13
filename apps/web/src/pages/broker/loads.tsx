@@ -13,7 +13,7 @@ import { cn } from '@/shared/lib/utils';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/components/ui/tabs';
 import { SkeletonList } from '@/shared/components/ui/skeleton';
 import { EmptyState } from '@/shared/components/empty-state';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 import type { LoadStatus } from '@/lib/database.types';
 
 type PageTab = 'active' | 'history';

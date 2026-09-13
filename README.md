@@ -33,7 +33,7 @@ freightx/
 │           ├── lib/            # supabase.ts, rate-limit.ts, geocoding.ts…
 │           └── shared/         # UI primitives, maps, nav, contexts
 ├── packages/
-│   ├── shared/                 # Shared types and constants (@freightx/shared)
+│   ├── shared/                 # Shared types and constants (@dispatchrelay/shared)
 │   └── typescript-config/      # Shared tsconfig presets
 ├── freightx-academy/           # Next.js 16 visual learning platform (port 3001)
 ├── supabase/

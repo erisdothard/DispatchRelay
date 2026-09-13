@@ -28,7 +28,7 @@ import {
 } from '@/services/documents.service';
 import { BolSignatureSheet } from '@/features/documents/components/bol-signature-sheet';
 import { SignedBolViewer } from '@/features/documents/components/signed-bol-viewer';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 import type { DocumentRow, DocumentType } from '@/lib/database.types';
 
 interface LoadWithDocs {

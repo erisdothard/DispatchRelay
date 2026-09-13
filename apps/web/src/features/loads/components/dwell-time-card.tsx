@@ -1,5 +1,5 @@
 import { Clock } from 'lucide-react';
-import type { DwellRecord } from '@freightx/shared';
+import type { DwellRecord } from '@dispatchrelay/shared';
 
 interface DwellTimeCardProps {
   records: DwellRecord[];

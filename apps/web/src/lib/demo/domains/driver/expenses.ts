@@ -76,7 +76,7 @@ function receiptRows(): Row[] {
       vendor: 'Pilot Travel Center #412 — Jackson, MS',
       amount: 486.72,
       date: localDate(fuelJackson),
-      loadNumber: 'FX-1042',
+      loadNumber: 'DR-1042',
       notes: '142.7 gal diesel @ $3.41',
     },
     {
@@ -84,7 +84,7 @@ function receiptRows(): Row[] {
       vendor: "Love's Travel Stop — Birmingham, AL",
       amount: 18.43,
       date: localDate(mealBirmingham),
-      loadNumber: 'FX-1042',
+      loadNumber: 'DR-1042',
       notes: null,
     },
     {
@@ -92,7 +92,7 @@ function receiptRows(): Row[] {
       vendor: 'TA Travel Center — Detroit, MI',
       amount: 25,
       date: localDate(parkingDetroit),
-      loadNumber: 'FX-1049',
+      loadNumber: 'DR-1049',
       notes: 'Reserved overnight spot',
     },
     {
@@ -100,7 +100,7 @@ function receiptRows(): Row[] {
       vendor: "Love's Travel Stop #291 — Louisville, KY",
       amount: 512.08,
       date: localDate(fuelLouisville),
-      loadNumber: 'FX-1049',
+      loadNumber: 'DR-1049',
       notes: '150.2 gal diesel @ $3.41',
     },
     {
@@ -108,7 +108,7 @@ function receiptRows(): Row[] {
       vendor: 'Indiana Toll Road — Elkhart, IN',
       amount: 31.9,
       date: localDate(fuelLouisville),
-      loadNumber: 'FX-1049',
+      loadNumber: 'DR-1049',
       notes: null,
     },
     {
@@ -167,7 +167,7 @@ function tireRows(): Row[] {
     {
       id: 'tire-001',
       driver_id: DEMO_IDS.driver,
-      load_number: 'FX-1049',
+      load_number: 'DR-1049',
       incident_date: localDate(detroit),
       location_text: 'TA Travel Center — Detroit, MI',
       lat: CITY_COORDS.Detroit?.lat ?? null,
@@ -213,7 +213,7 @@ interface IncidentSeed {
 }
 
 function incidentRows(): Row[] {
-  const loading = carlosWindow('pickup-FX-1042');
+  const loading = carlosWindow('pickup-DR-1042');
   const detroit = carlosWindow('parking-detroit').end;
   const seeds: IncidentSeed[] = [
     {
@@ -222,7 +222,7 @@ function incidentRows(): Row[] {
       date: localDate(loading.start),
       location: 'Atlanta Distribution Center — Atlanta, GA',
       city: 'Atlanta',
-      loadNumber: 'FX-1042',
+      loadNumber: 'DR-1042',
       description:
         'Two pallets had torn shrink wrap at loading. Photographed and noted on the BOL before departure.',
       resolution: null,
@@ -234,7 +234,7 @@ function incidentRows(): Row[] {
       date: localDate(detroit),
       location: 'TA Travel Center — Detroit, MI',
       city: 'Detroit',
-      loadNumber: 'FX-1049',
+      loadNumber: 'DR-1049',
       description:
         'Rear outer left at 82 psi on pre-trip. Valve stem leak patched by TA shop before departure.',
       resolution: 'Patched at TA shop — 45 min delay, no impact on delivery window.',

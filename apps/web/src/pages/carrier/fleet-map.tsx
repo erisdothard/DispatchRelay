@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { getMyActiveLoads, getCompanyDrivers } from '@/services/loads.service';
 import { useLiveTracking, type LivePing } from '@/features/loads/hooks/use-live-tracking';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 /* ── Types ──────────────────────────────────────────────────────── */
 

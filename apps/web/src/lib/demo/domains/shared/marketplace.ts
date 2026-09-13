@@ -163,7 +163,7 @@ function loadRow(l: MarketLoad): Row {
   const posted = hoursAgo(l.postedHoursAgo);
   return {
     id: `load-mkt-${String(l.n).padStart(2, '0')}`,
-    load_number: `FX-${1060 + l.n}`,
+    load_number: `DR-${1060 + l.n}`,
     posted_by: MARKETPLACE_BROKER_ID,
     company_id: MARKETPLACE_COMPANY_ID,
     company_name: COMPANY_NAME,

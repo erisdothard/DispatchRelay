@@ -7,7 +7,7 @@ import { detectAnomalies } from '../lib/anomaly-detection';
 import { getGeofencesForLoad, recordGeofenceEvent } from '@/services/geofence.service';
 import { startDwell, endDwell, findOpenDwell } from '@/services/dwell-time.service';
 import { supabase } from '@/lib/supabase';
-import type { Geofence } from '@freightx/shared';
+import type { Geofence } from '@dispatchrelay/shared';
 
 const PING_INTERVAL_MS = 30_000; // 30 seconds
 const MOVEMENT_THRESHOLD_M = 50; // 50 metres

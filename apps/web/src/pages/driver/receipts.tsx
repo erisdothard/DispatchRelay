@@ -9,7 +9,7 @@ import { Badge } from '@/shared/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { getReceipts } from '@/services/receipts.service';
 import { ReceiptCaptureSheet } from '@/features/driver/components/receipt-capture-sheet';
-import type { Receipt, ReceiptCategory } from '@freightx/shared';
+import type { Receipt, ReceiptCategory } from '@dispatchrelay/shared';
 
 const CATEGORY_LABELS: Record<ReceiptCategory, string> = {
   fuel: 'Fuel',

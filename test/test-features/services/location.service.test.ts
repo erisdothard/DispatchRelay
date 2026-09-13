@@ -35,7 +35,7 @@ let testIndex = 0;
 function makePing(overrides?: Partial<Parameters<typeof insertLocationPing>[0]>) {
   testIndex += 1;
   return {
-    load_number: 'FX-20260301-0001',
+    load_number: 'DR-20260301-0001',
     driver_id: `driver-${testIndex}`,
     latitude: 32.7767,
     longitude: -96.797,

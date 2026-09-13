@@ -19,7 +19,7 @@ import {
 } from '@/shared/components/ui/select';
 import { createLoad } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
 import type { EquipmentType } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 import { getLaneStats, suggestRate } from '@/services/rate-intelligence.service';
@@ -41,7 +41,7 @@ const EQUIPMENT_OPTIONS: EquipmentType[] = [
 function genLoadNumber(): string {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const seq = String(Math.floor(Math.random() * 9000) + 1000);
-  return `FX-${date}-${seq}`;
+  return `DR-${date}-${seq}`;
 }
 
 const EMPTY_FORM = {

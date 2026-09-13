@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getLoadsPage } from '@/services/loads.service';
 import type { LoadFilters } from '@/services/loads.service';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 import { realtimeSubscribe } from '@/lib/realtime-manager';
 
 interface UseLoadsResult {

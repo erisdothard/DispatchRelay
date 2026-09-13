@@ -1,5 +1,5 @@
 {
-  "extends": "@freightx/typescript-config/web.json",
+  "extends": "@dispatchrelay/typescript-config/web.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

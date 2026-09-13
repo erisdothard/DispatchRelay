@@ -2,7 +2,7 @@
  * Seed loads for demo mode — the backbone every dashboard reads. The demo backend
  * (lib/demo/domains/core.ts) turns these into `loads` rows; other seeds reference them by id.
  */
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 import { daysFromNow, hoursAgo } from '@/lib/demo/time';
 
 const BROKER_ID = 'demo-broker';
@@ -15,7 +15,7 @@ const DRIVER_3_ID = 'demo-driver-3';
 export const DEMO_LOADS: Load[] = [
   {
     id: 'load-001',
-    loadNumber: 'FX-1042',
+    loadNumber: 'DR-1042',
     postedBy: BROKER_ID,
     companyId: 'demo-company-broker',
     companyName: 'Apex Freight Solutions',
@@ -40,7 +40,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-002',
-    loadNumber: 'FX-1043',
+    loadNumber: 'DR-1043',
     postedBy: BROKER_ID,
     companyId: 'demo-company-broker',
     companyName: 'Apex Freight Solutions',
@@ -65,7 +65,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-003',
-    loadNumber: 'FX-1044',
+    loadNumber: 'DR-1044',
     postedBy: BROKER_ID,
     companyId: 'demo-company-broker',
     companyName: 'Apex Freight Solutions',
@@ -88,7 +88,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-004',
-    loadNumber: 'FX-1045',
+    loadNumber: 'DR-1045',
     postedBy: SHIPPER_ID,
     companyId: 'demo-company-shipper',
     companyName: 'Park Manufacturing Co',
@@ -113,7 +113,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-005',
-    loadNumber: 'FX-1046',
+    loadNumber: 'DR-1046',
     postedBy: BROKER_ID,
     companyId: 'demo-company-broker',
     companyName: 'Apex Freight Solutions',
@@ -136,7 +136,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-006',
-    loadNumber: 'FX-1047',
+    loadNumber: 'DR-1047',
     postedBy: SHIPPER_ID,
     companyId: 'demo-company-shipper',
     companyName: 'Park Manufacturing Co',
@@ -158,7 +158,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-007',
-    loadNumber: 'FX-1048',
+    loadNumber: 'DR-1048',
     postedBy: BROKER_ID,
     companyId: 'demo-company-broker',
     companyName: 'Apex Freight Solutions',
@@ -183,7 +183,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-008',
-    loadNumber: 'FX-1049',
+    loadNumber: 'DR-1049',
     postedBy: SHIPPER_ID,
     companyId: 'demo-company-shipper',
     companyName: 'Park Manufacturing Co',
@@ -207,7 +207,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-009',
-    loadNumber: 'FX-1050',
+    loadNumber: 'DR-1050',
     postedBy: BROKER_ID,
     companyId: 'demo-company-broker',
     companyName: 'Apex Freight Solutions',
@@ -230,7 +230,7 @@ export const DEMO_LOADS: Load[] = [
   },
   {
     id: 'load-010',
-    loadNumber: 'FX-1051',
+    loadNumber: 'DR-1051',
     postedBy: SHIPPER_ID,
     companyId: 'demo-company-shipper',
     companyName: 'Park Manufacturing Co',

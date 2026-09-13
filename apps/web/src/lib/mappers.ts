@@ -9,7 +9,7 @@ import type {
   EquipmentType,
   LoadStatus,
   TruckStatus,
-} from '@freightx/shared';
+} from '@dispatchrelay/shared';
 import type { LoadRow, TruckRow, TrackingMilestoneRow } from './database.types';
 import { titleCase } from './utils';
 

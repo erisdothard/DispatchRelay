@@ -3,7 +3,7 @@ import { UserCheck, Users, Loader2, X } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import { assignDriver, assignCoDriver, getCompanyDrivers } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 interface AssignDriverSheetProps {
   open: boolean;

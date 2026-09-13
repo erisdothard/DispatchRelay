@@ -92,8 +92,8 @@ type UsageSeed = [
 const USAGE_SEEDS: UsageSeed[] = [
   ['apikey-001', 'GET', '/v1/loads?status=posted', 200, 142, 0.4],
   ['apikey-001', 'POST', '/v1/loads', 201, 318, 1.2],
-  ['apikey-001', 'GET', '/v1/loads/FX-1046/bids', 200, 97, 1.3],
-  ['apikey-001', 'GET', '/v1/tracking/FX-1042', 200, 121, 2.1],
+  ['apikey-001', 'GET', '/v1/loads/DR-1046/bids', 200, 97, 1.3],
+  ['apikey-001', 'GET', '/v1/tracking/DR-1042', 200, 121, 2.1],
   ['apikey-002', 'POST', '/v1/webhooks/deliveries', 202, 84, 3],
   ['apikey-002', 'GET', '/v1/documents/doc-bol-004', 404, 61, 5],
   ['apikey-003', 'GET', '/v1/rates/lanes?origin=GA&dest=TX', 200, 233, 26],

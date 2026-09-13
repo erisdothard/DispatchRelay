@@ -16,7 +16,7 @@ import { useGpsConsent } from '@/features/loads/hooks/use-gps-consent';
 import { GpsConsentModal } from '@/features/loads/components/gps-consent-modal';
 import { canSendGps } from '@/lib/permissions';
 import { supabase } from '@/lib/supabase';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 /** Renders nothing — just activates GPS pinging for a single load */
 function GpsPinger({ loadNumber }: { loadNumber: string }) {

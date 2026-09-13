@@ -1,4 +1,4 @@
-import type { TirePosition } from '@freightx/shared';
+import type { TirePosition } from '@dispatchrelay/shared';
 
 interface TirePositionSelectorProps {
   selected: TirePosition | null;

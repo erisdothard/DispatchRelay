@@ -18,8 +18,8 @@ import { NotificationSheet } from '@/features/notifications/components/notificat
 import { AssignDriverSheet } from '@/features/loads/components/assign-driver-sheet';
 import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
 
-import { EQUIPMENT_LABELS } from '@freightx/shared';
-import type { Load } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
+import type { Load } from '@dispatchrelay/shared';
 import { EmptyState } from '@/shared/components/empty-state';
 import { SectionHeader } from '@/shared/components/section-header';
 

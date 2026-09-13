@@ -16,7 +16,7 @@ import { SignatureModal } from '@/features/bookings/components/signature-modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import type { BidRow } from '@/lib/database.types';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 const STATUS_STYLE: Record<string, string> = {
   pending: 'bg-fx-orange/10 text-fx-orange',

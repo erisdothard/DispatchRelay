@@ -29,7 +29,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@freightx/shared':
+      '@dispatchrelay/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@radix-ui/react-select':
@@ -120,7 +120,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      '@freightx/typescript-config':
+      '@dispatchrelay/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
       '@playwright/test':

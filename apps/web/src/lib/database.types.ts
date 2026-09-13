@@ -5430,7 +5430,7 @@ export type SubscriptionTier =
   | 'shipper';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Re-exports from @freightx/shared (for backwards compatibility)
+// Re-exports from @dispatchrelay/shared (for backwards compatibility)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type { UserRole, EquipmentType, LoadStatus, TruckStatus } from '@freightx/shared';
+export type { UserRole, EquipmentType, LoadStatus, TruckStatus } from '@dispatchrelay/shared';

@@ -1,6 +1,6 @@
 import { X, Printer, Download } from 'lucide-react';
 import type { DocumentRow } from '@/lib/database.types';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 interface SignedBolViewerProps {
   doc: DocumentRow;

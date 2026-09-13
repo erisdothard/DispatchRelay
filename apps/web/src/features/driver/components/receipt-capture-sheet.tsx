@@ -3,7 +3,7 @@ import { X, Camera, Upload } from 'lucide-react';
 import { createReceipt, uploadReceiptImage } from '@/services/receipts.service';
 import { getDriverLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
-import type { ReceiptCategory, Load } from '@freightx/shared';
+import type { ReceiptCategory, Load } from '@dispatchrelay/shared';
 
 interface ReceiptCaptureSheetProps {
   open: boolean;

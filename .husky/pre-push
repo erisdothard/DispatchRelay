@@ -10,7 +10,7 @@ echo "✅ Formatting passed"
 
 # 2. Type check
 echo "\n▶ Typechecking..."
-pnpm --filter @freightx/web typecheck || { echo "❌ Typecheck failed — fix errors before pushing"; exit 1; }
+pnpm --filter @dispatchrelay/web typecheck || { echo "❌ Typecheck failed — fix errors before pushing"; exit 1; }
 echo "✅ Typecheck passed"
 
 # 3. Run tests

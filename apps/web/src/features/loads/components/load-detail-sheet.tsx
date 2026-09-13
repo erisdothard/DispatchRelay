@@ -57,8 +57,8 @@ import { updateLoad, nudgeCarrier, confirmReceipt } from '@/services/loads.servi
 import { ShipperReviewModal } from '@/features/ratings/components/shipper-review-modal';
 import { RecommendedCarriersPanel } from './recommended-carriers-panel';
 import { generateRateCon } from '@/features/bookings/lib/generate-rate-con';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
-import type { Load } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
+import type { Load } from '@dispatchrelay/shared';
 import type { LoadStatus, UserRole } from '@/lib/database.types';
 import { useAuth } from '@/contexts/AuthContext';
 import { haversineDistance } from '@/shared/lib/utils';

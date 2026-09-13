@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { Geofence } from '@freightx/shared';
+import type { Geofence } from '@dispatchrelay/shared';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;

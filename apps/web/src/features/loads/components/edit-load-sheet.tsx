@@ -12,11 +12,11 @@ import {
 } from '@/shared/components/ui/select';
 import { updateLoad } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
 import type { EquipmentType } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 import { titleCase } from '@/lib/utils';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 const EQUIPMENT_OPTIONS: EquipmentType[] = [
   'van',

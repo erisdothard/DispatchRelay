@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getTrucks, PAGE_SIZE } from '@/services/trucks.service';
 import type { TruckFilters } from '@/services/trucks.service';
-import type { Truck } from '@freightx/shared';
+import type { Truck } from '@dispatchrelay/shared';
 
 interface UseTrucksResult {
   trucks: Truck[];

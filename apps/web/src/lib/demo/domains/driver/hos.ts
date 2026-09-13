@@ -60,7 +60,7 @@ const HOME = 'Home — Nashville, TN';
 const PRE_TRIP = 'Pre-trip inspection';
 const BREAK = '30-minute break';
 
-/** Carlos Mendez, oldest first. The last segment is still open (he's driving FX-1042 now). */
+/** Carlos Mendez, oldest first. The last segment is still open (he's driving DR-1042 now). */
 const CARLOS_PLAN: readonly PlanSegment[] = [
   seg('off_duty', 10, HOME, 'Nashville'),
   // Local turn to Chattanooga
@@ -76,7 +76,7 @@ const CARLOS_PLAN: readonly PlanSegment[] = [
   seg('driving', 2.5, 'Chattanooga, TN', 'Chattanooga'),
   seg('on_duty_not_driving', 0.5, YARD, 'Nashville', 'Post-trip inspection', 'maintenance'),
   seg('off_duty', 14.5, HOME, 'Nashville'),
-  // Deadhead north and pick up FX-1049
+  // Deadhead north and pick up DR-1049
   seg('on_duty_not_driving', 0.5, YARD, 'Nashville', PRE_TRIP),
   seg('driving', 3, 'Nashville, TN', 'Nashville'),
   seg(
@@ -93,28 +93,28 @@ const CARLOS_PLAN: readonly PlanSegment[] = [
     1.5,
     'Detroit Distribution Center — Detroit, MI',
     'Detroit',
-    'Loading FX-1049 — 22 pallets',
-    'pickup-FX-1049',
+    'Loading DR-1049 — 22 pallets',
+    'pickup-DR-1049',
   ),
   seg('off_duty', 2, 'TA Travel Center — Detroit, MI', 'Detroit', undefined, 'parking-detroit'),
   seg('sleeper_berth', 10, 'TA Travel Center — Detroit, MI', 'Detroit'),
-  // Deliver FX-1049, run home
+  // Deliver DR-1049, run home
   seg('on_duty_not_driving', 0.5, 'TA Travel Center — Detroit, MI', 'Detroit', PRE_TRIP),
-  seg('driving', 4.5, 'Detroit, MI', 'Detroit', 'FX-1049 → Indianapolis, IN', 'transit-FX-1049'),
+  seg('driving', 4.5, 'Detroit, MI', 'Detroit', 'DR-1049 → Indianapolis, IN', 'transit-DR-1049'),
   seg(
     'on_duty_not_driving',
     1.5,
     'Indianapolis Receiving — Indianapolis, IN',
     'Indianapolis',
-    'Unloading FX-1049 · POD signed',
-    'delivery-FX-1049',
+    'Unloading DR-1049 · POD signed',
+    'delivery-DR-1049',
   ),
   seg('driving', 2, 'Indianapolis, IN', 'Indianapolis'),
   seg('off_duty', 0.5, 'Pilot Travel Center — Louisville, KY', 'Louisville', BREAK),
   seg('driving', 3, 'Louisville, KY', 'Louisville'),
   seg('on_duty_not_driving', 0.5, YARD, 'Nashville', 'Post-trip inspection'),
   seg('off_duty', 36, HOME, 'Nashville', '34-hour restart'),
-  // Pick up FX-1042 in Atlanta
+  // Pick up DR-1042 in Atlanta
   seg('on_duty_not_driving', 0.5, YARD, 'Nashville', PRE_TRIP),
   seg('driving', 4, 'Nashville, TN', 'Nashville'),
   seg(
@@ -122,10 +122,10 @@ const CARLOS_PLAN: readonly PlanSegment[] = [
     1.5,
     'Atlanta Distribution Center — Atlanta, GA',
     'Atlanta',
-    'Loading FX-1042 — 24 pallets, BOL received',
-    'pickup-FX-1042',
+    'Loading DR-1042 — 24 pallets, BOL received',
+    'pickup-DR-1042',
   ),
-  seg('driving', 2.5, 'Atlanta, GA', 'Atlanta', 'FX-1042 → Dallas, TX'),
+  seg('driving', 2.5, 'Atlanta, GA', 'Atlanta', 'DR-1042 → Dallas, TX'),
   seg(
     'off_duty',
     0.5,
@@ -147,14 +147,14 @@ const CARLOS_PLAN: readonly PlanSegment[] = [
   seg('sleeper_berth', 10, 'Pilot Travel Center — Jackson, MS', 'Jackson'),
   // Today
   seg('on_duty_not_driving', 0.5, 'Pilot Travel Center — Jackson, MS', 'Jackson', PRE_TRIP),
-  seg('driving', 4, 'Jackson, MS', 'Jackson', 'FX-1042 → Dallas, TX'),
+  seg('driving', 4, 'Jackson, MS', 'Jackson', 'DR-1042 → Dallas, TX'),
   seg('off_duty', 0.5, "Love's Travel Stop — Shreveport, LA", 'Shreveport', BREAK),
   // Open segment — `hours` is time elapsed so far (matches profile.duty_status_updated_at).
-  seg('driving', 3, 'Shreveport, LA', 'Shreveport', 'FX-1042 → Dallas, TX'),
+  seg('driving', 3, 'Shreveport, LA', 'Shreveport', 'DR-1042 → Dallas, TX'),
 ];
 
 /**
- * Mike Johnson: loaded FX-1051 in San Antonio this morning (1.5h detention at the dock),
+ * Mike Johnson: loaded DR-1051 in San Antonio this morning (1.5h detention at the dock),
  * now running I-10 east past Beaumont. The last segment is still open.
  */
 const MIKE_PLAN: readonly PlanSegment[] = [
@@ -166,12 +166,12 @@ const MIKE_PLAN: readonly PlanSegment[] = [
     1.5,
     'San Antonio Distribution Center — San Antonio, TX',
     'San Antonio',
-    'Loading FX-1051 — 24 pallets (1.5h detention)',
+    'Loading DR-1051 — 24 pallets (1.5h detention)',
   ),
-  seg('driving', 3.5, 'San Antonio, TX', 'San Antonio', 'FX-1051 → New Orleans, LA'),
+  seg('driving', 3.5, 'San Antonio, TX', 'San Antonio', 'DR-1051 → New Orleans, LA'),
   seg('off_duty', 0.5, "Buc-ee's — Baytown, TX", 'Houston', BREAK),
   // Open segment — `hours` is time elapsed so far (matches profile.duty_status_updated_at).
-  seg('driving', 2.5, 'Houston, TX', 'Houston', 'FX-1051 → New Orleans, LA'),
+  seg('driving', 2.5, 'Houston, TX', 'Houston', 'DR-1051 → New Orleans, LA'),
 ];
 
 export interface PlacedSegment extends PlanSegment {
@@ -259,7 +259,7 @@ const VIOLATIONS: Row[] = [
     'missing_certification',
     70,
     'info',
-    'Duty log for the FX-1049 delivery day has not been certified. Review and sign the log.',
+    'Duty log for the DR-1049 delivery day has not been certified. Review and sign the log.',
     false,
   ),
   violation(

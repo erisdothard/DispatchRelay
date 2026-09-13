@@ -39,7 +39,7 @@ import {
   type CompanyInvite,
   type MemberRole,
 } from '@/services/company-members.service';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 /* ── Types ─────────────────────────────────────────────────────── */
 

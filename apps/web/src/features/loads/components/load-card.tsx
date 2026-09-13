@@ -7,8 +7,8 @@ import {
   getBrokerCreditLabel,
   calcGrossProfit,
 } from '@/shared/lib/freight';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
-import type { Load } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
+import type { Load } from '@dispatchrelay/shared';
 import type { LoadStatus } from '@/lib/database.types';
 import { getLaneStats } from '@/services/rate-intelligence.service';
 import { BrokerVerifiedBadge } from './broker-verified-badge';

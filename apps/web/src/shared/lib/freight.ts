@@ -1,4 +1,4 @@
-import type { EquipmentType, Load } from '@freightx/shared';
+import type { EquipmentType, Load } from '@dispatchrelay/shared';
 
 // Approximate national spot market averages (Feb 2026 mock)
 const MARKET_RATES: Record<EquipmentType, number> = {

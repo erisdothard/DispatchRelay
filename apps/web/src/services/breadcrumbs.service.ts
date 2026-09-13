@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { BreadcrumbPoint } from '@freightx/shared';
+import type { BreadcrumbPoint } from '@dispatchrelay/shared';
 
 // breadcrumb_snapshots table not yet in generated DB types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

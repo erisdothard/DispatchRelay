@@ -12,7 +12,7 @@
 - `scripts/db-maintenance.js` — index optimization suggestions, stale data cleanup, migration runner with rollback
 - `scripts/load-test.js` — k6-based load test simulating ramp to 10k concurrent users on load board and bidding
 - `scripts/deploy.js` — pre-deployment checks, migration run, Vercel deploy, post-deploy smoke tests, Slack/Discord notification
-- `packages/sdk/` — `@freightx/sdk` typed API client (loads, bids, webhooks) with webhook signature verification
+- `packages/sdk/` — `@dispatchrelay/sdk` typed API client (loads, bids, webhooks) with webhook signature verification
 - `scripts/seed-data.js` — generates and inserts realistic test loads, trucks, users, messages, and notifications
 
 **Features delivered:**
@@ -24,5 +24,5 @@
 - k6 load test suite targeting 10k concurrent users
 - Deployment automation with pre/post validation and rollback procedure
 - Deployment notifications to Slack/Discord
-- `@freightx/sdk` typed client npm package with webhook signature utility
+- `@dispatchrelay/sdk` typed client npm package with webhook signature utility
 - Data seeding script for staging and demo environments

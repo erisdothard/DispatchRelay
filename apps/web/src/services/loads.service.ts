@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { rowToLoad, rowToMilestone } from '@/lib/mappers';
 import type { LoadRow, EquipmentType, LoadStatus } from '@/lib/database.types';
-import type { Load, TrackingMilestone } from '@freightx/shared';
+import type { Load, TrackingMilestone } from '@dispatchrelay/shared';
 import { recordLaneRate } from './rate-intelligence.service';
 import { notifyLoadStatusChange, notifyDriverAssigned } from './email-notifications.service';
 import { LoadFiltersSchema, CreateLoadInputSchema } from '@/lib/schemas/loads.schema';

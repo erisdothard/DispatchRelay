@@ -69,7 +69,7 @@ describe('DemoQueryBuilder over seeded tables', () => {
       .eq('id', 'bid-001')
       .single();
     expect(error).toBeNull();
-    expect((data as Row).loads).toMatchObject({ load_number: 'FX-1046' });
+    expect((data as Row).loads).toMatchObject({ load_number: 'DR-1046' });
   });
 
   it('resolves column-named and fkey-hinted embeds on loads', async () => {
@@ -115,7 +115,7 @@ describe('DemoQueryBuilder over seeded tables', () => {
       .select()
       .single();
     expect(data).toMatchObject({ status: 'posted', bid_count: 0, origin_city: 'Nashville' });
-    expect((data as Row).load_number).toMatch(/^FX-\d+$/);
+    expect((data as Row).load_number).toMatch(/^DR-\d+$/);
   });
 
   it('updates only the filtered rows and returns no data without .select()', async () => {

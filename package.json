@@ -6,11 +6,11 @@
     "node": "20.x"
   },
   "scripts": {
-    "dev:web": "turbo run dev --filter=@freightx/web",
+    "dev:web": "turbo run dev --filter=@dispatchrelay/web",
     "dev:academy": "turbo run dev --filter=freightx-academy",
-    "dev:all": "turbo run dev --filter=@freightx/web --filter=freightx-academy",
+    "dev:all": "turbo run dev --filter=@dispatchrelay/web --filter=freightx-academy",
     "build": "turbo run build",
-    "build:web": "turbo run build --filter=@freightx/web",
+    "build:web": "turbo run build --filter=@dispatchrelay/web",
     "build:academy": "turbo run build --filter=freightx-academy",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",

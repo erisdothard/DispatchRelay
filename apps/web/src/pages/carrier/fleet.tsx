@@ -24,8 +24,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { deleteTruck } from '@/services/trucks.service';
 import { getMyActiveLoads } from '@/services/loads.service';
 import { useLiveTracking } from '@/features/loads/hooks/use-live-tracking';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
-import type { Truck as TruckType, Load } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
+import type { Truck as TruckType, Load } from '@dispatchrelay/shared';
 
 /** Shows live GPS status for a single in-transit load */
 function DriverGpsRow({ load }: { load: Load }) {

@@ -1,4 +1,4 @@
-import type { TirePosition } from '@freightx/shared';
+import type { TirePosition } from '@dispatchrelay/shared';
 
 export const TIRE_POSITION_LABELS: Record<TirePosition, string> = {
   front_left: 'Front Left',

@@ -12,7 +12,7 @@ import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { useNotifications } from '@/features/notifications/hooks/use-notifications';
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 const statusBadge: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
   in_transit: 'orange',

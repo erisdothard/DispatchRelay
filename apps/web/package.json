@@ -1,5 +1,5 @@
 {
-  "name": "@freightx/web",
+  "name": "@dispatchrelay/web",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -17,7 +17,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@freightx/shared": "workspace:*",
+    "@dispatchrelay/shared": "workspace:*",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-tabs": "^1.1.13",
@@ -49,7 +49,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@freightx/typescript-config": "workspace:*",
+    "@dispatchrelay/typescript-config": "workspace:*",
     "@playwright/test": "^1.58.2",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",

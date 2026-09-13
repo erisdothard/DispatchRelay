@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getExpenseSummary, getReceipts } from '@/services/receipts.service';
 import { getTireIncidents } from '@/services/tire-incidents.service';
 import type { ExpenseSummary } from '@/services/receipts.service';
-import type { ReceiptCategory, Receipt } from '@freightx/shared';
+import type { ReceiptCategory, Receipt } from '@dispatchrelay/shared';
 
 const CATEGORY_LABELS: Record<ReceiptCategory, string> = {
   fuel: 'Fuel',

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { DriverScore } from '@freightx/shared';
+import type { DriverScore } from '@dispatchrelay/shared';
 
 // Tables not yet in generated DB types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

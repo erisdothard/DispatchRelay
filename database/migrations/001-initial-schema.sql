@@ -218,26 +218,26 @@ insert into loads (load_number, company_name, origin_city, origin_state, dest_ci
   pickup_date, delivery_date, equipment, commodity, weight_lbs, rate_usd, rate_per_mile,
   total_miles, status, bid_count, hazmat, temp_controlled, posted_at, broker_credit_score)
 values
-  ('FX-20260217-0042','Apex Freight Solutions','Chicago','IL','Dallas','TX',
+  ('DR-20260217-0042','Apex Freight Solutions','Chicago','IL','Dallas','TX',
    '2026-02-19','2026-02-21','van','General Freight',42000,3200,2.98,1074,'posted',3,false,false,'2026-02-17T12:14:00Z',91),
-  ('FX-20260217-0043','Meridian Transport Group','Atlanta','GA','Miami','FL',
+  ('DR-20260217-0043','Meridian Transport Group','Atlanta','GA','Miami','FL',
    '2026-02-20','2026-02-21','reefer','Fresh Produce',38000,1850,3.42,662,'posted',1,false,true,'2026-02-17T09:45:00Z',78),
-  ('FX-20260217-0044','Pacific Rim Logistics','Los Angeles','CA','Phoenix','AZ',
+  ('DR-20260217-0044','Pacific Rim Logistics','Los Angeles','CA','Phoenix','AZ',
    '2026-02-18','2026-02-19','flatbed','Steel Coils',47500,2100,3.18,370,'posted',5,false,false,'2026-02-17T07:20:00Z',95),
-  ('FX-20260217-0045','Keystone Freight','Houston','TX','Memphis','TN',
+  ('DR-20260217-0045','Keystone Freight','Houston','TX','Memphis','TN',
    '2026-02-19','2026-02-20','van','Auto Parts',34000,2800,3.05,566,'bid_received',2,false,false,'2026-02-17T14:55:00Z',62),
-  ('FX-20260217-0046','Apex Freight Solutions','Charlotte','NC','New York','NY',
+  ('DR-20260217-0046','Apex Freight Solutions','Charlotte','NC','New York','NY',
    '2026-02-21','2026-02-22','reefer','Pharmaceuticals',28000,4200,4.15,634,'posted',0,false,true,'2026-02-17T15:30:00Z',88),
-  ('FX-20260217-0047','Redwood Distribution','Denver','CO','Kansas City','MO',
+  ('DR-20260217-0047','Redwood Distribution','Denver','CO','Kansas City','MO',
    '2026-02-20','2026-02-21','van','Electronics',22000,1950,2.87,601,'posted',4,false,false,'2026-02-16T18:00:00Z',84)
 on conflict (load_number) do nothing;
 
 -- ── 10. SEED — TRACKING MILESTONES ───────────────────────────
 insert into tracking_milestones (load_number, label, location, milestone_timestamp, completed, current, sort_order)
 values
-  ('FX-20260217-0042','Processed at Chicago DC',  'Chicago, IL',  'Feb 17, 2026 · 9:00 AM',  true,  false, 1),
-  ('FX-20260217-0042','Departed Origin',           'Chicago, IL',  'Feb 17, 2026 · 11:30 AM', true,  false, 2),
-  ('FX-20260217-0042','En Route to Destination',   'St. Louis, MO','Feb 18, 2026 · 2:15 PM',  true,  true,  3),
-  ('FX-20260217-0042','Approaching Delivery',      'Dallas, TX',   'Feb 19, 2026 · 9:00 AM',  false, false, 4),
-  ('FX-20260217-0042','Delivered',                 'Dallas, TX',   'Est. Feb 19, 2026 · 11:00 AM', false, false, 5)
+  ('DR-20260217-0042','Processed at Chicago DC',  'Chicago, IL',  'Feb 17, 2026 · 9:00 AM',  true,  false, 1),
+  ('DR-20260217-0042','Departed Origin',           'Chicago, IL',  'Feb 17, 2026 · 11:30 AM', true,  false, 2),
+  ('DR-20260217-0042','En Route to Destination',   'St. Louis, MO','Feb 18, 2026 · 2:15 PM',  true,  true,  3),
+  ('DR-20260217-0042','Approaching Delivery',      'Dallas, TX',   'Feb 19, 2026 · 9:00 AM',  false, false, 4),
+  ('DR-20260217-0042','Delivered',                 'Dallas, TX',   'Est. Feb 19, 2026 · 11:00 AM', false, false, 5)
 on conflict do nothing;

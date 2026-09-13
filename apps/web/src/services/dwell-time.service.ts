@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { DwellRecord } from '@freightx/shared';
+import type { DwellRecord } from '@dispatchrelay/shared';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;

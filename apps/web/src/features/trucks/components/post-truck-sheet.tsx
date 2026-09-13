@@ -4,8 +4,8 @@ import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
 import { createTruck, updateTruck } from '@/services/trucks.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
-import type { Truck } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
+import type { Truck } from '@dispatchrelay/shared';
 import type { EquipmentType } from '@/lib/database.types';
 
 const EQUIPMENT_OPTIONS: EquipmentType[] = [

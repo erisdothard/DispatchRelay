@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { Receipt, ReceiptCategory } from '@freightx/shared';
+import type { Receipt, ReceiptCategory } from '@dispatchrelay/shared';
 
 // receipts table not yet in generated DB types — use untyped client
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

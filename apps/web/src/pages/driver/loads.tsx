@@ -11,7 +11,7 @@ import { cn } from '@/shared/lib/utils';
 import { getDriverLoads } from '@/services/loads.service';
 import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 const STATUS_FILTERS = ['active', 'delivered', 'completed', 'All'];
 const STATUS_LABELS: Record<string, string> = {

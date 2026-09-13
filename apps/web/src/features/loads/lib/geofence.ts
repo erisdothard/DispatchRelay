@@ -1,4 +1,4 @@
-import type { Geofence } from '@freightx/shared';
+import type { Geofence } from '@dispatchrelay/shared';
 
 const EARTH_RADIUS_M = 6_371_000;
 

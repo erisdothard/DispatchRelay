@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { isDemoActive } from '@/lib/demo/demo-session';
 import { rowToTruck } from '@/lib/mappers';
 import type { TruckRow, EquipmentType, TruckStatus } from '@/lib/database.types';
-import type { Truck } from '@freightx/shared';
+import type { Truck } from '@dispatchrelay/shared';
 import { PostTruckInputSchema } from '@/lib/schemas/trucks.schema';
 
 export const PAGE_SIZE = 25;

@@ -51,7 +51,7 @@ function makeBuilder(result: unknown) {
 
 const RAW_LOAD = {
   id: 'load-1',
-  load_number: 'FX-20260301-0001',
+  load_number: 'DR-20260301-0001',
   posted_by: 'user-1',
   company_id: 'co-1',
   company_name: 'Acme Logistics',
@@ -100,7 +100,7 @@ describe('getLoads', () => {
     mockFrom.mockReturnValue(makeBuilder({ data: [RAW_LOAD], error: null }) as never);
     const loads = await getLoads();
     expect(loads).toHaveLength(1);
-    expect(loads[0].loadNumber).toBe('FX-20260301-0001');
+    expect(loads[0].loadNumber).toBe('DR-20260301-0001');
     expect(loads[0].originCity).toBe('Dallas');
     expect(loads[0].destCity).toBe('Chicago');
     expect(loads[0].rateUsd).toBe(2800);
@@ -170,15 +170,15 @@ describe('getLoads', () => {
 describe('getLoadByNumber', () => {
   it('returns a mapped Load when found', async () => {
     mockFrom.mockReturnValue(makeBuilder({ data: RAW_LOAD, error: null }) as never);
-    const load = await getLoadByNumber('FX-20260301-0001');
+    const load = await getLoadByNumber('DR-20260301-0001');
     expect(load).not.toBeNull();
-    expect(load!.loadNumber).toBe('FX-20260301-0001');
+    expect(load!.loadNumber).toBe('DR-20260301-0001');
     expect(load!.companyName).toBe('Acme Logistics');
   });
 
   it('returns null when Supabase returns an error (not found)', async () => {
     mockFrom.mockReturnValue(makeBuilder({ data: null, error: { message: 'no rows' } }) as never);
-    expect(await getLoadByNumber('FX-MISSING')).toBeNull();
+    expect(await getLoadByNumber('DR-MISSING')).toBeNull();
   });
 });
 
@@ -213,7 +213,7 @@ describe('createLoad', () => {
 
     const { id: _, created_at: __, ...payload } = RAW_LOAD;
     const load = await createLoad(payload as never);
-    expect(load.loadNumber).toBe('FX-20260301-0001');
+    expect(load.loadNumber).toBe('DR-20260301-0001');
     expect(load.companyName).toBe('Acme Logistics');
   });
 

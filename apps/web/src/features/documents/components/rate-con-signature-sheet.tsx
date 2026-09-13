@@ -6,7 +6,7 @@ import { embedSignatureIntoPdf } from '@/services/pdf-signature-embed.service';
 import { generateRateConBlob } from '@/features/bookings/lib/generate-rate-con';
 import { notifyRateConSigned } from '@/services/email-notifications.service';
 import { VerificationSeal } from './verification-seal';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 interface RateConSignatureSheetProps {
   open: boolean;

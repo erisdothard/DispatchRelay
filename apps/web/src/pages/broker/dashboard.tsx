@@ -13,7 +13,7 @@ import { useNotifications } from '@/features/notifications/hooks/use-notificatio
 import { NotificationSheet } from '@/features/notifications/components/notification-sheet';
 import { CarrierRelationshipsSheet } from '@/features/carriers/components/carrier-relationships-sheet';
 import { LoadDetailSheet } from '@/features/loads/components/load-detail-sheet';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 export default function BrokerDashboard() {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, Check, X } from 'lucide-react';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/shared/lib/utils';
 import {

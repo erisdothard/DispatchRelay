@@ -1,5 +1,10 @@
 import { supabase } from '@/lib/supabase';
-import type { TireIncident, TirePosition, TireSeverity, TireResolution } from '@freightx/shared';
+import type {
+  TireIncident,
+  TirePosition,
+  TireSeverity,
+  TireResolution,
+} from '@dispatchrelay/shared';
 
 // tire_incidents table not yet in generated DB types — use untyped client
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

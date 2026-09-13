@@ -30,7 +30,7 @@ import {
 } from '@/services/messages.service';
 import { getMyActiveLoads, getLoadByNumber } from '@/services/loads.service';
 import type { ConversationRow, MessageRow } from '@/lib/database.types';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 import { SkeletonList } from '@/shared/components/ui/skeleton';
 import { EmptyState } from '@/shared/components/empty-state';
 

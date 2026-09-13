@@ -32,8 +32,8 @@ import { getMyActiveBidsWithLoads } from '@/services/bids.service';
 import type { BidWithLoad } from '@/services/bids.service';
 import { realtimeSubscribe } from '@/lib/realtime-manager';
 import { cn } from '@/shared/lib/utils';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
-import type { Load } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
+import type { Load } from '@dispatchrelay/shared';
 import type { EquipmentType } from '@/lib/database.types';
 import type { LoadFilters } from '@/services/loads.service';
 

@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { haversineM } from '@/features/loads/lib/geofence';
-import type { ETAResult } from '@freightx/shared';
+import type { ETAResult } from '@dispatchrelay/shared';
 
 /**
  * Calculate predictive ETA using:

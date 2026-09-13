@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import { getLoadByToken } from '@/services/tracking-tokens.service';
 import { useLiveTracking, splitMilestoneStamp } from '@/features/loads/hooks/use-live-tracking';
 import { getTrackingMilestones } from '@/services/loads.service';
-import type { Load, TrackingMilestone } from '@freightx/shared';
+import type { Load, TrackingMilestone } from '@dispatchrelay/shared';
 
 export default function PublicTrackingPage() {
   const { token } = useParams();

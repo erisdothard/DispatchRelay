@@ -47,13 +47,13 @@ interface DwellSeed {
 }
 
 function dwellSeeds(): DwellSeed[] {
-  const pickup1042 = carlosWindow('pickup-FX-1042');
-  const pickup1049 = carlosWindow('pickup-FX-1049');
-  const delivery1049 = carlosWindow('delivery-FX-1049');
+  const pickup1042 = carlosWindow('pickup-DR-1042');
+  const pickup1049 = carlosWindow('pickup-DR-1049');
+  const delivery1049 = carlosWindow('delivery-DR-1049');
   const pad = 10 * 60_000;
   return [
     {
-      loadNumber: 'FX-1042',
+      loadNumber: 'DR-1042',
       stop: 'pickup',
       label: 'Atlanta Distribution Center',
       city: 'Atlanta',
@@ -61,7 +61,7 @@ function dwellSeeds(): DwellSeed[] {
       exitedAt: pickup1042.end + pad,
     },
     {
-      loadNumber: 'FX-1049',
+      loadNumber: 'DR-1049',
       stop: 'pickup',
       label: 'Detroit Distribution Center',
       city: 'Detroit',
@@ -69,16 +69,16 @@ function dwellSeeds(): DwellSeed[] {
       exitedAt: pickup1049.end + pad,
     },
     {
-      loadNumber: 'FX-1049',
+      loadNumber: 'DR-1049',
       stop: 'delivery',
       label: 'Indianapolis Receiving',
       city: 'Indianapolis',
       enteredAt: delivery1049.start - pad,
       exitedAt: delivery1049.end + pad,
     },
-    // FX-1045 sat at Charlotte receiving long enough to flag detention.
+    // DR-1045 sat at Charlotte receiving long enough to flag detention.
     {
-      loadNumber: 'FX-1045',
+      loadNumber: 'DR-1045',
       stop: 'pickup',
       label: 'Miami Distribution Center',
       city: 'Miami',
@@ -86,7 +86,7 @@ function dwellSeeds(): DwellSeed[] {
       exitedAt: Date.now() - 30 * HOUR_MS,
     },
     {
-      loadNumber: 'FX-1045',
+      loadNumber: 'DR-1045',
       stop: 'delivery',
       label: 'Charlotte Receiving',
       city: 'Charlotte',
@@ -96,9 +96,9 @@ function dwellSeeds(): DwellSeed[] {
   ];
 }
 
-/** FX-1045 was Luis Ortega's run; every other tracked load here is Carlos's. */
+/** DR-1045 was Luis Ortega's run; every other tracked load here is Carlos's. */
 function driverFor(loadNumber: string): string {
-  return loadNumber === 'FX-1045' ? DEMO_IDS.driver3 : DEMO_IDS.driver;
+  return loadNumber === 'DR-1045' ? DEMO_IDS.driver3 : DEMO_IDS.driver;
 }
 
 function dwellAndEventRows(): { dwell: Row[]; events: Row[] } {
@@ -160,12 +160,12 @@ function trail(waypoints: LatLng[], startMs: number, endMs: number): Row[] {
 function breadcrumbRows(): Row[] {
   const city = (name: string): LatLng => CITY_COORDS[name] ?? { lat: 0, lng: 0 };
   const fx1049 = {
-    start: carlosWindow('transit-FX-1049').start,
-    end: carlosWindow('delivery-FX-1049').start,
+    start: carlosWindow('transit-DR-1049').start,
+    end: carlosWindow('delivery-DR-1049').start,
   };
   const snapshots = [
     {
-      loadNumber: 'FX-1049',
+      loadNumber: 'DR-1049',
       points: trail(
         [city('Detroit'), { lat: 41.0793, lng: -85.1394 }, city('Indianapolis')],
         fx1049.start,
@@ -173,7 +173,7 @@ function breadcrumbRows(): Row[] {
       ),
     },
     {
-      loadNumber: 'FX-1045',
+      loadNumber: 'DR-1045',
       points: trail(
         [city('Miami'), city('Jacksonville'), city('Savannah'), city('Charlotte')],
         Date.now() - 30 * HOUR_MS,
@@ -216,7 +216,7 @@ function scoreRow(
 
 const DRIVER_SCORES: Row[] = [
   scoreRow(
-    'FX-1045',
+    'DR-1045',
     96,
     100,
     75,
@@ -224,7 +224,7 @@ const DRIVER_SCORES: Row[] = [
     6,
   ),
   scoreRow(
-    'FX-1049',
+    'DR-1049',
     98,
     100,
     100,

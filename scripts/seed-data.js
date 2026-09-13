@@ -254,7 +254,7 @@ async function main() {
   const loadsData = [
     // ── Posted (open for bids)
     {
-      load_number: 'FX-TEST-0001',
+      load_number: 'DR-TEST-0001',
       status: 'posted',
       origin_city: 'Chicago',
       origin_state: 'IL',
@@ -273,7 +273,7 @@ async function main() {
       bid_count: 0,
     },
     {
-      load_number: 'FX-TEST-0002',
+      load_number: 'DR-TEST-0002',
       status: 'posted',
       origin_city: 'Atlanta',
       origin_state: 'GA',
@@ -292,7 +292,7 @@ async function main() {
       bid_count: 0,
     },
     {
-      load_number: 'FX-TEST-0003',
+      load_number: 'DR-TEST-0003',
       status: 'posted',
       origin_city: 'Los Angeles',
       origin_state: 'CA',
@@ -311,7 +311,7 @@ async function main() {
       bid_count: 0,
     },
     {
-      load_number: 'FX-TEST-0004',
+      load_number: 'DR-TEST-0004',
       status: 'posted',
       origin_city: 'Houston',
       origin_state: 'TX',
@@ -330,7 +330,7 @@ async function main() {
       bid_count: 0,
     },
     {
-      load_number: 'FX-TEST-0005',
+      load_number: 'DR-TEST-0005',
       status: 'posted',
       origin_city: 'Seattle',
       origin_state: 'WA',
@@ -350,7 +350,7 @@ async function main() {
     },
     // ── Bids received (broker can review & accept)
     {
-      load_number: 'FX-TEST-0006',
+      load_number: 'DR-TEST-0006',
       status: 'bid_received',
       origin_city: 'Denver',
       origin_state: 'CO',
@@ -369,7 +369,7 @@ async function main() {
       bid_count: 2,
     },
     {
-      load_number: 'FX-TEST-0007',
+      load_number: 'DR-TEST-0007',
       status: 'bid_received',
       origin_city: 'Memphis',
       origin_state: 'TN',
@@ -389,7 +389,7 @@ async function main() {
     },
     // ── Dispatched (awarded, driver assigned)
     {
-      load_number: 'FX-TEST-0008',
+      load_number: 'DR-TEST-0008',
       status: 'dispatched',
       origin_city: 'Phoenix',
       origin_state: 'AZ',
@@ -409,7 +409,7 @@ async function main() {
     },
     // ── In transit (live)
     {
-      load_number: 'FX-TEST-0009',
+      load_number: 'DR-TEST-0009',
       status: 'in_transit',
       origin_city: 'Detroit',
       origin_state: 'MI',
@@ -429,7 +429,7 @@ async function main() {
     },
     // ── Delivered (closed)
     {
-      load_number: 'FX-TEST-0010',
+      load_number: 'DR-TEST-0010',
       status: 'delivered',
       origin_city: 'Boston',
       origin_state: 'MA',
@@ -538,37 +538,37 @@ async function main() {
   header('5/6  Bids');
   const bidsData = [
     {
-      load_number: 'FX-TEST-0006',
+      load_number: 'DR-TEST-0006',
       amount_usd: 1700,
       notes: 'Can pick up early if needed. Team driver available.',
       status: 'pending',
     },
     {
-      load_number: 'FX-TEST-0006',
+      load_number: 'DR-TEST-0006',
       amount_usd: 1750,
       notes: 'Top-rated carrier, 97% on-time. Happy to negotiate.',
       status: 'pending',
     },
     {
-      load_number: 'FX-TEST-0007',
+      load_number: 'DR-TEST-0007',
       amount_usd: 1600,
       notes: 'Available and ready to roll tomorrow morning.',
       status: 'pending',
     },
     {
-      load_number: 'FX-TEST-0008',
+      load_number: 'DR-TEST-0008',
       amount_usd: 920,
       notes: 'Quick turnaround guaranteed. Driver is pre-loaded.',
       status: 'accepted',
     },
     {
-      load_number: 'FX-TEST-0009',
+      load_number: 'DR-TEST-0009',
       amount_usd: 1080,
       notes: 'En route, ETA on time.',
       status: 'accepted',
     },
     {
-      load_number: 'FX-TEST-0010',
+      load_number: 'DR-TEST-0010',
       amount_usd: 730,
       notes: 'Delivered clean. No exceptions.',
       status: 'accepted',
@@ -614,13 +614,13 @@ async function main() {
   }
 
   // Assign in-transit load to driver
-  if (loadIds['FX-TEST-0009'] && ids.driver) {
+  if (loadIds['DR-TEST-0009'] && ids.driver) {
     const { error: assignErr } = await sb
       .from('loads')
       .update({ assigned_driver_id: ids.driver })
-      .eq('id', loadIds['FX-TEST-0009']);
+      .eq('id', loadIds['DR-TEST-0009']);
     if (assignErr) warn(`assign driver: ${assignErr.message}`);
-    else log('✅  FX-TEST-0009 assigned to driver');
+    else log('✅  DR-TEST-0009 assigned to driver');
   }
 
   // ── Done ───────────────────────────────────────────────────────────────────
@@ -638,7 +638,7 @@ async function main() {
   console.log('  • 3 trucks (van, reefer, flatbed) posted by carrier');
   console.log('  • 6 bids — 3 pending, 3 accepted');
   console.log('  • Companies with ratings, verification, credit scores');
-  console.log('  • Driver assigned to carrier company + in-transit load FX-TEST-0009');
+  console.log('  • Driver assigned to carrier company + in-transit load DR-TEST-0009');
 }
 
 main().catch((err) => {

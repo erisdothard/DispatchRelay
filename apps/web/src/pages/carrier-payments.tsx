@@ -6,7 +6,7 @@ import type { FactoringRequest } from '@/services/factoring.service';
 import { getMyActiveLoads } from '@/services/loads.service';
 import { FactoringSheet } from '@/features/payments/components/factoring-sheet';
 import { cn } from '@/shared/lib/utils';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 const STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   requested: { label: 'Pending Review', color: 'text-amber-400', icon: <Clock size={13} /> },

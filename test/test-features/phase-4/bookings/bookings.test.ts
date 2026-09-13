@@ -62,7 +62,7 @@ function validateRateCon(data: Partial<RateConData>): string[] {
 
 describe('Rate confirmation data validation', () => {
   const valid: RateConData = {
-    load_number: 'FX-20260219-0001',
+    load_number: 'DR-20260219-0001',
     origin: 'Dallas, TX',
     destination: 'Chicago, IL',
     pickup_date: '2026-03-01',

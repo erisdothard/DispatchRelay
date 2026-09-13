@@ -132,8 +132,8 @@ const SAVED_SEARCHES: Row[] = [
 const TRACKING_TOKENS: Row[] = [
   {
     id: 'tt-fx1042',
-    load_number: 'FX-1042',
-    token: 'demo-fx1042',
+    load_number: 'DR-1042',
+    token: 'demo-dr1042',
     created_by: broker,
     expires_at: hoursFromNow(24 * 6),
     revoked: false,
@@ -141,8 +141,8 @@ const TRACKING_TOKENS: Row[] = [
   },
   {
     id: 'tt-fx1051',
-    load_number: 'FX-1051',
-    token: 'demo-fx1051',
+    load_number: 'DR-1051',
+    token: 'demo-dr1051',
     created_by: shipper,
     expires_at: hoursFromNow(24 * 6),
     revoked: false,
@@ -150,8 +150,8 @@ const TRACKING_TOKENS: Row[] = [
   },
   {
     id: 'tt-fx1045',
-    load_number: 'FX-1045',
-    token: 'demo-fx1045',
+    load_number: 'DR-1045',
+    token: 'demo-dr1045',
     created_by: shipper,
     expires_at: hoursFromNow(24 * 2),
     revoked: false,
@@ -172,18 +172,18 @@ type QueueSeed = [
 ];
 
 const QUEUE: QueueSeed[] = [
-  ['email', 'broker@freightx.com', 'New bid on load FX-1046', 'sent', 1, 7],
-  ['email', 'broker@freightx.com', 'New bid on load FX-1050', 'sent', 1, 5],
-  ['email', 'carrier@freightx.com', 'Counter-offer on load FX-1050', 'sent', 1, 3],
-  ['email', 'carrier@freightx.com', 'Your bid on FX-1043 was accepted!', 'sent', 1, 2],
+  ['email', 'broker@freightx.com', 'New bid on load DR-1046', 'sent', 1, 7],
+  ['email', 'broker@freightx.com', 'New bid on load DR-1050', 'sent', 1, 5],
+  ['email', 'carrier@freightx.com', 'Counter-offer on load DR-1050', 'sent', 1, 3],
+  ['email', 'carrier@freightx.com', 'Your bid on DR-1043 was accepted!', 'sent', 1, 2],
   ['sms', '+16155550142', null, 'sent', 1, 1],
-  ['email', 'shipper@freightx.com', 'Load FX-1051 status: in transit', 'sent', 2, 4],
+  ['email', 'shipper@freightx.com', 'Load DR-1051 status: in transit', 'sent', 2, 4],
   ['push', 'dev-driver-ios', 'Delivery appointment tomorrow', 'sent', 1, 1],
-  ['email', 'dispatch@blueridgelogistics.com', 'Bid update for load FX-1046', 'sent', 1, 0.5],
+  ['email', 'dispatch@blueridgelogistics.com', 'Bid update for load DR-1046', 'sent', 1, 0.5],
   [
     'email',
     'ops@summithaulers.com',
-    'Counter-offer on load FX-1050',
+    'Counter-offer on load DR-1050',
     'failed',
     3,
     2.5,
@@ -193,7 +193,7 @@ const QUEUE: QueueSeed[] = [
   [
     'email',
     'old-contact@parkmfg.com',
-    'BOL signed for load FX-1049',
+    'BOL signed for load DR-1049',
     'dead',
     5,
     60,

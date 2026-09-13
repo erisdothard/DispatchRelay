@@ -6,20 +6,20 @@ function generateLoadNumber(date: Date, sequence: number): string {
   const y = date.getUTCFullYear();
   const m = String(date.getUTCMonth() + 1).padStart(2, '0');
   const d = String(date.getUTCDate()).padStart(2, '0');
-  return `FX-${y}${m}${d}-${String(sequence).padStart(4, '0')}`;
+  return `DR-${y}${m}${d}-${String(sequence).padStart(4, '0')}`;
 }
 
 describe('Load number generation', () => {
   it('formats correctly', () => {
-    expect(generateLoadNumber(new Date('2026-02-19'), 1)).toBe('FX-20260219-0001');
+    expect(generateLoadNumber(new Date('2026-02-19'), 1)).toBe('DR-20260219-0001');
   });
 
   it('pads sequence to 4 digits', () => {
-    expect(generateLoadNumber(new Date('2026-02-19'), 42)).toBe('FX-20260219-0042');
+    expect(generateLoadNumber(new Date('2026-02-19'), 42)).toBe('DR-20260219-0042');
   });
 
   it('handles sequence over 9999', () => {
-    expect(generateLoadNumber(new Date('2026-02-19'), 10000)).toBe('FX-20260219-10000');
+    expect(generateLoadNumber(new Date('2026-02-19'), 10000)).toBe('DR-20260219-10000');
   });
 });
 

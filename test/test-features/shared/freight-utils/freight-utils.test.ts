@@ -19,7 +19,7 @@ import type { Load } from '../../packages/shared/src/index';
 
 const baseLoad: Load = {
   id: 'test-1',
-  loadNumber: 'FX-0001',
+  loadNumber: 'DR-0001',
   originCity: 'Chicago',
   originState: 'IL',
   destCity: 'Dallas',

@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 export interface RateConParams {
   load: Load;

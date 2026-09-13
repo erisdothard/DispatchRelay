@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowRight, TrendingUp } from 'lucide-react';
 import { getPopularLanes } from '@/services/rate-intelligence.service';
 import type { PopularLane } from '@/services/rate-intelligence.service';
-import { EQUIPMENT_LABELS } from '@freightx/shared';
+import { EQUIPMENT_LABELS } from '@dispatchrelay/shared';
 import { cn } from '@/shared/lib/utils';
 
 interface PopularLanesCardProps {

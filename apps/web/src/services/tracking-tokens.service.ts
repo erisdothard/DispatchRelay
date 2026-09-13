@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { Load } from '@freightx/shared';
+import type { Load } from '@dispatchrelay/shared';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { calculateETA } from '@/services/eta.service';
 import { geocodeCity } from '@/lib/geocoding';
-import type { ETAResult } from '@freightx/shared';
+import type { ETAResult } from '@dispatchrelay/shared';
 
 interface UsePredictiveETAOptions {
   loadNumber: string | null;
