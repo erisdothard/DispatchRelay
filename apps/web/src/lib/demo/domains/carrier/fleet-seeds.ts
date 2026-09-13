@@ -286,7 +286,7 @@ function fuelCards(): Row[] {
     id,
     company_id: COMPANY_ID,
     card_number_masked: `****-****-****-${last4}`,
-    provider: 'freightx',
+    provider: 'dispatchrelay',
     assigned_driver: driverId,
     assigned_truck: truckId,
     spending_limit_usd: 6000,

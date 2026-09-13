@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * FreightX — Full Test Environment Seed
+ * DispatchRelay — Full Test Environment Seed
  *
  * Creates 3 test users (broker, carrier, shipper), their companies,
  * 10 loads across every status, 3 trucks, and bids so you can see the full
@@ -64,13 +64,23 @@ const sb = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const PASSWORD = 'FreightX2026!';
+const PASSWORD = 'DispatchRelay2026!';
 
 const TEST_USERS = [
-  { idKey: 'broker', email: 'broker@freightx.com', full_name: 'Test Broker', role: 'broker' },
-  { idKey: 'carrier', email: 'carrier@freightx.com', full_name: 'Test Carrier', role: 'carrier' },
-  { idKey: 'shipper', email: 'shipper@freightx.com', full_name: 'Test Shipper', role: 'shipper' },
-  { idKey: 'driver', email: 'driver@freightx.com', full_name: 'Test Driver', role: 'driver' },
+  { idKey: 'broker', email: 'broker@dispatchrelay.co', full_name: 'Test Broker', role: 'broker' },
+  {
+    idKey: 'carrier',
+    email: 'carrier@dispatchrelay.co',
+    full_name: 'Test Carrier',
+    role: 'carrier',
+  },
+  {
+    idKey: 'shipper',
+    email: 'shipper@dispatchrelay.co',
+    full_name: 'Test Shipper',
+    role: 'shipper',
+  },
+  { idKey: 'driver', email: 'driver@dispatchrelay.co', full_name: 'Test Driver', role: 'driver' },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -121,7 +131,7 @@ async function upsertUser({ email, full_name, role }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-  console.log('FreightX Seed — ' + new Date().toISOString());
+  console.log('DispatchRelay Seed — ' + new Date().toISOString());
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
   // ── 1. Auth Users ──────────────────────────────────────────────────────────
@@ -164,7 +174,7 @@ async function main() {
       state: 'IL',
       zip: '60606',
       phone: '312-555-0100',
-      email: 'broker@freightx.dev',
+      email: 'broker@dispatchrelay.co',
       verified: true,
       rating: 4.7,
       total_loads: 412,
@@ -183,7 +193,7 @@ async function main() {
       state: 'TX',
       zip: '75244',
       phone: '972-555-0200',
-      email: 'carrier@freightx.dev',
+      email: 'carrier@dispatchrelay.co',
       verified: true,
       rating: 4.9,
       total_loads: 284,
@@ -199,7 +209,7 @@ async function main() {
       state: 'GA',
       zip: '30303',
       phone: '404-555-0300',
-      email: 'shipper@freightx.dev',
+      email: 'shipper@dispatchrelay.co',
       verified: true,
       rating: 4.5,
       total_loads: 103,
@@ -628,10 +638,10 @@ async function main() {
   console.log('✅  Seed complete!\n');
   console.log('Test credentials (all share the same password):\n');
   console.log(`  Email                       Role      Password`);
-  console.log(`  broker@freightx.com         broker    ${PASSWORD}`);
-  console.log(`  carrier@freightx.com        carrier   ${PASSWORD}`);
-  console.log(`  shipper@freightx.com        shipper   ${PASSWORD}`);
-  console.log(`  driver@freightx.com         driver    ${PASSWORD}`);
+  console.log(`  broker@dispatchrelay.co     broker    ${PASSWORD}`);
+  console.log(`  carrier@dispatchrelay.co    carrier   ${PASSWORD}`);
+  console.log(`  shipper@dispatchrelay.co    shipper   ${PASSWORD}`);
+  console.log(`  driver@dispatchrelay.co     driver    ${PASSWORD}`);
   console.log('');
   console.log("What's seeded:");
   console.log('  • 10 loads across all statuses (posted → delivered)');

@@ -305,7 +305,7 @@ export const simulateReply: DemoHandler = (args, { identity, db }) => {
       {
         user_id: identity.id,
         type: 'new_message',
-        title: `Message from ${String(other.full_name ?? 'FreightX user')}`,
+        title: `Message from ${String(other.full_name ?? 'DispatchRelay user')}`,
         body: text,
         load_id: null,
       },

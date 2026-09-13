@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
       ) : (
         <div className="flex flex-col gap-5 mt-4">
           <p className="text-sm text-fx-text-muted leading-relaxed">
-            Enter the email address for your FreightX account and we'll send you a reset link.
+            Enter the email address for your DispatchRelay account and we'll send you a reset link.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">

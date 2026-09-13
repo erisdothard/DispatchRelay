@@ -6,7 +6,7 @@ import { currentDemoIdentity } from './demo-session';
 
 const SESSION_TTL_SECONDS = 3600;
 const DEMO_AUTH_MESSAGE =
-  'Sign-in is turned off in this demo. Pick a role on the login screen to explore FreightX.';
+  'Sign-in is turned off in this demo. Pick a role on the login screen to explore DispatchRelay.';
 
 function authError() {
   return { name: 'AuthApiError', message: DEMO_AUTH_MESSAGE, status: 400 };

@@ -207,7 +207,7 @@ async function checkDependencies() {
 }
 
 async function runHealthCheck() {
-  console.log(chalk.blue.bold('\n🏥 FreightX Health Check\n'));
+  console.log(chalk.blue.bold('\n🏥 DispatchRelay Health Check\n'));
   console.log(chalk.gray(`Timestamp: ${new Date().toISOString()}\n`));
 
   const checks = {

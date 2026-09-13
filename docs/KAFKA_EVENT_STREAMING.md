@@ -271,7 +271,7 @@ kafka-topics.sh --create \
 import { Kafka } from 'kafkajs';
 
 const kafka = new Kafka({
-  clientId: 'freightx-web',
+  clientId: 'dispatchrelay-web',
   brokers: [process.env.KAFKA_BROKER_URL!],
   ssl: true,
   sasl: {

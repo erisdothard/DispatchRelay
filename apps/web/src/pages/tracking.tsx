@@ -427,7 +427,7 @@ export default function TrackingPage() {
               </div>
               <div className="flex-1">
                 <p className="text-[15px] font-semibold text-white tracking-[-0.01em]">
-                  FreightX Support
+                  DispatchRelay Support
                 </p>
                 <p className="text-[12px] text-fx-text-dim mt-0.5">Customer Services</p>
               </div>
@@ -579,7 +579,7 @@ export default function TrackingPage() {
                       const token = await createTrackingToken(load.loadNumber, user!.id);
                       const publicUrl = `${window.location.origin}/t/${token}`;
                       const shareData = {
-                        title: `FreightX — ${load.loadNumber}`,
+                        title: `DispatchRelay — ${load.loadNumber}`,
                         text: `Track load ${load.loadNumber}: ${load.originCity}, ${load.originState} → ${load.destCity}, ${load.destState}`,
                         url: publicUrl,
                       };

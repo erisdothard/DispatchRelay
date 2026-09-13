@@ -43,8 +43,8 @@ export function GpsConsentModal({ open, onAllow, onDismiss }: GpsConsentModalPro
             </div>
 
             <p className="text-sm text-fx-text-dim mb-5 leading-relaxed">
-              FreightX needs your permission to share your live GPS location with your carrier and
-              dispatcher while you're on active loads.
+              DispatchRelay needs your permission to share your live GPS location with your carrier
+              and dispatcher while you're on active loads.
             </p>
 
             {/* What's collected */}

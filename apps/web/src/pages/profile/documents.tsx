@@ -257,11 +257,13 @@ export default function DocumentsPage() {
         {/* Help Text */}
         <p className="text-xs text-fx-text-dim text-center">
           Documents are reviewed within 1-2 business days.{'\n'}
-          Need help? Contact support@freightx.com
+          Need help? Contact support@dispatchrelay.co
         </p>
 
         {/* Version Info */}
-        <p className="text-center text-[10px] text-fx-text-dim mt-6">FreightX v0.2.0 · Phase 2</p>
+        <p className="text-center text-[10px] text-fx-text-dim mt-6">
+          DispatchRelay v0.2.0 · Phase 2
+        </p>
       </div>
 
       <BottomNav role={role} />

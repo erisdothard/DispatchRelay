@@ -1,5 +1,5 @@
 /**
- * Vercel Edge Middleware — FreightX Phase 13D
+ * Vercel Edge Middleware — DispatchRelay Phase 13D
  * Real sliding-window rate limiting for API-adjacent routes.
  * Runs at the edge before the request reaches the origin.
  *

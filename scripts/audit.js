@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * FreightX Audit Script
+ * DispatchRelay Audit Script
  * Runs on every git push (via pre-push hook).
  * Outputs a timestamped audit report to test/audits/
  */
@@ -77,7 +77,7 @@ const services = existsSync(servicesDir)
 
 // ─── Build report ─────────────────────────────────────────────────────────────
 
-const report = `# FreightX Audit Report
+const report = `# DispatchRelay Audit Report
 Generated: ${dateLabel}
 Branch: ${branch}
 Commits: ${commitCount}

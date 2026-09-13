@@ -45,19 +45,19 @@ function profile(id: string, fullName: string, email: string, role: string, extr
 }
 
 const PROFILES: Row[] = [
-  profile(DEMO_IDS.carrier, 'Marcus Rivera', 'carrier@freightx.com', 'carrier'),
+  profile(DEMO_IDS.carrier, 'Marcus Rivera', 'carrier@dispatchrelay.co', 'carrier'),
   profile(DEMO_IDS.carrier2, 'Dana Brooks', 'dispatch@blueridgelogistics.com', 'carrier'),
   profile(DEMO_IDS.carrier3, 'Tom Alvarez', 'ops@summithaulers.com', 'carrier'),
-  profile(DEMO_IDS.broker, 'Sarah Chen', 'broker@freightx.com', 'broker'),
-  profile(DEMO_IDS.shipper, 'James Park', 'shipper@freightx.com', 'shipper'),
-  profile(DEMO_IDS.driver, 'Carlos Mendez', 'driver@freightx.com', 'driver', {
+  profile(DEMO_IDS.broker, 'Sarah Chen', 'broker@dispatchrelay.co', 'broker'),
+  profile(DEMO_IDS.shipper, 'James Park', 'shipper@dispatchrelay.co', 'shipper'),
+  profile(DEMO_IDS.driver, 'Carlos Mendez', 'driver@dispatchrelay.co', 'driver', {
     carrier_id: DEMO_IDS.carrier,
     phone: '(615) 555-0142',
     current_duty_status: 'driving',
     duty_status_updated_at: hoursAgo(3),
     last_location_update: hoursAgo(0.1),
   }),
-  profile(DEMO_IDS.driver2, 'Mike Johnson', 'driver2@freightx.com', 'driver', {
+  profile(DEMO_IDS.driver2, 'Mike Johnson', 'driver2@dispatchrelay.co', 'driver', {
     carrier_id: DEMO_IDS.carrier,
     phone: '(615) 555-0177',
     current_duty_status: 'driving',
@@ -65,14 +65,14 @@ const PROFILES: Row[] = [
     last_location_update: hoursAgo(0.3),
   }),
   // Delivered DR-1045 in Charlotte this morning; resting before the next dispatch.
-  profile(DEMO_IDS.driver3, 'Luis Ortega', 'driver3@freightx.com', 'driver', {
+  profile(DEMO_IDS.driver3, 'Luis Ortega', 'driver3@dispatchrelay.co', 'driver', {
     carrier_id: DEMO_IDS.carrier,
     phone: '(615) 555-0193',
     current_duty_status: 'off_duty',
     duty_status_updated_at: hoursAgo(5.5),
     last_location_update: hoursAgo(5.5),
   }),
-  profile(DEMO_IDS.admin, 'Admin User', 'admin@freightx.com', 'admin'),
+  profile(DEMO_IDS.admin, 'Admin User', 'admin@dispatchrelay.co', 'admin'),
 ];
 
 function company(
@@ -192,7 +192,7 @@ const COMPANIES: Row[] = [
   company(
     DEMO_IDS.platformCompany,
     DEMO_IDS.admin,
-    'FreightX Platform',
+    'DispatchRelay Platform',
     'carrier',
     'Nashville',
     'TN',

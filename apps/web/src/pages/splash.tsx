@@ -213,7 +213,7 @@ export default function SplashPage() {
         className="relative px-7 pb-12 pt-8 ios-blur"
         style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
       >
-        <img src="/logo-user-1.svg" alt="FreightX" className="h-8 mb-5 opacity-90" />
+        <img src="/logo-user-1.svg" alt="DispatchRelay" className="h-8 mb-5 opacity-90" />
         <p className="text-[22px] font-bold text-white leading-snug tracking-[-0.01em] mb-8">
           Our Logistics Services provide end-to-end solutions for all your shipping needs.
         </p>

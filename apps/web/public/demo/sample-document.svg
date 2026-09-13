@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="850" height="1100" viewBox="0 0 850 1100" role="img" aria-label="Sample freight document">
   <rect width="850" height="1100" fill="#ffffff"/>
   <rect x="0" y="0" width="850" height="10" fill="#e86030"/>
-  <text x="60" y="110" font-family="Helvetica, Arial, sans-serif" font-size="40" font-weight="700" fill="#111827">FreightX</text>
+  <text x="60" y="110" font-family="Helvetica, Arial, sans-serif" font-size="40" font-weight="700" fill="#111827">DispatchRelay</text>
   <text x="60" y="150" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#6b7280">Sample document · demo data only</text>
   <line x1="60" y1="190" x2="790" y2="190" stroke="#e5e7eb" stroke-width="2"/>
   <g font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">

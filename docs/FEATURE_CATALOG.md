@@ -1,4 +1,4 @@
-# FreightX — Feature Catalog
+# DispatchRelay — Feature Catalog
 
 **Last audited:** 2026-04-12 (updated Phase 20)
 **Audit basis:** Source code in `apps/web/src/features/`, `apps/web/src/services/`, `apps/web/src/pages/`, `database/migrations/`, and `supabase/functions/`
@@ -446,7 +446,7 @@ These features appear in older documentation but have no corresponding source co
 | DAT / Truckstop cross-posting                  | No code found                                                              |
 | Multi-language support                         | No i18n setup found                                                        |
 | Open REST API for external partners            | No public API layer found                                                  |
-| FreightX Academy / Learning Platform           | No Next.js academy app found in monorepo                                   |
+| DispatchRelay Academy / Learning Platform      | No Next.js academy app found in monorepo                                   |
 | Automated IFTA mileage / tax reporting         | No code found                                                              |
 | Payment escrow / Guaranteed Pay                | No escrow logic found                                                      |
 | Direct ACH carrier payment (Stripe Connect)    | Stripe Checkout exists for subscriptions; ACH carrier payout not confirmed |

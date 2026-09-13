@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
 const GPS_CONSENT_TEXT =
-  'I consent to FreightX collecting and sharing my live GPS location (latitude, longitude, speed, heading) with my carrier and dispatcher while I am on active loads. I understand I can revoke this consent at any time from my profile settings.';
+  'I consent to DispatchRelay collecting and sharing my live GPS location (latitude, longitude, speed, heading) with my carrier and dispatcher while I am on active loads. I understand I can revoke this consent at any time from my profile settings.';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;

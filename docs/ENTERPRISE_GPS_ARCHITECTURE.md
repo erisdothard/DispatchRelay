@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-FreightX currently has a **production-ready GPS tracking system** built for single-region, low-volume operations (<500 concurrent drivers). To scale to **enterprise freight marketplace** levels (multi-tenant, 10K+ drivers, compliance-critical), we need architectural upgrades in:
+DispatchRelay currently has a **production-ready GPS tracking system** built for single-region, low-volume operations (<500 concurrent drivers). To scale to **enterprise freight marketplace** levels (multi-tenant, 10K+ drivers, compliance-critical), we need architectural upgrades in:
 
 1. **Role-based GPS permissions** (who can send vs. view)
 2. **Enterprise geocoding** (commercial-grade address validation)

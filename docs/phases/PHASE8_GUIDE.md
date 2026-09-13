@@ -15,7 +15,7 @@
 
 **Features delivered:**
 
-- FreightX Academy app: interactive system diagram, database schema explorer, API explorer with live request builder, CEO executive presentation mode with slides
+- DispatchRelay Academy app: interactive system diagram, database schema explorer, API explorer with live request builder, CEO executive presentation mode with slides
 - Help Center page: categorized FAQ accordion, live chat / email / phone contact options
 - Notification settings page: per-event-type toggles (new bid, bid accepted, load status, etc.)
 - Avatar upload and profile image display via Supabase Storage

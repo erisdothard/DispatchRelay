@@ -1,4 +1,4 @@
-# FreightX Competitive Analysis & Development Roadmap
+# DispatchRelay Competitive Analysis & Development Roadmap
 
 **Date:** 2026-05-08
 **Research:** 9 parallel agents across 2 rounds
@@ -8,17 +8,17 @@
 
 ## RESEARCH SUMMARY
 
-| Agent                  | Scope                                    | Key Finding                                                                                     |
-| ---------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| DAT Features           | Every tier, add-on, acquisition          | DAT acquired Trucker Tools + Convoy Platform + Outgo in 2025. $49-$449/mo. 722K loads/day.      |
-| Truckstop + 123LB      | All tiers, fraud tools, payments         | Truckstop won 2025 Fraud Fighters Award. Private Loads launched July 2025. Denim acquisition.   |
-| Highway + Emerging     | Identity, TruckSmarter, Relay, Loadsmart | Highway = FreightTech #1 2026. 65s carrier onboarding. Free carrier portal.                     |
-| FreightX Codebase v1   | 17 domains audited                       | 11 complete, 6 with gaps                                                                        |
-| User Pain Points       | Reddit, forums, Trustpilot, industry     | DAT 2.7 Trustpilot. 19K fake loads. Convoy left 88K carriers unpaid.                            |
-| Fresh Codebase Re-read | File-by-file verification                | Found: broken table ref, 9 duplicate migrations, dead accessorials code, breadcrumb RLS missing |
-| Shipper Pain Points    | Shipper-specific needs                   | 67% rank reliability #1. Digital POD reduces disputes 23%. Performance scorecards wanted.       |
-| FMCSA Regulatory       | Legal compliance requirements            | FreightX likely needs broker authority (MC + $75K bond). Hazmat enforcement missing.            |
-| Pricing Strategy       | Competitor pricing, unit economics       | Free carrier tier + 2.5% factoring beats DAT. Financial services subsidize free load board.     |
+| Agent                     | Scope                                    | Key Finding                                                                                     |
+| ------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| DAT Features              | Every tier, add-on, acquisition          | DAT acquired Trucker Tools + Convoy Platform + Outgo in 2025. $49-$449/mo. 722K loads/day.      |
+| Truckstop + 123LB         | All tiers, fraud tools, payments         | Truckstop won 2025 Fraud Fighters Award. Private Loads launched July 2025. Denim acquisition.   |
+| Highway + Emerging        | Identity, TruckSmarter, Relay, Loadsmart | Highway = FreightTech #1 2026. 65s carrier onboarding. Free carrier portal.                     |
+| DispatchRelay Codebase v1 | 17 domains audited                       | 11 complete, 6 with gaps                                                                        |
+| User Pain Points          | Reddit, forums, Trustpilot, industry     | DAT 2.7 Trustpilot. 19K fake loads. Convoy left 88K carriers unpaid.                            |
+| Fresh Codebase Re-read    | File-by-file verification                | Found: broken table ref, 9 duplicate migrations, dead accessorials code, breadcrumb RLS missing |
+| Shipper Pain Points       | Shipper-specific needs                   | 67% rank reliability #1. Digital POD reduces disputes 23%. Performance scorecards wanted.       |
+| FMCSA Regulatory          | Legal compliance requirements            | DispatchRelay likely needs broker authority (MC + $75K bond). Hazmat enforcement missing.       |
+| Pricing Strategy          | Competitor pricing, unit economics       | Free carrier tier + 2.5% factoring beats DAT. Financial services subsidize free load board.     |
 
 ---
 
@@ -26,46 +26,46 @@
 
 ### 1. LOAD MANAGEMENT
 
-| Feature                            | FreightX | DAT      | Truckstop | 123Loadboard | Highway |
-| ---------------------------------- | -------- | -------- | --------- | ------------ | ------- |
-| Load posting (basic)               | ✅       | ✅       | ✅        | ✅           | ❌      |
-| Load search with filters           | ✅       | ✅       | ✅        | ✅           | ❌      |
-| AI-powered semantic search         | ✅       | ❌       | ❌        | ❌           | ❌      |
-| Full-text search                   | ✅       | ✅       | ✅        | ✅           | ❌      |
-| Equipment type filtering (8 types) | ✅       | ✅       | ✅        | ✅           | ❌      |
-| Load templates / saved posting     | ✅       | ⚠️       | ⚠️        | ⚠️           | ❌      |
-| CSV batch import                   | ✅       | ✅ (API) | ✅ (TMS)  | ❌           | ❌      |
-| Load expiration / auto-cleanup     | ✅       | ✅       | ✅        | ✅           | ❌      |
-| Enterprise load details            | ✅       | ✅       | ✅        | ⚠️           | ❌      |
-| Load status lifecycle              | ✅       | ⚠️       | ⚠️        | ⚠️           | ❌      |
+| Feature                            | DispatchRelay | DAT      | Truckstop | 123Loadboard | Highway |
+| ---------------------------------- | ------------- | -------- | --------- | ------------ | ------- |
+| Load posting (basic)               | ✅            | ✅       | ✅        | ✅           | ❌      |
+| Load search with filters           | ✅            | ✅       | ✅        | ✅           | ❌      |
+| AI-powered semantic search         | ✅            | ❌       | ❌        | ❌           | ❌      |
+| Full-text search                   | ✅            | ✅       | ✅        | ✅           | ❌      |
+| Equipment type filtering (8 types) | ✅            | ✅       | ✅        | ✅           | ❌      |
+| Load templates / saved posting     | ✅            | ⚠️       | ⚠️        | ⚠️           | ❌      |
+| CSV batch import                   | ✅            | ✅ (API) | ✅ (TMS)  | ❌           | ❌      |
+| Load expiration / auto-cleanup     | ✅            | ✅       | ✅        | ✅           | ❌      |
+| Enterprise load details            | ✅            | ✅       | ✅        | ⚠️           | ❌      |
+| Load status lifecycle              | ✅            | ⚠️       | ⚠️        | ⚠️           | ❌      |
 
 ### 2. BIDDING & BOOKING
 
-| Feature                               | FreightX | DAT            | Truckstop      | 123Loadboard | Highway |
-| ------------------------------------- | -------- | -------------- | -------------- | ------------ | ------- |
-| Carrier bid submission                | ✅       | ✅             | ✅             | ✅           | ❌      |
-| Counter-offer (multi-round)           | ✅       | ❌             | ❌             | ❌           | ❌      |
-| Book-It-Now (instant)                 | ✅       | ✅             | ✅             | ❌           | ❌      |
-| Bid expiration                        | ✅       | ⚠️             | ⚠️             | ⚠️           | ❌      |
-| Race guard (double-award prevention)  | ✅       | ❌             | ❌             | ❌           | ❌      |
-| Carrier eligibility gate (hard block) | ✅       | ⚠️ (flag only) | ⚠️ (flag only) | ❌           | ❌      |
+| Feature                               | DispatchRelay | DAT            | Truckstop      | 123Loadboard | Highway |
+| ------------------------------------- | ------------- | -------------- | -------------- | ------------ | ------- |
+| Carrier bid submission                | ✅            | ✅             | ✅             | ✅           | ❌      |
+| Counter-offer (multi-round)           | ✅            | ❌             | ❌             | ❌           | ❌      |
+| Book-It-Now (instant)                 | ✅            | ✅             | ✅             | ❌           | ❌      |
+| Bid expiration                        | ✅            | ⚠️             | ⚠️             | ⚠️           | ❌      |
+| Race guard (double-award prevention)  | ✅            | ❌             | ❌             | ❌           | ❌      |
+| Carrier eligibility gate (hard block) | ✅            | ⚠️ (flag only) | ⚠️ (flag only) | ❌           | ❌      |
 
 ### 3. RATE INTELLIGENCE
 
-| Feature                       | FreightX  | DAT                   | Truckstop | 123Loadboard | Highway |
-| ----------------------------- | --------- | --------------------- | --------- | ------------ | ------- |
-| Market rate per lane          | ✅        | ✅                    | ✅        | ✅           | ❌      |
-| Historical rate data          | ✅        | ✅ (13-month, 💰$99+) | ✅        | ⚠️           | ❌      |
-| Rate fairness percentile      | ✅ (free) | ⚠️ (💰$99+)           | ⚠️        | ❌           | ❌      |
-| AI rate suggestions           | ✅        | ⚠️ (💰$180+)          | ❌        | ❌           | ❌      |
-| Rate trend charts             | ✅        | ✅ (💰$99+)           | ⚠️        | ❌           | ❌      |
-| Lane intelligence dashboard   | ✅        | ✅ (💰$149+)          | ⚠️        | ❌           | ❌      |
-| Rate forecasting (predictive) | ❌        | ✅ (💰$180+)          | ❌        | ❌           | ❌      |
-| Shipper Spot Rate             | ❌        | ✅ (💰$149+)          | ❌        | ❌           | ❌      |
+| Feature                       | DispatchRelay | DAT                   | Truckstop | 123Loadboard | Highway |
+| ----------------------------- | ------------- | --------------------- | --------- | ------------ | ------- |
+| Market rate per lane          | ✅            | ✅                    | ✅        | ✅           | ❌      |
+| Historical rate data          | ✅            | ✅ (13-month, 💰$99+) | ✅        | ⚠️           | ❌      |
+| Rate fairness percentile      | ✅ (free)     | ⚠️ (💰$99+)           | ⚠️        | ❌           | ❌      |
+| AI rate suggestions           | ✅            | ⚠️ (💰$180+)          | ❌        | ❌           | ❌      |
+| Rate trend charts             | ✅            | ✅ (💰$99+)           | ⚠️        | ❌           | ❌      |
+| Lane intelligence dashboard   | ✅            | ✅ (💰$149+)          | ⚠️        | ❌           | ❌      |
+| Rate forecasting (predictive) | ❌            | ✅ (💰$180+)          | ❌        | ❌           | ❌      |
+| Shipper Spot Rate             | ❌            | ✅ (💰$149+)          | ❌        | ❌           | ❌      |
 
 ### 4. FRAUD & TRUST
 
-| Feature                                 | FreightX            | DAT        | Truckstop         | 123Loadboard | Highway            |
+| Feature                                 | DispatchRelay       | DAT        | Truckstop         | 123Loadboard | Highway            |
 | --------------------------------------- | ------------------- | ---------- | ----------------- | ------------ | ------------------ |
 | Carrier FMCSA/DOT verification          | ✅                  | ✅         | ✅                | ⚠️           | ✅                 |
 | Insurance monitoring                    | ⚠️ (no auto-alerts) | ✅ (daily) | ✅ (continuous)   | ❌           | ✅                 |
@@ -81,48 +81,48 @@
 
 ### 5. GPS & TRACKING
 
-| Feature                      | FreightX    | DAT | Truckstop | 123Loadboard | Highway |
-| ---------------------------- | ----------- | --- | --------- | ------------ | ------- |
-| Real-time GPS tracking       | ✅          | ✅  | ✅        | ❌           | ❌      |
-| Geofencing with alerts       | ✅          | ✅  | ⚠️        | ❌           | ❌      |
-| Dwell time / detention       | ⚠️ (manual) | ✅  | ❌        | ❌           | ❌      |
-| Public tracking link         | ✅          | ✅  | ⚠️        | ❌           | ❌      |
-| Breadcrumb / route replay    | ✅          | ✅  | ❌        | ❌           | ❌      |
-| Predictive ETA               | ❌          | ✅  | ⚠️        | ❌           | ❌      |
-| Fleet map                    | ✅          | ✅  | ⚠️        | ❌           | ❌      |
-| ELD / telematics integration | ❌          | ✅  | ✅        | ❌           | ✅      |
-| Auto-status on geofence      | ⚠️          | ✅  | ⚠️        | ❌           | ❌      |
+| Feature                      | DispatchRelay | DAT | Truckstop | 123Loadboard | Highway |
+| ---------------------------- | ------------- | --- | --------- | ------------ | ------- |
+| Real-time GPS tracking       | ✅            | ✅  | ✅        | ❌           | ❌      |
+| Geofencing with alerts       | ✅            | ✅  | ⚠️        | ❌           | ❌      |
+| Dwell time / detention       | ⚠️ (manual)   | ✅  | ❌        | ❌           | ❌      |
+| Public tracking link         | ✅            | ✅  | ⚠️        | ❌           | ❌      |
+| Breadcrumb / route replay    | ✅            | ✅  | ❌        | ❌           | ❌      |
+| Predictive ETA               | ❌            | ✅  | ⚠️        | ❌           | ❌      |
+| Fleet map                    | ✅            | ✅  | ⚠️        | ❌           | ❌      |
+| ELD / telematics integration | ❌            | ✅  | ✅        | ❌           | ✅      |
+| Auto-status on geofence      | ⚠️            | ✅  | ⚠️        | ❌           | ❌      |
 
 ### 6. DOCUMENTS
 
-| Feature                    | FreightX | DAT | Truckstop | 123Loadboard | Highway |
-| -------------------------- | -------- | --- | --------- | ------------ | ------- |
-| BOL upload/view            | ✅       | ⚠️  | ⚠️        | ⚠️           | ❌      |
-| BOL e-signature            | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Rate con PDF generation    | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Signature embedding in PDF | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Document hash (SHA-256)    | ✅       | ❌  | ❌        | ❌           | ❌      |
-| POD upload                 | ✅       | ⚠️  | ⚠️        | ⚠️           | ❌      |
-| Insurance cert upload      | ✅       | ✅  | ✅        | ❌           | ✅      |
-| W-9 upload                 | ✅       | ⚠️  | ✅        | ❌           | ❌      |
+| Feature                    | DispatchRelay | DAT | Truckstop | 123Loadboard | Highway |
+| -------------------------- | ------------- | --- | --------- | ------------ | ------- |
+| BOL upload/view            | ✅            | ⚠️  | ⚠️        | ⚠️           | ❌      |
+| BOL e-signature            | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Rate con PDF generation    | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Signature embedding in PDF | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Document hash (SHA-256)    | ✅            | ❌  | ❌        | ❌           | ❌      |
+| POD upload                 | ✅            | ⚠️  | ⚠️        | ⚠️           | ❌      |
+| Insurance cert upload      | ✅            | ✅  | ✅        | ❌           | ✅      |
+| W-9 upload                 | ✅            | ⚠️  | ✅        | ❌           | ❌      |
 
 ### 7. MESSAGING
 
-| Feature                       | FreightX | DAT | Truckstop | 123Loadboard | Highway |
-| ----------------------------- | -------- | --- | --------- | ------------ | ------- |
-| Per-load conversation threads | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Direct user-to-user messaging | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Real-time delivery            | ✅       | ❌  | ❌        | ❌           | ❌      |
-| File attachments              | ❌       | ❌  | ❌        | ❌           | ❌      |
-| Read receipts                 | ❌       | ❌  | ❌        | ❌           | ❌      |
-| Email notifications           | ✅       | ✅  | ✅        | ✅           | ⚠️      |
-| SMS notifications             | ✅       | ✅  | ✅        | ⚠️           | ❌      |
-| Push notifications            | ✅       | ✅  | ✅        | ✅           | ❌      |
-| Lane alerts                   | ✅       | ✅  | ✅        | ✅           | ❌      |
+| Feature                       | DispatchRelay | DAT | Truckstop | 123Loadboard | Highway |
+| ----------------------------- | ------------- | --- | --------- | ------------ | ------- |
+| Per-load conversation threads | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Direct user-to-user messaging | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Real-time delivery            | ✅            | ❌  | ❌        | ❌           | ❌      |
+| File attachments              | ❌            | ❌  | ❌        | ❌           | ❌      |
+| Read receipts                 | ❌            | ❌  | ❌        | ❌           | ❌      |
+| Email notifications           | ✅            | ✅  | ✅        | ✅           | ⚠️      |
+| SMS notifications             | ✅            | ✅  | ✅        | ⚠️           | ❌      |
+| Push notifications            | ✅            | ✅  | ✅        | ✅           | ❌      |
+| Lane alerts                   | ✅            | ✅  | ✅        | ✅           | ❌      |
 
 ### 8. PAYMENTS
 
-| Feature                 | FreightX       | DAT           | Truckstop    | 123Loadboard  | Highway |
+| Feature                 | DispatchRelay  | DAT           | Truckstop    | 123Loadboard  | Highway |
 | ----------------------- | -------------- | ------------- | ------------ | ------------- | ------- |
 | Subscription plans      | ✅             | ✅            | ✅           | ✅            | ✅      |
 | Invoice auto-generation | ✅             | ❌            | ❌           | ❌            | ❌      |
@@ -134,33 +134,33 @@
 
 ### 9. DRIVER TOOLS
 
-| Feature                   | FreightX | DAT | Truckstop | 123Loadboard | Highway |
-| ------------------------- | -------- | --- | --------- | ------------ | ------- |
-| Driver dashboard          | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Receipt / expense capture | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Tire incident log         | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Incident reporting        | ✅       | ❌  | ❌        | ❌           | ❌      |
-| Duty status tracking      | ✅       | ❌  | ⚠️        | ❌           | ❌      |
+| Feature                   | DispatchRelay | DAT | Truckstop | 123Loadboard | Highway |
+| ------------------------- | ------------- | --- | --------- | ------------ | ------- |
+| Driver dashboard          | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Receipt / expense capture | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Tire incident log         | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Incident reporting        | ✅            | ❌  | ❌        | ❌           | ❌      |
+| Duty status tracking      | ✅            | ❌  | ⚠️        | ❌           | ❌      |
 
 ### 10. INTEGRATIONS
 
-| Feature              | FreightX | DAT      | Truckstop | 123Loadboard | Highway |
-| -------------------- | -------- | -------- | --------- | ------------ | ------- |
-| TMS integrations     | ❌       | ✅ (25+) | ✅ (20+)  | ⚠️           | ✅      |
-| Open REST API        | ❌       | ✅       | ✅        | ❌           | ✅      |
-| Google Calendar sync | ✅       | ❌       | ❌        | ❌           | ❌      |
+| Feature              | DispatchRelay | DAT      | Truckstop | 123Loadboard | Highway |
+| -------------------- | ------------- | -------- | --------- | ------------ | ------- |
+| TMS integrations     | ❌            | ✅ (25+) | ✅ (20+)  | ⚠️           | ✅      |
+| Open REST API        | ❌            | ✅       | ✅        | ❌           | ✅      |
+| Google Calendar sync | ✅            | ❌       | ❌        | ❌           | ❌      |
 
 ### 11. MOBILE
 
-| Feature                 | FreightX | DAT | Truckstop | 123Loadboard | Highway |
-| ----------------------- | -------- | --- | --------- | ------------ | ------- |
-| Mobile-first responsive | ✅       | ✅  | ✅        | ✅           | ✅      |
-| Native app              | ❌       | ✅  | ✅        | ✅           | ❌      |
-| Dark mode               | ❌       | ❌  | ❌        | ✅           | ❌      |
+| Feature                 | DispatchRelay | DAT | Truckstop | 123Loadboard | Highway |
+| ----------------------- | ------------- | --- | --------- | ------------ | ------- |
+| Mobile-first responsive | ✅            | ✅  | ✅        | ✅           | ✅      |
+| Native app              | ❌            | ✅  | ✅        | ✅           | ❌      |
+| Dark mode               | ❌            | ❌  | ❌        | ✅           | ❌      |
 
 ---
 
-## WHAT FREIGHTX HAS THAT NO COMPETITOR HAS
+## WHAT DISPATCHRELAY HAS THAT NO COMPETITOR HAS
 
 1. **Counter-offer negotiation** (multi-round bidding)
 2. **Race condition guard** (double-award prevention)
@@ -293,14 +293,14 @@ Status: All 8 items implemented (migrations 073–080 + edge function fix + type
 
 ## PRICING STRATEGY
 
-| Tier                    | Target                 | Price        | Core Value                                              |
-| ----------------------- | ---------------------- | ------------ | ------------------------------------------------------- |
-| FreightX Free           | Owner-operators        | $0/mo        | Load search, basic contact, 1 truck posting             |
-| FreightX Pro            | Owner-op + small fleet | $49/mo       | Rate analytics, broker credit, load alerts, multi-truck |
-| FreightX Fleet          | 5-20 trucks            | $99/mo       | All Pro + team seats, lane optimization                 |
-| FreightX Broker Starter | Small brokerages       | $99/mo       | Posting, carrier search, credit data                    |
-| FreightX Broker Pro     | Mid-size brokerages    | $199/mo      | All Starter + rate data, verification, analytics        |
-| Factoring               | All carriers           | 2.5%/invoice | Same-day funding, no contract                           |
+| Tier                         | Target                 | Price        | Core Value                                              |
+| ---------------------------- | ---------------------- | ------------ | ------------------------------------------------------- |
+| DispatchRelay Free           | Owner-operators        | $0/mo        | Load search, basic contact, 1 truck posting             |
+| DispatchRelay Pro            | Owner-op + small fleet | $49/mo       | Rate analytics, broker credit, load alerts, multi-truck |
+| DispatchRelay Fleet          | 5-20 trucks            | $99/mo       | All Pro + team seats, lane optimization                 |
+| DispatchRelay Broker Starter | Small brokerages       | $99/mo       | Posting, carrier search, credit data                    |
+| DispatchRelay Broker Pro     | Mid-size brokerages    | $199/mo      | All Starter + rate data, verification, analytics        |
+| Factoring                    | All carriers           | 2.5%/invoice | Same-day funding, no contract                           |
 
 **Why this beats DAT:** Free entry vs $49 floor. $99 broker vs $159. No surprise price hikes. Factoring revenue subsidizes free tier.
 
@@ -308,14 +308,14 @@ Status: All 8 items implemented (migrations 073–080 + edge function fix + type
 
 ## COMPETITOR FAILURES — LESSONS
 
-| Company      | Raised    | Died          | Lesson for FreightX                              |
+| Company      | Raised    | Died          | Lesson for DispatchRelay                         |
 | ------------ | --------- | ------------- | ------------------------------------------------ |
 | Convoy       | $900M     | $16M sale     | Unit economics first. Don't burn cash for scale. |
 | Transfix     | $940M val | Fire-sold     | Be profitable, not just funded.                  |
 | Uber Freight | $2.25B    | -$22M/quarter | Freight ≠ ride-hailing. Relationships matter.    |
 | Cargomatic   | $15M      | Near-death    | Never sign customers at negative margin.         |
 
-**FreightX advantage:** $10K build, not $900M burn. Grow sustainably. Keep trust.
+**DispatchRelay advantage:** $10K build, not $900M burn. Grow sustainably. Keep trust.
 
 ---
 

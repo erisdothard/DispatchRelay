@@ -34,7 +34,7 @@ function factoringRequests(): Row[] {
     fee_percent: feePercent,
     net_payout: round2(invoice * (1 - feePercent / 100)),
     status,
-    factor_partner: 'FreightX QuickPay',
+    factor_partner: 'DispatchRelay QuickPay',
     notes: null,
     requested_at: hoursAgo(hoursOld),
     approved_at: null,

@@ -1,4 +1,4 @@
-# FreightX Testing Structure
+# DispatchRelay Testing Structure
 
 ## How to run
 

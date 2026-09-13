@@ -74,7 +74,7 @@ export async function issueFuelCard(params: {
     .insert({
       company_id: params.companyId,
       card_number_masked: `****-****-****-${Math.floor(1000 + Math.random() * 9000)}`,
-      provider: 'freightx',
+      provider: 'dispatchrelay',
       assigned_driver: params.driverId ?? null,
       daily_limit_usd: params.dailyLimit ?? 500,
       status: 'active',

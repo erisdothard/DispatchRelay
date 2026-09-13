@@ -85,7 +85,7 @@ export function SignedRateConViewer({
               style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
             >
               <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest">
-                FreightX
+                DispatchRelay
               </p>
               <p className="text-xl font-extrabold text-white mt-1">Rate Confirmation</p>
               <p className="text-sm text-fx-text-muted mt-0.5">Load #{load.loadNumber}</p>

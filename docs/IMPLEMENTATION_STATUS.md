@@ -1,4 +1,4 @@
-# FreightX — Implementation Status
+# DispatchRelay — Implementation Status
 
 **Last Updated:** 2026-04-12
 **Audit basis:** Source code in `apps/web/src/`, `database/migrations/`, `supabase/functions/`, `apps/web/package.json`, `apps/web/tailwind.config.ts`
@@ -288,7 +288,7 @@ These features are referenced in older documentation but have no source code:
 - DAT / Truckstop cross-posting
 - Multi-language / i18n support
 - Open REST API for external partners
-- FreightX Academy / learning platform (no academy app in monorepo)
+- DispatchRelay Academy / learning platform (no academy app in monorepo)
 - Automated IFTA mileage / quarterly tax export
 - Payment escrow / Guaranteed Pay
 - HOS (Hours of Service) compliance tracking

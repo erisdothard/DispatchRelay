@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Performance Monitor — Phase 7
- * Collects and reports key performance metrics from the FreightX API.
+ * Collects and reports key performance metrics from the DispatchRelay API.
  * Usage: node scripts/performance-monitor.js
  */
 

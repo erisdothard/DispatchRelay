@@ -33,7 +33,7 @@ export default function PrivacyPage() {
               2. How We Use Your Information
             </h2>
             <p>
-              We use your information to provide and improve the FreightX platform, process
+              We use your information to provide and improve the DispatchRelay platform, process
               payments, verify carrier/broker credentials via FMCSA, send transactional
               notifications, and comply with applicable law. We do not sell your personal
               information to third parties.
@@ -75,7 +75,7 @@ export default function PrivacyPage() {
               Depending on your location, you may have rights to access, correct, delete, or export
               your personal data. California residents have additional rights under CCPA. To
               exercise any rights, contact us at{' '}
-              <span className="text-fx-text-main">privacy@freightx.io</span>.
+              <span className="text-fx-text-main">privacy@dispatchrelay.co</span>.
             </p>
           </section>
 
@@ -102,7 +102,7 @@ export default function PrivacyPage() {
             <h2 className="text-base font-semibold text-fx-text-main mb-2">9. Contact</h2>
             <p>
               Questions about this policy? Contact us at{' '}
-              <span className="text-fx-text-main">privacy@freightx.io</span>.
+              <span className="text-fx-text-main">privacy@dispatchrelay.co</span>.
             </p>
           </section>
         </div>

@@ -23,12 +23,12 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
 
   const header = `
     <div style="text-align:center;margin-bottom:24px;">
-      <span style="font-size:24px;font-weight:900;color:${accentColor};letter-spacing:-0.5px;">FreightX</span>
+      <span style="font-size:24px;font-weight:900;color:${accentColor};letter-spacing:-0.5px;">DispatchRelay</span>
     </div>`;
 
   const footer = `
     <div style="text-align:center;margin-top:32px;font-size:11px;color:${mutedColor};">
-      FreightX · Real-time freight management · <a href="https://freightx.app" style="color:${accentColor};text-decoration:none;">freightx.app</a>
+      DispatchRelay · Real-time freight management · <a href="https://dispatchrelay.co" style="color:${accentColor};text-decoration:none;">dispatchrelay.co</a>
     </div>`;
 
   const templates: Record<string, string> = {
@@ -47,7 +47,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
             <div style="font-size:28px;font-weight:900;color:${accentColor};">$${data.amount?.toLocaleString() ?? ''}</div>
             <div style="font-size:13px;color:${mutedColor};margin-top:4px;">from ${data.carrier_name ?? 'Unknown Carrier'}</div>
           </div>
-          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">Review Bid</a>
+          <a href="https://dispatchrelay.co" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">Review Bid</a>
         </div>
         ${footer}
       </div>`,
@@ -63,7 +63,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
             <div style="font-size:16px;font-weight:600;color:#fff;">${data.load_number ?? ''} · ${data.origin ?? ''} → ${data.dest ?? ''}</div>
             <div style="font-size:13px;color:${mutedColor};margin-top:8px;">Pickup: ${data.pickup_date ?? ''}</div>
           </div>
-          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Load Details</a>
+          <a href="https://dispatchrelay.co" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Load Details</a>
         </div>
         ${footer}
       </div>`,
@@ -75,7 +75,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
           <h2 style="font-size:20px;font-weight:700;color:#fff;margin:0 0 8px;">Bid Update</h2>
           <p style="color:${mutedColor};margin:0 0 24px;font-size:14px;">Your bid on load <strong style="color:#fff;">${data.load_number ?? ''}</strong> was not selected this time.</p>
           <p style="font-size:14px;color:${mutedColor};">Keep checking the load board — new loads are posted daily.</p>
-          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;margin-top:24px;">Browse Open Loads</a>
+          <a href="https://dispatchrelay.co" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;margin-top:24px;">Browse Open Loads</a>
         </div>
         ${footer}
       </div>`,
@@ -100,7 +100,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
               <span style="font-size:13px;font-weight:600;color:${accentColor};">$${data.amount?.toLocaleString() ?? ''}</span>
             </div>
           </div>
-          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Booking</a>
+          <a href="https://dispatchrelay.co" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Booking</a>
         </div>
         ${footer}
       </div>`,
@@ -116,7 +116,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
             <div style="font-size:22px;font-weight:900;color:${accentColor};text-transform:uppercase;letter-spacing:1px;">${String(data.status ?? '').replace(/_/g, ' ')}</div>
             <div style="font-size:12px;color:${mutedColor};margin-top:4px;">${data.load_number ?? ''} · ${data.origin ?? ''} → ${data.dest ?? ''}</div>
           </div>
-          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">Track Load</a>
+          <a href="https://dispatchrelay.co" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">Track Load</a>
         </div>
         ${footer}
       </div>`,
@@ -130,7 +130,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
           <div style="background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:24px;border-left:3px solid ${accentColor};">
             <p style="font-size:14px;color:#e8e8e8;margin:0;line-height:1.6;">"${data.preview ?? ''}"</p>
           </div>
-          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">Reply</a>
+          <a href="https://dispatchrelay.co" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">Reply</a>
         </div>
         ${footer}
       </div>`,
@@ -147,7 +147,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
             <div style="font-size:13px;color:${mutedColor};margin-top:12px;">Signed by</div>
             <div style="font-size:14px;font-weight:600;color:${accentColor};">${data.signed_by ?? ''}</div>
           </div>
-          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Document</a>
+          <a href="https://dispatchrelay.co" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Document</a>
         </div>
         ${footer}
       </div>`,
@@ -164,7 +164,7 @@ function buildEmailHtml(template: string, data: Record<string, unknown>): string
             <div style="font-size:20px;font-weight:900;color:${accentColor};margin-top:12px;">$${data.rate?.toLocaleString() ?? 'Call'}</div>
             <div style="font-size:12px;color:${mutedColor};margin-top:2px;">${data.equipment ?? ''} · ${data.miles ?? ''} mi</div>
           </div>
-          <a href="https://freightx.app" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Load</a>
+          <a href="https://dispatchrelay.co" style="display:block;background:${accentColor};color:#fff;text-align:center;padding:14px 24px;border-radius:12px;font-weight:700;text-decoration:none;font-size:15px;">View Load</a>
         </div>
         ${footer}
       </div>`,
@@ -201,7 +201,7 @@ Deno.serve(async (req) => {
     const html = buildEmailHtml(template, data);
 
     const emailBody: Record<string, unknown> = {
-      from: 'FreightX <notifications@freightx.app>',
+      from: 'DispatchRelay <notifications@dispatchrelay.co>',
       to: [to],
       subject,
       html,

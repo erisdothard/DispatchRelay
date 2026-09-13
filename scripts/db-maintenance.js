@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Database Maintenance — Phase 7
- * Runs periodic cleanup tasks on the FreightX Supabase database.
+ * Runs periodic cleanup tasks on the DispatchRelay Supabase database.
  * Usage: node scripts/db-maintenance.js
  *
  * Tasks:

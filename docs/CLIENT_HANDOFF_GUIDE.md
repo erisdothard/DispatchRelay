@@ -1,4 +1,4 @@
-# FreightX — Client Handoff Guide
+# DispatchRelay — Client Handoff Guide
 
 **Version:** 2.0
 **Date:** 2026-03-16
@@ -8,7 +8,7 @@
 
 ## 🎯 Project Overview
 
-FreightX is a **unified freight marketplace** that serves Carriers, Brokers, and Shippers in a single platform. The application is built with modern technologies and is ready for production deployment.
+DispatchRelay is a **unified freight marketplace** that serves Carriers, Brokers, and Shippers in a single platform. The application is built with modern technologies and is ready for production deployment.
 
 ### Key Statistics
 
@@ -163,7 +163,7 @@ supabase functions deploy location-cleanup
 ## 📁 Project Structure
 
 ```
-FreightX/
+DispatchRelay/
 ├── apps/web/              # Main React application
 │   ├── src/
 │   │   ├── features/      # Feature modules (bids, loads, trucks, etc.)
@@ -395,4 +395,4 @@ All 13 phases are complete. Recommended post-launch priorities:
 
 ---
 
-_This guide provides everything needed to deploy and maintain FreightX in production. For additional support, refer to the detailed documentation in the `docs/` directory._
+_This guide provides everything needed to deploy and maintain DispatchRelay in production. For additional support, refer to the detailed documentation in the `docs/` directory._

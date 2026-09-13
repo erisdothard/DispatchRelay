@@ -359,7 +359,7 @@ export function HosStatusCard({ driverId }: { driverId: string }) {
 
 ## ELD (Electronic Logging Device) Integration
 
-FreightX GPS tracking can serve as an ELD alternative if certified:
+DispatchRelay GPS tracking can serve as an ELD alternative if certified:
 
 ### ELD Certification Requirements
 
@@ -443,4 +443,4 @@ $$;
 
 ## Legal Disclaimer
 
-This documentation is for informational purposes only. FreightX is not currently ELD-certified. Carriers are responsible for ensuring compliance with all applicable FMCSA regulations. Consult with legal counsel before relying on this system for HOS compliance.
+This documentation is for informational purposes only. DispatchRelay is not currently ELD-certified. Carriers are responsible for ensuring compliance with all applicable FMCSA regulations. Consult with legal counsel before relying on this system for HOS compliance.

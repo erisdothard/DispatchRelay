@@ -1,4 +1,4 @@
-# FreightX — Deployment Guide
+# DispatchRelay — Deployment Guide
 
 **Purpose:** Step-by-step guide to deploy Phase 6 infrastructure  
 **Time Required:** 30-60 minutes
@@ -35,7 +35,7 @@
 
 ```bash
 # Navigate to project root
-cd /Users/erisdothard/Desktop/FreightX
+cd <repo-root>
 
 # Install Supabase CLI if not already installed
 brew install supabase/tap/supabase
@@ -322,7 +322,7 @@ After completing Phase 6:
    - Developer SDK
 
 2. **Phase 8:** Create study guide app
-   - FreightX Academy
+   - DispatchRelay Academy
    - Interactive diagrams
    - CEO presentation
 

@@ -74,9 +74,9 @@ Deno.serve(async (req) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-FreightX-Signature': signatureHex,
-            'X-FreightX-Event': delivery.event_type,
-            'X-FreightX-Delivery-ID': delivery.id,
+            'X-DispatchRelay-Signature': signatureHex,
+            'X-DispatchRelay-Event': delivery.event_type,
+            'X-DispatchRelay-Delivery-ID': delivery.id,
           },
           body: JSON.stringify(delivery.payload),
           signal: AbortSignal.timeout(30000), // 30 second timeout

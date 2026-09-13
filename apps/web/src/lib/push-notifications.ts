@@ -1,5 +1,5 @@
 /**
- * Web Push subscription management for the FreightX PWA.
+ * Web Push subscription management for the DispatchRelay PWA.
  * Uses the Web Push API (VAPID) to subscribe/unsubscribe users.
  *
  * Prerequisites:

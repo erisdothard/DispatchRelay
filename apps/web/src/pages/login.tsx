@@ -65,7 +65,7 @@ export default function LoginPage() {
 
       {/* Logo */}
       <div className="flex flex-col items-center pt-10 pb-10">
-        <img src="/logo-user-1.svg" alt="FreightX" className="h-10 mb-2" />
+        <img src="/logo-user-1.svg" alt="DispatchRelay" className="h-10 mb-2" />
         <p className="text-[14px] text-fx-text-dim mt-1">
           {IS_DEMO_ENV
             ? 'Pick a role and explore the live demo.'

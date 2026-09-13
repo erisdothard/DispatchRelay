@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Load Test — Phase 7
- * Fires concurrent requests at the FreightX API to measure throughput.
+ * Fires concurrent requests at the DispatchRelay API to measure throughput.
  * Usage: node scripts/load-test.js [--concurrency 20] [--requests 200]
  *
  * Does NOT mutate data — only hits GET endpoints.

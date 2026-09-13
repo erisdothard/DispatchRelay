@@ -57,7 +57,7 @@ export function TopHeader({
           <h1
             className={cn('font-bold text-fx-text leading-tight', greeting ? 'text-xl' : 'text-lg')}
           >
-            {title || name || 'FreightX'}
+            {title || name || 'DispatchRelay'}
           </h1>
         </div>
       </div>

@@ -242,7 +242,7 @@ function buildCalendarEvent(load: LoadRow, deadheadMiles: number | null) {
     ...(deadheadMiles !== null ? [`Deadhead: ~${deadheadMiles} mi`] : []),
     ...(load.special_instructions ? [`\nSpecial Instructions:\n${load.special_instructions}`] : []),
     '',
-    'Managed by FreightX',
+    'Managed by DispatchRelay',
   ];
 
   return {

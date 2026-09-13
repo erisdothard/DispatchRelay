@@ -138,7 +138,7 @@ export function LoadCard({
           </span>
         </div>
 
-        {/* Rate health pill — unique FreightX feature */}
+        {/* Rate health pill — unique DispatchRelay feature */}
         <div
           className="shrink-0 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
           style={{

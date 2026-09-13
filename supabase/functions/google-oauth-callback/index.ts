@@ -2,7 +2,7 @@
  * google-oauth-callback Edge Function
  *
  * Handles the OAuth 2.0 callback from Google after the driver authorizes
- * FreightX to manage their calendar. Exchanges the auth code for tokens
+ * DispatchRelay to manage their calendar. Exchanges the auth code for tokens
  * and stores them in the calendar_integrations table.
  *
  * Flow:
@@ -11,7 +11,7 @@
  * 3. Google redirects back here with ?code=... &state=...
  * 4. We exchange the code for access + refresh tokens
  * 5. Store tokens in calendar_integrations
- * 6. Redirect driver back to FreightX settings page
+ * 6. Redirect driver back to DispatchRelay settings page
  */
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
       return redirectWithError('Failed to save calendar connection.');
     }
 
-    // Redirect back to FreightX settings with success
+    // Redirect back to DispatchRelay settings with success
     const redirectUrl = new URL(stateData.redirect_url);
     redirectUrl.searchParams.set('calendar_connected', 'true');
     return Response.redirect(redirectUrl.toString(), 302);

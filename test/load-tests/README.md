@@ -1,6 +1,6 @@
 # GPS Load Testing
 
-Enterprise-grade load testing for FreightX GPS tracking system.
+Enterprise-grade load testing for DispatchRelay GPS tracking system.
 
 ## Prerequisites
 

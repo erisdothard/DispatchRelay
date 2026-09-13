@@ -1,29 +1,35 @@
-# FreightX
+# DispatchRelay
 
-**Multi-role logistics load board SaaS platform** connecting Carriers, Brokers, and Shippers in the freight industry.
+**Multi-role logistics load board SaaS platform** connecting Carriers, Brokers, and Shippers in the freight industry. Formerly FreightX.
 
 ## Status
 
 `Phases 1–10 Complete — Production Ready`
 
+## Live Demo
+
+**[dispatchrelay.co/demo](https://dispatchrelay.co/demo)** — pick a role, no sign-up. Or jump straight in as a [carrier](https://dispatchrelay.co/demo/carrier), [broker](https://dispatchrelay.co/demo/broker), [shipper](https://dispatchrelay.co/demo/shipper), or [driver](https://dispatchrelay.co/demo/driver).
+
+The demo needs no database. When `VITE_SUPABASE_URL` is unset (or `VITE_DEMO_MODE=true`), `apps/web/src/lib/supabase.ts` routes every call to an in-memory demo client (`apps/web/src/lib/demo`) backed by seeded tables, so the whole app runs on sample data.
+
 ---
 
-## What Is FreightX?
+## What Is DispatchRelay?
 
-FreightX is a unified marketplace where:
+DispatchRelay is a unified marketplace where:
 
 - **Carriers** post available trucks, search for loads, bid, and track deliveries with live GPS
 - **Brokers** post loads, search for available trucks, manage bids, and issue rate confirmations
 - **Shippers** post freight, book carriers, and track shipments end-to-end
 
-**Key differentiator:** Most competitors (DAT, Truckstop) serve one or two roles. FreightX puts all three in one platform with real-time bidding, AI load matching, live GPS tracking, in-platform payments, and built-in carrier verification.
+**Key differentiator:** Most competitors (DAT, Truckstop) serve one or two roles. DispatchRelay puts all three in one platform with real-time bidding, AI load matching, live GPS tracking, in-platform payments, and built-in carrier verification.
 
 ---
 
 ## Monorepo Structure
 
 ```
-freightx/
+dispatchrelay/
 ├── apps/
 │   └── web/                    # React 19 + Vite 6 SPA (primary app)
 │       └── src/

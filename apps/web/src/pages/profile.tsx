@@ -283,7 +283,9 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        <p className="text-center text-[10px] text-fx-text-dim pb-6">FreightX v2.0.0 · Phase 13</p>
+        <p className="text-center text-[10px] text-fx-text-dim pb-6">
+          DispatchRelay v2.0.0 · Phase 13
+        </p>
       </div>
 
       <BottomNav role={role} />

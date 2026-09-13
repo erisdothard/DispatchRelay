@@ -1,4 +1,4 @@
-# FreightX — Product Brief
+# DispatchRelay — Product Brief
 
 **Version:** 1.0
 **Date:** February 17, 2026
@@ -8,7 +8,7 @@
 
 ## Vision
 
-FreightX is a **unified freight marketplace** that replaces the fragmented ecosystem of load boards, TMS tools, and carrier portals with a single platform where Carriers, Brokers, and Shippers operate together in real time.
+DispatchRelay is a **unified freight marketplace** that replaces the fragmented ecosystem of load boards, TMS tools, and carrier portals with a single platform where Carriers, Brokers, and Shippers operate together in real time.
 
 ---
 
@@ -26,9 +26,9 @@ No single platform serves all three. Users pay for three products, switch betwee
 
 ## The Solution
 
-FreightX unifies all three roles in one SaaS platform:
+DispatchRelay unifies all three roles in one SaaS platform:
 
-| Role        | What They Do on FreightX                                                                      |
+| Role        | What They Do on DispatchRelay                                                                 |
 | ----------- | --------------------------------------------------------------------------------------------- |
 | **Carrier** | Post available trucks, search loads, bid, book, update status, upload POD, get paid           |
 | **Broker**  | Post loads, search trucks, accept bids, generate rate confirmations, track shipments, invoice |
@@ -50,7 +50,7 @@ New load postings appear instantly. Status updates push to all parties. Chat is 
 
 ### 3. Booking-to-Payment Workflow
 
-From posting to payment, every step is in FreightX. Rate confirmation auto-generated on booking. Invoice auto-generated on delivery. Payment processed in-platform. No more chasing paper.
+From posting to payment, every step is in DispatchRelay. Rate confirmation auto-generated on booking. Invoice auto-generated on delivery. Payment processed in-platform. No more chasing paper.
 
 ### 4. Carrier Verification Built-In
 
@@ -98,23 +98,23 @@ MC/DOT numbers verified against FMCSA SAFER on signup. Insurance certificates tr
 
 ### Transaction Fees (Secondary Revenue)
 
-- 0.5–1% on in-platform payments processed through FreightX
+- 0.5–1% on in-platform payments processed through DispatchRelay
 - Quick Pay fee: 2% for 2-day payment vs net-30
 
 ---
 
 ## Competitive Landscape
 
-| Feature              | DAT     | Truckstop | Convoy     | **FreightX** |
-| -------------------- | ------- | --------- | ---------- | ------------ |
-| Multi-role (C+B+S)   | No      | No        | No         | **Yes**      |
-| Real-time messaging  | Basic   | Basic     | Yes        | Yes          |
-| In-platform payments | No      | Yes       | Yes        | Yes          |
-| Carrier verification | Yes     | Yes       | Yes        | Yes          |
-| Live GPS tracking    | Yes     | Yes       | Yes        | Planned      |
-| AI matching          | No      | Limited   | Yes        | Planned      |
-| Open API             | Limited | Yes       | No         | Planned      |
-| Price                | $50+/mo | $50+/mo   | Commission | $49–$349/mo  |
+| Feature              | DAT     | Truckstop | Convoy     | **DispatchRelay** |
+| -------------------- | ------- | --------- | ---------- | ----------------- |
+| Multi-role (C+B+S)   | No      | No        | No         | **Yes**           |
+| Real-time messaging  | Basic   | Basic     | Yes        | Yes               |
+| In-platform payments | No      | Yes       | Yes        | Yes               |
+| Carrier verification | Yes     | Yes       | Yes        | Yes               |
+| Live GPS tracking    | Yes     | Yes       | Yes        | Planned           |
+| AI matching          | No      | Limited   | Yes        | Planned           |
+| Open API             | Limited | Yes       | No         | Planned           |
+| Price                | $50+/mo | $50+/mo   | Commission | $49–$349/mo       |
 
 ---
 

@@ -13,4 +13,4 @@ Disallow: /track/
 Disallow: /onboarding
 Disallow: /reset-password
 
-Sitemap: https://freightx.io/sitemap.xml
+Sitemap: https://dispatchrelay.co/sitemap.xml

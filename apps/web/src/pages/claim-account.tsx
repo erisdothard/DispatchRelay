@@ -76,7 +76,7 @@ export default function ClaimAccountPage() {
         <div>
           <h1 className="text-xl font-bold text-fx-text">Claim Your Account</h1>
           <p className="text-xs text-fx-text-muted mt-0.5">
-            Set a password to activate your FreightX account.
+            Set a password to activate your DispatchRelay account.
           </p>
         </div>
       </div>

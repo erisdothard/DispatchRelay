@@ -6,7 +6,7 @@ const NO_CREDENTIALS = 'Demo builds have no credential login';
 test.describe('Auth flows', () => {
   test('splash page loads and shows login CTA', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle(/FreightX/);
+    await expect(page).toHaveTitle(/DispatchRelay/);
     await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
   });
 

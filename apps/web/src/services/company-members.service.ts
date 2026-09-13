@@ -109,7 +109,7 @@ export async function inviteMember(params: {
     .invoke('send-notification-email', {
       body: {
         to: invite.email,
-        subject: `You're invited to join ${params.companyName ?? 'a FreightX team'}`,
+        subject: `You're invited to join ${params.companyName ?? 'a DispatchRelay team'}`,
         template: 'company_invite',
         data: {
           invite_url: inviteUrl,

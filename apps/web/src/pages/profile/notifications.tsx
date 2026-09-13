@@ -250,7 +250,9 @@ export default function NotificationsPage() {
           )}
         </button>
 
-        <p className="text-center text-[10px] text-fx-text-dim mt-6">FreightX v0.13.0 · Phase 13</p>
+        <p className="text-center text-[10px] text-fx-text-dim mt-6">
+          DispatchRelay v0.13.0 · Phase 13
+        </p>
       </div>
 
       <BottomNav role={role} />

@@ -1,4 +1,4 @@
-# FreightX — Development Roadmap
+# DispatchRelay — Development Roadmap
 
 > **IMPORTANT:** Items listed here are NOT yet implemented. Everything built is in [IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md).
 
@@ -75,6 +75,6 @@ The following items have no corresponding source code as of the last audit (2026
 
 ## Competitive Context
 
-FreightX's strategic advantage over DAT / Truckstop / Convoy is owning the full transaction: instant book → digital rate con → GPS tracking → POD → payment. The unbuilt items above (ACH payout, escrow, factoring) are the critical missing pieces that would complete that loop.
+DispatchRelay's strategic advantage over DAT / Truckstop / Convoy is owning the full transaction: instant book → digital rate con → GPS tracking → POD → payment. The unbuilt items above (ACH payout, escrow, factoring) are the critical missing pieces that would complete that loop.
 
 See archived PHASE guides in `docs/phases/` for the full historical build record.

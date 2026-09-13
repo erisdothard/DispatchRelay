@@ -1,4 +1,4 @@
-# FreightX — Claude Context
+# DispatchRelay — Claude Context
 
 > Created: 2026-04-01 | Stack: React 19 + Vite + TypeScript + Supabase | Status: active (Phase 20)
 
@@ -13,7 +13,7 @@ Multi-role SaaS freight marketplace for 3 Aces Trucking Inc. Connects carriers, 
 ## Architecture Map
 
 ```
-FreightX/                         # Turborepo monorepo (pnpm)
+dispatchrelay/                    # Turborepo monorepo (pnpm)
 ├── apps/
 │   └── web/                      # Main React app (Vite + React 19)
 │       ├── src/
@@ -79,12 +79,13 @@ npx supabase secrets set KEY=value --project-ref gqmcuzhdqvfczqreklpk
 
 ## Database
 
-- **Supabase URL:** `https://gqmcuzhdqvfczqreklpk.supabase.co`
+- **Status:** The Supabase project is retired. The app runs as a no-database demo on an in-memory backend (`apps/web/src/lib/demo`), which activates when `VITE_SUPABASE_URL` is unset or `VITE_DEMO_MODE=true`. Public demo: https://dispatchrelay.co/demo and `/demo/:role` (carrier, broker, shipper, driver). The notes below describe the retired backend.
+- **Supabase URL (retired):** `https://gqmcuzhdqvfczqreklpk.supabase.co`
 - **Auth:** Supabase Auth (JWT, email/password, magic links)
 - **RLS:** Enabled on all tables
 - **Key tables:** users, companies, loads, trucks, drivers, bookings, messages, notifications, payments, equipment, routes, team_members
 - **Edge Functions:** ai-load-search (Anthropic Claude API for semantic load search)
-- **See:** `~/.claude/projects/-Users-erisdothard-Desktop-Freightx-Main-Folder-FreightX/memory/schema_map.md` for full schema
+- **See:** `schema_map.md` in the Claude memory for the original checkout (`~/.claude/projects/<original-checkout-slug>/memory/`) for the full schema as it stood before retirement
 
 ---
 
@@ -152,10 +153,10 @@ See `.env.example` for full list with comments.
 
 ## Test Accounts
 
-- Carrier: `carrier@freightx.com` (company: Rivera Transport Inc)
-- Driver 1: `driver@freightx.com` (viewer in carrier company)
-- Driver 2: `driver2@freightx.com` (viewer in carrier company)
-- Broker: `broker@freightx.com`
+- Carrier: `carrier@dispatchrelay.co` (company: Rivera Transport Inc)
+- Driver 1: `driver@dispatchrelay.co` (viewer in carrier company)
+- Driver 2: `driver2@dispatchrelay.co` (viewer in carrier company)
+- Broker: `broker@dispatchrelay.co`
 
 ---
 

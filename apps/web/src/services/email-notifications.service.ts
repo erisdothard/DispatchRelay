@@ -254,7 +254,7 @@ export async function smsBookingConfirmed(params: {
 }): Promise<void> {
   await enqueueSms({
     to: params.to,
-    message: `FreightX: Booking confirmed — Load ${params.loadNumber}, ${params.origin} → ${params.dest}. View: freightx.app`,
+    message: `DispatchRelay: Booking confirmed — Load ${params.loadNumber}, ${params.origin} → ${params.dest}. View: dispatchrelay.co`,
   });
 }
 
@@ -265,6 +265,6 @@ export async function smsPickupReminder(params: {
 }): Promise<void> {
   await enqueueSms({
     to: params.to,
-    message: `FreightX reminder: Pickup tomorrow for load ${params.loadNumber} in ${params.pickupCity}. freightx.app`,
+    message: `DispatchRelay reminder: Pickup tomorrow for load ${params.loadNumber} in ${params.pickupCity}. dispatchrelay.co`,
   });
 }

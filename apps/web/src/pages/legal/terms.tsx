@@ -19,8 +19,8 @@ export default function TermsPage() {
           <section>
             <h2 className="text-base font-semibold text-fx-text-main mb-2">1. Acceptance</h2>
             <p>
-              By creating a FreightX account or using our platform, you agree to these Terms of
-              Service. If you do not agree, do not use FreightX.
+              By creating a DispatchRelay account or using our platform, you agree to these Terms of
+              Service. If you do not agree, do not use DispatchRelay.
             </p>
           </section>
 
@@ -29,10 +29,10 @@ export default function TermsPage() {
               2. Platform Description
             </h2>
             <p>
-              FreightX is a freight marketplace connecting carriers, freight brokers, and shippers.
-              We provide tools for load posting, bidding, booking, document management, and payment
-              processing. FreightX is not a freight broker or carrier — we are a technology platform
-              facilitating transactions between independent parties.
+              DispatchRelay is a freight marketplace connecting carriers, freight brokers, and
+              shippers. We provide tools for load posting, bidding, booking, document management,
+              and payment processing. DispatchRelay is not a freight broker or carrier — we are a
+              technology platform facilitating transactions between independent parties.
             </p>
           </section>
 
@@ -82,10 +82,10 @@ export default function TermsPage() {
               7. Limitation of Liability
             </h2>
             <p>
-              FreightX provides the platform "as is." We are not liable for cargo loss or damage,
-              load cancellations, disputes between users, or any indirect, consequential, or
+              DispatchRelay provides the platform "as is." We are not liable for cargo loss or
+              damage, load cancellations, disputes between users, or any indirect, consequential, or
               incidental damages. Our total liability to you shall not exceed the fees you paid to
-              FreightX in the 3 months preceding the claim.
+              DispatchRelay in the 3 months preceding the claim.
             </p>
           </section>
 
@@ -110,7 +110,8 @@ export default function TermsPage() {
           <section>
             <h2 className="text-base font-semibold text-fx-text-main mb-2">10. Contact</h2>
             <p>
-              Questions? Contact us at <span className="text-fx-text-main">legal@freightx.io</span>.
+              Questions? Contact us at{' '}
+              <span className="text-fx-text-main">legal@dispatchrelay.co</span>.
             </p>
           </section>
         </div>
@@ -120,7 +121,7 @@ export default function TermsPage() {
             Privacy Policy
           </Link>
           <span>·</span>
-          <span>© 2026 FreightX. All rights reserved.</span>
+          <span>© 2026 DispatchRelay. All rights reserved.</span>
         </div>
       </div>
     </div>

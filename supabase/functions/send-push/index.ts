@@ -43,7 +43,7 @@ async function sendWebPush(
 
   const vapidPublicKey = Deno.env.get('VAPID_PUBLIC_KEY');
   const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY');
-  const vapidSubject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:noreply@freightx.app';
+  const vapidSubject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:noreply@dispatchrelay.co';
 
   if (!vapidPublicKey || !vapidPrivateKey) {
     console.warn('[send-push] VAPID keys not configured — skipping push delivery');
@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const pushData = { title, body, url: url ?? '/', tag: tag ?? 'freightx' };
+    const pushData = { title, body, url: url ?? '/', tag: tag ?? 'dispatchrelay' };
     let sent = 0;
     let failed = 0;
 

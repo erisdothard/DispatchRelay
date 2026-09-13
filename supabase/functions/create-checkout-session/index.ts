@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
         .eq('id', companyId);
     }
 
-    const appUrl = Deno.env.get('APP_URL') ?? 'https://freightx.io';
+    const appUrl = Deno.env.get('APP_URL') ?? 'https://dispatchrelay.co';
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

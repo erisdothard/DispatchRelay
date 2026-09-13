@@ -1,5 +1,5 @@
 /**
- * FreightX logo system
+ * DispatchRelay logo system
  *
  * Each chevron is a tall, narrow hexagonal arrow (portrait, ~0.72:1 w:h).
  * Three overlap in sequence, rendered back→front so brightest is on top.
@@ -42,7 +42,7 @@ function ChevronsSVG({ size }: { size: number }) {
 
 export function LogoWordmark({ height = 32, className }: { height?: number; className?: string }) {
   return (
-    <div className={`flex items-center gap-3 ${className ?? ''}`} aria-label="FreightX">
+    <div className={`flex items-center gap-3 ${className ?? ''}`} aria-label="DispatchRelay">
       <ChevronsSVG size={height} />
       <span
         style={{
@@ -53,8 +53,8 @@ export function LogoWordmark({ height = 32, className }: { height?: number; clas
           fontFamily: 'inherit',
         }}
       >
-        <span style={{ color: '#FFFFFF' }}>FREIGHT</span>
-        <span style={{ color: '#CB521A' }}>X</span>
+        <span style={{ color: '#FFFFFF' }}>DISPATCH</span>
+        <span style={{ color: '#CB521A' }}>RELAY</span>
       </span>
     </div>
   );
@@ -64,7 +64,7 @@ export function LogoEmblem({ size = 56, className }: { size?: number; className?
   return (
     <div
       className={className}
-      aria-label="FreightX"
+      aria-label="DispatchRelay"
       style={{
         width: size,
         height: size,

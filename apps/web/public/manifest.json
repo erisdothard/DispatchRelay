@@ -1,6 +1,6 @@
 {
-  "name": "FreightX",
-  "short_name": "FreightX",
+  "name": "DispatchRelay",
+  "short_name": "DispatchRelay",
   "description": "The freight load board built for carriers, brokers, and shippers.",
   "start_url": "/",
   "display": "standalone",
@@ -35,7 +35,7 @@
       "src": "/og-image.png",
       "sizes": "1200x630",
       "type": "image/png",
-      "label": "FreightX load board"
+      "label": "DispatchRelay load board"
     }
   ],
   "shortcuts": [

@@ -44,7 +44,7 @@ const faqs: FAQItem[] = [
   {
     question: 'How do I contact support?',
     answer:
-      'You can reach our support team via the Contact options below, or email us at support@freightx.com. We typically respond within 24 hours.',
+      'You can reach our support team via the Contact options below, or email us at support@dispatchrelay.co. We typically respond within 24 hours.',
   },
   {
     question: 'Can I change my profile information?',
@@ -130,7 +130,7 @@ export default function HelpCenterPage() {
             </button>
 
             <a
-              href="mailto:support@freightx.com"
+              href="mailto:support@dispatchrelay.co"
               className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors"
             >
               <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
@@ -138,7 +138,7 @@ export default function HelpCenterPage() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-fx-text">Email Support</p>
-                <p className="text-xs text-fx-text-muted">support@freightx.com</p>
+                <p className="text-xs text-fx-text-muted">support@dispatchrelay.co</p>
               </div>
             </a>
 
@@ -158,7 +158,7 @@ export default function HelpCenterPage() {
         </div>
 
         {/* Version Info */}
-        <p className="text-center text-[10px] text-fx-text-dim">FreightX v0.2.0 · Phase 2</p>
+        <p className="text-center text-[10px] text-fx-text-dim">DispatchRelay v0.2.0 · Phase 2</p>
       </div>
 
       <BottomNav role={role} />

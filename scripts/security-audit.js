@@ -93,7 +93,7 @@ async function checkSecrets() {
 }
 
 async function main() {
-  console.log(chalk.bold('\nFreightX Security Audit\n'));
+  console.log(chalk.bold('\nDispatchRelay Security Audit\n'));
 
   const deps = await checkDependencies();
   const secrets = await checkSecrets();

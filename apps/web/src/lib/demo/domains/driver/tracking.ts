@@ -267,7 +267,7 @@ const MOBILE_DEVICES: Row[] = [
 ];
 
 const CONSENT_TEXT =
-  'I consent to FreightX collecting and sharing my live GPS location with my carrier and dispatcher while I am on active loads.';
+  'I consent to DispatchRelay collecting and sharing my live GPS location with my carrier and dispatcher while I am on active loads.';
 
 const GPS_CONSENT: Row[] = [DEMO_IDS.driver, DEMO_IDS.driver2].map((userId, i) => ({
   id: `gps-consent-${i + 1}`,
@@ -277,7 +277,7 @@ const GPS_CONSENT: Row[] = [DEMO_IDS.driver, DEMO_IDS.driver2].map((userId, i) =
   granted_at: hoursAgo(24 * (45 - i * 10)),
   revoked_at: null,
   ip_address: null,
-  user_agent: 'FreightX iOS 2.14.0',
+  user_agent: 'DispatchRelay iOS 2.14.0',
   created_at: hoursAgo(24 * (45 - i * 10)),
 }));
 

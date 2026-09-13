@@ -172,12 +172,12 @@ type QueueSeed = [
 ];
 
 const QUEUE: QueueSeed[] = [
-  ['email', 'broker@freightx.com', 'New bid on load DR-1046', 'sent', 1, 7],
-  ['email', 'broker@freightx.com', 'New bid on load DR-1050', 'sent', 1, 5],
-  ['email', 'carrier@freightx.com', 'Counter-offer on load DR-1050', 'sent', 1, 3],
-  ['email', 'carrier@freightx.com', 'Your bid on DR-1043 was accepted!', 'sent', 1, 2],
+  ['email', 'broker@dispatchrelay.co', 'New bid on load DR-1046', 'sent', 1, 7],
+  ['email', 'broker@dispatchrelay.co', 'New bid on load DR-1050', 'sent', 1, 5],
+  ['email', 'carrier@dispatchrelay.co', 'Counter-offer on load DR-1050', 'sent', 1, 3],
+  ['email', 'carrier@dispatchrelay.co', 'Your bid on DR-1043 was accepted!', 'sent', 1, 2],
   ['sms', '+16155550142', null, 'sent', 1, 1],
-  ['email', 'shipper@freightx.com', 'Load DR-1051 status: in transit', 'sent', 2, 4],
+  ['email', 'shipper@dispatchrelay.co', 'Load DR-1051 status: in transit', 'sent', 2, 4],
   ['push', 'dev-driver-ios', 'Delivery appointment tomorrow', 'sent', 1, 1],
   ['email', 'dispatch@blueridgelogistics.com', 'Bid update for load DR-1046', 'sent', 1, 0.5],
   [
@@ -199,7 +199,7 @@ const QUEUE: QueueSeed[] = [
     60,
     'SMTP 550: mailbox does not exist',
   ],
-  ['email', 'carrier@freightx.com', 'Weekly lane digest', 'pending', 0, 0.1],
+  ['email', 'carrier@dispatchrelay.co', 'Weekly lane digest', 'pending', 0, 0.1],
 ];
 
 function buildQueue(): Row[] {

@@ -86,7 +86,9 @@ export default function PublicTrackingPage() {
             <span className="text-sm font-bold text-white">FX</span>
           </div>
           <div>
-            <p className="text-[17px] font-bold text-white tracking-[-0.01em]">FreightX Tracking</p>
+            <p className="text-[17px] font-bold text-white tracking-[-0.01em]">
+              DispatchRelay Tracking
+            </p>
             <p className="text-[11px] text-fx-text-dim">Public tracking link</p>
           </div>
         </div>
@@ -246,7 +248,7 @@ export default function PublicTrackingPage() {
             {/* Footer */}
             <div className="text-center py-4">
               <p className="text-[11px] text-fx-text-dim">
-                Powered by <span className="text-fx-orange font-semibold">FreightX</span>
+                Powered by <span className="text-fx-orange font-semibold">DispatchRelay</span>
               </p>
             </div>
           </>

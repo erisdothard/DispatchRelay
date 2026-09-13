@@ -1,5 +1,5 @@
 /**
- * Role-based permissions for FreightX
+ * Role-based permissions for DispatchRelay
  *
  * Enforces enterprise-grade access control across GPS tracking,
  * fleet management, and load operations.

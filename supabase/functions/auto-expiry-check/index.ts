@@ -15,7 +15,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2?target=deno';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
-const FROM_EMAIL = 'noreply@freightx.io';
+const FROM_EMAIL = 'noreply@dispatchrelay.co';
 
 interface ExpiringVerification {
   id: string;
@@ -76,7 +76,7 @@ Deno.serve(async (_req) => {
 
   for (const v of (verifications as ExpiringVerification[]) ?? []) {
     const email = v.companies?.profiles?.email;
-    const name = v.companies?.profiles?.full_name ?? v.companies?.name ?? 'FreightX User';
+    const name = v.companies?.profiles?.full_name ?? v.companies?.name ?? 'DispatchRelay User';
     const companyName = v.companies?.name ?? '';
 
     if (!email) continue;
@@ -94,31 +94,31 @@ Deno.serve(async (_req) => {
 
         await sendEmail(
           email,
-          `⚠️ FreightX: Your insurance certificate has expired`,
+          `⚠️ DispatchRelay: Your insurance certificate has expired`,
           `<p>Hi ${name},</p>
            <p>Your insurance certificate for <strong>${companyName}</strong> has <strong>expired</strong>.</p>
            <p>Your account is now suspended from posting trucks until you upload a valid certificate.</p>
-           <p><a href="https://freightx.io/profile">Update your verification →</a></p>`,
+           <p><a href="https://dispatchrelay.co/profile">Update your verification →</a></p>`,
         );
         expired++;
       } else if (expiry <= in7) {
         await sendEmail(
           email,
-          `🔔 FreightX: Insurance expiring in 7 days`,
+          `🔔 DispatchRelay: Insurance expiring in 7 days`,
           `<p>Hi ${name},</p>
            <p>Your insurance certificate for <strong>${companyName}</strong> expires on <strong>${expiry.toLocaleDateString()}</strong> — that's in 7 days.</p>
            <p>Please upload a renewed certificate now to avoid any disruption.</p>
-           <p><a href="https://freightx.io/profile">Update verification →</a></p>`,
+           <p><a href="https://dispatchrelay.co/profile">Update verification →</a></p>`,
         );
         notified++;
       } else if (expiry <= in30) {
         await sendEmail(
           email,
-          `📋 FreightX: Insurance expiring in 30 days`,
+          `📋 DispatchRelay: Insurance expiring in 30 days`,
           `<p>Hi ${name},</p>
            <p>Your insurance certificate for <strong>${companyName}</strong> expires on <strong>${expiry.toLocaleDateString()}</strong>.</p>
            <p>Start the renewal process early to keep your account in good standing.</p>
-           <p><a href="https://freightx.io/profile">View verification status →</a></p>`,
+           <p><a href="https://dispatchrelay.co/profile">View verification status →</a></p>`,
         );
         notified++;
       }

@@ -248,7 +248,7 @@ export default function OnboardingPage() {
       {step === 1 && (
         <>
           <p className="text-fx-text-muted text-sm mb-6">
-            Select how you use FreightX. You can always add more roles later.
+            Select how you use DispatchRelay. You can always add more roles later.
           </p>
 
           <div className="flex flex-col gap-3 flex-1">
@@ -546,7 +546,7 @@ export default function OnboardingPage() {
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Launch FreightX <ArrowRight size={18} />
+                  Launch DispatchRelay <ArrowRight size={18} />
                 </>
               )}
             </Button>

@@ -1,5 +1,5 @@
 /**
- * FreightX Service Worker
+ * DispatchRelay Service Worker
  * Handles: push notifications, notificationclick events
  */
 
@@ -10,16 +10,16 @@ self.addEventListener('push', (event) => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: 'FreightX', body: event.data.text(), url: '/' };
+    payload = { title: 'DispatchRelay', body: event.data.text(), url: '/' };
   }
 
-  const title = payload.title ?? 'FreightX';
+  const title = payload.title ?? 'DispatchRelay';
   const options = {
     body: payload.body ?? '',
     icon: '/logo.svg',
     badge: '/logo.svg',
     data: { url: payload.url ?? '/' },
-    tag: payload.tag ?? 'freightx',
+    tag: payload.tag ?? 'dispatchrelay',
     renotify: !!payload.tag,
   };
 

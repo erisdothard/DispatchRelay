@@ -187,7 +187,7 @@ export async function embedSignatureIntoPdf(
   });
 
   // Verification text
-  lastPage.drawText('This document has been electronically signed via FreightX', {
+  lastPage.drawText('This document has been electronically signed via DispatchRelay', {
     x: signatureBlockX,
     y: signatureBlockY + 5,
     size: 8,

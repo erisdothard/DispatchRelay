@@ -2,7 +2,7 @@
 
 **Status:** 🔧 In Progress
 **Branch:** `feat/dat-parity-load-detail` (pushed, not merged to main)
-**Goal:** Carrier load detail must match what carriers see on DAT side-by-side. FreightX loses credibility if carriers compare the two. The reference is 4 DAT screenshots saved at `Screenshots/IMG_2954.png` through `IMG_2957.png`. READ THOSE SCREENSHOTS FIRST.
+**Goal:** Carrier load detail must match what carriers see on DAT side-by-side. DispatchRelay loses credibility if carriers compare the two. The reference is 4 DAT screenshots saved at `Screenshots/IMG_2954.png` through `IMG_2957.png`. READ THOSE SCREENSHOTS FIRST.
 
 ---
 
@@ -253,6 +253,6 @@ Cards are full-width, stacked vertically, not a grid. The ELD card (#2) has a di
 
 ## Test Accounts
 
-- Carrier: `carrier@freightx.com` — use this to view load detail as carrier
+- Carrier: `carrier@dispatchrelay.co` — use this to view load detail as carrier
 - All 5 test loads reset to `posted` status with signed BOL + rate con seeded
-- App: https://freightx-nine.vercel.app
+- App: https://dispatchrelay.co
