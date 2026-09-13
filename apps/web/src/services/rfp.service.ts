@@ -170,11 +170,16 @@ export async function submitRfpProposal(params: {
 export async function getRfpProposals(rfpId: string): Promise<RfpProposal[]> {
   const { data, error } = await supabase
     .from('rfp_proposals')
-    .select('*')
+    .select('*, carrier:companies!rfp_proposals_carrier_company_id_fkey(name)')
     .eq('rfp_id', rfpId)
     .order('proposed_rate_usd', { ascending: true });
   if (error) throw new Error(error.message);
-  return (data ?? []) as RfpProposal[];
+  return (
+    (data ?? []) as unknown as Array<RfpProposal & { carrier?: { name?: string } | null }>
+  ).map(({ carrier, ...proposal }) => ({
+    ...proposal,
+    carrier_name: carrier?.name ?? proposal.carrier_name,
+  }));
 }
 
 export async function awardRfpLane(proposalId: string): Promise<void> {

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { isDemoActive } from '@/lib/demo/demo-session';
 
 export interface LaneStats {
   avg_rate_per_mile: number | null;
@@ -116,6 +117,20 @@ export async function suggestRate(params: {
   totalMiles: number;
   laneStats: LaneStats;
 }): Promise<RateSuggestion | null> {
+  const body = {
+    action: 'suggest_rate',
+    origin_state: params.originState,
+    dest_state: params.destState,
+    equipment: params.equipment,
+    total_miles: params.totalMiles,
+    lane_stats: params.laneStats,
+  };
+
+  if (isDemoActive()) {
+    const { data, error } = await supabase.functions.invoke('ai-load-search', { body });
+    return error ? null : (data as RateSuggestion);
+  }
+
   try {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
     const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
@@ -127,14 +142,7 @@ export async function suggestRate(params: {
         apikey: anonKey,
         Authorization: `Bearer ${anonKey}`,
       },
-      body: JSON.stringify({
-        action: 'suggest_rate',
-        origin_state: params.originState,
-        dest_state: params.destState,
-        equipment: params.equipment,
-        total_miles: params.totalMiles,
-        lane_stats: params.laneStats,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!resp.ok) return null;

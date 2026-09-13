@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CreditCard, DollarSign, Fuel, Snowflake, AlertCircle } from 'lucide-react';
+import { CreditCard, Fuel, Snowflake } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { SkeletonList } from '@/shared/components/ui/skeleton';
@@ -101,54 +101,57 @@ export default function CarrierFuelCardsPage() {
           ) : (
             <div className="space-y-2">
               {cards.map((card) => (
-                <button
+                <div
                   key={card.id}
-                  onClick={() => setSelectedCard(selectedCard === card.id ? null : card.id)}
-                  className={`w-full bg-fx-surface border rounded-xl p-4 text-left transition-colors ${
+                  className={`w-full bg-fx-surface border rounded-xl transition-colors ${
                     selectedCard === card.id
                       ? 'border-fx-orange/40'
                       : 'border-fx-border hover:bg-fx-surface-2'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CreditCard size={16} className="text-fx-orange" />
-                      <span className="text-sm font-semibold text-fx-text font-mono">
-                        {card.card_number_masked}
+                  <button
+                    type="button"
+                    aria-expanded={selectedCard === card.id}
+                    onClick={() => setSelectedCard(selectedCard === card.id ? null : card.id)}
+                    className="w-full p-4 text-left rounded-xl"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CreditCard size={16} className="text-fx-orange" />
+                        <span className="text-sm font-semibold text-fx-text font-mono">
+                          {card.card_number_masked}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md ${STATUS_COLORS[card.status] ?? ''}`}
+                      >
+                        {card.status}
                       </span>
                     </div>
-                    <span
-                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md ${STATUS_COLORS[card.status] ?? ''}`}
-                    >
-                      {card.status}
-                    </span>
-                  </div>
-                  <p className="text-xs text-fx-text-muted mt-1">
-                    Daily: ${card.daily_limit_usd ?? 0} · Spending: ${card.spending_limit_usd ?? 0}
-                  </p>
+                    <p className="text-xs text-fx-text-muted mt-1">
+                      Daily: ${card.daily_limit_usd ?? 0} · Spending: $
+                      {card.spending_limit_usd ?? 0}
+                    </p>
+                  </button>
                   {card.status === 'active' && (
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        statusMutation.mutate({ cardId: card.id, status: 'frozen' });
-                      }}
-                      className="mt-2 text-[10px] font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                      type="button"
+                      onClick={() => statusMutation.mutate({ cardId: card.id, status: 'frozen' })}
+                      className="mx-4 mb-3 -mt-2 text-[10px] font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1"
                     >
                       <Snowflake size={10} /> Freeze Card
                     </button>
                   )}
                   {card.status === 'frozen' && (
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        statusMutation.mutate({ cardId: card.id, status: 'active' });
-                      }}
-                      className="mt-2 text-[10px] font-semibold text-emerald-400 hover:text-emerald-300"
+                      type="button"
+                      onClick={() => statusMutation.mutate({ cardId: card.id, status: 'active' })}
+                      className="mx-4 mb-3 -mt-2 text-[10px] font-semibold text-emerald-400 hover:text-emerald-300"
                     >
                       Unfreeze
                     </button>
                   )}
-                </button>
+                </div>
               ))}
             </div>
           )}

@@ -25,6 +25,7 @@ import {
   sendMessage,
   deleteMessage,
   getOrCreateConversation,
+  markConversationRead,
   searchUsers,
 } from '@/services/messages.service';
 import { getMyActiveLoads, getLoadByNumber } from '@/services/loads.service';
@@ -337,14 +338,42 @@ export default function MessagesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const fetchMessages = useCallback((id: string) => {
-    getMessages(id)
-      .then(({ data, hasMore }) => {
-        setMessages(data);
-        setHasMoreMessages(hasMore);
-      })
-      .catch(console.error);
-  }, []);
+  // Keep the inbox fresh: reload when returning from a chat and whenever a message lands.
+  useEffect(() => {
+    if (!user || selected) return;
+    const reload = () => {
+      getConversations(user.id)
+        .then(({ data: convos }) => setConversations(convos))
+        .catch(console.error);
+    };
+    reload();
+    const channel = supabase
+      .channel('inbox-live')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, reload)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, selected]);
+
+  const fetchMessages = useCallback(
+    (id: string) => {
+      getMessages(id)
+        .then(({ data, hasMore }) => {
+          setMessages(data);
+          setHasMoreMessages(hasMore);
+          if (!user) return;
+          // Opening a chat reads it — clear its badge here and in the bottom nav.
+          return markConversationRead(id, user.id).then(() =>
+            setConversations((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, unread_count: 0 } : c)),
+            ),
+          );
+        })
+        .catch(console.error);
+    },
+    [user],
+  );
 
   const loadOlderMessages = useCallback(async () => {
     if (!selected || !hasMoreMessages || loadingOlder) return;
@@ -486,11 +515,10 @@ export default function MessagesPage() {
           ) : (
             messages.map((msg) => {
               const isSelected = selectedMsgId === msg.id;
+              // from_me is stored from the sender's side; compare ids so both sides render right.
+              const mine = msg.sender_id ? msg.sender_id === user?.id : msg.from_me;
               return (
-                <div
-                  key={msg.id}
-                  className={cn('flex', msg.from_me ? 'justify-end' : 'justify-start')}
-                >
+                <div key={msg.id} className={cn('flex', mine ? 'justify-end' : 'justify-start')}>
                   <div className="relative max-w-[75%]">
                     <div
                       onClick={() =>
@@ -500,7 +528,7 @@ export default function MessagesPage() {
                       }
                       className={cn(
                         'rounded-2xl px-4 py-2.5 transition-all',
-                        msg.from_me
+                        mine
                           ? 'bg-fx-orange text-white rounded-br-sm'
                           : 'bg-fx-surface border border-fx-border text-fx-text rounded-bl-sm',
                         msg.sender_id === user?.id && 'cursor-pointer',
@@ -511,7 +539,7 @@ export default function MessagesPage() {
                       <p
                         className={cn(
                           'text-[10px] mt-1',
-                          msg.from_me ? 'text-white/60 text-right' : 'text-fx-text-dim',
+                          mine ? 'text-white/60 text-right' : 'text-fx-text-dim',
                         )}
                       >
                         {new Date(msg.created_at).toLocaleTimeString('en-US', {

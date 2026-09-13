@@ -52,10 +52,20 @@ export default function ShipperRfpsPage() {
         ) : (
           <div className="space-y-3">
             {rfps.map((rfp) => (
-              <button
+              // A div, not a <button>: the card contains its own Publish button.
+              <div
                 key={rfp.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelectedRfp(rfp)}
-                className="w-full bg-fx-surface border border-fx-border rounded-xl p-4 text-left hover:bg-fx-surface-2 transition-colors"
+                onKeyDown={(e) => {
+                  if (e.target !== e.currentTarget) return;
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedRfp(rfp);
+                  }
+                }}
+                className="w-full cursor-pointer bg-fx-surface border border-fx-border rounded-xl p-4 text-left hover:bg-fx-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fx-orange/60"
               >
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-sm font-bold text-fx-text">{rfp.title}</p>
@@ -79,7 +89,7 @@ export default function ShipperRfpsPage() {
                     Publish
                   </button>
                 )}
-              </button>
+              </div>
             ))}
           </div>
         )}

@@ -43,8 +43,13 @@ export function usePredictiveETA({
     }
 
     async function refresh() {
-      const dest = destCoordsRef.current;
-      if (!loadNumber || !dest) return;
+      if (!loadNumber) return;
+      // The first run can beat the geocode effect above — resolve the destination here so the
+      // ETA shows immediately instead of after the first 30s interval.
+      const dest =
+        destCoordsRef.current ?? (await geocodeCity(destCity, destState).catch(() => null));
+      if (!dest) return;
+      destCoordsRef.current = dest;
       setLoading(true);
       try {
         const result = await calculateETA(loadNumber, dest[0], dest[1]);
@@ -62,7 +67,7 @@ export function usePredictiveETA({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [active, loadNumber]);
+  }, [active, loadNumber, destCity, destState]);
 
   return { eta, loading };
 }

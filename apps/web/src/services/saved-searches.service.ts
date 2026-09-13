@@ -14,9 +14,13 @@ export interface SavedSearch {
 }
 
 export async function getSavedSearches(): Promise<SavedSearch[]> {
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return [];
+
   const { data, error } = await supabase
     .from('saved_searches')
     .select('*')
+    .eq('user_id', authData.user.id)
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);

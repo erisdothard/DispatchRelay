@@ -48,7 +48,11 @@ function rowToFactoring(row: FactoringRow): FactoringRequest {
     loadNumber: row.load_number,
     invoiceAmount: Number(row.invoice_amount),
     feePercent: Number(row.fee_percent),
-    netPayout: row.net_payout != null ? Number(row.net_payout) : null,
+    // net_payout is a generated column; derive it if a backend returns the row without it.
+    netPayout:
+      row.net_payout != null
+        ? Number(row.net_payout)
+        : Number(row.invoice_amount) * (1 - Number(row.fee_percent) / 100),
     status: row.status as FactoringStatus,
     factorPartner: row.factor_partner,
     notes: row.notes,

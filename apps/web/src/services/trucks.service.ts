@@ -1,10 +1,18 @@
+import { z } from 'zod';
 import { supabase } from '@/lib/supabase';
+import { isDemoActive } from '@/lib/demo/demo-session';
 import { rowToTruck } from '@/lib/mappers';
 import type { TruckRow, EquipmentType, TruckStatus } from '@/lib/database.types';
 import type { Truck } from '@freightx/shared';
 import { PostTruckInputSchema } from '@/lib/schemas/trucks.schema';
 
 export const PAGE_SIZE = 25;
+
+/** Demo personas use readable ids ("demo-carrier") rather than UUIDs. */
+const DemoPostTruckInputSchema = PostTruckInputSchema.extend({
+  posted_by: z.string().min(1),
+  company_id: z.string().min(1).nullable().optional(),
+});
 
 export interface TruckFilters {
   equipment?: EquipmentType | 'all';
@@ -40,7 +48,7 @@ export async function getTrucks(filters: TruckFilters = {}): Promise<Truck[]> {
 }
 
 export async function createTruck(truck: Omit<TruckRow, 'id' | 'created_at'>): Promise<Truck> {
-  PostTruckInputSchema.parse(truck);
+  (isDemoActive() ? DemoPostTruckInputSchema : PostTruckInputSchema).parse(truck);
   const { data, error } = await supabase.from('trucks').insert(truck).select().single();
   if (error) throw error;
   return rowToTruck(data);

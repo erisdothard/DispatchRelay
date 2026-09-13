@@ -8,6 +8,7 @@
  *   - push_subscriptions table created (migration 049)
  */
 import { supabase } from '@/lib/supabase';
+import { isDemoActive } from '@/lib/demo/demo-session';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
@@ -24,6 +25,8 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 }
 
 export async function isPushSupported(): Promise<boolean> {
+  // Demo personas have no push backend to deliver to.
+  if (isDemoActive()) return false;
   return 'serviceWorker' in navigator && 'PushManager' in window;
 }
 

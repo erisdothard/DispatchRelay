@@ -2,23 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import Map, { Marker, Source, Layer, type MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { geocodeCity, geocodeAddress } from '@/lib/geocoding';
+import { isKeylessMapMode, makePinSvg } from '@/lib/map-engine';
+import { LeafletRouteMap } from './leaflet-route-map';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string;
-
-// ── Apple-style SVG teardrop pins ────────────────────────────────────────────
-
-function makePinSvg(fill: string) {
-  return (
-    `<svg width="28" height="36" viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg">` +
-    `<filter id="ps" x="-60%" y="-30%" width="220%" height="200%">` +
-    `<feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="rgba(0,0,0,0.5)"/>` +
-    `</filter>` +
-    `<g filter="url(#ps)">` +
-    `<path d="M14 2C8.477 2 4 6.477 4 12c0 7.5 10 20 10 20S24 19.5 24 12C24 6.477 19.523 2 14 2z" fill="${fill}"/>` +
-    `<circle cx="14" cy="12" r="4.5" fill="white" fill-opacity="0.92"/>` +
-    `</g></svg>`
-  );
-}
 
 // ── Driver marker — precision dot + heading wedge + pulse ring ────────────────
 
@@ -225,6 +212,24 @@ export function MapView({
   const replayPos: [number, number] | null =
     breadcrumbTrail && replayIndex != null ? (breadcrumbTrail[replayIndex] ?? null) : null;
 
+  // No token, no WebGL, or demo mode: render the same map with keyless raster tiles.
+  if (isKeylessMapMode()) {
+    return (
+      <LeafletRouteMap
+        originPos={originPos}
+        destPos={destPos}
+        truckPos={truckPos}
+        replayPos={replayPos}
+        heading={heading}
+        inTransit={inTransit}
+        live={Boolean(livePosition)}
+        breadcrumbTrail={breadcrumbTrail}
+        geofences={geofences}
+        className={className}
+      />
+    );
+  }
+
   // Route GeoJSON — Mapbox expects [lng, lat]
   const routeCoords: [number, number][] = destPos
     ? [
@@ -371,8 +376,8 @@ export function MapView({
         )}
       </Map>
 
-      {/* FIND DRIVER button */}
-      {truckPos && (
+      {/* FIND DRIVER — only for a real GPS fix, never an interpolated position */}
+      {truckPos && livePosition && (
         <button
           onClick={() =>
             mapRef.current?.flyTo({ center: [truckPos[1], truckPos[0]], zoom: 15, duration: 800 })
@@ -440,8 +445,8 @@ export function MapView({
         ))}
       </div>
 
-      {/* Live badge */}
-      {inTransit && (
+      {/* Live badge — only with a real GPS ping, not an interpolated position */}
+      {inTransit && livePosition && (
         <div
           style={{
             position: 'absolute',

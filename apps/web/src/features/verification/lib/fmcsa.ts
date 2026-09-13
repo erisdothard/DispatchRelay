@@ -1,3 +1,6 @@
+import { supabase } from '@/lib/supabase';
+import { isDemoActive } from '@/lib/demo/demo-session';
+
 const FMCSA_BASE = 'https://mobile.fmcsa.dot.gov/qc/services';
 const API_KEY = import.meta.env.VITE_FMCSA_API_KEY as string;
 
@@ -11,6 +14,7 @@ export interface FmcsaResult {
 }
 
 export async function verifyByMcNumber(mcNumber: string): Promise<FmcsaResult> {
+  if (isDemoActive()) return demoFmcsaResult(mcNumber);
   if (API_KEY === 'PLACEHOLDER_FMCSA_KEY') {
     return mockFmcsaResult(mcNumber);
   }
@@ -29,6 +33,7 @@ export async function verifyByMcNumber(mcNumber: string): Promise<FmcsaResult> {
 }
 
 export async function verifyByDotNumber(dotNumber: string): Promise<FmcsaResult> {
+  if (isDemoActive()) return demoFmcsaResult(dotNumber);
   if (API_KEY === 'PLACEHOLDER_FMCSA_KEY') {
     return mockFmcsaResult(dotNumber);
   }
@@ -43,6 +48,27 @@ export async function verifyByDotNumber(dotNumber: string): Promise<FmcsaResult>
     mcNumber: carrier?.mcNumber ? String(carrier.mcNumber) : null,
     safetyRating: carrier?.safetyRating ?? null,
     csaScore: null,
+  };
+}
+
+/** Demo mode: answer from the demo company records instead of calling FMCSA. */
+async function demoFmcsaResult(identifier: string): Promise<FmcsaResult> {
+  const digits = identifier.replace(/\D/g, '');
+  const { data } = digits
+    ? await supabase
+        .from('companies')
+        .select('name, mc_number, dot_number')
+        .or(`mc_number.ilike.%${digits}%,dot_number.ilike.%${digits}%`)
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+  return {
+    status: 'AUTHORIZED',
+    legalName: data?.name ?? 'Demo Carrier LLC',
+    dotNumber: data?.dot_number ?? identifier,
+    mcNumber: data?.mc_number ?? identifier,
+    safetyRating: 'Satisfactory',
+    csaScore: 12,
   };
 }
 

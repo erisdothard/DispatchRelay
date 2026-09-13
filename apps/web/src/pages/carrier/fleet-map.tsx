@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import MapGL, { Marker, type MapRef } from 'react-map-gl/mapbox';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { Navigation, Radio, Truck, Users, Loader2, MapPin, Send } from 'lucide-react';
+import { DriverMap, type DriverMapHandle, type DriverPin } from '@/shared/components/driver-map';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
@@ -13,11 +12,6 @@ import { getMyActiveLoads, getCompanyDrivers } from '@/services/loads.service';
 import { useLiveTracking, type LivePing } from '@/features/loads/hooks/use-live-tracking';
 import type { Load } from '@freightx/shared';
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string;
-
-// CONUS center fallback
-const DEFAULT_VIEW = { longitude: -98.5795, latitude: 39.8283, zoom: 3.8 };
-
 /* ── Types ──────────────────────────────────────────────────────── */
 
 interface DriverProfile {
@@ -28,68 +22,6 @@ interface DriverProfile {
 }
 
 type BatchPing = LivePing & { load_number: string | null; driver_id: string };
-
-/* ── Live GPS map pin ────────────────────────────────────────────── */
-
-function LiveDriverPin({
-  heading,
-  name,
-  onLoad,
-}: {
-  heading: number | null;
-  name: string;
-  onLoad?: boolean;
-}) {
-  const color = onLoad ? '#e86030' : '#3b82f6'; // orange = in-transit, blue = manual GPS
-  const initials = name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-
-  return (
-    <div style={{ position: 'relative', width: 44, height: 44, cursor: 'pointer' }}>
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: '50%',
-          background: color,
-          animation: 'fx-pulse-ring 1.8s ease-out infinite',
-          pointerEvents: 'none',
-        }}
-      />
-      <svg
-        width="44"
-        height="44"
-        viewBox="0 0 44 44"
-        style={{ position: 'absolute', inset: 0, zIndex: 1 }}
-      >
-        {heading != null && (
-          <path
-            d="M22 22 L16 8 L28 8 Z"
-            fill={color}
-            opacity="0.65"
-            transform={`rotate(${heading}, 22, 22)`}
-          />
-        )}
-        <circle cx="22" cy="22" r="16" fill={color} stroke="white" strokeWidth="2.5" />
-        <text
-          x="22"
-          y="27"
-          textAnchor="middle"
-          fill="white"
-          fontSize="11"
-          fontWeight="700"
-          fontFamily="system-ui, sans-serif"
-        >
-          {initials}
-        </text>
-      </svg>
-    </div>
-  );
-}
 
 /* ── Status badge config ─────────────────────────────────────────── */
 
@@ -391,7 +323,7 @@ function DriverRosterCard({
 
 export default function CarrierFleetMapPage() {
   const { company, user } = useAuth();
-  const mapRef = useRef<MapRef>(null);
+  const driverMapRef = useRef<DriverMapHandle>(null);
 
   const [loads, setLoads] = useState<Load[]>([]);
   const [driverProfiles, setDriverProfiles] = useState<DriverProfile[]>([]);
@@ -399,7 +331,6 @@ export default function CarrierFleetMapPage() {
   const [pings, setPings] = useState<Map<string, BatchPing>>(new Map());
   const [selectedDriver, setSelectedDriver] = useState<DriverProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mapLoaded, setMapLoaded] = useState(false);
 
   const companyId = company?.id;
   const inTransitCount = loads.filter((l) => l.status === 'in_transit').length;
@@ -508,38 +439,6 @@ export default function CarrierFleetMapPage() {
     };
   }, [driverProfiles]);
 
-  /* ── Map helpers ────────────────────────────────────────────── */
-
-  function fitToAllDrivers() {
-    if (!mapRef.current || pings.size === 0) return;
-    const positions = [...pings.values()];
-    if (positions.length === 1) {
-      mapRef.current.flyTo({
-        center: [positions[0].longitude, positions[0].latitude],
-        zoom: 10,
-        duration: 800,
-      });
-      return;
-    }
-    const lngs = positions.map((p) => p.longitude);
-    const lats = positions.map((p) => p.latitude);
-    mapRef.current.fitBounds(
-      [
-        [Math.min(...lngs), Math.min(...lats)],
-        [Math.max(...lngs), Math.max(...lats)],
-      ],
-      { padding: 60, duration: 800, maxZoom: 12 },
-    );
-  }
-
-  // Auto-fit map once both map and pings are ready
-  useEffect(() => {
-    if (mapLoaded && pings.size > 0) {
-      fitToAllDrivers();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLoaded, pings.size]);
-
   function getDriverPing(driver: DriverProfile): BatchPing | null {
     return pings.get(driver.id) ?? null;
   }
@@ -570,6 +469,21 @@ export default function CarrierFleetMapPage() {
     }
   }
 
+  const driverPins: DriverPin[] = driverProfiles.flatMap((driver) => {
+    const ping = getDriverPing(driver);
+    if (!ping) return [];
+    return [
+      {
+        id: driver.id,
+        name: driver.full_name ?? driver.email ?? 'Unknown',
+        latitude: ping.latitude,
+        longitude: ping.longitude,
+        heading: ping.heading_deg,
+        onLoad: isDriverOnLoad(driver),
+      },
+    ];
+  });
+
   const navRole = 'carrier' as const;
 
   return (
@@ -584,36 +498,13 @@ export default function CarrierFleetMapPage() {
         <>
           {/* ── Live map ──────────────────────────────────────── */}
           <div className="relative" style={{ height: 'calc(56vh - 56px)' }}>
-            <MapGL
-              ref={mapRef}
-              mapboxAccessToken={MAPBOX_TOKEN}
-              mapStyle="mapbox://styles/mapbox/dark-v11"
-              initialViewState={DEFAULT_VIEW}
-              scrollZoom
-              dragPan
-              attributionControl={false}
-              logoPosition="top-right"
-              onLoad={() => setMapLoaded(true)}
-              style={{ height: '100%', width: '100%' }}
-            >
-              {driverProfiles.map((driver) => {
-                const ping = getDriverPing(driver);
-                if (!ping) return null;
-                const name = driver.full_name ?? driver.email ?? 'Unknown';
-                const onLoad = isDriverOnLoad(driver);
-                return (
-                  <Marker
-                    key={driver.id}
-                    longitude={ping.longitude}
-                    latitude={ping.latitude}
-                    anchor="center"
-                    onClick={() => setSelectedDriver(driver)}
-                  >
-                    <LiveDriverPin heading={ping.heading_deg} name={name} onLoad={onLoad} />
-                  </Marker>
-                );
-              })}
-            </MapGL>
+            <DriverMap
+              ref={driverMapRef}
+              pins={driverPins}
+              onSelect={(driverId) =>
+                setSelectedDriver(driverProfiles.find((d) => d.id === driverId) ?? null)
+              }
+            />
 
             {/* GPS count badge */}
             {pings.size > 0 && (
@@ -662,7 +553,7 @@ export default function CarrierFleetMapPage() {
             {/* Fit-all button */}
             {pings.size > 0 && (
               <button
-                onClick={fitToAllDrivers}
+                onClick={() => driverMapRef.current?.fitAll()}
                 style={{
                   position: 'absolute',
                   bottom: 12,

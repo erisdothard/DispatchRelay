@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Clock, Truck, Coffee, Moon, AlertTriangle } from 'lucide-react';
 import type { HosStatus, DutyStatus } from '@/services/hos.service';
 import { useDutyTransition } from '@/features/driver/hooks/use-hos-status';
+import { isDemoActive } from '@/lib/demo/demo-session';
 
 interface Props {
   status: HosStatus;
@@ -85,7 +86,8 @@ export function HosDashboard({ status, driverId }: Props) {
 
     let lat: number | undefined;
     let lng: number | undefined;
-    if (navigator.geolocation) {
+    // Demo personas log from the truck's last recorded ping — never prompt the viewer for GPS.
+    if (!isDemoActive() && navigator.geolocation) {
       try {
         const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
           navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 }),

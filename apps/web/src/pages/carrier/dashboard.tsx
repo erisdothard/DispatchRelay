@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { NegotiationCard } from '@/pages/carrier/components/negotiation-card';
+import { groupNegotiations } from '@/pages/carrier/lib/negotiations';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpRight, MapPin, Navigation, UserCheck, TrendingUp, Package } from 'lucide-react';
 import { TopHeader } from '@/shared/components/top-header';
@@ -57,6 +59,17 @@ export default function CarrierDashboard() {
   const [assignLoad, setAssignLoad] = useState<Load | null>(null);
   const [selectedLoad, setSelectedLoad] = useState<Load | null>(null);
   const [myBids, setMyBids] = useState<BidWithLoad[]>([]);
+  // A broker counter is its own bid row — fold each thread into one card.
+  const negotiations = useMemo(() => groupNegotiations(myBids), [myBids]);
+
+  const openLoad = useCallback(async (loadId: string) => {
+    try {
+      const fullLoad = await getLoadById(loadId);
+      if (fullLoad) setSelectedLoad(fullLoad);
+    } catch {
+      /* load no longer visible — leave the sheet closed */
+    }
+  }, []);
 
   const { notifications, unreadCount, markAllRead } = useNotifications();
 
@@ -172,78 +185,33 @@ export default function CarrierDashboard() {
           ))}
         </div>
 
-        {/* Bidding On — active bids waiting for broker response */}
-        {myBids.length > 0 && (
+        {/* Bidding On — one card per negotiation (a broker counter folds into its bid) */}
+        {negotiations.length > 0 && (
           <div>
             <SectionHeader
               label="Negotiating"
               title="Bidding On"
               badge={
                 <span className="text-[11px] font-bold text-white bg-blue-500 px-2.5 py-1 rounded-full">
-                  {myBids.length}
+                  {negotiations.length}
                 </span>
               }
             />
             <div className="space-y-3">
-              {myBids.slice(0, 3).map((bid) => {
-                const l = bid.load;
-                if (!l) return null;
-                const isCountered = bid.status === 'countered';
-                return (
-                  <button
-                    key={bid.id}
-                    onClick={async () => {
-                      try {
-                        const fullLoad = await getLoadById(bid.load_id);
-                        if (fullLoad) setSelectedLoad(fullLoad);
-                      } catch {
-                        /* ignore */
-                      }
-                    }}
-                    className={`w-full text-left rounded-ios-sm p-4 active-scale transition-colors ${
-                      isCountered
-                        ? 'bg-blue-500/[0.06] border border-blue-500/20'
-                        : 'bg-fx-surface border border-white/[0.06]'
-                    }`}
-                    style={
-                      isCountered ? { boxShadow: 'inset 3px 0 0 rgba(96,165,250,0.65)' } : undefined
-                    }
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <p className="text-[11px] text-fx-text-dim">{l.load_number}</p>
-                        <p className="text-[15px] font-bold text-white mt-0.5">
-                          {l.origin_city} → {l.dest_city}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[15px] font-bold text-white">
-                          ${bid.amount_usd.toLocaleString()}
-                        </p>
-                        <span
-                          className={`text-[10px] font-semibold tracking-[0.06em] uppercase ${
-                            isCountered ? 'text-blue-400' : 'text-fx-orange'
-                          }`}
-                        >
-                          {isCountered ? 'Counter Received' : 'Bid Pending'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-[11px] text-fx-text-dim">
-                        Ask <span className="font-semibold">${l.rate_usd.toLocaleString()}</span>
-                      </p>
-                      <p className="text-[11px] font-bold text-blue-400">View Details →</p>
-                    </div>
-                  </button>
-                );
-              })}
-              {myBids.length > 3 && (
+              {negotiations.slice(0, 3).map((negotiation) => (
+                <NegotiationCard
+                  key={negotiation.id}
+                  negotiation={negotiation}
+                  onOpen={openLoad}
+                  onResolved={fetchLoads}
+                />
+              ))}
+              {negotiations.length > 3 && (
                 <button
                   onClick={() => navigate('/carrier/loads')}
                   className="text-xs font-semibold text-fx-orange text-center w-full py-2"
                 >
-                  +{myBids.length - 3} more — View All →
+                  +{negotiations.length - 3} more — View All →
                 </button>
               )}
             </div>
@@ -379,113 +347,117 @@ export default function CarrierDashboard() {
               }
             >
               {inProgressLoads.map((currentLoad) => (
-                <button
+                <div
                   key={currentLoad.id}
-                  onClick={() => setSelectedLoad(currentLoad)}
-                  className={`${inProgressLoads.length > 1 ? 'min-w-[85%] snap-center shrink-0' : 'w-full'} bg-fx-surface border border-white/[0.06] rounded-ios p-5 card-highlight text-left active-scale transition-colors`}
+                  className={`${inProgressLoads.length > 1 ? 'min-w-[85%] snap-center shrink-0' : 'w-full'} bg-fx-surface border border-white/[0.06] rounded-ios card-highlight transition-colors`}
                 >
-                  <div className="flex items-center justify-between">
-                    <p className="text-[13px] font-medium text-fx-text-dim">
-                      ID {currentLoad.loadNumber}
-                    </p>
-                    {currentLoad.assignedDriverId && (
-                      <span className="text-[11px] font-semibold text-green-400">
-                        {currentLoad.driverName ?? 'Driver assigned'}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedLoad(currentLoad)}
+                    className="w-full p-5 text-left active-scale rounded-ios"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-[13px] font-medium text-fx-text-dim">
+                        ID {currentLoad.loadNumber}
+                      </p>
+                      {currentLoad.assignedDriverId && (
+                        <span className="text-[11px] font-semibold text-green-400">
+                          {currentLoad.driverName ?? 'Driver assigned'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 mb-4">
+                      <span className="text-[11px] font-bold text-fx-orange bg-fx-orange/15 px-2 py-0.5 rounded-full">
+                        {EQUIPMENT_LABELS[currentLoad.equipment] ?? currentLoad.equipment}
                       </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mt-1 mb-4">
-                    <span className="text-[11px] font-bold text-fx-orange bg-fx-orange/15 px-2 py-0.5 rounded-full">
-                      {EQUIPMENT_LABELS[currentLoad.equipment] ?? currentLoad.equipment}
-                    </span>
-                    {currentLoad.weightLbs > 0 && (
+                      {currentLoad.weightLbs > 0 && (
+                        <span className="text-[11px] text-fx-text-dim">
+                          {currentLoad.weightLbs.toLocaleString()} lbs
+                        </span>
+                      )}
                       <span className="text-[11px] text-fx-text-dim">
-                        {currentLoad.weightLbs.toLocaleString()} lbs
+                        ${currentLoad.rateUsd.toLocaleString()}
                       </span>
-                    )}
-                    <span className="text-[11px] text-fx-text-dim">
-                      ${currentLoad.rateUsd.toLocaleString()}
-                    </span>
-                  </div>
-
-                  {/* Progress track */}
-                  <div className="relative mb-4">
-                    <div className="w-full h-[3px] bg-fx-border rounded-full" />
-                    <div
-                      className="absolute left-0 top-0 h-[3px] rounded-full bg-orange-gradient"
-                      style={{
-                        width:
-                          currentLoad.status === 'in_transit'
-                            ? '75%'
-                            : currentLoad.status === 'dispatched'
-                              ? '50%'
-                              : '25%',
-                      }}
-                    />
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-orange-gradient ring-2 ring-fx-bg" />
-                    <div
-                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-orange-gradient ring-2 ring-fx-bg shadow-orange-glow-sm"
-                      style={{
-                        left:
-                          currentLoad.status === 'in_transit'
-                            ? '75%'
-                            : currentLoad.status === 'dispatched'
-                              ? '50%'
-                              : '25%',
-                      }}
-                    />
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 rounded-full bg-fx-border ring-2 ring-fx-bg" />
-                  </div>
-
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-[11px] text-fx-text-dim">
-                        {new Date(currentLoad.pickupDate + 'T12:00:00').toLocaleDateString(
-                          'en-US',
-                          {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          },
-                        )}
-                      </p>
-                      <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
-                        {currentLoad.originCity}
-                      </p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-[11px] text-fx-text-dim">
-                        Estimated{' '}
-                        {new Date(currentLoad.deliveryDate + 'T12:00:00').toLocaleDateString(
-                          'en-US',
-                          {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          },
-                        )}
-                      </p>
-                      <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
-                        {currentLoad.destCity}
-                      </p>
-                    </div>
-                  </div>
 
-                  {/* Assign Driver button */}
+                    {/* Progress track */}
+                    <div className="relative mb-4">
+                      <div className="w-full h-[3px] bg-fx-border rounded-full" />
+                      <div
+                        className="absolute left-0 top-0 h-[3px] rounded-full bg-orange-gradient"
+                        style={{
+                          width:
+                            currentLoad.status === 'in_transit'
+                              ? '75%'
+                              : currentLoad.status === 'dispatched'
+                                ? '50%'
+                                : '25%',
+                        }}
+                      />
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-orange-gradient ring-2 ring-fx-bg" />
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-orange-gradient ring-2 ring-fx-bg shadow-orange-glow-sm"
+                        style={{
+                          left:
+                            currentLoad.status === 'in_transit'
+                              ? '75%'
+                              : currentLoad.status === 'dispatched'
+                                ? '50%'
+                                : '25%',
+                        }}
+                      />
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 rounded-full bg-fx-border ring-2 ring-fx-bg" />
+                    </div>
+
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <p className="text-[11px] text-fx-text-dim">
+                          {new Date(currentLoad.pickupDate + 'T12:00:00').toLocaleDateString(
+                            'en-US',
+                            {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            },
+                          )}
+                        </p>
+                        <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
+                          {currentLoad.originCity}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[11px] text-fx-text-dim">
+                          Estimated{' '}
+                          {new Date(currentLoad.deliveryDate + 'T12:00:00').toLocaleDateString(
+                            'en-US',
+                            {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            },
+                          )}
+                        </p>
+                        <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
+                          {currentLoad.destCity}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Assign Driver sits beside the card's button, never nested inside it */}
                   {['awarded', 'dispatched'].includes(currentLoad.status) && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        setAssignLoad(currentLoad);
-                      }}
-                      className="mt-4 w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
-                    >
-                      <UserCheck size={14} />
-                      {currentLoad.assignedDriverId ? 'Reassign Driver' : 'Assign Driver'}
-                    </button>
+                    <div className="px-5 pb-5">
+                      <button
+                        type="button"
+                        onClick={() => setAssignLoad(currentLoad)}
+                        className="w-full h-10 rounded-xl border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center justify-center gap-2 hover:bg-fx-orange/10 transition-colors"
+                      >
+                        <UserCheck size={14} />
+                        {currentLoad.assignedDriverId ? 'Reassign Driver' : 'Assign Driver'}
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
               ))}
             </div>
 

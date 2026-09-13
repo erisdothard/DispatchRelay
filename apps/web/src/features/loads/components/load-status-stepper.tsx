@@ -3,7 +3,7 @@ import { CheckCircle2, Circle, ArrowRight } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { updateLoad } from '@/services/loads.service';
-import { createDocument } from '@/services/documents.service';
+import { createDocument, getDocumentsForLoad } from '@/services/documents.service';
 import { BolSignatureSheet } from '@/features/documents/components/bol-signature-sheet';
 import type { LoadStatus } from '@/lib/database.types';
 import type { UserRole } from '@/lib/database.types';
@@ -96,16 +96,21 @@ export function LoadStatusStepper({
       setAdvancing(true);
       setError(null);
       try {
-        // Create a BOL document record first
+        // Sign the BOL already on file (uploaded at pickup); only create a record if none exists
+        const existingBol = (await getDocumentsForLoad(loadId)).find(
+          (d) => d.type === 'bill_of_lading' && !d.signed_at,
+        );
         const {
           data: { user },
         } = await supabase.auth.getUser();
-        const doc = await createDocument({
-          loadId,
-          type: 'bill_of_lading',
-          fileName: `BOL-${loadNumber || loadId}.pdf`,
-          uploadedBy: user?.id,
-        });
+        const doc =
+          existingBol ??
+          (await createDocument({
+            loadId,
+            type: 'bill_of_lading',
+            fileName: `BOL-${loadNumber || loadId}.pdf`,
+            uploadedBy: user?.id,
+          }));
         setBolDocId(doc.id);
         setBolSignOpen(true);
       } catch (e) {

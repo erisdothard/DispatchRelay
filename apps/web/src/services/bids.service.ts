@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase';
 import type { BidRow } from '@/lib/database.types';
-import { DEMO_BIDS } from '@/lib/demo-data';
 import {
   notifyNewBid,
   notifyBidAccepted,
@@ -50,7 +49,6 @@ export interface BidWithLoad extends BidRow {
 }
 
 export async function getMyActiveBidsWithLoads(carrierId: string): Promise<BidWithLoad[]> {
-  if (carrierId.startsWith('demo-')) return DEMO_BIDS;
   const { data, error } = await supabase
     .from('bids')
     .select(

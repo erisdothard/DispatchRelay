@@ -2,6 +2,14 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import type { ProfileRow, CompanyRow, UserRole } from '@/lib/database.types';
+import { IS_DEMO_ENV } from '@/lib/demo/demo-env';
+import { demoIdentityFor } from '@/lib/demo/identities';
+import {
+  endDemoSession,
+  isDemoActive,
+  persistedDemoRole,
+  startDemoSession,
+} from '@/lib/demo/demo-session';
 
 interface AuthState {
   user: User | null;
@@ -39,18 +47,6 @@ interface AuthActions {
 }
 
 const AuthContext = createContext<(AuthState & AuthActions) | null>(null);
-
-const DEMO_PROFILES: Record<string, { name: string; email: string; company: string }> = {
-  carrier: {
-    name: 'Marcus Rivera',
-    email: 'carrier@freightx.com',
-    company: 'Rivera Transport Inc',
-  },
-  broker: { name: 'Sarah Chen', email: 'broker@freightx.com', company: 'Apex Freight Solutions' },
-  shipper: { name: 'James Park', email: 'shipper@freightx.com', company: 'Park Manufacturing Co' },
-  driver: { name: 'Carlos Mendez', email: 'driver@freightx.com', company: 'Rivera Transport Inc' },
-  admin: { name: 'Admin User', email: 'admin@freightx.com', company: 'FreightX Platform' },
-};
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -115,10 +111,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [fetchCompany],
   );
 
+  /**
+   * Demo mode — sign in as a seeded persona. Profile and company load through the
+   * demo backend exactly like a real sign-in, so every screen sees consistent data.
+   */
+  const enterDemoMode = useCallback(
+    (role: UserRole) => {
+      const identity = demoIdentityFor(role);
+      startDemoSession(identity);
+      setIsDemo(true);
+      setUser({ id: identity.id, email: identity.email } as User);
+      setSession({ access_token: 'demo' } as Session);
+      setLoading(true);
+      fetchProfile(identity.id).finally(() => setLoading(false));
+    },
+    [fetchProfile],
+  );
+
   useEffect(() => {
+    // Resume a demo walkthrough after a refresh; demo builds never touch real auth.
+    const demoRole = persistedDemoRole();
+    if (demoRole) {
+      enterDemoMode(demoRole);
+      return;
+    }
+    if (IS_DEMO_ENV) {
+      setLoading(false);
+      return;
+    }
+
     supabase.auth
       .getSession()
       .then(({ data: { session } }) => {
+        // A demo session may have started while this was in flight (e.g. landing
+        // straight on /demo) — applying a null real session here would wipe it.
+        if (isDemoActive()) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
@@ -128,6 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch((err) => {
+        if (isDemoActive()) return;
         console.error('Auth initialization error:', err);
         setLoading(false);
       });
@@ -135,6 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isDemoActive()) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -146,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [fetchProfile]);
+  }, [fetchProfile, enterDemoMode]);
 
   /** Sign in with email + password */
   const signIn = useCallback(async (email: string, password: string) => {
@@ -190,53 +219,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    if (!isDemo) await supabase.auth.signOut();
+    if (isDemo) endDemoSession();
+    else await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setProfile(null);
     setCompany(null);
     setIsDemo(false);
   }, [isDemo]);
-
-  const enterDemoMode = useCallback((role: UserRole) => {
-    const demo = DEMO_PROFILES[role] ?? DEMO_PROFILES.carrier;
-    const fakeId = `demo-${role}-${Date.now()}`;
-
-    setUser({ id: fakeId, email: demo.email } as User);
-    setSession({ access_token: 'demo' } as Session);
-    setProfile({
-      id: fakeId,
-      email: demo.email,
-      full_name: demo.name,
-      role,
-      status: 'active',
-      onboarding_complete: true,
-      avatar_url: null,
-      phone: null,
-      phone_verified_at: null,
-      phone_carrier_type: null,
-      carrier_id: null,
-      theme: 'dark',
-      last_known_location: null,
-      last_location_update: null,
-      last_synced_at: null,
-      current_duty_status: null,
-      duty_status_updated_at: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    } as ProfileRow);
-    setCompany({
-      id: `demo-company-${role}`,
-      owner_id: fakeId,
-      name: demo.company,
-      type: role === 'driver' ? 'carrier' : role,
-      mc_number: 'MC-123456',
-      dot_number: 'DOT-789012',
-      status: 'active',
-    } as unknown as CompanyRow);
-    setIsDemo(true);
-    setLoading(false);
-  }, []);
 
   /**
    * Create the company for the current user (called in onboarding Step 3).

@@ -4,6 +4,7 @@ import { createDriverIncident, uploadIncidentPhoto } from '@/services/driver-inc
 import type { IncidentType, IncidentSeverity } from '@/services/driver-incidents.service';
 import { getDriverLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
+import { isDemoActive } from '@/lib/demo/demo-session';
 import type { Load } from '@freightx/shared';
 
 interface IncidentFormProps {
@@ -50,9 +51,9 @@ export function IncidentForm({ open, onClose, onCreated }: IncidentFormProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
 
-  // Auto-fill GPS on open
+  // Auto-fill GPS on open (demo personas never prompt the viewer for location)
   useEffect(() => {
-    if (open && 'geolocation' in navigator) {
+    if (open && !isDemoActive() && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setLat(pos.coords.latitude);

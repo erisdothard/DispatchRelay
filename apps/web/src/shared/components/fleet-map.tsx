@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { geocodeCity } from '@/lib/geocoding';
+import { KeylessTiles, LeafletAutoResize, MapCredit } from './leaflet-route-map';
 
 // ── Apple-style truck pins with pulse for available trucks ────────────────────
 
@@ -77,19 +78,12 @@ export function FleetMap({ trucks, className = 'h-44' }: FleetMapProps) {
     setLoading(true);
 
     void (async () => {
-      const results: Array<{ truck: TruckPin; pos: [number, number] }> = [];
-      for (let i = 0; i < trucks.length; i++) {
-        if (cancelled) return;
-        const truck = trucks[i]!;
-        const pos = await geocodeCity(truck.city, truck.state);
-        if (pos) results.push({ truck, pos });
-        // Nominatim rate limit: 1 req/s
-        if (i < trucks.length - 1 && !cancelled) {
-          await new Promise<void>((r) => setTimeout(r, 350));
-        }
-      }
+      // Geocoding is cached (Mapbox) or offline (demo/no token), so resolve in parallel.
+      const resolved = await Promise.all(
+        trucks.map(async (truck) => ({ truck, pos: await geocodeCity(truck.city, truck.state) })),
+      );
       if (!cancelled) {
-        setPins(results);
+        setPins(resolved.flatMap(({ truck, pos }) => (pos ? [{ truck, pos }] : [])));
         setLoading(false);
       }
     })();
@@ -130,7 +124,8 @@ export function FleetMap({ trucks, className = 'h-44' }: FleetMapProps) {
   const positions = pins.map((p) => p.pos);
 
   return (
-    <div className={`relative rounded-2xl overflow-hidden ${className}`}>
+    // z-0 contains Leaflet's pane z-indexes (400+) so the map can't paint over the bottom nav.
+    <div className={`relative z-0 rounded-2xl overflow-hidden ${className}`}>
       <MapContainer
         center={positions[0]}
         zoom={5}
@@ -140,11 +135,8 @@ export function FleetMap({ trucks, className = 'h-44' }: FleetMapProps) {
         dragging
         style={{ height: '100%', width: '100%' }}
       >
-        {/* Stadia Alidade Smooth Dark — Apple Maps aesthetic, free */}
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          maxZoom={20}
-        />
+        <KeylessTiles />
+        <LeafletAutoResize />
         <FitAll positions={positions} />
 
         {pins.map(({ truck, pos }) => (
@@ -199,21 +191,7 @@ export function FleetMap({ trucks, className = 'h-44' }: FleetMapProps) {
         </span>
       </div>
 
-      {/* Attribution */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 4,
-          left: 6,
-          zIndex: 1000,
-          fontSize: 9,
-          color: 'rgba(255,255,255,0.22)',
-          pointerEvents: 'none',
-          userSelect: 'none',
-        }}
-      >
-        © Stadia · OSM
-      </div>
+      <MapCredit />
     </div>
   );
 }

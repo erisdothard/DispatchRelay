@@ -21,6 +21,7 @@ import { BottomNav } from '@/shared/components/bottom-nav';
 import { Badge } from '@/shared/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { KEYLESS_TILE_URL } from '@/lib/map-engine';
 import type { DutyStatus } from '@/features/loads/hooks/use-continuous-gps';
 import { useFleetDutyStatus } from '@/features/loads/hooks/use-continuous-gps';
 
@@ -146,7 +147,7 @@ export default function FleetAvailabilityPage() {
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={KEYLESS_TILE_URL}
               />
 
               {filteredDrivers.map((driver) => (

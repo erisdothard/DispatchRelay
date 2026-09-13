@@ -5,19 +5,6 @@ import type { Load, TrackingMilestone } from '@freightx/shared';
 import { recordLaneRate } from './rate-intelligence.service';
 import { notifyLoadStatusChange, notifyDriverAssigned } from './email-notifications.service';
 import { LoadFiltersSchema, CreateLoadInputSchema } from '@/lib/schemas/loads.schema';
-import {
-  getAllLoads,
-  getCarrierLoads,
-  getDriverLoadsDemo,
-  getBrokerLoads,
-  getShipperLoads,
-  DEMO_LOADS,
-} from '@/lib/demo-data';
-
-/** Returns true when the app is running in demo mode (no real Supabase calls). */
-function isDemoUser(userId?: string): boolean {
-  return !!userId?.startsWith('demo-');
-}
 
 export const PAGE_SIZE = 25;
 
@@ -40,28 +27,6 @@ export interface LoadsPage {
 }
 
 export async function getLoads(filters: LoadFilters = {}): Promise<Load[]> {
-  if (isDemoUser(filters.postedBy)) {
-    let loads = filters.postedBy?.includes('broker')
-      ? getBrokerLoads()
-      : filters.postedBy?.includes('shipper')
-        ? getShipperLoads()
-        : getAllLoads();
-    if (filters.equipment && filters.equipment !== 'all')
-      loads = loads.filter((l) => l.equipment === filters.equipment);
-    if (filters.status && filters.status !== 'all')
-      loads = loads.filter((l) => l.status === filters.status);
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
-      loads = loads.filter(
-        (l) =>
-          l.loadNumber.toLowerCase().includes(q) ||
-          l.originCity.toLowerCase().includes(q) ||
-          l.destCity.toLowerCase().includes(q) ||
-          l.commodity.toLowerCase().includes(q),
-      );
-    }
-    return loads;
-  }
   LoadFiltersSchema.parse(filters);
   const page = filters.page ?? 0;
   const from = page * PAGE_SIZE;
@@ -114,10 +79,6 @@ export async function getLoads(filters: LoadFilters = {}): Promise<Load[]> {
 }
 
 export async function getLoadsPage(filters: LoadFilters = {}): Promise<LoadsPage> {
-  if (isDemoUser(filters.postedBy)) {
-    const loads = await getLoads(filters);
-    return { loads, hasMore: false, total: loads.length };
-  }
   const page = filters.page ?? 0;
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
@@ -184,7 +145,6 @@ export async function getLoadByNumber(loadNumber: string): Promise<Load | null> 
 }
 
 export async function getLoadById(id: string): Promise<Load | null> {
-  if (id.startsWith('load-')) return DEMO_LOADS.find((l) => l.id === id) ?? null;
   const { data, error } = await supabase.from('loads').select('*').eq('id', id).single();
   if (error) return null;
   return rowToLoad(data);
@@ -298,7 +258,6 @@ export async function recordBookingRateHistory(loadId: string): Promise<void> {
  * Get loads where this carrier has an accepted bid OR where carrier's company owns the load.
  */
 export async function getMyActiveLoads(carrierId: string): Promise<Load[]> {
-  if (isDemoUser(carrierId)) return getCarrierLoads();
   // 1. Get carrier's company via company_members join
   const { data: membership } = await supabase
     .from('company_members')
@@ -447,11 +406,6 @@ export async function assignCoDriver(loadId: string, driverId: string | null): P
  * Get loads assigned to a specific driver (primary or co-driver).
  */
 export async function getDriverLoads(driverId: string, status?: string): Promise<Load[]> {
-  if (isDemoUser(driverId)) {
-    let loads = getDriverLoadsDemo();
-    if (status) loads = loads.filter((l) => l.status === status);
-    return loads;
-  }
   let query = supabase
     .from('loads')
     .select('*, company_logo_url:companies!loads_company_id_fkey(logo_url)')

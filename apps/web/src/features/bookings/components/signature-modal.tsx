@@ -152,8 +152,9 @@ export function SignatureModal({
 
   if (!open) return null;
 
+  // z-[70] sits above bottom sheets (z-[60]) — it opens from the bids sheet after a bid is accepted.
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div
         className="relative w-full max-w-lg rounded-t-3xl p-6 space-y-4"

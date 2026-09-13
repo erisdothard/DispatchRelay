@@ -1,16 +1,19 @@
+import { isDemoActive } from '@/lib/demo/demo-session';
+import { hasMapboxToken } from '@/lib/map-engine';
+import { lookupCity } from '@/lib/us-city-coords';
+
 // Simple in-memory cache to avoid redundant Mapbox Geocoding requests
 const cache = new Map<string, [number, number] | null>();
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
+/** Without a Mapbox token (or in the demo) resolve locations from the offline gazetteer. */
+function shouldGeocodeOffline(): boolean {
+  return isDemoActive() || !hasMapboxToken();
+}
+
 async function mapboxGeocode(query: string, cacheKey: string): Promise<[number, number] | null> {
   if (cache.has(cacheKey)) return cache.get(cacheKey)!;
-
-  if (!MAPBOX_TOKEN) {
-    console.warn('[geocoding] VITE_MAPBOX_TOKEN is not set');
-    cache.set(cacheKey, null);
-    return null;
-  }
 
   try {
     const q = encodeURIComponent(query);
@@ -40,6 +43,7 @@ async function mapboxGeocode(query: string, cacheKey: string): Promise<[number, 
 }
 
 export async function geocodeCity(city: string, state: string): Promise<[number, number] | null> {
+  if (shouldGeocodeOffline()) return lookupCity(city, state);
   const key = `${city},${state}`.toLowerCase().trim();
   return mapboxGeocode(`${city}, ${state}`, key);
 }
@@ -50,6 +54,7 @@ export async function geocodeAddress(
   city: string,
   state: string,
 ): Promise<[number, number] | null> {
+  if (shouldGeocodeOffline()) return lookupCity(city, state);
   const key = `${address},${city},${state}`.toLowerCase().trim();
   const result = await mapboxGeocode(`${address}, ${city}, ${state}`, key);
   if (result) return result;

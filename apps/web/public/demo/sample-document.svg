@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="850" height="1100" viewBox="0 0 850 1100" role="img" aria-label="Sample freight document">
+  <rect width="850" height="1100" fill="#ffffff"/>
+  <rect x="0" y="0" width="850" height="10" fill="#e86030"/>
+  <text x="60" y="110" font-family="Helvetica, Arial, sans-serif" font-size="40" font-weight="700" fill="#111827">FreightX</text>
+  <text x="60" y="150" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#6b7280">Sample document · demo data only</text>
+  <line x1="60" y1="190" x2="790" y2="190" stroke="#e5e7eb" stroke-width="2"/>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#374151">
+    <text x="60" y="250" font-weight="700">Shipper</text>
+    <text x="60" y="276">Park Manufacturing Co</text>
+    <text x="440" y="250" font-weight="700">Carrier</text>
+    <text x="440" y="276">Rivera Transport Inc · MC-123456</text>
+    <text x="60" y="340" font-weight="700">Consignee</text>
+    <text x="60" y="366">Receiving Dock 4</text>
+    <text x="440" y="340" font-weight="700">Broker</text>
+    <text x="440" y="366">Apex Freight Solutions</text>
+  </g>
+  <rect x="60" y="420" width="730" height="44" fill="#f3f4f6"/>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#111827" font-weight="700">
+    <text x="76" y="448">Qty</text><text x="170" y="448">Description</text><text x="560" y="448">Weight</text><text x="680" y="448">Class</text>
+  </g>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#374151">
+    <text x="76" y="500">24</text><text x="170" y="500">Palletized freight</text><text x="560" y="500">38,000 lb</text><text x="680" y="500">70</text>
+  </g>
+  <line x1="60" y1="940" x2="380" y2="940" stroke="#9ca3af" stroke-width="1.5"/>
+  <line x1="470" y1="940" x2="790" y2="940" stroke="#9ca3af" stroke-width="1.5"/>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#6b7280">
+    <text x="60" y="966">Shipper signature</text>
+    <text x="470" y="966">Carrier signature</text>
+  </g>
+</svg>

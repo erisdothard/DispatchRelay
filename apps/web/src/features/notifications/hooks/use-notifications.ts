@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { DEMO_NOTIFICATIONS } from '@/lib/demo-data';
 
 export interface AppNotification {
   id: string;
@@ -29,18 +28,6 @@ export function useNotifications(): UseNotificationsResult {
 
   const fetch = useCallback(() => {
     if (!user) return;
-    if (user.id.startsWith('demo-')) {
-      setNotifications(
-        DEMO_NOTIFICATIONS.map((n) => ({
-          ...n,
-          user_id: user.id,
-          load_id: null,
-          body: n.body,
-        })),
-      );
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     supabase
       .from('notifications')

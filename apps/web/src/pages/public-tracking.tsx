@@ -5,7 +5,7 @@ import { EmptyState } from '@/shared/components/empty-state';
 import { MapView } from '@/shared/components/map-view';
 import { useParams } from 'react-router-dom';
 import { getLoadByToken } from '@/services/tracking-tokens.service';
-import { useLiveTracking } from '@/features/loads/hooks/use-live-tracking';
+import { useLiveTracking, splitMilestoneStamp } from '@/features/loads/hooks/use-live-tracking';
 import { getTrackingMilestones } from '@/services/loads.service';
 import type { Load, TrackingMilestone } from '@freightx/shared';
 
@@ -232,10 +232,10 @@ export default function PublicTrackingPage() {
                       <p
                         className={`text-[14px] font-bold ${m.current || m.completed ? 'text-fx-orange' : 'text-fx-text-dim'}`}
                       >
-                        {m.timestamp?.split('·')[1]?.trim() ?? '—'}
+                        {splitMilestoneStamp(m.timestamp)?.[1] || '—'}
                       </p>
                       <p className="text-[11px] text-fx-text-dim mt-0.5">
-                        {m.timestamp?.split('·')[0]?.trim()}
+                        {splitMilestoneStamp(m.timestamp)?.[0]}
                       </p>
                     </div>
                   </div>

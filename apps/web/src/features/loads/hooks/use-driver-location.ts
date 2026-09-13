@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { insertLocationPing } from '../lib/location';
+import { insertLocationPing, simulateDemoPing } from '../lib/location';
+import { isDemoActive } from '@/lib/demo/demo-session';
 import { checkGeofences } from '../lib/geofence';
 import { detectAnomalies } from '../lib/anomaly-detection';
 import { getGeofencesForLoad, recordGeofenceEvent } from '@/services/geofence.service';
@@ -13,6 +14,7 @@ const MOVEMENT_THRESHOLD_M = 50; // 50 metres
 const HEARTBEAT_MS = 30_000; // backup heartbeat interval
 const AUTO_STATUS_DWELL_MS = 180_000; // 3 minutes dwell before auto-status
 const AUTO_ACCEPT_TIMEOUT_MS = 60_000; // 60s auto-accept for dispatcher confirmation
+const IDLE_LOAD_NUMBER = '__idle__'; // manual share with no load attached
 
 /** Haversine distance in metres between two lat/lng pairs. */
 function distanceM(lat1: number, lng1: number, lat2: number, lng2: number) {
@@ -373,6 +375,18 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
   useEffect(() => {
     if (!active) return;
 
+    if (isDemoActive()) {
+      // Demo walkthrough: never prompt for (or share) the viewer's real location — advance the
+      // load's recorded trail instead so tracking views stay live.
+      const driverId = profile?.id;
+      if (!driverId || !loadNumber || loadNumber === IDLE_LOAD_NUMBER) return;
+      const tick = () =>
+        void simulateDemoPing(loadNumber, driverId, PING_INTERVAL_MS / 1000).catch(() => undefined);
+      tick();
+      const timer = setInterval(tick, PING_INTERVAL_MS);
+      return () => clearInterval(timer);
+    }
+
     startWatch();
 
     // When the tab comes back to the foreground, restart the watch and fire
@@ -395,5 +409,5 @@ export function useDriverLocation({ loadNumber, active }: UseDriverLocationOptio
       stopWatch();
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, [active, startWatch, stopWatch, sendPing]);
+  }, [active, loadNumber, profile?.id, startWatch, stopWatch, sendPing]);
 }

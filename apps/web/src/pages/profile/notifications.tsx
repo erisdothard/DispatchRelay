@@ -124,12 +124,15 @@ export default function NotificationsPage() {
     setSaving(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from('notification_preferences').upsert({
-      user_id: profile.id,
-      settings,
-      phone_number: phoneNumber.trim() || null,
-      updated_at: new Date().toISOString(),
-    });
+    const { error } = await (supabase as any).from('notification_preferences').upsert(
+      {
+        user_id: profile.id,
+        settings,
+        phone_number: phoneNumber.trim() || null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' },
+    );
 
     setSaving(false);
     if (!error) {

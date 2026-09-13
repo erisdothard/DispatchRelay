@@ -20,6 +20,7 @@ import { BottomNav } from '@/shared/components/bottom-nav';
 import { Calendar, MapPin, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { KEYLESS_TILE_URL } from '@/lib/map-engine';
 
 // Create HeatmapLayer component
 const HeatmapLayer = HeatmapLayerFactory<[number, number, number]>();
@@ -214,7 +215,7 @@ export default function FleetHeatmapPage() {
             >
               <TileLayer
                 attribution='&copy; <a href="https://carto.com/">CartoDB</a>'
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                url={KEYLESS_TILE_URL}
               />
 
               <HeatmapLayer

@@ -1,8 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
 import { Loader2, RotateCcw, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { isDemoActive } from '@/lib/demo/demo-session';
 import { markBolSigned, notifyBolSignedParties } from '@/services/documents.service';
 import { embedSignatureIntoPdf } from '@/services/pdf-signature-embed.service';
+import { getLatestLoadPing } from '@/features/loads/lib/location';
 import { VerificationSeal } from './verification-seal';
 
 interface BolSignatureSheetProps {
@@ -18,6 +20,7 @@ interface BolSignatureSheetProps {
 
 /** Fetch server-side timestamp via Supabase REST response header to avoid device clock spoofing. */
 async function getNetworkTimestamp(): Promise<string> {
+  if (isDemoActive()) return new Date().toISOString();
   try {
     const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/`, {
       method: 'HEAD',
@@ -31,8 +34,12 @@ async function getNetworkTimestamp(): Promise<string> {
   return new Date().toISOString();
 }
 
-/** Request GPS coordinates (non-blocking — returns null on failure). */
-function getGpsCoords(): Promise<{ lat: number; lng: number } | null> {
+/**
+ * Request GPS coordinates (non-blocking — returns null on failure).
+ * Demo mode uses the load's latest recorded ping rather than the viewer's device.
+ */
+async function getGpsCoords(loadNumber: string): Promise<{ lat: number; lng: number } | null> {
+  if (isDemoActive()) return getLatestLoadPing(loadNumber).catch(() => null);
   return new Promise((resolve) => {
     if (!('geolocation' in navigator)) return resolve(null);
     navigator.geolocation.getCurrentPosition(
@@ -163,7 +170,7 @@ export function BolSignatureSheet({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const [bolDocResult, gps, networkTs, attestationResult] = await Promise.all([
         supabase.from('documents').select('*').eq('id', documentId).single(),
-        getGpsCoords(),
+        getGpsCoords(loadNumber),
         getNetworkTimestamp(),
         // Fetch the carrier attestation hash for this load (chain of custody link)
         (supabase as any)
@@ -294,7 +301,7 @@ export function BolSignatureSheet({
 
   if (showSuccess) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center">
         <div className="absolute inset-0 bg-black/70" />
         <div className="relative flex flex-col items-center gap-4 animate-scale-in">
           <VerificationSeal />
@@ -306,7 +313,7 @@ export function BolSignatureSheet({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div
         className="relative w-full max-w-lg rounded-t-3xl p-6 space-y-4"

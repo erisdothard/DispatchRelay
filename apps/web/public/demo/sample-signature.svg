@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="120" viewBox="0 0 360 120" role="img" aria-label="Sample signature">
+  <path d="M18 82c14-30 30-52 40-50 11 2-6 50 2 52 9 2 22-40 34-40 10 0 2 34 12 35 12 1 20-26 30-26 9 0 4 22 13 22 11 0 18-20 29-20 10 0 6 18 16 18 14 0 24-16 38-16 12 0 10 12 22 12 16 0 30-10 48-12"
+        fill="none" stroke="#1f2937" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 96c60-6 150-8 250-4" fill="none" stroke="#1f2937" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+</svg>

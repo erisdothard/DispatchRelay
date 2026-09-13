@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Loader2, RotateCcw, Check, FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { isDemoActive } from '@/lib/demo/demo-session';
 import { embedSignatureIntoPdf } from '@/services/pdf-signature-embed.service';
 import { generateRateConBlob } from '@/features/bookings/lib/generate-rate-con';
 import { notifyRateConSigned } from '@/services/email-notifications.service';
@@ -19,6 +20,7 @@ interface RateConSignatureSheetProps {
 
 /** Fetch server-side timestamp via Supabase REST response header to avoid device clock spoofing. */
 async function getNetworkTimestamp(): Promise<string> {
+  if (isDemoActive()) return new Date().toISOString();
   try {
     const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/`, {
       method: 'HEAD',

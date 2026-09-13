@@ -398,6 +398,7 @@ function MembersTabContent() {
         setInviteEmail('');
         setInviteFullName('');
         setInvitePhone('');
+        setInvites(await getCompanyInvites(companyId));
       } else {
         // Existing flow for non-driver roles
         const invite = await inviteMember({

@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { realtimeSubscribe } from '@/lib/realtime-manager';
-import { DEMO_LOADS, DEMO_BIDS } from '@/lib/demo-data';
 
 /**
  * Returns the number of loads requiring action for the current user's role.
@@ -14,37 +13,23 @@ import { DEMO_LOADS, DEMO_BIDS } from '@/lib/demo-data';
  * Others  → 0
  */
 export function useLoadActionCounts(): number {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  // App role lives on the profile — the auth user's `role` is always 'authenticated'.
+  const role = profile?.role;
   const [count, setCount] = useState(0);
 
   const fetchCount = useCallback(async () => {
-    if (!user?.id || !user?.role) return;
-
-    if (user.id.startsWith('demo-')) {
-      const role = user.id.split('-')[1];
-      if (role === 'broker') setCount(DEMO_LOADS.filter((l) => l.status === 'bid_received').length);
-      else if (role === 'carrier')
-        setCount(DEMO_LOADS.filter((l) => l.status === 'awarded').length);
-      else if (role === 'driver')
-        setCount(
-          DEMO_LOADS.filter(
-            (l) => l.status === 'dispatched' && l.assignedDriverId?.startsWith('demo-driver'),
-          ).length,
-        );
-      else setCount(0);
-      void DEMO_BIDS; // suppress unused
-      return;
-    }
+    if (!user?.id || !role) return;
 
     try {
-      if (user.role === 'broker') {
+      if (role === 'broker') {
         const { count: c } = await supabase
           .from('loads')
           .select('*', { count: 'exact', head: true })
           .eq('posted_by', user.id)
           .eq('status', 'bid_received');
         setCount(c ?? 0);
-      } else if (user.role === 'carrier') {
+      } else if (role === 'carrier') {
         // Find load IDs where this carrier has an accepted bid
         const { data: bids } = await supabase
           .from('bids')
@@ -63,7 +48,7 @@ export function useLoadActionCounts(): number {
           .in('id', loadIds)
           .eq('status', 'awarded');
         setCount(c ?? 0);
-      } else if (user.role === 'driver') {
+      } else if (role === 'driver') {
         const { count: c } = await supabase
           .from('loads')
           .select('*', { count: 'exact', head: true })
@@ -76,7 +61,7 @@ export function useLoadActionCounts(): number {
     } catch {
       // non-fatal — badge just won't show
     }
-  }, [user?.id, user?.role]);
+  }, [user?.id, role]);
 
   useEffect(() => {
     fetchCount();

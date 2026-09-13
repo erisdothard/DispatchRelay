@@ -13,6 +13,7 @@
 
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { isDemoActive } from '@/lib/demo/demo-session';
 
 // Initialize Redis client
 const redis = new Redis({
@@ -79,6 +80,9 @@ export async function checkRateLimit(
   remaining: number;
   reset: number;
 }> {
+  // Demo mode has no backend to protect — never call Upstash.
+  if (isDemoActive()) return { success: true, limit: 0, remaining: 0, reset: 0 };
+
   try {
     const { success, limit, remaining, reset } = await limiter.limit(identifier);
 

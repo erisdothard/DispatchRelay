@@ -11,6 +11,24 @@ export interface LivePing {
 }
 
 /**
+ * Split a milestone timestamp into [date, time]. Accepts preformatted "Mar 5 · 10:30 AM"
+ * labels as well as ISO timestamps straight from tracking_milestones.
+ */
+export function splitMilestoneStamp(stamp: string | null | undefined): [string, string] | null {
+  if (!stamp) return null;
+  if (stamp.includes('·')) {
+    const [date, time] = stamp.split('·');
+    return [date.trim(), (time ?? '').trim()];
+  }
+  const parsed = new Date(stamp);
+  if (Number.isNaN(parsed.getTime())) return [stamp, ''];
+  return [
+    parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    parsed.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+  ];
+}
+
+/**
  * Subscribes to real-time location pings for the given load number.
  * Returns the most recent ping, or null if none have arrived yet.
  * Falls back gracefully if Realtime is unavailable.

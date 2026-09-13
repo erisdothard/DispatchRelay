@@ -122,10 +122,36 @@ function localParse(query: string): LoadFilters {
   return filters;
 }
 
+/** Structured intent returned by the ai-load-search edge function. */
+interface AiSearchResult {
+  equipment?: LoadFilters['equipment'] | null;
+  origin_state?: string | null;
+  origin_city?: string | null;
+  dest_states?: string[] | null;
+  dest_city?: string | null;
+  min_rate_per_mile?: number | null;
+  keyword?: string | null;
+  summary?: string | null;
+}
+
+function toFilters(result: AiSearchResult): LoadFilters {
+  const filters: LoadFilters = {};
+  if (result.equipment) filters.equipment = result.equipment;
+  if (result.origin_state) filters.originState = result.origin_state;
+  if (result.dest_states?.length) filters.destState = result.dest_states[0];
+  if (result.min_rate_per_mile) filters.minRatePerMile = result.min_rate_per_mile;
+  // Only a recognised city or commodity goes to text search — never the raw sentence,
+  // which would false-negative on every word the load doesn't contain.
+  const term = result.origin_city ?? result.dest_city ?? result.keyword;
+  if (term) filters.search = term;
+  return filters;
+}
+
 export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleSearch() {
@@ -134,6 +160,7 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
     setLoading(true);
 
     let filters: LoadFilters = {};
+    let understood: string | null = null;
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke('ai-load-search', {
@@ -142,17 +169,16 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
 
       if (fnError) throw fnError;
 
-      // Map structured fields only — skip 'search' (causes false-negative text matches)
-      if (data?.equipment) filters.equipment = data.equipment;
-      if (data?.origin_state) filters.originState = data.origin_state;
-      if (data?.dest_states?.length) filters.destState = data.dest_states[0];
-      if (data?.min_rate_per_mile) filters.minRatePerMile = data.min_rate_per_mile;
+      const result = (data ?? {}) as AiSearchResult;
+      filters = toFilters(result);
+      understood = result.summary ?? 'No lane, equipment or rate recognised — showing all loads.';
     } catch {
       // Edge function unavailable — fall back to local keyword parser silently
       filters = localParse(q);
     }
 
     onFilters(filters);
+    setSummary(understood);
     setActive(true);
     setLoading(false);
   }
@@ -160,6 +186,7 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
   function handleClear() {
     setQuery('');
     setActive(false);
+    setSummary(null);
     onClear();
     inputRef.current?.focus();
   }
@@ -213,6 +240,19 @@ export function AiSearchBar({ onFilters, onClear, className }: AiSearchBarProps)
           </button>
         </div>
       </div>
+
+      {/* What the AI understood */}
+      {active && summary && (
+        <p
+          className="flex items-center gap-1.5 px-1 text-[11px] text-fx-text-dim"
+          aria-live="polite"
+        >
+          <Sparkles size={11} className="text-fx-orange shrink-0" />
+          <span className="truncate">
+            Understood: <span className="text-fx-text font-medium">{summary}</span>
+          </span>
+        </p>
+      )}
 
       {/* Example prompts */}
       {!query && !active && (

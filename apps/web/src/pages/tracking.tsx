@@ -7,7 +7,7 @@ import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { BottomNav } from '@/shared/components/bottom-nav';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLoadByNumber, getTrackingMilestones } from '@/services/loads.service';
-import { useLiveTracking } from '@/features/loads/hooks/use-live-tracking';
+import { useLiveTracking, splitMilestoneStamp } from '@/features/loads/hooks/use-live-tracking';
 import { useDriverLocation } from '@/features/loads/hooks/use-driver-location';
 import { useBreadcrumbTrail } from '@/features/loads/hooks/use-breadcrumb-trail';
 import { RouteReplaySlider } from '@/features/loads/components/route-replay-slider';
@@ -68,6 +68,8 @@ export default function TrackingPage() {
     'pending_approval',
   ]);
   const gpsEligible = !!load && !GPS_TERMINAL.has(load.status);
+  // Booked but not yet loaded — no pings are expected before pickup.
+  const awaitingPickup = !!load && (load.status === 'awarded' || load.status === 'dispatched');
 
   const role =
     (profile?.role === 'admin'
@@ -264,7 +266,11 @@ export default function TrackingPage() {
                 {gpsEligible && !livePosition && (
                   <span className="text-xs text-fx-text-dim font-medium flex items-center gap-1">
                     <span className="w-2 h-2 bg-fx-text-dim rounded-full" />
-                    Awaiting GPS
+                    {awaitingPickup && load.pickupDate
+                      ? `Not picked up · pickup ${new Date(
+                          load.pickupDate + 'T12:00:00',
+                        ).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                      : 'Awaiting GPS'}
                   </span>
                 )}
               </div>
@@ -515,10 +521,10 @@ export default function TrackingPage() {
                       <p
                         className={`text-[14px] font-bold tracking-tight ${m.current || m.completed ? 'text-fx-orange' : 'text-fx-text-dim'}`}
                       >
-                        {m.timestamp?.split('·')[1]?.trim() ?? '—'}
+                        {splitMilestoneStamp(m.timestamp)?.[1] || '—'}
                       </p>
                       <p className="text-[11px] text-fx-text-dim mt-0.5">
-                        {m.timestamp?.split('·')[0]?.trim()}
+                        {splitMilestoneStamp(m.timestamp)?.[0]}
                       </p>
                     </div>
                   </div>

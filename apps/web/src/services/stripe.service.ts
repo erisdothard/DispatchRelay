@@ -16,14 +16,16 @@ export async function redirectToCheckout(tier: SubscriptionTier, companyId: stri
   if (!priceId) throw new Error(`No price configured for tier: ${tier}`);
 
   // Edge Function creates a Stripe Checkout session and returns the hosted URL
-  const { data, error } = await supabase.functions.invoke<{ url: string }>(
-    'create-checkout-session',
-    {
-      body: { priceId, companyId, tier },
-    },
-  );
+  const { data, error } = await supabase.functions.invoke<{
+    url?: string | null;
+    activated?: boolean;
+  }>('create-checkout-session', {
+    body: { priceId, companyId, tier },
+  });
 
   if (error) throw new Error(error.message);
+  // Backends without hosted checkout (the demo) activate the plan in place — nothing to visit.
+  if (data?.activated) return;
   if (!data?.url) throw new Error('No checkout URL returned');
 
   // Redirect to Stripe-hosted checkout page

@@ -1,8 +1,56 @@
 import { supabase } from '@/lib/supabase';
 import type { ConversationRow, MessageRow } from '@/lib/database.types';
+import { isDemoActive } from '@/lib/demo/demo-session';
 import { notifyNewMessage } from './email-notifications.service';
 
 const PAGE_SIZE = 30;
+
+/**
+ * A conversation row stores `other_party` from its creator's (participant_a) side, and
+ * `unread_count` is shared by both participants. Re-derive both for the reader so each
+ * side sees the right name and only their own unread messages.
+ */
+async function forReader(rows: ConversationRow[], userId: string): Promise<ConversationRow[]> {
+  if (rows.length === 0) return rows;
+  const ids = rows.map((c) => c.id);
+  const creatorIds = [
+    ...new Set(
+      rows
+        .filter((c) => c.participant_b === userId && c.participant_a)
+        .map((c) => c.participant_a as string),
+    ),
+  ];
+
+  const [unreadRes, creatorsRes] = await Promise.all([
+    supabase
+      .from('messages')
+      .select('conversation_id')
+      .in('conversation_id', ids)
+      .eq('read', false)
+      .neq('sender_id', userId),
+    creatorIds.length > 0
+      ? supabase.from('profiles').select('id, full_name, role').in('id', creatorIds)
+      : Promise.resolve({
+          data: [] as Array<{ id: string; full_name: string | null; role: string }>,
+        }),
+  ]);
+
+  const unread = new Map<string, number>();
+  (unreadRes.data ?? []).forEach((m) =>
+    unread.set(m.conversation_id, (unread.get(m.conversation_id) ?? 0) + 1),
+  );
+  const creators = new Map((creatorsRes.data ?? []).map((p) => [p.id, p]));
+
+  return rows.map((c) => {
+    const creator = c.participant_b === userId ? creators.get(c.participant_a ?? '') : undefined;
+    return {
+      ...c,
+      other_party: creator?.full_name ?? c.other_party,
+      other_party_role: creator?.role ?? c.other_party_role,
+      unread_count: unreadRes.error ? c.unread_count : (unread.get(c.id) ?? 0),
+    };
+  });
+}
 
 export async function getConversations(
   userId: string,
@@ -17,8 +65,19 @@ export async function getConversations(
     .order('last_message_at', { ascending: false })
     .range(from, to);
   if (error) throw error;
-  const rows = data ?? [];
-  return { data: rows.slice(0, PAGE_SIZE), hasMore: rows.length > PAGE_SIZE };
+  const rows = await forReader((data ?? []).slice(0, PAGE_SIZE), userId);
+  return { data: rows, hasMore: (data ?? []).length > PAGE_SIZE };
+}
+
+/** Mark every message the other participant sent in this conversation as read. */
+export async function markConversationRead(conversationId: string, userId: string): Promise<void> {
+  const { error } = await supabase
+    .from('messages')
+    .update({ read: true })
+    .eq('conversation_id', conversationId)
+    .eq('read', false)
+    .neq('sender_id', userId);
+  if (error) throw error;
 }
 
 /**
@@ -61,6 +120,16 @@ export async function sendMessage(
     .select()
     .single();
   if (error) throw error;
+
+  // Demo mode: the other participant answers a moment later, so the inbox feels live.
+  if (isDemoActive()) {
+    supabase
+      .rpc('demo_simulate_reply' as never, { p_conversation_id: conversationId } as never)
+      .then(
+        () => undefined,
+        () => undefined,
+      );
+  }
 
   // Update last_message on conversation
   await supabase

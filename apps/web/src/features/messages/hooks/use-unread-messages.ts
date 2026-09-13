@@ -3,48 +3,60 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
 /**
- * Returns the total number of conversations with unread messages for the current user.
- * Uses polling (30s) with realtime INSERT listener for instant updates.
+ * Returns how many of the current user's conversations have messages they haven't read.
+ * Counts only messages sent by the other participant, so each side of a conversation
+ * gets its own badge. Uses realtime listeners with a 30s polling fallback.
  */
 export function useUnreadMessages(): number {
   const { user } = useAuth();
   const [count, setCount] = useState(0);
 
-  const fetch = useCallback(() => {
+  const refresh = useCallback(async () => {
     if (!user) return;
-    supabase
+    const { data: convos, error: convoError } = await supabase
       .from('conversations')
-      .select('id, unread_count', { count: 'exact' })
-      .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`)
-      .gt('unread_count', 0)
-      .then(({ count: total }) => {
-        setCount(total ?? 0);
-      });
+      .select('id')
+      .or(`participant_a.eq.${user.id},participant_b.eq.${user.id}`);
+    if (convoError) return;
+    const ids = (convos ?? []).map((c) => c.id);
+    if (ids.length === 0) {
+      setCount(0);
+      return;
+    }
+    const { data: unread, error } = await supabase
+      .from('messages')
+      .select('conversation_id')
+      .in('conversation_id', ids)
+      .eq('read', false)
+      .neq('sender_id', user.id);
+    if (error) return;
+    setCount(new Set((unread ?? []).map((m) => m.conversation_id)).size);
   }, [user]);
 
   useEffect(() => {
-    fetch();
-  }, [fetch]);
+    void refresh();
+  }, [refresh]);
 
-  // Realtime — new messages trigger re-check
+  // Realtime — new or read messages re-check the badge
   useEffect(() => {
     if (!user) return;
+    const onChange = () => void refresh();
     const channel = supabase
       .channel('unread-messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, fetch)
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, fetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, onChange)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, onChange)
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fetch]);
+  }, [user, refresh]);
 
   // Polling fallback
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(fetch, 30_000);
+    const interval = setInterval(() => void refresh(), 30_000);
     return () => clearInterval(interval);
-  }, [user, fetch]);
+  }, [user, refresh]);
 
   return count;
 }

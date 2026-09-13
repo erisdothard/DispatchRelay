@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { isDemoActive } from '@/lib/demo/demo-session';
 
 export interface CalendarIntegration {
   id: string;
@@ -36,6 +37,15 @@ export async function getCalendarIntegration(): Promise<CalendarIntegration | nu
  * The state parameter encodes the user_id so the callback can associate tokens.
  */
 export function initiateGoogleOAuth(redirectUrl: string): void {
+  if (isDemoActive()) {
+    // No Google in the demo — record a connected calendar and return as the OAuth callback would.
+    void connectDemoCalendar().then(() => {
+      const joiner = redirectUrl.includes('?') ? '&' : '?';
+      window.location.href = `${redirectUrl}${joiner}calendar_connected=true`;
+    });
+    return;
+  }
+
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
   const callbackUrl = `${supabaseUrl}/functions/v1/google-oauth-callback`;
@@ -63,6 +73,23 @@ export function initiateGoogleOAuth(redirectUrl: string): void {
 
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   });
+}
+
+async function connectDemoCalendar(): Promise<void> {
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any).from('calendar_integrations').upsert(
+    {
+      user_id: authData.user.id,
+      provider: 'google',
+      calendar_id: 'primary',
+      enabled: true,
+      token_expires_at: new Date(Date.now() + 30 * 24 * 3_600_000).toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id,provider' },
+  );
 }
 
 /**
@@ -105,6 +132,14 @@ export async function toggleCalendarSync(enabled: boolean): Promise<void> {
 export async function syncLoadToCalendar(loadId: string): Promise<void> {
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) return;
+
+  if (isDemoActive()) {
+    const { error } = await supabase.functions.invoke('calendar-sync', {
+      body: { load_id: loadId, driver_id: authData.user.id },
+    });
+    if (error) throw new Error(error.message);
+    return;
+  }
 
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;

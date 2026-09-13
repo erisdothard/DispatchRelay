@@ -5,6 +5,7 @@ import { TIRE_POSITION_LABELS } from '../lib/tire-constants';
 import { createTireIncident, uploadTirePhoto } from '@/services/tire-incidents.service';
 import { getDriverLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
+import { isDemoActive } from '@/lib/demo/demo-session';
 import type { TirePosition, TireSeverity, TireResolution, Load } from '@freightx/shared';
 
 interface TireIncidentFormProps {
@@ -49,7 +50,8 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
 
   // Auto-fill GPS location on open (locationText intentionally excluded to avoid re-triggering)
   useEffect(() => {
-    if (open && 'geolocation' in navigator) {
+    // Demo personas never prompt the viewer for location.
+    if (open && !isDemoActive() && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setLat(pos.coords.latitude);

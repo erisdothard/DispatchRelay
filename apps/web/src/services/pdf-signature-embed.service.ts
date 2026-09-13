@@ -21,21 +21,104 @@ async function sha256Hex(buffer: ArrayBuffer): Promise<string> {
     .join('');
 }
 
+const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46]; // %PDF
+const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47];
+const JPEG_MAGIC = [0xff, 0xd8, 0xff];
+
+function hasMagic(bytes: ArrayBuffer, magic: number[]): boolean {
+  const head = new Uint8Array(bytes.slice(0, magic.length));
+  return magic.every((b, i) => head[i] === b);
+}
+
+/** Decode any browser-renderable image (e.g. SVG, WebP) to PNG bytes via a canvas. */
+async function rasterizeToPng(
+  bytes: ArrayBuffer,
+  contentType: string,
+): Promise<ArrayBuffer | null> {
+  if (typeof document === 'undefined') return null;
+  const url = URL.createObjectURL(new Blob([bytes], { type: contentType || 'image/svg+xml' }));
+  try {
+    const img = new Image();
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error('Unsupported image'));
+      img.src = url;
+    });
+    const scale = Math.min(2, 2000 / Math.max(img.naturalWidth || 1, img.naturalHeight || 1));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round((img.naturalWidth || 612) * scale);
+    canvas.height = Math.round((img.naturalHeight || 792) * scale);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+    return blob ? await blob.arrayBuffer() : null;
+  } catch {
+    return null;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+/**
+ * Open the source as a PDF. Drivers often upload a photo of the paper BOL instead of a PDF —
+ * in that case wrap the image on a Letter page, leaving room for the signature block below it.
+ */
+async function loadAsPdf(bytes: ArrayBuffer, contentType: string): Promise<PDFDocument> {
+  if (hasMagic(bytes, PDF_MAGIC)) return PDFDocument.load(bytes);
+
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([612, 792]);
+  const png = hasMagic(bytes, PNG_MAGIC)
+    ? bytes
+    : hasMagic(bytes, JPEG_MAGIC)
+      ? null
+      : await rasterizeToPng(bytes, contentType);
+  const image = hasMagic(bytes, JPEG_MAGIC)
+    ? await pdfDoc.embedJpg(bytes)
+    : png
+      ? await pdfDoc.embedPng(png)
+      : null;
+
+  if (image) {
+    const box = { x: 40, y: 240, width: 532, height: 512 };
+    const scale = Math.min(box.width / image.width, box.height / image.height);
+    const width = image.width * scale;
+    const height = image.height * scale;
+    page.drawImage(image, {
+      x: box.x + (box.width - width) / 2,
+      y: box.y + (box.height - height) / 2,
+      width,
+      height,
+    });
+  } else {
+    page.drawText('Original document attached separately.', {
+      x: 50,
+      y: 700,
+      size: 11,
+      color: rgb(0.3, 0.3, 0.3),
+    });
+  }
+  return pdfDoc;
+}
+
 export async function embedSignatureIntoPdf(
   params: EmbedSignatureParams,
 ): Promise<EmbedSignatureResult> {
   const { pdfUrl, signatureDataUrl, signatoryName, signedAt } = params;
 
-  // 1. Load original PDF
-  const pdfBytes = await fetch(pdfUrl).then((r) => {
-    if (!r.ok) throw new Error(`Failed to load PDF (${r.status})`);
-    return r.arrayBuffer();
-  });
+  // 1. Load original document (PDF, or an image of the paper BOL)
+  const response = await fetch(pdfUrl);
+  if (!response.ok) throw new Error(`Failed to load PDF (${response.status})`);
+  const contentType = response.headers.get('content-type') ?? '';
+  const pdfBytes = await response.arrayBuffer();
 
-  // 1b. Hash unsigned PDF
+  // 1b. Hash unsigned original
   const docHash = await sha256Hex(pdfBytes);
 
-  const pdfDoc = await PDFDocument.load(pdfBytes);
+  const pdfDoc = await loadAsPdf(pdfBytes, contentType);
 
   // 2. Embed signature PNG
   const signatureImageBytes = await fetch(signatureDataUrl).then((r) => {

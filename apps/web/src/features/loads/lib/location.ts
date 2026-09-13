@@ -1,4 +1,6 @@
 import { supabase } from '@/lib/supabase';
+import { getGeofencesForLoad } from '@/services/geofence.service';
+import { haversineM } from './geofence';
 
 export interface LocationPing {
   load_number: string;
@@ -87,4 +89,71 @@ export async function insertLocationPing(ping: LocationPing) {
   if (pendingQueue.length > 0) void flushQueue();
 
   return data;
+}
+
+/* ── Latest known position ─────────────────────────────── */
+
+export interface LoadPosition {
+  lat: number;
+  lng: number;
+  recordedAt: string;
+}
+
+/** The most recent ping recorded for a load, or null if it has never reported. */
+export async function getLatestLoadPing(loadNumber: string): Promise<LoadPosition | null> {
+  const { data } = await supabase
+    .from('location_pings')
+    .select('latitude, longitude, recorded_at')
+    .eq('load_number', loadNumber)
+    .order('recorded_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data ? { lat: data.latitude, lng: data.longitude, recordedAt: data.recorded_at } : null;
+}
+
+/* ── Demo-mode position simulation ─────────────────────── */
+
+const DEMO_SPEED_MS = 26; // ~58 mph
+const DEMO_STOP_BUFFER_M = 2_000; // park short of the delivery geofence
+
+function bearingDeg(from: { lat: number; lng: number }, to: { lat: number; lng: number }): number {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLng = toRad(to.lng - from.lng);
+  const y = Math.sin(dLng) * Math.cos(toRad(to.lat));
+  const x =
+    Math.cos(toRad(from.lat)) * Math.sin(toRad(to.lat)) -
+    Math.sin(toRad(from.lat)) * Math.cos(toRad(to.lat)) * Math.cos(dLng);
+  return Math.round(((Math.atan2(y, x) * 180) / Math.PI + 360) % 360);
+}
+
+/**
+ * Demo walkthroughs never read the viewer's device GPS. Instead, advance the load's latest
+ * ping toward its delivery stop so tracking views keep moving as if the truck were live.
+ */
+export async function simulateDemoPing(loadNumber: string, driverId: string, elapsedS: number) {
+  const last = await getLatestLoadPing(loadNumber);
+  if (!last) return null;
+
+  const dest = (await getGeofencesForLoad(loadNumber)).find((f) => f.stopType === 'delivery');
+  const remainingM = dest ? haversineM(last.lat, last.lng, dest.lat, dest.lng) : 0;
+  const moving = !!dest && remainingM > DEMO_STOP_BUFFER_M;
+  const fraction = moving
+    ? Math.min((DEMO_SPEED_MS * elapsedS) / remainingM, 1 - DEMO_STOP_BUFFER_M / remainingM)
+    : 0;
+  const next = dest
+    ? {
+        lat: last.lat + (dest.lat - last.lat) * fraction,
+        lng: last.lng + (dest.lng - last.lng) * fraction,
+      }
+    : last;
+
+  return insertLocationPing({
+    load_number: loadNumber,
+    driver_id: driverId,
+    latitude: Number(next.lat.toFixed(5)),
+    longitude: Number(next.lng.toFixed(5)),
+    accuracy_m: 8,
+    heading_deg: dest && moving ? bearingDeg(last, dest) : undefined,
+    speed_ms: moving ? DEMO_SPEED_MS : 0,
+  });
 }

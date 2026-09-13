@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { NegotiationCard } from '@/pages/carrier/components/negotiation-card';
+import { groupNegotiations } from '@/pages/carrier/lib/negotiations';
 import { useSearchParams } from 'react-router-dom';
 import {
   Search,
@@ -7,7 +9,6 @@ import {
   Settings2,
   Sparkles,
   Truck,
-  ArrowRight,
   LayoutList,
   LayoutGrid,
   FileText,
@@ -148,6 +149,18 @@ export default function CarrierLoadsPage() {
 
   const matchList = hasPrefs ? topMatches : scoredLoads;
 
+  // A broker counter is its own bid row — fold each thread into one card.
+  const negotiations = useMemo(() => groupNegotiations(myBids), [myBids]);
+
+  const openLoadById = useCallback(async (loadId: string) => {
+    try {
+      const fullLoad = await getLoadById(loadId);
+      if (fullLoad) setSelectedLoad(fullLoad);
+    } catch {
+      /* load no longer visible — leave the sheet closed */
+    }
+  }, []);
+
   // My Loads grouped by status (active pipeline only)
   const myAwarded = myLoads.filter((l) => l.status === 'awarded');
   const myInProgress = myLoads.filter((l) => ['dispatched', 'in_transit'].includes(l.status));
@@ -215,9 +228,13 @@ export default function CarrierLoadsPage() {
             >
               <Truck size={12} />
               My Loads
-              {myAwarded.length + myInProgress.length + myDelivered.length + myBids.length > 0 && (
+              {myAwarded.length + myInProgress.length + myDelivered.length + negotiations.length >
+                0 && (
                 <span className="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1">
-                  {myAwarded.length + myInProgress.length + myDelivered.length + myBids.length}
+                  {myAwarded.length +
+                    myInProgress.length +
+                    myDelivered.length +
+                    negotiations.length}
                 </span>
               )}
             </TabsTrigger>
@@ -385,7 +402,10 @@ export default function CarrierLoadsPage() {
               : tab === 'my_loads'
                 ? (() => {
                     const n =
-                      myAwarded.length + myInProgress.length + myDelivered.length + myBids.length;
+                      myAwarded.length +
+                      myInProgress.length +
+                      myDelivered.length +
+                      negotiations.length;
                     return `${n} active load${n !== 1 ? 's' : ''}`;
                   })()
                 : tab === 'matches'
@@ -413,7 +433,7 @@ export default function CarrierLoadsPage() {
             }
           />
         ) : tab === 'my_loads' ? (
-          myAwarded.length + myInProgress.length + myDelivered.length + myBids.length === 0 &&
+          myAwarded.length + myInProgress.length + myDelivered.length + negotiations.length === 0 &&
           myHistory.length === 0 ? (
             <EmptyState
               icon={<Truck size={28} />}
@@ -428,7 +448,8 @@ export default function CarrierLoadsPage() {
                 </button>
               }
             />
-          ) : myAwarded.length + myInProgress.length + myDelivered.length + myBids.length === 0 ? (
+          ) : myAwarded.length + myInProgress.length + myDelivered.length + negotiations.length ===
+            0 ? (
             <EmptyState
               icon={<Truck size={28} />}
               title="No active loads right now"
@@ -449,7 +470,7 @@ export default function CarrierLoadsPage() {
                 {[
                   {
                     label: 'Bidding',
-                    count: myBids.length,
+                    count: negotiations.length,
                     textColor: 'text-blue-400',
                     bgClass: 'bg-blue-400/10 border border-blue-400/25',
                   },
@@ -488,86 +509,23 @@ export default function CarrierLoadsPage() {
                   ))}
               </div>
 
-              {/* Bidding On — loads with pending/countered bids */}
-              {myBids.length > 0 && (
+              {/* Bidding On — one card per negotiation (a broker counter folds into its bid) */}
+              {negotiations.length > 0 && (
                 <div className="space-y-3 mb-6">
                   <div style={{ borderLeft: '3px solid #60A5FA', paddingLeft: '12px' }}>
                     <p className="text-[17px] font-bold text-blue-400 leading-tight">Bidding On</p>
                     <p className="text-[11px] text-fx-text-dim mt-0.5">
-                      Waiting for broker response
+                      Open negotiations with brokers
                     </p>
                   </div>
-                  {myBids.map((bid) => {
-                    const l = bid.load;
-                    if (!l) return null;
-                    const isCountered = bid.status === 'countered';
-                    return (
-                      <button
-                        key={bid.id}
-                        onClick={async () => {
-                          try {
-                            const fullLoad = await getLoadById(bid.load_id);
-                            if (fullLoad) setSelectedLoad(fullLoad);
-                          } catch {
-                            /* fallback — do nothing */
-                          }
-                        }}
-                        className={cn(
-                          'w-full text-left rounded-ios p-4 active-scale transition-colors',
-                          isCountered
-                            ? 'bg-blue-500/[0.06] border border-blue-500/20'
-                            : 'bg-fx-surface border border-white/[0.06]',
-                        )}
-                        style={
-                          isCountered
-                            ? { boxShadow: 'inset 3px 0 0 rgba(96,165,250,0.65)' }
-                            : undefined
-                        }
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <p className="text-[11px] text-fx-text-dim">{l.load_number}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[15px] font-bold text-white truncate">
-                                {l.origin_city}, {l.origin_state}
-                              </span>
-                              <ArrowRight size={12} className="text-fx-text-dim shrink-0" />
-                              <span className="text-[15px] font-bold text-white truncate">
-                                {l.dest_city}, {l.dest_state}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <p className="text-[15px] font-bold text-white">
-                              ${bid.amount_usd.toLocaleString()}
-                            </p>
-                            <p className="text-[10px] text-fx-text-dim">
-                              Ask ${l.rate_usd.toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-semibold text-fx-text-dim bg-fx-surface-2 px-2.5 py-0.5 rounded-full">
-                              {EQUIPMENT_LABELS[l.equipment as keyof typeof EQUIPMENT_LABELS] ??
-                                l.equipment}
-                            </span>
-                            <span
-                              className={cn(
-                                'text-[11px] font-semibold px-2.5 py-0.5 rounded-full',
-                                isCountered
-                                  ? 'text-blue-400 bg-blue-400/10'
-                                  : 'text-fx-orange bg-fx-orange/10',
-                              )}
-                            >
-                              {isCountered ? 'Counter Received' : 'Bid Pending'}
-                            </span>
-                          </div>
-                          <p className="text-[11px] font-bold text-blue-400">View →</p>
-                        </div>
-                      </button>
-                    );
-                  })}
+                  {negotiations.map((negotiation) => (
+                    <NegotiationCard
+                      key={negotiation.id}
+                      negotiation={negotiation}
+                      onOpen={openLoadById}
+                      onResolved={refreshMyLoads}
+                    />
+                  ))}
                 </div>
               )}
 

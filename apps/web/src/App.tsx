@@ -4,6 +4,17 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 import { PageSkeleton } from '@/shared/components/PageSkeleton';
 import { ErrorBoundary } from '@/shared/components/error-boundary';
+import { IS_DEMO_ENV } from '@/lib/demo/demo-env';
+
+/** Account flows that need a real auth backend — demo builds send them to the role picker. */
+const AUTH_ONLY_PATHS = [
+  '/onboarding',
+  '/invite/:token',
+  '/claim-account',
+  '/auth/callback',
+  '/forgot-password',
+  '/reset-password',
+];
 
 // Auto-retry lazy imports once on chunk-load failure (stale deploy cache)
 function lazyRetry(fn: () => Promise<{ default: ComponentType }>) {
@@ -23,6 +34,7 @@ import ResetPasswordPage from '@/pages/reset-password';
 import OnboardingPage from '@/pages/onboarding';
 import ClaimAccountPage from '@/pages/claim-account';
 import AuthCallbackPage from '@/pages/auth-callback';
+import DemoPage from '@/pages/demo';
 
 // Lazy-loaded — only downloaded when the user navigates to that role
 const CarrierDashboard = lazyRetry(() => import('@/pages/carrier/dashboard'));
@@ -80,12 +92,22 @@ export default function App() {
           {/* Public */}
           <Route path="/" element={<SplashPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
-          <Route path="/invite/:token" element={<OnboardingPage />} />
-          <Route path="/claim-account" element={<ClaimAccountPage />} />
-          <Route path="/auth/callback" element={<AuthCallbackPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/demo" element={<DemoPage />} />
+          <Route path="/demo/:role" element={<DemoPage />} />
+          {IS_DEMO_ENV ? (
+            AUTH_ONLY_PATHS.map((path) => (
+              <Route key={path} path={path} element={<Navigate to="/login" replace />} />
+            ))
+          ) : (
+            <>
+              <Route path="/onboarding" element={<OnboardingPage />} />
+              <Route path="/invite/:token" element={<OnboardingPage />} />
+              <Route path="/claim-account" element={<ClaimAccountPage />} />
+              <Route path="/auth/callback" element={<AuthCallbackPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+            </>
+          )}
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/t/:token" element={<PublicTrackingPage />} />
