@@ -179,10 +179,10 @@ const QUEUE: QueueSeed[] = [
   ['sms', '+16155550142', null, 'sent', 1, 1],
   ['email', 'shipper@dispatchrelay.co', 'Load DR-1051 status: in transit', 'sent', 2, 4],
   ['push', 'dev-driver-ios', 'Delivery appointment tomorrow', 'sent', 1, 1],
-  ['email', 'dispatch@blueridgelogistics.com', 'Bid update for load DR-1046', 'sent', 1, 0.5],
+  ['email', 'dispatch@blueridgelogistics.example', 'Bid update for load DR-1046', 'sent', 1, 0.5],
   [
     'email',
-    'ops@summithaulers.com',
+    'ops@summithaulers.example',
     'Counter-offer on load DR-1050',
     'failed',
     3,
@@ -192,7 +192,7 @@ const QUEUE: QueueSeed[] = [
   ['sms', '+12055550199', null, 'failed', 2, 1.5, 'Carrier rejected: unreachable handset'],
   [
     'email',
-    'old-contact@parkmfg.com',
+    'old-contact@parkmfg.example',
     'BOL signed for load DR-1049',
     'dead',
     5,

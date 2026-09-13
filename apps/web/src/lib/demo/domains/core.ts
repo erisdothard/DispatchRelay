@@ -46,8 +46,8 @@ function profile(id: string, fullName: string, email: string, role: string, extr
 
 const PROFILES: Row[] = [
   profile(DEMO_IDS.carrier, 'Marcus Rivera', 'carrier@dispatchrelay.co', 'carrier'),
-  profile(DEMO_IDS.carrier2, 'Dana Brooks', 'dispatch@blueridgelogistics.com', 'carrier'),
-  profile(DEMO_IDS.carrier3, 'Tom Alvarez', 'ops@summithaulers.com', 'carrier'),
+  profile(DEMO_IDS.carrier2, 'Dana Brooks', 'dispatch@blueridgelogistics.example', 'carrier'),
+  profile(DEMO_IDS.carrier3, 'Tom Alvarez', 'ops@summithaulers.example', 'carrier'),
   profile(DEMO_IDS.broker, 'Sarah Chen', 'broker@dispatchrelay.co', 'broker'),
   profile(DEMO_IDS.shipper, 'James Park', 'shipper@dispatchrelay.co', 'shipper'),
   profile(DEMO_IDS.driver, 'Carlos Mendez', 'driver@dispatchrelay.co', 'driver', {
@@ -124,7 +124,7 @@ const COMPANIES: Row[] = [
     {
       mc_number: 'MC-123456',
       dot_number: 'DOT-789012',
-      email: 'dispatch@riveratransport.com',
+      email: 'dispatch@riveratransport.example',
       address: '2200 Lebanon Pike',
       zip: '37210',
       total_loads: 412,
@@ -173,7 +173,7 @@ const COMPANIES: Row[] = [
       broker_bond_amount: 75000,
       broker_bond_expires_at: daysFromNow(240),
       broker_bond_verified: true,
-      email: 'loads@apexfreight.com',
+      email: 'loads@apexfreight.example',
       total_loads: 1290,
     },
   ),
@@ -185,7 +185,7 @@ const COMPANIES: Row[] = [
     'Detroit',
     'MI',
     {
-      email: 'logistics@parkmfg.com',
+      email: 'logistics@parkmfg.example',
       total_loads: 318,
     },
   ),

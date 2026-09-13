@@ -57,19 +57,25 @@ function teamProfile(
 
 function teamProfiles(): Row[] {
   return [
-    teamProfile(RT_TEAM.dispatcher, 'Angela Torres', 'angela@riveratransport.com', 'carrier', {
+    teamProfile(RT_TEAM.dispatcher, 'Angela Torres', 'angela@riveratransport.example', 'carrier', {
       phone: '(615) 555-0119',
     }),
-    teamProfile(RT_TEAM.accounting, 'Priya Shah', 'ap@riveratransport.com', 'carrier', {
+    teamProfile(RT_TEAM.accounting, 'Priya Shah', 'ap@riveratransport.example', 'carrier', {
       phone: '(615) 555-0133',
     }),
-    teamProfile(RT_TEAM.darnell, 'Darnell Washington', 'darnell.w@riveratransport.com', 'driver', {
-      carrier_id: DEMO_IDS.carrier,
-      phone: '(615) 555-0188',
-      current_duty_status: 'on_duty',
-      duty_status_updated_at: hoursAgo(2),
-      last_location_update: hoursAgo(0.15),
-    }),
+    teamProfile(
+      RT_TEAM.darnell,
+      'Darnell Washington',
+      'darnell.w@riveratransport.example',
+      'driver',
+      {
+        carrier_id: DEMO_IDS.carrier,
+        phone: '(615) 555-0188',
+        current_duty_status: 'on_duty',
+        duty_status_updated_at: hoursAgo(2),
+        last_location_update: hoursAgo(0.15),
+      },
+    ),
   ];
 }
 
@@ -112,7 +118,7 @@ function companyInvites(): Row[] {
     invite('invite-rt-driver', 'jwilliams.cdl@example.com', 'driver', 'demo7f3a9c41d2e8b605', 48),
     invite(
       'invite-rt-dispatch',
-      'kevin.nguyen@riveratransport.com',
+      'kevin.nguyen@riveratransport.example',
       'dispatcher',
       'demo2b81e4c9a07f3d16',
       20,

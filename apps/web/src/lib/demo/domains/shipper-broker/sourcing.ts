@@ -45,7 +45,7 @@ const EXTRA_CARRIERS: Row[] = [
   carrierCompany(GREAT_LAKES_CO, 'Great Lakes Carriers', 'Toledo', 'OH', {
     mc_number: 'MC-557310',
     dot_number: 'DOT-2419087',
-    email: 'dispatch@greatlakescarriers.com',
+    email: 'dispatch@greatlakescarriers.example',
     rating: 4.7,
     on_time_percent: 95,
     total_loads: 264,

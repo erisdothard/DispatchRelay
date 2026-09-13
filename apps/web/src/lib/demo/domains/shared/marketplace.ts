@@ -220,7 +220,7 @@ export function buildMarketplaceSeeds(): Record<string, Row[]> {
     profiles: [
       {
         id: MARKETPLACE_BROKER_ID,
-        email: 'loads@crossroadsfreight.com',
+        email: 'loads@crossroadsfreight.example',
         full_name: 'Rachel Kim',
         role: 'broker',
         status: 'active',
@@ -246,7 +246,7 @@ export function buildMarketplaceSeeds(): Record<string, Row[]> {
         address: '4100 Airways Blvd',
         zip: '38116',
         phone: '(901) 555-0100',
-        email: 'loads@crossroadsfreight.com',
+        email: 'loads@crossroadsfreight.example',
         website: null,
         logo_url: null,
         mc_number: 'MC-655902',

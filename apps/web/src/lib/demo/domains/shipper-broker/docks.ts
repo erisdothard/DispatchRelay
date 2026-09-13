@@ -58,7 +58,7 @@ const FACILITIES: Row[] = [
     lng: -83.1245,
     contact_name: 'Angela Ruiz',
     contact_phone: '(313) 555-0188',
-    contact_email: 'dock@parkmfg.com',
+    contact_email: 'dock@parkmfg.example',
   }),
   facility('fac-toledo', 'Toledo Distribution Center', '2150 Hill Ave', 'Toledo', 'OH', '43607', {
     lat: 41.6391,
