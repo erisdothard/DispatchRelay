@@ -2,11 +2,14 @@ import type { Page } from '@playwright/test';
 
 export type DemoRole = 'carrier' | 'broker' | 'shipper' | 'driver';
 
-/** Demo builds (no backend configured) show only role cards on /login — no credential form. */
+/** Shared demo-account password — matches VITE_DEMO_PASSWORD's default in the app. */
+export const DEMO_PASSWORD = process.env.VITE_DEMO_PASSWORD ?? 'dispatchrelay';
+
+/** Demo builds (no backend configured) mark the login screen with `data-demo-build`. */
 export async function isDemoBuild(page: Page): Promise<boolean> {
   await page.goto('/login');
-  await page.getByText('Carrier', { exact: true }).waitFor();
-  return (await page.locator('input[type="email"]').count()) === 0;
+  await page.locator('input[type="email"], [data-demo-build]').first().waitFor();
+  return (await page.locator('[data-demo-build]').count()) > 0;
 }
 
 /** Signs in as a demo persona on every navigation, exactly like picking a role card. */

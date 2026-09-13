@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { isDemoBuild } from './helpers/demo';
 
-const NO_CREDENTIALS = 'Demo builds have no credential login';
+const NO_PASSWORD_RESET = 'Demo builds have no password reset';
 
 test.describe('Auth flows', () => {
   test('splash page loads and shows login CTA', async ({ page }) => {
@@ -11,7 +11,6 @@ test.describe('Auth flows', () => {
   });
 
   test('login page renders correctly', async ({ page }) => {
-    test.skip(await isDemoBuild(page), NO_CREDENTIALS);
     await page.goto('/login');
     await expect(page.locator('input[type="email"]')).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
@@ -19,7 +18,6 @@ test.describe('Auth flows', () => {
   });
 
   test('invalid login shows error', async ({ page }) => {
-    test.skip(await isDemoBuild(page), NO_CREDENTIALS);
     await page.goto('/login');
     await page.fill('input[type="email"]', 'notreal@test.com');
     await page.fill('input[type="password"]', 'wrongpassword');
@@ -28,7 +26,7 @@ test.describe('Auth flows', () => {
   });
 
   test('forgot password page is accessible', async ({ page }) => {
-    test.skip(await isDemoBuild(page), NO_CREDENTIALS);
+    test.skip(await isDemoBuild(page), NO_PASSWORD_RESET);
     await page.goto('/forgot-password');
     await expect(page.locator('input[type="email"]')).toBeVisible();
   });

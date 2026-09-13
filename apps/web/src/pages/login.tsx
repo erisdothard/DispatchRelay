@@ -10,11 +10,14 @@ import {
   Briefcase,
   Package,
   UserCircle,
+  KeyRound,
 } from 'lucide-react';
 import { IOSStatusBar } from '@/shared/components/ios-status-bar';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole } from '@/lib/database.types';
 import { IS_DEMO_ENV } from '@/lib/demo/demo-env';
+import { DEMO_LOGIN_ROLES, DEMO_PASSWORD } from '@/lib/demo/credentials';
+import { DEMO_IDENTITIES } from '@/lib/demo/identities';
 
 const ROLE_ROUTES: Record<string, string> = {
   carrier: '/carrier',
@@ -23,6 +26,37 @@ const ROLE_ROUTES: Record<string, string> = {
   driver: '/driver',
   admin: '/admin',
 };
+
+const ROLE_CARDS = [
+  {
+    role: 'carrier' as UserRole,
+    label: 'Carrier',
+    blurb: 'Bid on loads, dispatch drivers, run your fleet',
+    icon: <Truck size={20} />,
+    color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+  },
+  {
+    role: 'broker' as UserRole,
+    label: 'Broker',
+    blurb: 'Post loads, compare bids, track shipments',
+    icon: <Briefcase size={20} />,
+    color: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+  },
+  {
+    role: 'shipper' as UserRole,
+    label: 'Shipper',
+    blurb: 'Ship freight, schedule docks, confirm delivery',
+    icon: <Package size={20} />,
+    color: 'text-green-400 bg-green-500/10 border-green-500/20',
+  },
+  {
+    role: 'driver' as UserRole,
+    label: 'Driver',
+    blurb: 'Run loads, sign BOLs, log your hours',
+    icon: <UserCircle size={20} />,
+    color: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
+  },
+] as const;
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -56,100 +90,153 @@ export default function LoginPage() {
     setAwaitingProfile(true);
   }
 
+  function fillDemoAccount(demoEmail: string) {
+    setEmail(demoEmail);
+    setPassword(DEMO_PASSWORD);
+    setError(null);
+  }
+
   const inputClass =
     'w-full h-12 bg-fx-surface rounded-ios-xs px-4 text-[14px] text-white placeholder:text-fx-text-dim focus:ring-1 focus:ring-fx-orange/50 outline-none transition-all card-highlight';
 
   return (
-    <div className="min-h-dvh flex flex-col px-6 pb-10">
+    <div
+      className="min-h-dvh flex flex-col px-6 pb-10"
+      data-demo-build={IS_DEMO_ENV ? '' : undefined}
+    >
       <IOSStatusBar />
 
       {/* Logo */}
       <div className="flex flex-col items-center pt-10 pb-10">
         <img src="/logo-user-1.svg" alt="DispatchRelay" className="h-10 mb-2" />
-        <p className="text-[14px] text-fx-text-dim mt-1">
+        <p className="text-[14px] text-fx-text-dim mt-1 text-center">
           {IS_DEMO_ENV
-            ? 'Pick a role and explore the live demo.'
+            ? 'Sign in with a demo account, or jump straight in as a role.'
             : "Welcome back. Let's move freight."}
         </p>
       </div>
 
-      {/* Credentials — hidden in demo builds, which have no accounts */}
-      {!IS_DEMO_ENV && (
-        <>
-          {/* Form */}
-          <form onSubmit={handleSignIn} className="flex flex-col gap-3 mb-8">
-            <div className="relative">
-              <Mail
-                size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
-              />
-              <input
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={`${inputClass} pl-10`}
-                autoComplete="email"
-                required
-              />
-            </div>
+      {/* Form */}
+      <form
+        onSubmit={handleSignIn}
+        className={`flex flex-col gap-3 ${IS_DEMO_ENV ? 'mb-4' : 'mb-8'}`}
+      >
+        <div className="relative">
+          <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim" />
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={`${inputClass} pl-10`}
+            autoComplete="email"
+            required
+          />
+        </div>
 
-            <div className="relative">
-              <Lock
-                size={15}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
-              />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`${inputClass} pl-10 pr-11`}
-                autoComplete="current-password"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
-              >
-                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-              </button>
-            </div>
+        <div className="relative">
+          <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim" />
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={`${inputClass} pl-10 pr-11`}
+            autoComplete="current-password"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((s) => !s)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim"
+          >
+            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+          </button>
+        </div>
 
-            <div className="flex justify-end -mt-1">
-              <button
-                type="button"
-                onClick={() => navigate('/forgot-password')}
-                className="text-[13px] text-fx-orange font-semibold"
-              >
-                Forgot password?
-              </button>
-            </div>
-
-            {error && (
-              <p className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3">
-                {error}
-              </p>
-            )}
-
+        {!IS_DEMO_ENV && (
+          <div className="flex justify-end -mt-1">
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-12 rounded-ios-xs flex items-center justify-center gap-2 text-[15px] font-semibold text-white active-scale disabled:opacity-60 mt-1 bg-orange-gradient"
-              style={{ boxShadow: '0 4px 20px rgba(232,96,48,0.4)' }}
+              type="button"
+              onClick={() => navigate('/forgot-password')}
+              className="text-[13px] text-fx-orange font-semibold"
             >
-              {loading ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>Sign In</span>
-                  <ArrowRight size={17} strokeWidth={2.5} />
-                </>
-              )}
+              Forgot password?
             </button>
-          </form>
+          </div>
+        )}
 
+        {error && (
+          <p
+            role="alert"
+            className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3"
+          >
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full h-12 rounded-ios-xs flex items-center justify-center gap-2 text-[15px] font-semibold text-white active-scale disabled:opacity-60 mt-1 bg-orange-gradient"
+          style={{ boxShadow: '0 4px 20px rgba(232,96,48,0.4)' }}
+        >
+          {loading ? (
+            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <>
+              <span>Sign In</span>
+              <ArrowRight size={17} strokeWidth={2.5} />
+            </>
+          )}
+        </button>
+      </form>
+
+      {IS_DEMO_ENV ? (
+        /* Demo accounts — tap one to fill the form */
+        <section
+          aria-labelledby="demo-accounts-heading"
+          className="mb-8 rounded-xl border border-fx-border bg-fx-surface/60 p-3"
+        >
+          <div className="flex items-center justify-between gap-3 px-1 mb-2">
+            <p
+              id="demo-accounts-heading"
+              className="text-xs uppercase tracking-widest font-bold text-fx-text-dim"
+            >
+              Demo accounts
+            </p>
+            <p className="flex items-center gap-1.5 text-[12px] text-fx-text-dim">
+              <KeyRound size={13} aria-hidden="true" />
+              Password <code className="text-fx-orange font-semibold">{DEMO_PASSWORD}</code>
+            </p>
+          </div>
+          <ul className="flex flex-col">
+            {DEMO_LOGIN_ROLES.map((role) => {
+              const { email: demoEmail, fullName } = DEMO_IDENTITIES[role];
+              const label = ROLE_CARDS.find((card) => card.role === role)?.label ?? role;
+              return (
+                <li key={role}>
+                  <button
+                    type="button"
+                    onClick={() => fillDemoAccount(demoEmail)}
+                    className="w-full flex items-center justify-between gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fx-orange/60"
+                  >
+                    <span className="min-w-0">
+                      <span className="block text-[13px] text-white truncate">{demoEmail}</span>
+                      <span className="block text-[11px] text-fx-text-dim">
+                        {label} · {fullName}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-[12px] font-semibold text-fx-orange">Use</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : (
+        <>
           {/* Google OAuth */}
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-px bg-fx-border" />
@@ -199,44 +286,13 @@ export default function LoginPage() {
         </>
       )}
 
-      {/* Demo Mode */}
+      {/* Role cards — one tap into a persona */}
       <div className={IS_DEMO_ENV ? '' : 'mt-8 pt-6 border-t border-fx-border'}>
         <p className="text-xs text-fx-text-dim text-center mb-3 uppercase tracking-widest font-bold">
-          {IS_DEMO_ENV ? 'Choose a role' : 'Demo Mode'}
+          {IS_DEMO_ENV ? 'Or jump straight in' : 'Demo Mode'}
         </p>
         <div className={`grid gap-2 ${IS_DEMO_ENV ? 'grid-cols-1' : 'grid-cols-2'}`}>
-          {(
-            [
-              {
-                role: 'carrier' as UserRole,
-                label: 'Carrier',
-                blurb: 'Bid on loads, dispatch drivers, run your fleet',
-                icon: <Truck size={20} />,
-                color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
-              },
-              {
-                role: 'broker' as UserRole,
-                label: 'Broker',
-                blurb: 'Post loads, compare bids, track shipments',
-                icon: <Briefcase size={20} />,
-                color: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
-              },
-              {
-                role: 'shipper' as UserRole,
-                label: 'Shipper',
-                blurb: 'Ship freight, schedule docks, confirm delivery',
-                icon: <Package size={20} />,
-                color: 'text-green-400 bg-green-500/10 border-green-500/20',
-              },
-              {
-                role: 'driver' as UserRole,
-                label: 'Driver',
-                blurb: 'Run loads, sign BOLs, log your hours',
-                icon: <UserCircle size={20} />,
-                color: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
-              },
-            ] as const
-          ).map(({ role, label, blurb, icon, color }) => (
+          {ROLE_CARDS.map(({ role, label, blurb, icon, color }) => (
             <button
               key={role}
               onClick={() => {

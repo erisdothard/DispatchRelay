@@ -3,6 +3,7 @@ import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import type { ProfileRow, CompanyRow, UserRole } from '@/lib/database.types';
 import { IS_DEMO_ENV } from '@/lib/demo/demo-env';
+import { demoIdentityForCredentials } from '@/lib/demo/credentials';
 import { demoIdentityFor } from '@/lib/demo/identities';
 import {
   endDemoSession,
@@ -177,11 +178,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [fetchProfile, enterDemoMode]);
 
-  /** Sign in with email + password */
-  const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
-  }, []);
+  /** Sign in with email + password — demo builds check the demo accounts instead. */
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      if (IS_DEMO_ENV) {
+        const identity = demoIdentityForCredentials(email, password);
+        if (!identity) {
+          return { error: 'Email or password is incorrect. Use one of the demo accounts below.' };
+        }
+        enterDemoMode(identity.role);
+        return { error: null };
+      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error?.message ?? null };
+    },
+    [enterDemoMode],
+  );
 
   /**
    * Sign up — passes full_name + role as metadata so the DB trigger

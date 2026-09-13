@@ -1,5 +1,18 @@
 import { test, expect } from '@playwright/test';
-import { isDemoBuild, signInAsDemo, watchForProblems, type DemoRole } from './helpers/demo';
+import {
+  DEMO_PASSWORD,
+  isDemoBuild,
+  signInAsDemo,
+  watchForProblems,
+  type DemoRole,
+} from './helpers/demo';
+
+const DEMO_EMAILS = [
+  'carrier@dispatchrelay.co',
+  'broker@dispatchrelay.co',
+  'shipper@dispatchrelay.co',
+  'driver@dispatchrelay.co',
+];
 
 /** Every screen each demo persona can reach from its navigation. */
 const SHARED_ROUTES = [
@@ -50,12 +63,38 @@ test.describe('Demo mode (no backend)', () => {
     test.skip(!(await isDemoBuild(page)), 'Only runs against a demo build');
   });
 
-  test('login offers role cards instead of a credential form', async ({ page }) => {
-    await expect(page.getByText('Choose a role')).toBeVisible();
+  test('login lists the demo accounts next to the role cards', async ({ page }) => {
+    await expect(page.locator('input[type="email"]')).toBeVisible();
+    await expect(page.getByText('Demo accounts')).toBeVisible();
+    for (const email of DEMO_EMAILS) await expect(page.getByText(email)).toBeVisible();
     for (const label of ['Carrier', 'Broker', 'Shipper', 'Driver']) {
       await expect(page.getByText(label, { exact: true })).toBeVisible();
     }
-    await expect(page.locator('input[type="password"]')).toHaveCount(0);
+    await expect(page.getByText('Sign in with Google')).toHaveCount(0);
+  });
+
+  test('a demo email and password open that persona', async ({ page }) => {
+    await page.fill('input[type="email"]', 'broker@dispatchrelay.co');
+    await page.fill('input[type="password"]', DEMO_PASSWORD);
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL(/\/broker$/);
+    await expect(page.getByText('Sarah Chen')).toBeVisible();
+  });
+
+  test('tapping a demo account fills the form', async ({ page }) => {
+    await page.getByRole('button', { name: /shipper@dispatchrelay\.co/ }).click();
+    await expect(page.locator('input[type="email"]')).toHaveValue('shipper@dispatchrelay.co');
+    await expect(page.locator('input[type="password"]')).toHaveValue(DEMO_PASSWORD);
+    await page.click('button[type="submit"]');
+    await expect(page).toHaveURL(/\/shipper$/);
+  });
+
+  test('a wrong password is rejected', async ({ page }) => {
+    await page.fill('input[type="email"]', 'carrier@dispatchrelay.co');
+    await page.fill('input[type="password"]', 'not-the-password');
+    await page.click('button[type="submit"]');
+    await expect(page.getByRole('alert')).toContainText(/incorrect/i);
+    await expect(page).toHaveURL(/\/login$/);
   });
 
   test('account-only routes send visitors back to the role picker', async ({ page }) => {

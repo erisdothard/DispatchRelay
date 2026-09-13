@@ -153,10 +153,12 @@ See `.env.example` for full list with comments.
 
 ## Test Accounts
 
-- Carrier: `carrier@dispatchrelay.co` (company: Rivera Transport Inc)
-- Driver 1: `driver@dispatchrelay.co` (viewer in carrier company)
-- Driver 2: `driver2@dispatchrelay.co` (viewer in carrier company)
-- Broker: `broker@dispatchrelay.co`
+Demo logins (demo builds only). Password for all: `dispatchrelay` (override with `VITE_DEMO_PASSWORD`).
+
+- Carrier: `carrier@dispatchrelay.co` (Marcus Rivera, Rivera Transport Inc)
+- Broker: `broker@dispatchrelay.co` (Sarah Chen, Apex Freight Solutions)
+- Shipper: `shipper@dispatchrelay.co` (James Park, Park Manufacturing Co)
+- Driver: `driver@dispatchrelay.co` (Carlos Mendez, viewer in the carrier company)
 
 ---
 
