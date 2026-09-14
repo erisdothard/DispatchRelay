@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm build:web",
-  "outputDirectory": "apps/web/dist",
+  "buildCommand": "cd ../.. && pnpm build:web",
+  "outputDirectory": "dist",
   "installCommand": "npm install -g pnpm@10.29.2 && pnpm install",
   "framework": "vite",
   "rewrites": [
