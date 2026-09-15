@@ -217,7 +217,7 @@ export default function CarrierLoadsPage() {
       {/* Tabs */}
       <div className="px-5 pt-3 pb-1 border-b border-fx-divider">
         <Tabs value={tab} onValueChange={(v: string) => setTab(v as Tab)}>
-          <TabsList className="w-full bg-fx-surface-2">
+          <TabsList scrollable className="bg-fx-surface-2">
             <TabsTrigger
               value="my_loads"
               className={cn(

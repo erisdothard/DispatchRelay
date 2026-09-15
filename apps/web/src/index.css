@@ -211,6 +211,33 @@ html.light .ios-blur {
     scrollbar-width: none;
   }
 
+  /* Horizontal scrollers fade the edge that still has content behind it, so
+     off-screen items read as scrollable instead of clipped. */
+  .fade-edge-start {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22px);
+    mask-image: linear-gradient(to right, transparent 0, #000 22px);
+  }
+  .fade-edge-end {
+    -webkit-mask-image: linear-gradient(to left, transparent 0, #000 22px);
+    mask-image: linear-gradient(to left, transparent 0, #000 22px);
+  }
+  .fade-edge-both {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 22px,
+      #000 calc(100% - 22px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 22px,
+      #000 calc(100% - 22px),
+      transparent 100%
+    );
+  }
+
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 16px);
   }

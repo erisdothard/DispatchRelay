@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { cn } from '@/shared/lib/utils';
 
 /* ------------------------------------------------------------------ */
@@ -64,12 +64,89 @@ export function Tabs({
 interface TabsListProps {
   children: React.ReactNode;
   className?: string;
+  /**
+   * Scroll horizontally when the triggers don't fit instead of squeezing them.
+   * Needed on mobile where four labelled tabs overflow the viewport.
+   */
+  scrollable?: boolean;
 }
 
-export function TabsList({ children, className }: TabsListProps) {
+export function TabsList({ children, className, scrollable = false }: TabsListProps) {
+  const { value } = useTabsContext();
+  const listRef = useRef<HTMLDivElement>(null);
+  const [overflow, setOverflow] = useState({ start: false, end: false });
+
+  // Fade whichever edge still has triggers behind it so the row reads as
+  // scrollable rather than cut off.
+  const syncOverflow = useCallback(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const max = list.scrollWidth - list.clientWidth;
+    setOverflow({ start: list.scrollLeft > 1, end: list.scrollLeft < max - 1 });
+  }, []);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!scrollable || !list) return;
+
+    syncOverflow();
+    list.addEventListener('scroll', syncOverflow, { passive: true });
+
+    const observer = new ResizeObserver(syncOverflow);
+    observer.observe(list);
+
+    return () => {
+      list.removeEventListener('scroll', syncOverflow);
+      observer.disconnect();
+    };
+  }, [scrollable, syncOverflow, children]);
+
+  // Keep the active trigger in view — tapping a tab that's half off-screen, or
+  // landing on one via deep link, should bring it fully into the scroll window.
+  useEffect(() => {
+    const list = listRef.current;
+    if (!scrollable || !list) return;
+
+    const active = list.querySelector<HTMLElement>('[data-state="active"]');
+    if (!active) return;
+
+    const left = active.offsetLeft;
+    const right = left + active.offsetWidth;
+    const pad = 12;
+
+    if (left < list.scrollLeft) {
+      list.scrollTo({ left: Math.max(0, left - pad), behavior: 'smooth' });
+    } else if (right > list.scrollLeft + list.clientWidth) {
+      list.scrollTo({ left: right - list.clientWidth + pad, behavior: 'smooth' });
+    }
+  }, [scrollable, value]);
+
+  if (!scrollable) {
+    return (
+      <div
+        role="tablist"
+        className={cn('inline-flex items-center gap-1 rounded-xl p-1', className)}
+      >
+        {children}
+      </div>
+    );
+  }
+
   return (
-    <div role="tablist" className={cn('inline-flex items-center gap-1 rounded-xl p-1', className)}>
-      {children}
+    // The pill sits on the outer wrapper so only the triggers scroll inside it.
+    <div className={cn('rounded-xl p-1', className)}>
+      <div
+        ref={listRef}
+        role="tablist"
+        className={cn(
+          'flex items-center gap-1 overflow-x-auto scrollbar-hide',
+          overflow.start && overflow.end && 'fade-edge-both',
+          overflow.start && !overflow.end && 'fade-edge-start',
+          !overflow.start && overflow.end && 'fade-edge-end',
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 }
