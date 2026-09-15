@@ -19,10 +19,11 @@ import type { BidRow } from '@/lib/database.types';
 import type { Load } from '@dispatchrelay/shared';
 
 const STATUS_STYLE: Record<string, string> = {
-  pending: 'bg-fx-orange/10 text-fx-orange',
-  accepted: 'bg-green-500/10 text-green-400',
-  declined: 'bg-red-500/10 text-red-400',
-  countered: 'bg-blue-500/10 text-blue-400',
+  pending: 'bg-fx-surface-2 text-fx-text-muted',
+  accepted: 'bg-fx-success-dim text-fx-success',
+  declined: 'bg-fx-danger-dim text-fx-danger',
+  countered: 'bg-fx-surface-3 text-fx-text',
+  // Expired is a no-fault timeout, not a rejection: neutral, so it never reads as `declined`.
   expired: 'bg-fx-surface-2 text-fx-text-dim',
   cancelled: 'bg-fx-surface-2 text-fx-text-dim',
 };
@@ -187,7 +188,9 @@ export function BidListSheet({ open, onClose, load, onBidAccepted }: BidListShee
         )}
 
         {error && (
-          <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-4 py-3 mb-3">{error}</p>
+          <p className="text-xs text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3 mb-3">
+            {error}
+          </p>
         )}
 
         {loading ? (
@@ -304,11 +307,12 @@ function BidCard({
   const diff = askingRate ? ((bid.amount_usd - askingRate) / askingRate) * 100 : 0;
   const diffLabel =
     diff === 0 ? 'at ask' : diff > 0 ? `+${diff.toFixed(1)}%` : `${diff.toFixed(1)}%`;
-  const diffColor = diff > 5 ? 'text-red-400' : diff < -5 ? 'text-green-400' : 'text-fx-text-muted';
+  const diffColor =
+    diff > 5 ? 'text-fx-danger' : diff < -5 ? 'text-fx-success' : 'text-fx-text-muted';
 
   return (
     <div
-      className={`rounded-2xl border p-4 ${bid.status === 'pending' ? 'border-fx-orange/20 bg-fx-orange/5' : 'border-fx-border bg-fx-surface'}`}
+      className={`rounded-2xl border p-4 ${bid.status === 'pending' ? 'border-fx-border-2 bg-fx-surface' : 'border-fx-border bg-fx-surface'}`}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div>
@@ -366,7 +370,7 @@ function BidCard({
                 <button
                   onClick={onCounterSubmit}
                   disabled={acting || !counterAmount}
-                  className="flex-1 h-9 rounded-xl bg-blue-500 text-xs font-bold text-white disabled:opacity-50"
+                  className="flex-1 h-9 rounded-xl bg-fx-orange text-xs font-bold text-white disabled:opacity-50"
                 >
                   {acting ? (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
@@ -381,21 +385,21 @@ function BidCard({
               <button
                 onClick={onDecline}
                 disabled={acting}
-                className="flex-1 h-10 rounded-xl border border-fx-border text-xs font-bold text-fx-text-muted flex items-center justify-center gap-1.5 hover:border-red-400/50 hover:text-red-400 transition-colors disabled:opacity-50"
+                className="flex-1 h-10 rounded-xl border border-fx-border text-xs font-bold text-fx-text-muted flex items-center justify-center gap-1.5 hover:border-fx-danger hover:text-fx-danger transition-colors disabled:opacity-50"
               >
                 <XCircle size={14} /> Decline
               </button>
               <button
                 onClick={onCounter}
                 disabled={acting}
-                className="flex-1 h-10 rounded-xl border border-blue-500/40 text-xs font-bold text-blue-400 flex items-center justify-center gap-1.5 hover:bg-blue-500/10 transition-colors disabled:opacity-50"
+                className="flex-1 h-10 rounded-xl border border-fx-border-2 text-xs font-bold text-fx-text flex items-center justify-center gap-1.5 hover:bg-fx-surface-2 transition-colors disabled:opacity-50"
               >
                 <ArrowLeftRight size={14} /> Counter
               </button>
               <button
                 onClick={onAccept}
                 disabled={acting}
-                className="flex-1 h-10 rounded-xl bg-green-500 text-xs font-bold text-white flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="flex-1 h-10 rounded-xl bg-fx-orange text-xs font-bold text-white flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {acting ? (
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -429,7 +433,7 @@ function BidCard({
       )}
 
       {bid.status === 'accepted' && (
-        <div className="flex items-center gap-2 mt-2 text-green-400">
+        <div className="flex items-center gap-2 mt-2 text-fx-success">
           <CheckCircle size={14} />
           <span className="text-xs font-semibold">Accepted — load awarded</span>
         </div>

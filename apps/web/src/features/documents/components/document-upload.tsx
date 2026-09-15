@@ -117,8 +117,8 @@ export function DocumentUpload({ loadId, role }: DocumentUploadProps) {
               <span className="w-4 h-4 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
             ) : justUploaded ? (
               <>
-                <CheckCircle2 size={14} className="text-green-400" />{' '}
-                <span className="text-green-400">Uploaded!</span>
+                <CheckCircle2 size={14} className="text-fx-success" />{' '}
+                <span className="text-fx-success">Uploaded!</span>
               </>
             ) : (
               <>
@@ -156,7 +156,7 @@ export function DocumentUpload({ loadId, role }: DocumentUploadProps) {
         />
 
         {error && (
-          <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-3 py-2">{error}</p>
+          <p className="text-xs text-fx-danger bg-fx-danger-dim rounded-xl px-3 py-2">{error}</p>
         )}
       </div>
 

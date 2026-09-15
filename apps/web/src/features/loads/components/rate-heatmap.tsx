@@ -19,9 +19,9 @@ const SAMPLE_LANES = [
 ] as const;
 
 const intensityStyles = {
-  high: 'bg-fx-orange/25 text-fx-orange border-fx-orange/30',
-  medium: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25',
-  low: 'bg-green-500/15 text-green-400 border-green-500/25',
+  high: 'bg-fx-orange/30 text-fx-orange border-fx-orange/40',
+  medium: 'bg-fx-orange/15 text-fx-text border-fx-orange/20',
+  low: 'bg-fx-orange/5 text-fx-text-muted border-fx-border',
 } as const;
 
 export function RateHeatmap({ equipment: _equipment, className }: RateHeatmapProps) {
@@ -52,13 +52,13 @@ export function RateHeatmap({ equipment: _equipment, className }: RateHeatmapPro
 
       <div className="flex items-center justify-center gap-4 pt-1">
         <span className="flex items-center gap-1.5 text-[10px] text-fx-text-dim">
-          <span className="w-2.5 h-2.5 rounded-full bg-green-500/40" /> Low
+          <span className="w-2.5 h-2.5 rounded-full bg-fx-orange/15" /> Low
         </span>
         <span className="flex items-center gap-1.5 text-[10px] text-fx-text-dim">
-          <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" /> Medium
+          <span className="w-2.5 h-2.5 rounded-full bg-fx-orange/40" /> Medium
         </span>
         <span className="flex items-center gap-1.5 text-[10px] text-fx-text-dim">
-          <span className="w-2.5 h-2.5 rounded-full bg-fx-orange/40" /> High
+          <span className="w-2.5 h-2.5 rounded-full bg-fx-orange/80" /> High
         </span>
       </div>
     </div>

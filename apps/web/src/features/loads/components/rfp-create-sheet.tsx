@@ -95,7 +95,7 @@ export function RfpCreateSheet({ open, onClose, companyId }: Props) {
             Title *
           </label>
           <input
-            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Q3 2026 Lane RFP"
@@ -106,7 +106,7 @@ export function RfpCreateSheet({ open, onClose, companyId }: Props) {
             Description
           </label>
           <textarea
-            className="w-full h-16 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-fx-text resize-none focus:outline-none focus:border-fx-orange"
+            className="w-full h-16 bg-fx-surface-2 border border-fx-border rounded-lg px-3 py-2 text-sm text-fx-text resize-none focus:outline-none focus:border-fx-orange"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -118,7 +118,7 @@ export function RfpCreateSheet({ open, onClose, companyId }: Props) {
             </label>
             <input
               type="date"
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+              className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
@@ -129,7 +129,7 @@ export function RfpCreateSheet({ open, onClose, companyId }: Props) {
             </label>
             <input
               type="date"
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+              className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
@@ -140,7 +140,7 @@ export function RfpCreateSheet({ open, onClose, companyId }: Props) {
             </label>
             <input
               type="date"
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+              className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
             />
@@ -152,29 +152,29 @@ export function RfpCreateSheet({ open, onClose, companyId }: Props) {
           Lanes
         </p>
         {lanes.map((lane, idx) => (
-          <div key={idx} className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 space-y-2">
+          <div key={idx} className="bg-fx-surface border border-fx-border rounded-xl p-3 space-y-2">
             <div className="grid grid-cols-2 gap-2">
               <input
-                className="h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
+                className="h-9 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="Origin City"
                 value={lane.originCity}
                 onChange={(e) => updateLane(idx, 'originCity', e.target.value)}
               />
               <input
-                className="h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
+                className="h-9 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="ST"
                 maxLength={2}
                 value={lane.originState}
                 onChange={(e) => updateLane(idx, 'originState', e.target.value)}
               />
               <input
-                className="h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
+                className="h-9 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="Dest City"
                 value={lane.destinationCity}
                 onChange={(e) => updateLane(idx, 'destinationCity', e.target.value)}
               />
               <input
-                className="h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
+                className="h-9 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="ST"
                 maxLength={2}
                 value={lane.destinationState}
@@ -183,13 +183,13 @@ export function RfpCreateSheet({ open, onClose, companyId }: Props) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <input
-                className="h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
+                className="h-9 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="Target Rate $"
                 value={lane.targetRate}
                 onChange={(e) => updateLane(idx, 'targetRate', e.target.value)}
               />
               <input
-                className="h-9 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
+                className="h-9 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="Vol/Week"
                 value={lane.volumePerWeek}
                 onChange={(e) => updateLane(idx, 'volumePerWeek', e.target.value)}
@@ -206,7 +206,7 @@ export function RfpCreateSheet({ open, onClose, companyId }: Props) {
       </div>
 
       {error && (
-        <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-400">
+        <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-fx-danger-dim border border-fx-danger-dim text-xs text-fx-danger">
           <AlertCircle size={13} />
           {error}
         </div>

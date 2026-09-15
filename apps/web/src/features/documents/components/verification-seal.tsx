@@ -13,8 +13,8 @@ export function VerificationSeal({ verified = true, label, className }: Verifica
       className={cn(
         'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold tracking-wide border',
         verified
-          ? 'bg-green-500/10 text-green-400 border-green-500/25'
-          : 'bg-red-500/10 text-red-400 border-red-500/25',
+          ? 'bg-fx-success-dim text-fx-success border-transparent'
+          : 'bg-fx-danger-dim text-fx-danger border-transparent',
         className,
       )}
     >

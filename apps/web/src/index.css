@@ -12,7 +12,8 @@
     --fx-border-2: #48484a;
     --fx-text: #ffffff;
     --fx-text-muted: #ebebf5;
-    --fx-text-dim: #636366;
+    /* 4.68:1 on surface-3, 5.75:1 on surface-2, 7.02:1 on surface, 8.02:1 on bg (was #636366, 2.3-3.3:1) */
+    --fx-text-dim: #a6a6ab;
     /* Semantic status colors */
     --fx-success: #34d399;
     --fx-success-dim: rgba(52, 211, 153, 0.15);
@@ -158,8 +159,9 @@ html.light #root {
   --fx-border: rgba(0, 0, 0, 0.08);
   --fx-border-2: rgba(0, 0, 0, 0.12);
   --fx-text: #1a1815;
-  --fx-text-muted: #6b6560;
-  --fx-text-dim: #9b9590;
+  /* On surface-3, the darkest light ground: muted 6.15:1, dim 4.80:1 (dim was #9b9590, 2.5:1) */
+  --fx-text-muted: #57524d;
+  --fx-text-dim: #67625d;
   /* Semantic status colors — light mode */
   --fx-success: #059669;
   --fx-success-dim: rgba(5, 150, 105, 0.1);

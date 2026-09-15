@@ -3,6 +3,7 @@ import { X, Camera, Upload } from 'lucide-react';
 import { createReceipt, uploadReceiptImage } from '@/services/receipts.service';
 import { getDriverLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
+import { RECEIPT_CATEGORY_ICONS } from '@/features/driver/lib/receipt-category-icons';
 import type { ReceiptCategory, Load } from '@dispatchrelay/shared';
 
 interface ReceiptCaptureSheetProps {
@@ -11,15 +12,15 @@ interface ReceiptCaptureSheetProps {
   onCreated: () => void;
 }
 
-const CATEGORIES: { value: ReceiptCategory; label: string; icon: string }[] = [
-  { value: 'fuel', label: 'Fuel', icon: '⛽' },
-  { value: 'maintenance', label: 'Maintenance', icon: '🔧' },
-  { value: 'tolls', label: 'Tolls', icon: '🛣️' },
-  { value: 'meals', label: 'Meals', icon: '🍔' },
-  { value: 'lodging', label: 'Lodging', icon: '🏨' },
-  { value: 'parking', label: 'Parking', icon: '🅿️' },
-  { value: 'supplies', label: 'Supplies', icon: '📦' },
-  { value: 'other', label: 'Other', icon: '📋' },
+const CATEGORIES: { value: ReceiptCategory; label: string }[] = [
+  { value: 'fuel', label: 'Fuel' },
+  { value: 'maintenance', label: 'Maintenance' },
+  { value: 'tolls', label: 'Tolls' },
+  { value: 'meals', label: 'Meals' },
+  { value: 'lodging', label: 'Lodging' },
+  { value: 'parking', label: 'Parking' },
+  { value: 'supplies', label: 'Supplies' },
+  { value: 'other', label: 'Other' },
 ];
 
 export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCaptureSheetProps) {
@@ -190,20 +191,23 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
                 Category
               </p>
               <div className="grid grid-cols-4 gap-2">
-                {CATEGORIES.map((c) => (
-                  <button
-                    key={c.value}
-                    onClick={() => setCategory(c.value)}
-                    className={`flex flex-col items-center gap-1 p-2 rounded-xl text-xs font-semibold transition-all ${
-                      category === c.value
-                        ? 'bg-fx-orange/15 border border-fx-orange/40 text-fx-orange'
-                        : 'bg-fx-surface-2 border border-fx-border text-fx-text-muted'
-                    }`}
-                  >
-                    <span className="text-lg">{c.icon}</span>
-                    <span>{c.label}</span>
-                  </button>
-                ))}
+                {CATEGORIES.map((c) => {
+                  const Icon = RECEIPT_CATEGORY_ICONS[c.value];
+                  return (
+                    <button
+                      key={c.value}
+                      onClick={() => setCategory(c.value)}
+                      className={`flex flex-col items-center gap-1 p-2 rounded-xl text-xs font-semibold transition-all ${
+                        category === c.value
+                          ? 'bg-fx-orange/15 border border-fx-orange/40 text-fx-orange'
+                          : 'bg-fx-surface-2 border border-fx-border text-fx-text-muted'
+                      }`}
+                    >
+                      <Icon size={20} aria-hidden="true" className="my-0.5" />
+                      <span>{c.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -288,7 +292,9 @@ export function ReceiptCaptureSheet({ open, onClose, onCreated }: ReceiptCapture
             </div>
 
             {error && (
-              <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-3 py-2">{error}</p>
+              <p className="text-xs text-fx-danger bg-fx-danger-dim rounded-xl px-3 py-2">
+                {error}
+              </p>
             )}
 
             <button

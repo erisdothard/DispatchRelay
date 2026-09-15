@@ -42,20 +42,20 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
       <div
         className="relative w-full max-w-[430px] mx-auto rounded-t-[28px] flex flex-col animate-slide-up"
         style={{
-          background: 'linear-gradient(180deg, #1E1A17 0%, #181410 100%)',
+          background: 'var(--fx-surface)',
           boxShadow: '0 -8px 48px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.07)',
           maxHeight: '92dvh',
         }}
       >
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+          <div className="w-10 h-1 rounded-full bg-fx-border-2" />
         </div>
 
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 py-3.5 shrink-0"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+          style={{ borderBottom: '1px solid var(--fx-border)' }}
         >
           <button
             onClick={onClose}
@@ -63,10 +63,10 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
           >
             Cancel
           </button>
-          <p className="text-[17px] font-bold text-white tracking-[-0.01em]">{title}</p>
+          <p className="text-[17px] font-bold text-fx-text tracking-[-0.01em]">{title}</p>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-white/08 flex items-center justify-center hover:bg-white/12 transition-colors"
+            className="w-7 h-7 rounded-full bg-fx-surface-2 flex items-center justify-center hover:bg-fx-surface-3 transition-colors"
           >
             <X size={14} className="text-fx-text-muted" />
           </button>

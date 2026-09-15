@@ -170,7 +170,7 @@ export function SavedSearchesSheet({
                   </button>
                   <button
                     onClick={() => handleDelete(search.id)}
-                    className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center"
+                    className="w-8 h-8 rounded-lg bg-fx-danger-dim text-fx-danger hover:bg-fx-danger hover:text-white flex items-center justify-center"
                   >
                     <Trash2 size={13} />
                   </button>

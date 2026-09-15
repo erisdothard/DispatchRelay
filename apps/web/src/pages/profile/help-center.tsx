@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, MessageCircle, Mail, Phone } from 'lucide-react';
+import { ChevronDown, ChevronUp, CircleHelp, MessageCircle, Mail, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -75,7 +75,9 @@ export default function HelpCenterPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">❓</div>
+          <div className="w-16 h-16 rounded-2xl bg-fx-surface-2 flex items-center justify-center mx-auto mb-3">
+            <CircleHelp size={32} className="text-fx-text-muted" aria-hidden="true" />
+          </div>
           <h1 className="text-xl font-bold text-fx-text">How can we help?</h1>
           <p className="text-sm text-fx-text-muted mt-1">Find answers to common questions below</p>
         </div>
@@ -133,8 +135,8 @@ export default function HelpCenterPage() {
               href="mailto:support@dispatchrelay.co"
               className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors"
             >
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                <Mail size={18} className="text-blue-400" />
+              <div className="w-10 h-10 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center">
+                <Mail size={18} className="text-fx-text-muted" />
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-fx-text">Email Support</p>
@@ -146,8 +148,8 @@ export default function HelpCenterPage() {
               href={`tel:${SUPPORT_PHONE}`}
               className="w-full bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3 hover:bg-fx-surface-2 transition-colors"
             >
-              <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                <Phone size={18} className="text-green-400" />
+              <div className="w-10 h-10 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center">
+                <Phone size={18} className="text-fx-text-muted" />
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-fx-text">Phone Support</p>

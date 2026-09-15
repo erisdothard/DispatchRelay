@@ -63,7 +63,7 @@ export default function ClaimAccountPage() {
   }
 
   const inputClass =
-    'w-full h-12 bg-fx-surface rounded-ios-xs px-4 text-[14px] text-white placeholder:text-fx-text-dim focus:ring-1 focus:ring-fx-orange/50 outline-none transition-all card-highlight';
+    'w-full h-12 bg-fx-surface rounded-ios-xs px-4 text-[14px] text-fx-text placeholder:text-fx-text-dim focus:ring-1 focus:ring-fx-orange/50 outline-none transition-all card-highlight';
 
   return (
     <div className="min-h-dvh flex flex-col px-5 pb-10">
@@ -83,8 +83,8 @@ export default function ClaimAccountPage() {
 
       {done ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-4 gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-            <CheckCircle2 size={32} className="text-green-400" />
+          <div className="w-16 h-16 rounded-2xl bg-fx-success-dim border border-fx-border flex items-center justify-center">
+            <CheckCircle2 size={32} className="text-fx-success" />
           </div>
           <div>
             <p className="text-lg font-bold text-fx-text">Account claimed</p>
@@ -98,7 +98,7 @@ export default function ClaimAccountPage() {
         </div>
       ) : error && !password ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-4 gap-3">
-          <p className="text-sm text-red-400">{error}</p>
+          <p className="text-sm text-fx-danger">{error}</p>
           <button
             onClick={() => navigate('/login', { replace: true })}
             className="text-sm text-fx-orange underline"
@@ -149,7 +149,7 @@ export default function ClaimAccountPage() {
           </div>
 
           {error && (
-            <p className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3">
+            <p className="text-[13px] text-fx-danger bg-fx-danger-dim rounded-ios-xs px-4 py-3">
               {error}
             </p>
           )}

@@ -10,9 +10,9 @@ import { getSpotRateIndex, type SpotRateIndex } from '@/services/spot-rate-index
 import { useQuery } from '@tanstack/react-query';
 
 const TREND_CONFIG = {
-  up: { icon: TrendingUp, color: 'text-emerald-400' },
-  down: { icon: TrendingDown, color: 'text-red-400' },
-  stable: { icon: Minus, color: 'text-zinc-400' },
+  up: { icon: TrendingUp, color: 'text-fx-text' },
+  down: { icon: TrendingDown, color: 'text-fx-text-muted' },
+  stable: { icon: Minus, color: 'text-fx-text-dim' },
 };
 
 export default function CarrierSpotRatesPage() {
@@ -39,14 +39,14 @@ export default function CarrierSpotRatesPage() {
         {/* Filters */}
         <div className="flex gap-2">
           <input
-            className="flex-1 h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="flex-1 h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             placeholder="Origin State"
             value={originState}
             onChange={(e) => setOriginState(e.target.value.toUpperCase())}
             maxLength={2}
           />
           <input
-            className="flex-1 h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="flex-1 h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             placeholder="Dest State"
             value={destState}
             onChange={(e) => setDestState(e.target.value.toUpperCase())}

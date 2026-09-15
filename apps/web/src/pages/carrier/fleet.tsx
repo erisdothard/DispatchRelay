@@ -38,10 +38,10 @@ function DriverGpsRow({ load }: { load: Load }) {
   return (
     <div className="bg-fx-surface border border-fx-border rounded-2xl p-4">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
+        <span className="text-xs font-bold text-fx-text">{load.loadNumber}</span>
         {ping ? (
-          <span className="text-xs text-green-400 font-medium flex items-center gap-1">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+          <span className="text-xs text-fx-success font-medium flex items-center gap-1">
+            <span className="w-2 h-2 bg-fx-success rounded-full animate-pulse" />
             Live
           </span>
         ) : (
@@ -55,7 +55,7 @@ function DriverGpsRow({ load }: { load: Load }) {
         {load.originCity}, {load.originState} → {load.destCity}, {load.destState}
       </p>
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-[10px] font-bold text-fx-orange bg-fx-orange/15 px-1.5 py-0.5 rounded-full">
+        <span className="text-[10px] font-bold text-fx-text-muted bg-fx-surface-2 px-1.5 py-0.5 rounded-full">
           {EQUIPMENT_LABELS[load.equipment] ?? load.equipment}
         </span>
         {load.weightLbs > 0 && (
@@ -67,13 +67,13 @@ function DriverGpsRow({ load }: { load: Load }) {
       <div className="flex items-center gap-3 text-xs text-fx-text-muted">
         {speedKmh != null && (
           <span className="flex items-center gap-1">
-            <Navigation size={11} className="text-fx-orange" />
+            <Navigation size={11} className="text-fx-text-dim" />
             {speedKmh} km/h
           </span>
         )}
         {lastPing && <span>Last ping: {lastPing}</span>}
         {ping && (
-          <span className="ml-auto text-green-400 font-semibold flex items-center gap-1">
+          <span className="ml-auto text-fx-text-muted font-semibold flex items-center gap-1">
             <Radio size={11} /> GPS
           </span>
         )}
@@ -207,7 +207,7 @@ export default function CarrierFleetPage() {
                       truck.status === 'available'
                         ? 'green'
                         : truck.status === 'booked'
-                          ? 'orange'
+                          ? 'blue'
                           : 'gray'
                     }
                   >
@@ -218,7 +218,7 @@ export default function CarrierFleetPage() {
                     {truck.lengthFt && ` · ${truck.lengthFt}ft`}
                   </p>
                 </div>
-                <div className="text-2xl">🚛</div>
+                <Truck size={22} className="text-fx-text-muted shrink-0" aria-hidden="true" />
               </div>
 
               <div className="space-y-1.5">
@@ -267,8 +267,8 @@ export default function CarrierFleetPage() {
                   disabled={deleting && confirmDeleteId === truck.id}
                   className={`flex-1 h-9 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-semibold transition-colors ${
                     confirmDeleteId === truck.id
-                      ? 'bg-red-500/15 border-red-500/40 text-red-400'
-                      : 'bg-fx-surface-2 border-fx-border text-fx-text-muted hover:border-red-500/30 hover:text-red-400'
+                      ? 'bg-fx-danger-dim border-fx-danger text-fx-danger'
+                      : 'bg-fx-surface-2 border-fx-border text-fx-text-muted hover:border-fx-danger hover:text-fx-danger'
                   }`}
                 >
                   <Trash2 size={13} />

@@ -50,12 +50,12 @@ export default function NotificationHealthPage() {
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
             <Bell size={20} className="text-fx-orange" />
-            <h1 className="text-xl font-bold text-white">Notification Health</h1>
+            <h1 className="text-xl font-bold text-fx-text">Notification Health</h1>
           </div>
           <button
             onClick={() => void load()}
             disabled={loading}
-            className="p-2 text-fx-text-dim hover:text-white disabled:opacity-40"
+            className="p-2 text-fx-text-dim hover:text-fx-text disabled:opacity-40"
           >
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -67,9 +67,9 @@ export default function NotificationHealthPage() {
       {stats && (
         <div className="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4">
           {[
-            { label: 'Sent Today', value: stats.sentToday, color: 'text-emerald-400' },
-            { label: 'Failed Today', value: stats.failedToday, color: 'text-red-400' },
-            { label: 'Dead Letters', value: stats.deadLetterCount, color: 'text-amber-400' },
+            { label: 'Sent Today', value: stats.sentToday, color: 'text-fx-success' },
+            { label: 'Failed Today', value: stats.failedToday, color: 'text-fx-danger' },
+            { label: 'Dead Letters', value: stats.deadLetterCount, color: 'text-fx-orange' },
             { label: 'Avg Retries', value: stats.avgRetryCount, color: 'text-fx-text-dim' },
           ].map((item) => (
             <div key={item.label} className="bg-fx-surface rounded-ios p-4 text-center">
@@ -90,7 +90,7 @@ export default function NotificationHealthPage() {
         <button
           onClick={() => void handleRetryAll()}
           disabled={retrying || failed.filter((f) => f.status === 'failed').length === 0}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-fx-surface rounded-ios-xs text-[12px] font-semibold text-white border border-fx-border hover:border-fx-orange/50 disabled:opacity-40 active-scale"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-fx-surface rounded-ios-xs text-[12px] font-semibold text-fx-text border border-fx-border hover:border-fx-orange/50 disabled:opacity-40 active-scale"
         >
           <RefreshCw size={12} className={retrying ? 'animate-spin' : ''} />
           Retry All Failed
@@ -98,9 +98,9 @@ export default function NotificationHealthPage() {
       </div>
 
       {retryResult !== null && (
-        <div className="flex items-center gap-2 bg-emerald-400/10 border border-emerald-400/20 rounded-ios-xs px-4 py-2.5 mb-4">
-          <CheckCircle size={14} className="text-emerald-400" />
-          <span className="text-[13px] text-emerald-400 font-semibold">
+        <div className="flex items-center gap-2 bg-fx-surface-2 border border-fx-border rounded-ios-xs px-4 py-2.5 mb-4">
+          <CheckCircle size={14} className="text-fx-success" />
+          <span className="text-[13px] text-fx-text font-semibold">
             {retryResult} notifications re-queued for delivery.
           </span>
         </div>
@@ -114,7 +114,7 @@ export default function NotificationHealthPage() {
         </div>
       ) : failed.length === 0 ? (
         <div className="bg-fx-surface rounded-ios p-8 text-center">
-          <CheckCircle size={32} className="text-emerald-400 mx-auto mb-2" />
+          <CheckCircle size={32} className="text-fx-success mx-auto mb-2" />
           <p className="text-fx-text-dim text-sm">No failed notifications. All clear.</p>
         </div>
       ) : (
@@ -124,18 +124,18 @@ export default function NotificationHealthPage() {
               <div className="flex items-start justify-between gap-2 mb-1">
                 <div className="flex items-center gap-1.5">
                   {n.status === 'dead' ? (
-                    <SkipForward size={13} className="text-amber-400 shrink-0" />
+                    <SkipForward size={13} className="text-fx-text-dim shrink-0" />
                   ) : (
-                    <AlertTriangle size={13} className="text-red-400 shrink-0" />
+                    <AlertTriangle size={13} className="text-fx-danger shrink-0" />
                   )}
-                  <span className="text-[13px] font-semibold text-white">{n.type}</span>
+                  <span className="text-[13px] font-semibold text-fx-text">{n.type}</span>
                 </div>
                 <span
                   className={cn(
                     'text-[10px] font-bold px-2 py-0.5 rounded-full',
                     n.status === 'dead'
-                      ? 'text-amber-400 bg-amber-400/10'
-                      : 'text-red-400 bg-red-400/10',
+                      ? 'text-fx-text-muted bg-fx-surface-2'
+                      : 'text-fx-danger bg-fx-danger-dim',
                   )}
                 >
                   {n.status}
@@ -145,7 +145,7 @@ export default function NotificationHealthPage() {
                 <p className="text-[12px] text-fx-text-dim truncate mb-0.5">To: {n.recipient}</p>
               )}
               {n.error_message && (
-                <p className="text-[11px] text-red-400/80 truncate">{n.error_message}</p>
+                <p className="text-[11px] text-fx-danger truncate">{n.error_message}</p>
               )}
               <div className="flex items-center gap-3 mt-1 text-[10px] text-fx-text-dim">
                 <span>

@@ -29,11 +29,11 @@ const STATUS_BADGE: Record<
   string,
   { label: string; variant: 'orange' | 'blue' | 'green' | 'gray' }
 > = {
-  in_transit: { label: 'In Transit', variant: 'orange' },
-  dispatched: { label: 'Dispatched', variant: 'blue' },
-  awarded: { label: 'Awarded', variant: 'blue' },
+  in_transit: { label: 'In Transit', variant: 'blue' },
+  dispatched: { label: 'Dispatched', variant: 'gray' },
+  awarded: { label: 'Awarded', variant: 'orange' },
   delivered: { label: 'Delivered', variant: 'green' },
-  completed: { label: 'Completed', variant: 'gray' },
+  completed: { label: 'Completed', variant: 'green' },
 };
 
 const DONE_STATUSES = new Set(['delivered', 'completed']);
@@ -67,8 +67,8 @@ function ActiveLoadRow({ load }: { load: Load }) {
         </div>
         {!isDone &&
           (ping ? (
-            <span className="text-[10px] text-green-400 font-semibold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-[10px] text-fx-success font-semibold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-fx-success rounded-full animate-pulse" />
               Live GPS
             </span>
           ) : (
@@ -93,7 +93,7 @@ function ActiveLoadRow({ load }: { load: Load }) {
             </span>
           )}
           {lastPing && <span>Last: {lastPing}</span>}
-          <span className="ml-auto text-green-400 flex items-center gap-1">
+          <span className="ml-auto text-fx-text-muted flex items-center gap-1">
             <Radio size={10} /> Tracking
           </span>
         </div>
@@ -137,7 +137,7 @@ function DriverGpsMap({ load }: { load: Load }) {
             </span>
           )}
           {lastPing && <span>Last ping: {lastPing}</span>}
-          <span className="ml-auto text-green-400 flex items-center gap-1">
+          <span className="ml-auto text-fx-text-muted flex items-center gap-1">
             <Radio size={12} /> Live
           </span>
         </div>
@@ -189,7 +189,7 @@ function DriverDetailSheet({
             <p className="text-base font-bold text-fx-text">{name}</p>
             {driver.email && <p className="text-xs text-fx-text-dim">{driver.email}</p>}
           </div>
-          <Badge variant={activeLoad ? 'orange' : hasGps ? 'blue' : 'green'}>
+          <Badge variant={activeLoad ? 'blue' : 'gray'}>
             {activeLoad ? 'In Transit' : hasGps ? 'GPS On' : 'Available'}
           </Badge>
         </div>
@@ -267,8 +267,8 @@ function DriverRosterCard({
       onClick={onTap}
       className="w-full text-left bg-fx-surface border border-fx-border rounded-2xl p-3 flex items-center gap-3 active:bg-fx-surface-2 transition-colors"
     >
-      <div className="w-10 h-10 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center shrink-0">
-        <span className="text-sm font-extrabold text-fx-orange">
+      <div className="w-10 h-10 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
+        <span className="text-sm font-extrabold text-fx-text">
           {name
             .split(' ')
             .map((n) => n[0])
@@ -294,17 +294,17 @@ function DriverRosterCard({
         )}
       </div>
       <div className="flex flex-col items-end gap-1 shrink-0">
-        <Badge variant={activeLoad ? 'orange' : ping ? 'blue' : 'green'}>
+        <Badge variant={activeLoad ? 'blue' : 'gray'}>
           {activeLoad ? 'In Transit' : ping ? 'GPS On' : 'Available'}
         </Badge>
         <span
           className={`text-[10px] font-semibold flex items-center gap-1 ${
-            ping ? 'text-green-400' : 'text-fx-text-dim'
+            ping ? 'text-fx-success' : 'text-fx-text-dim'
           }`}
         >
           {ping ? (
             <>
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+              <span className="w-1.5 h-1.5 bg-fx-success rounded-full animate-pulse" />
               {onLoad ? 'GPS Live' : 'Sharing'}
             </>
           ) : (
@@ -530,8 +530,8 @@ export default function CarrierFleetMapPage() {
                     width: 7,
                     height: 7,
                     borderRadius: '50%',
-                    background: '#22c55e',
-                    boxShadow: '0 0 6px #22c55e',
+                    background: 'var(--fx-success)',
+                    boxShadow: '0 0 6px var(--fx-success)',
                     display: 'inline-block',
                     animation: 'pulse 1.4s ease-in-out infinite',
                   }}

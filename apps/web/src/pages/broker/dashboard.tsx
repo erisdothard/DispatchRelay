@@ -1,5 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, TrendingUp, Package, DollarSign, CheckCircle } from 'lucide-react';
+import {
+  Search,
+  TrendingUp,
+  Package,
+  DollarSign,
+  CheckCircle,
+  Handshake,
+  KeyRound,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -107,11 +115,11 @@ export default function BrokerDashboard() {
                 <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
                   Pending
                 </p>
-                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
+                <p className="text-[17px] font-bold text-fx-text tracking-[-0.02em]">
                   Action Required
                 </p>
               </div>
-              <span className="text-[11px] font-bold text-amber-900 bg-amber-400 px-2.5 py-1 rounded-full">
+              <span className="text-[11px] font-bold text-white bg-fx-orange px-2.5 py-1 rounded-full">
                 {deliveredAwaitingCompletion.length}
               </span>
             </div>
@@ -120,13 +128,13 @@ export default function BrokerDashboard() {
                 <button
                   key={load.id}
                   onClick={() => setSelectedLoad(load)}
-                  className="w-full text-left bg-green-500/[0.06] border border-green-500/20 rounded-ios-sm p-4 active-scale transition-colors"
-                  style={{ boxShadow: 'inset 3px 0 0 rgba(34, 197, 94, 0.65)' }}
+                  className="w-full text-left bg-fx-surface border border-fx-border rounded-ios-sm p-4 active-scale transition-colors"
+                  style={{ boxShadow: 'inset 3px 0 0 var(--fx-border-2)' }}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <p className="text-[11px] text-fx-text-dim">Load {load.loadNumber}</p>
-                      <p className="text-[15px] font-bold text-white mt-0.5">
+                      <p className="text-[15px] font-bold text-fx-text mt-0.5">
                         {load.originCity} → {load.destCity}
                       </p>
                     </div>
@@ -134,16 +142,16 @@ export default function BrokerDashboard() {
                       <p className="text-[15px] font-bold text-fx-orange">
                         ${load.rateUsd.toLocaleString()}
                       </p>
-                      <span className="text-[10px] font-semibold text-green-400 tracking-[0.06em] uppercase">
+                      <span className="text-[10px] font-semibold text-fx-success tracking-[0.06em] uppercase">
                         Delivered
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-[11px] text-fx-text-dim">
-                      <span className="text-green-400 font-semibold">Ready to close out</span>
+                      <span className="text-fx-text-muted font-semibold">Ready to close out</span>
                     </p>
-                    <p className="text-[11px] font-bold text-green-400">Mark Complete →</p>
+                    <p className="text-[11px] font-bold text-fx-orange">Mark Complete →</p>
                   </div>
                 </button>
               ))}
@@ -159,7 +167,7 @@ export default function BrokerDashboard() {
                 <p className="text-[10px] font-semibold text-fx-text-dim tracking-[0.12em] uppercase mb-1">
                   Action Required
                 </p>
-                <p className="text-[17px] font-bold text-white tracking-[-0.02em]">
+                <p className="text-[17px] font-bold text-fx-text tracking-[-0.02em]">
                   Bids to Review
                 </p>
               </div>
@@ -178,7 +186,7 @@ export default function BrokerDashboard() {
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <p className="text-[11px] text-fx-text-dim">Load {load.loadNumber}</p>
-                      <p className="text-[15px] font-bold text-white mt-0.5">
+                      <p className="text-[15px] font-bold text-fx-text mt-0.5">
                         {load.originCity} → {load.destCity}
                       </p>
                     </div>
@@ -212,14 +220,14 @@ export default function BrokerDashboard() {
             <StatCard
               label="Active Loads"
               value={String(activeLoads || '—')}
-              trend="up"
+              trend="flat"
               trendValue="from load board"
               icon={<Package size={16} />}
             />
             <StatCard
               label="Total Revenue"
               value={revenueLabel || '—'}
-              trend="up"
+              trend="flat"
               trendValue="all loaded loads"
               icon={<DollarSign size={16} />}
               highlight
@@ -227,7 +235,7 @@ export default function BrokerDashboard() {
             <StatCard
               label="Delivered"
               value={String(deliveredLoads || '—')}
-              trend="up"
+              trend="flat"
               trendValue="completed loads"
               icon={<CheckCircle size={16} />}
             />
@@ -278,15 +286,19 @@ export default function BrokerDashboard() {
             onClick={() => setCarrierNetworkOpen(true)}
             className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200"
           >
-            <span className="text-2xl">🤝</span>
-            <span className="text-xs font-semibold text-fx-text-muted">Carrier Network</span>
+            <span className="w-10 h-10 rounded-ios-xs bg-fx-orange/15 flex items-center justify-center">
+              <Handshake size={20} className="text-fx-orange" />
+            </span>
+            <span className="text-xs font-semibold text-fx-text">Carrier Network</span>
           </button>
           <button
             onClick={() => navigate('/broker/api-keys')}
             className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200"
           >
-            <span className="text-2xl">🔑</span>
-            <span className="text-xs font-semibold text-fx-text-muted">API Keys</span>
+            <span className="w-10 h-10 rounded-ios-xs bg-fx-orange/15 flex items-center justify-center">
+              <KeyRound size={20} className="text-fx-orange" />
+            </span>
+            <span className="text-xs font-semibold text-fx-text">API Keys</span>
           </button>
         </div>
       </div>

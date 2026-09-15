@@ -148,11 +148,11 @@ export function AddressValidator({
 
       {/* Error message */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-start gap-2">
-          <AlertCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
+        <div className="bg-fx-danger-dim border border-fx-danger-dim rounded-xl p-3 flex items-start gap-2">
+          <AlertCircle size={16} className="text-fx-danger shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-red-400">Address Not Found</p>
-            <p className="text-xs text-red-300 mt-0.5">{error}</p>
+            <p className="text-sm font-semibold text-fx-danger">Address Not Found</p>
+            <p className="text-xs text-fx-text-muted mt-0.5">{error}</p>
           </div>
         </div>
       )}
@@ -179,7 +179,7 @@ export function AddressValidator({
                       {suggestion.normalized_address}
                     </p>
                     {index === 0 && (
-                      <span className="px-1.5 py-0.5 bg-green-500/15 border border-green-500/30 rounded text-[10px] font-bold text-green-400 uppercase">
+                      <span className="px-1.5 py-0.5 bg-fx-surface-3 border border-fx-border-2 rounded text-[10px] font-bold text-fx-text uppercase">
                         Best Match
                       </span>
                     )}
@@ -187,9 +187,9 @@ export function AddressValidator({
                   <div className="flex items-center gap-2 text-[11px] text-fx-text-dim">
                     <span className="flex items-center gap-1">
                       {suggestion.confidence === 'ROOFTOP' ? (
-                        <CheckCircle size={11} className="text-green-400" />
+                        <CheckCircle size={11} className="text-fx-text-muted" />
                       ) : (
-                        <AlertCircle size={11} className="text-yellow-400" />
+                        <AlertCircle size={11} className="text-fx-text-dim" />
                       )}
                       {getConfidenceLabel(suggestion.confidence)}
                     </span>
@@ -300,13 +300,13 @@ export function InlineAddressValidator({
         {validationStatus === 'valid' && (
           <CheckCircle
             size={16}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-fx-success"
           />
         )}
         {validationStatus === 'invalid' && (
           <AlertCircle
             size={16}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-fx-danger"
           />
         )}
       </div>
@@ -338,11 +338,11 @@ export function InlineAddressValidator({
       </div>
 
       {validationStatus === 'valid' && validatedResult && (
-        <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-2.5 flex items-start gap-2">
-          <CheckCircle size={14} className="text-green-400 shrink-0 mt-0.5" />
+        <div className="bg-fx-surface-2 border border-fx-border rounded-xl p-2.5 flex items-start gap-2">
+          <CheckCircle size={14} className="text-fx-success shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-green-400 mb-0.5">Address Validated</p>
-            <p className="text-[11px] text-green-300 truncate">
+            <p className="text-xs font-semibold text-fx-success mb-0.5">Address Validated</p>
+            <p className="text-[11px] text-fx-text-muted truncate">
               {validatedResult.normalized_address}
             </p>
           </div>
@@ -350,9 +350,9 @@ export function InlineAddressValidator({
       )}
 
       {validationStatus === 'invalid' && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-2.5 flex items-start gap-2">
-          <AlertCircle size={14} className="text-red-400 shrink-0 mt-0.5" />
-          <p className="text-xs font-semibold text-red-400">
+        <div className="bg-fx-danger-dim border border-fx-danger-dim rounded-xl p-2.5 flex items-start gap-2">
+          <AlertCircle size={14} className="text-fx-danger shrink-0 mt-0.5" />
+          <p className="text-xs font-semibold text-fx-danger">
             Address not found. Please check and try again.
           </p>
         </div>

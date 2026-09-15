@@ -21,14 +21,14 @@ const STATUS_CONFIG: Record<
 > = {
   preferred: {
     label: 'Preferred',
-    color: 'text-green-400',
-    bg: 'bg-green-400/10 border-green-400/20',
+    color: 'text-fx-text',
+    bg: 'bg-fx-surface-3 border-fx-border-2',
     icon: Star,
   },
   blocked: {
     label: 'Blocked',
-    color: 'text-red-400',
-    bg: 'bg-red-400/10 border-red-400/20',
+    color: 'text-fx-danger',
+    bg: 'bg-fx-danger-dim border-transparent',
     icon: Ban,
   },
 };
@@ -122,7 +122,7 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
   return (
     <BottomSheet open={open} onClose={onClose} title="Carrier Network">
       {error && (
-        <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-4 py-3 mb-3">{error}</p>
+        <p className="text-xs text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3 mb-3">{error}</p>
       )}
 
       {/* Add carrier button */}
@@ -261,7 +261,7 @@ export function CarrierRelationshipsSheet({ open, onClose }: CarrierRelationship
                       <button
                         onClick={() => void handleRemove(rel.id)}
                         disabled={saving}
-                        className="h-9 w-9 flex items-center justify-center rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                        className="h-9 w-9 flex items-center justify-center rounded-xl border border-fx-border text-fx-danger hover:bg-fx-danger-dim transition-colors disabled:opacity-50"
                       >
                         <Trash2 size={13} />
                       </button>

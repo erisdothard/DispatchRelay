@@ -69,6 +69,20 @@ export function BottomNav({ role }: { role: NavRole }) {
   const actionCount = useLoadActionCounts();
   const unreadMessages = useUnreadMessages();
 
+  // One live badge per screen: dispatch actions outrank unread messages. When both are
+  // pending, Messages drops to a quiet neutral dot instead of a second orange count.
+  const loadsBadgeLive =
+    actionCount > 0 &&
+    items.some((item) => {
+      const basePath = item.path.split('?')[0];
+      return (
+        item.label !== 'Post Load' &&
+        (basePath === '/carrier/loads' ||
+          basePath === '/broker/loads' ||
+          basePath === '/driver/loads')
+      );
+    });
+
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50">
       {/* iOS frosted glass bar */}
@@ -100,7 +114,8 @@ export function BottomNav({ role }: { role: NavRole }) {
 
           // Show unread badge on Messages nav item
           const isMessagesItem = item.label === 'Messages';
-          const showMessageBadge = isMessagesItem && unreadMessages > 0;
+          const showMessageBadge = isMessagesItem && unreadMessages > 0 && !loadsBadgeLive;
+          const showMessageDot = isMessagesItem && unreadMessages > 0 && loadsBadgeLive;
 
           return (
             <Link
@@ -127,6 +142,11 @@ export function BottomNav({ role }: { role: NavRole }) {
                     <span className="text-[8px] font-bold text-white leading-none">
                       {unreadMessages > 9 ? '9+' : unreadMessages}
                     </span>
+                  </span>
+                )}
+                {showMessageDot && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-fx-text-muted ring-2 ring-fx-bg">
+                    <span className="sr-only">{unreadMessages} unread</span>
                   </span>
                 )}
               </div>

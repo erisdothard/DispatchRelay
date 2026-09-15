@@ -25,6 +25,9 @@ import {
   Phone,
   Mail,
   Star,
+  Check,
+  Truck,
+  Download,
 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import { InfoRow } from '@/shared/components/info-row';
@@ -421,9 +424,8 @@ export function LoadDetailSheet({
         <div
           className="rounded-2xl p-4 mb-5 flex flex-col gap-2"
           style={{
-            background:
-              'linear-gradient(135deg, rgba(240,112,64,0.12) 0%, rgba(192,58,18,0.08) 100%)',
-            border: '1px solid rgba(240,112,64,0.2)',
+            background: 'var(--fx-surface-2)',
+            border: '1px solid var(--fx-border)',
           }}
         >
           {(() => {
@@ -435,7 +437,7 @@ export function LoadDetailSheet({
                     <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
                       Origin
                     </p>
-                    <p className="text-[17px] font-extrabold text-white tracking-tight">
+                    <p className="text-[17px] font-extrabold text-fx-text tracking-tight">
                       {load.originCity}, {load.originState}
                       {(isCarrier || role === 'driver') && distanceMi !== null
                         ? ` (${distanceMi} mi)`
@@ -453,7 +455,7 @@ export function LoadDetailSheet({
                     <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
                       Destination
                     </p>
-                    <p className="text-[17px] font-extrabold text-white tracking-tight">
+                    <p className="text-[17px] font-extrabold text-fx-text tracking-tight">
                       {load.destCity}, {load.destState}
                     </p>
                     {showFullAddress && load.destAddress && (
@@ -492,9 +494,7 @@ export function LoadDetailSheet({
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)' }}
           >
             <div>
-              <p className="text-[9px] font-bold text-green-400 uppercase tracking-widest">
-                Pickup
-              </p>
+              <p className="text-[9px] font-bold text-white/70 uppercase tracking-widest">Pickup</p>
               <p className="text-[13px] font-bold text-white leading-tight">
                 {load.originCity}, {load.originState}
               </p>
@@ -530,8 +530,8 @@ export function LoadDetailSheet({
           <div
             className="grid grid-cols-4 rounded-2xl mb-3 overflow-hidden"
             style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.07)',
+              background: 'var(--fx-surface)',
+              border: '1px solid var(--fx-border)',
             }}
           >
             {[
@@ -549,7 +549,7 @@ export function LoadDetailSheet({
               <div
                 key={cell.label}
                 className="flex flex-col items-center justify-center py-3 px-1"
-                style={i < 3 ? { borderRight: '1px solid rgba(255,255,255,0.07)' } : {}}
+                style={i < 3 ? { borderRight: '1px solid var(--fx-border)' } : {}}
               >
                 <span className="text-[10px] font-bold text-fx-text-dim uppercase tracking-widest mb-1">
                   {cell.label}
@@ -566,8 +566,8 @@ export function LoadDetailSheet({
             {(companyExtra?.phone ?? load.shipperContactPhone) && (
               <a
                 href={`tel:${companyExtra?.phone ?? load.shipperContactPhone}`}
-                className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white"
-                style={{ background: '#2563EB' }}
+                className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-fx-text"
+                style={{ background: 'var(--fx-surface-3)' }}
               >
                 <Phone size={16} />
                 CALL
@@ -578,9 +578,9 @@ export function LoadDetailSheet({
                 href={`mailto:${companyExtra?.email ?? load.shipperContactEmail}`}
                 className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold border"
                 style={{
-                  borderColor: 'rgba(255,255,255,0.2)',
-                  color: '#60A5FA',
-                  background: 'transparent',
+                  borderColor: 'var(--fx-border-2)',
+                  color: 'var(--fx-text)',
+                  background: 'var(--fx-surface)',
                 }}
               >
                 <Mail size={16} />
@@ -594,15 +594,15 @@ export function LoadDetailSheet({
         <div
           className="rounded-2xl p-4 mb-5 flex items-center justify-between"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            background: 'var(--fx-surface)',
+            border: '1px solid var(--fx-border)',
           }}
         >
           <div>
             <div className="flex items-baseline gap-1.5 mb-1">
               <span
                 className="text-[36px] font-extrabold leading-none tracking-[-0.03em]"
-                style={{ color: rate.health === 'low' ? '#F87171' : '#FFFFFF' }}
+                style={{ color: rate.health === 'low' ? 'var(--fx-danger)' : 'var(--fx-text)' }}
               >
                 ${load.rateUsd.toLocaleString()}
               </span>
@@ -628,8 +628,8 @@ export function LoadDetailSheet({
             <div
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold"
               style={{
-                background: `${rate.color}1A`,
-                border: `1px solid ${rate.color}40`,
+                background: `color-mix(in srgb, ${rate.color} 10%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${rate.color} 25%, transparent)`,
                 color: rate.color,
               }}
             >
@@ -706,8 +706,8 @@ export function LoadDetailSheet({
 
         {/* Broker: waiting for carrier to dispatch */}
         {isBroker && liveStatus === 'awarded' && (
-          <div className="mb-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
-            <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">
+          <div className="mb-5 p-4 rounded-2xl bg-fx-surface-2 border border-fx-border">
+            <p className="text-xs font-bold text-fx-text uppercase tracking-widest mb-1">
               Waiting on Carrier
             </p>
             <p className="text-[12px] text-fx-text-muted mb-3">
@@ -721,9 +721,16 @@ export function LoadDetailSheet({
               <button
                 onClick={handleNudgeCarrier}
                 disabled={nudgeSent}
-                className="w-full h-10 rounded-xl text-sm font-bold border border-amber-500/40 text-amber-400 disabled:opacity-50 transition-opacity"
+                className="w-full h-10 rounded-xl text-sm font-bold border border-fx-orange/40 text-fx-orange disabled:opacity-50 transition-opacity"
               >
-                {nudgeSent ? '✓ Reminder Sent' : 'Nudge Carrier'}
+                {nudgeSent ? (
+                  <span className="inline-flex items-center justify-center gap-1.5">
+                    <Check size={14} strokeWidth={2.5} aria-hidden="true" />
+                    Reminder Sent
+                  </span>
+                ) : (
+                  'Nudge Carrier'
+                )}
               </button>
             ) : (
               <p className="text-[11px] text-fx-text-dim">No carrier contact available.</p>
@@ -733,8 +740,8 @@ export function LoadDetailSheet({
 
         {/* Broker: load en route */}
         {isBroker && (liveStatus === 'dispatched' || liveStatus === 'in_transit') && (
-          <div className="mb-5 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">
+          <div className="mb-5 p-4 rounded-2xl bg-fx-surface-2 border border-fx-border">
+            <p className="text-xs font-bold text-fx-text uppercase tracking-widest mb-1">
               {liveStatus === 'dispatched' ? 'En Route to Pickup' : 'Load In Transit'}
             </p>
             <p className="text-[12px] text-fx-text-muted">
@@ -747,8 +754,8 @@ export function LoadDetailSheet({
 
         {/* Broker: delivered — awaiting BOL */}
         {isBroker && liveStatus === 'delivered' && !hasSignedBol && (
-          <div className="mb-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
-            <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">
+          <div className="mb-5 p-4 rounded-2xl bg-fx-surface-2 border border-fx-border">
+            <p className="text-xs font-bold text-fx-text uppercase tracking-widest mb-1">
               Awaiting BOL Signature
             </p>
             <p className="text-[12px] text-fx-text-muted">
@@ -760,9 +767,10 @@ export function LoadDetailSheet({
 
         {/* Broker: delivered + BOL signed — ready to complete */}
         {isBroker && liveStatus === 'delivered' && hasSignedBol && (
-          <div className="mb-5 p-4 rounded-2xl bg-green-500/10 border border-green-500/20">
-            <p className="text-xs font-bold text-green-400 uppercase tracking-widest mb-1">
-              ✓ Delivered — BOL Signed
+          <div className="mb-5 p-4 rounded-2xl bg-fx-surface-2 border border-fx-border">
+            <p className="flex items-center gap-1.5 text-xs font-bold text-fx-success uppercase tracking-widest mb-1">
+              <Check size={12} strokeWidth={2.75} aria-hidden="true" />
+              Delivered — BOL Signed
             </p>
             <p className="text-[12px] text-fx-text-muted mb-3">
               Driver delivered and signed the Bill of Lading. Complete this load to close it out for
@@ -773,7 +781,7 @@ export function LoadDetailSheet({
                 href={bolDownloadUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] font-semibold text-green-400 underline underline-offset-2"
+                className="text-[11px] font-semibold text-fx-text-muted underline underline-offset-2"
               >
                 View Signed BOL
               </a>
@@ -784,8 +792,8 @@ export function LoadDetailSheet({
         {/* Rate Con CTA - carrier must sign before dispatch */}
         {isCarrier && liveStatus === 'awarded' && !rateConSigned && (
           <div className="mb-5">
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-3">
-              <p className="text-xs font-bold text-amber-400 mb-1">Rate Confirmation Required</p>
+            <div className="p-3 rounded-xl bg-fx-orange/10 border border-fx-orange/20 mb-3">
+              <p className="text-xs font-bold text-fx-orange mb-1">Rate Confirmation Required</p>
               <p className="text-[11px] text-fx-text-muted">
                 Sign the rate confirmation to lock in your rate before dispatch.
               </p>
@@ -804,29 +812,29 @@ export function LoadDetailSheet({
         {isCarrier && liveStatus !== 'posted' && rateConSigned && (
           <button
             onClick={() => setRateConViewerOpen(true)}
-            className="mb-5 w-full flex items-center justify-between px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 transition-colors"
+            className="mb-5 w-full flex items-center justify-between px-3 py-2 rounded-xl bg-fx-surface-2 border border-fx-border hover:bg-fx-surface-3 transition-colors"
           >
             <div className="flex items-center gap-2">
-              <FileText size={13} className="text-green-400" />
-              <span className="text-[12px] font-semibold text-green-400">
+              <FileText size={13} className="text-fx-success" />
+              <span className="text-[12px] font-semibold text-fx-success">
                 Rate Confirmation Signed
               </span>
             </div>
-            <span className="text-[11px] font-semibold text-green-400">View →</span>
+            <span className="text-[11px] font-semibold text-fx-text-muted">View →</span>
           </button>
         )}
 
         {/* Assigned Driver — carrier only */}
         {isCarrier && (driverAssigned || load.assignedDriverId) && (
           <div className="mb-4 flex items-center gap-3 p-3 rounded-2xl bg-fx-surface border border-fx-border">
-            <div className="w-9 h-9 rounded-full bg-green-500/15 flex items-center justify-center shrink-0">
-              <UserCheck size={16} className="text-green-400" />
+            <div className="w-9 h-9 rounded-full bg-fx-success-dim flex items-center justify-center shrink-0">
+              <UserCheck size={16} className="text-fx-success" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[10px] font-semibold text-fx-text-dim uppercase tracking-widest">
                 Assigned Driver
               </p>
-              <p className="text-sm font-bold text-white truncate">
+              <p className="text-sm font-bold text-fx-text truncate">
                 {load.driverName ?? 'Driver assigned'}
               </p>
             </div>
@@ -850,8 +858,8 @@ export function LoadDetailSheet({
 
         {/* Carrier: waiting on driver alerts */}
         {isCarrier && liveStatus === 'dispatched' && (
-          <div className="mb-5 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">
+          <div className="mb-5 p-4 rounded-2xl bg-fx-surface-2 border border-fx-border">
+            <p className="text-xs font-bold text-fx-text uppercase tracking-widest mb-1">
               Waiting on Driver
             </p>
             <p className="text-[12px] text-fx-text-muted">
@@ -871,8 +879,8 @@ export function LoadDetailSheet({
           </div>
         )}
         {isCarrier && liveStatus === 'delivered' && !hasSignedBol && (
-          <div className="mb-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
-            <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">
+          <div className="mb-5 p-4 rounded-2xl bg-fx-surface-2 border border-fx-border">
+            <p className="text-xs font-bold text-fx-text uppercase tracking-widest mb-1">
               Awaiting BOL Signature
             </p>
             <p className="text-[12px] text-fx-text-muted">
@@ -882,9 +890,10 @@ export function LoadDetailSheet({
           </div>
         )}
         {isCarrier && liveStatus === 'delivered' && hasSignedBol && (
-          <div className="mb-5 p-4 rounded-2xl bg-green-500/10 border border-green-500/20">
-            <p className="text-xs font-bold text-green-400 uppercase tracking-widest mb-1">
-              ✓ Delivery Confirmed
+          <div className="mb-5 p-4 rounded-2xl bg-fx-surface-2 border border-fx-border">
+            <p className="flex items-center gap-1.5 text-xs font-bold text-fx-success uppercase tracking-widest mb-1">
+              <Check size={12} strokeWidth={2.75} aria-hidden="true" />
+              Delivery Confirmed
             </p>
             <p className="text-[12px] text-fx-text-muted">
               Driver delivered and signed the BOL. Waiting for the broker to close out this load.
@@ -894,7 +903,7 @@ export function LoadDetailSheet({
                 href={bolDownloadUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] font-semibold text-green-400 underline underline-offset-2 mt-2 inline-block"
+                className="text-[11px] font-semibold text-fx-text-muted underline underline-offset-2 mt-2 inline-block"
               >
                 View Signed BOL
               </a>
@@ -904,10 +913,10 @@ export function LoadDetailSheet({
 
         {/* Shipper: carrier assigned info */}
         {isShipper && ACTIVE_STATUSES.includes(liveStatus) && load.assigneeName && (
-          <div className="mb-5 flex items-center gap-3 p-3 rounded-xl bg-green-500/10 border border-green-500/20">
-            <UserCheck size={14} className="text-green-400 shrink-0" />
+          <div className="mb-5 flex items-center gap-3 p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+            <UserCheck size={14} className="text-fx-text-muted shrink-0" />
             <div>
-              <p className="text-[10px] font-bold text-green-400 uppercase">Carrier Assigned</p>
+              <p className="text-[10px] font-bold text-fx-text-dim uppercase">Carrier Assigned</p>
               <p className="text-sm font-bold text-fx-text">{load.assigneeName}</p>
             </div>
           </div>
@@ -923,8 +932,8 @@ export function LoadDetailSheet({
           </div>
         )}
         {isShipper && liveStatus === 'bid_received' && (
-          <div className="mb-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <p className="text-xs font-bold text-amber-400 mb-1">Bids Received</p>
+          <div className="mb-5 p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+            <p className="text-xs font-bold text-fx-text mb-1">Bids Received</p>
             <p className="text-[11px] text-fx-text-dim">
               Carriers have submitted bids. Your broker is reviewing and will assign a carrier
               shortly.
@@ -932,8 +941,8 @@ export function LoadDetailSheet({
           </div>
         )}
         {isShipper && liveStatus === 'dispatched' && (
-          <div className="mb-5 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs font-bold text-blue-400 mb-1">On the Way to Pickup</p>
+          <div className="mb-5 p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+            <p className="text-xs font-bold text-fx-text mb-1">On the Way to Pickup</p>
             <p className="text-[11px] text-fx-text-dim">
               Your carrier is en route to the pickup location. You'll get an update when they're in
               transit.
@@ -949,8 +958,8 @@ export function LoadDetailSheet({
           </div>
         )}
         {isShipper && liveStatus === 'delivered' && !receiptConfirmed && (
-          <div className="mb-5 p-3 rounded-xl bg-green-500/10 border border-green-500/20">
-            <p className="text-xs font-bold text-green-400 mb-1">Delivered — Action Required</p>
+          <div className="mb-5 p-3 rounded-xl bg-fx-orange/10 border border-fx-orange/20">
+            <p className="text-xs font-bold text-fx-orange mb-1">Delivered — Action Required</p>
             <p className="text-[11px] text-fx-text-dim">
               Your shipment has been delivered. Please confirm receipt so the broker can close this
               load.
@@ -959,8 +968,11 @@ export function LoadDetailSheet({
         )}
         {isShipper &&
           (liveStatus === 'completed' || (liveStatus === 'delivered' && receiptConfirmed)) && (
-            <div className="mb-5 p-3 rounded-xl bg-green-500/10 border border-green-500/20">
-              <p className="text-xs font-bold text-green-400 mb-1">✓ Delivery Confirmed</p>
+            <div className="mb-5 p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+              <p className="flex items-center gap-1.5 text-xs font-bold text-fx-success mb-1">
+                <Check size={12} strokeWidth={2.75} aria-hidden="true" />
+                Delivery Confirmed
+              </p>
               <p className="text-[11px] text-fx-text-dim">
                 {liveStatus === 'completed'
                   ? 'This load has been fully closed out.'
@@ -978,7 +990,7 @@ export function LoadDetailSheet({
               <InfoRow icon={<Calendar size={14} />} label="Delivery" value={deliveryFmt} />
               <div
                 className="flex items-center gap-3 py-3"
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ borderBottom: '1px solid var(--fx-divider)' }}
               >
                 <div className="w-8 h-8 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
                   <span className="text-fx-text-muted">
@@ -1009,7 +1021,7 @@ export function LoadDetailSheet({
           )}
           <div
             className="flex items-center gap-3 py-3"
-            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+            style={{ borderBottom: '1px solid var(--fx-divider)' }}
           >
             <div className="w-8 h-8 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
               <span className="text-fx-text-muted">
@@ -1025,7 +1037,7 @@ export function LoadDetailSheet({
                   className="h-5 w-5 rounded object-cover"
                 />
               ) : (
-                <div className="h-5 w-5 rounded bg-brand/10 flex items-center justify-center text-[9px] font-medium text-brand">
+                <div className="h-5 w-5 rounded bg-fx-surface-2 flex items-center justify-center text-[9px] font-medium text-fx-text-muted">
                   {load.companyName.slice(0, 2).toUpperCase()}
                 </div>
               )}
@@ -1137,7 +1149,7 @@ export function LoadDetailSheet({
                     label: hasCosts ? 'My Costs' : 'My Costs (Add Costs to calculate)',
                     value: hasCosts ? `$${(opCost + factoringFee).toFixed(0)}` : '',
                     tappable: true,
-                    labelClass: 'text-red-400 font-semibold text-sm',
+                    labelClass: 'text-fx-text font-semibold text-sm',
                   },
                   {
                     key: 'allInRate',
@@ -1177,9 +1189,9 @@ export function LoadDetailSheet({
                     valueClass:
                       miles > 0
                         ? net >= 0
-                          ? 'text-sm text-green-400 font-bold'
-                          : 'text-sm text-red-400 font-bold'
-                        : 'text-sm text-red-400',
+                          ? 'text-sm text-fx-text font-bold'
+                          : 'text-sm text-fx-danger font-bold'
+                        : 'text-sm text-fx-text-dim',
                   },
                 ];
 
@@ -1194,7 +1206,7 @@ export function LoadDetailSheet({
                             setProfitEditRow(row.key === profitEditRow ? null : row.key)
                           }
                           className="w-full flex items-center justify-between py-3 disabled:cursor-default"
-                          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                          style={{ borderBottom: '1px solid var(--fx-divider)' }}
                         >
                           <span className={row.labelClass ?? 'text-sm text-fx-text'}>
                             {row.label}
@@ -1319,7 +1331,7 @@ export function LoadDetailSheet({
                   <div
                     key={row.label}
                     className="flex justify-between items-center py-3"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                    style={{ borderBottom: '1px solid var(--fx-divider)' }}
                   >
                     <span className="text-sm text-fx-text-muted">{row.label}</span>
                     <span className="text-sm font-semibold text-fx-text">{row.value}</span>
@@ -1378,7 +1390,7 @@ export function LoadDetailSheet({
                   <div
                     key={row.label}
                     className="flex justify-between items-center py-3"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                    style={{ borderBottom: '1px solid var(--fx-divider)' }}
                   >
                     <span className="text-sm text-fx-text-muted">{row.label}</span>
                     <span className="text-sm font-semibold text-fx-text text-right max-w-[60%]">
@@ -1428,7 +1440,7 @@ export function LoadDetailSheet({
                   <div
                     key={row.label}
                     className="flex justify-between items-center py-3"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                    style={{ borderBottom: '1px solid var(--fx-divider)' }}
                   >
                     <span className="text-sm text-fx-text-muted">{row.label}</span>
                     <span className="text-sm font-semibold text-fx-text">{row.value}</span>
@@ -1641,9 +1653,10 @@ export function LoadDetailSheet({
                     </div>
                   )}
                   {load.loadingNotes && (
-                    <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20">
-                      <p className="text-[10px] font-bold text-blue-400 uppercase mb-2">
-                        📍 Pickup Location Notes
+                    <div className="p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+                      <p className="flex items-center gap-1.5 text-[10px] font-bold text-fx-text-muted uppercase mb-2">
+                        <MapPin size={12} aria-hidden="true" />
+                        Pickup Location Notes
                       </p>
                       <p className="text-xs text-fx-text whitespace-pre-wrap">
                         {load.loadingNotes}
@@ -1651,9 +1664,10 @@ export function LoadDetailSheet({
                     </div>
                   )}
                   {load.deliveryNotes && (
-                    <div className="p-3 rounded-xl bg-green-500/5 border border-green-500/20">
-                      <p className="text-[10px] font-bold text-green-400 uppercase mb-2">
-                        🚚 Delivery Location Notes
+                    <div className="p-3 rounded-xl bg-fx-surface-2 border border-fx-border">
+                      <p className="flex items-center gap-1.5 text-[10px] font-bold text-fx-text-muted uppercase mb-2">
+                        <Truck size={12} aria-hidden="true" />
+                        Delivery Location Notes
                       </p>
                       <p className="text-xs text-fx-text whitespace-pre-wrap">
                         {load.deliveryNotes}
@@ -1750,11 +1764,11 @@ export function LoadDetailSheet({
                   <div
                     key={row.label}
                     className="flex justify-between items-center py-3"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                    style={{ borderBottom: '1px solid var(--fx-divider)' }}
                   >
                     <span className="text-sm text-fx-text-muted">{row.label}</span>
                     {row.href ? (
-                      <a href={row.href} className="text-sm font-semibold text-blue-400">
+                      <a href={row.href} className="text-sm font-semibold text-fx-orange">
                         {row.value}
                       </a>
                     ) : (
@@ -1771,12 +1785,12 @@ export function LoadDetailSheet({
         {(load.tempControlled || load.hazmat || (load.bidCount && load.bidCount > 0)) && (
           <div className="flex flex-wrap gap-2 mb-5">
             {load.tempControlled && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold text-blue-400 bg-blue-400/10 border border-blue-400/20">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold text-fx-text-muted bg-fx-surface-2 border border-fx-border">
                 <Thermometer size={11} /> Temperature Controlled
               </div>
             )}
             {load.hazmat && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold text-red-400 bg-red-400/10 border border-red-400/20">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold text-fx-orange bg-fx-orange/10 border border-fx-orange/30">
                 <AlertTriangle size={11} /> HAZMAT
               </div>
             )}
@@ -1814,15 +1828,18 @@ export function LoadDetailSheet({
                     disabled={loadingBol}
                     className="flex-1 h-10 rounded-xl border text-[12px] font-semibold flex items-center justify-center gap-2 transition-colors"
                     style={{
-                      borderColor: 'rgba(34,197,94,0.3)',
-                      color: '#4ade80',
-                      background: 'rgba(34,197,94,0.06)',
+                      borderColor: 'var(--fx-border)',
+                      color: 'var(--fx-success)',
+                      background: 'var(--fx-surface-2)',
                     }}
                   >
                     {loadingBol ? (
-                      <span className="w-4 h-4 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-fx-border border-t-fx-success rounded-full animate-spin" />
                     ) : (
-                      '✓ View BOL'
+                      <>
+                        <Check size={14} strokeWidth={2.5} aria-hidden="true" />
+                        View BOL
+                      </>
                     )}
                   </button>
                   {bolDownloadUrl && (
@@ -1833,9 +1850,9 @@ export function LoadDetailSheet({
                       rel="noreferrer"
                       className="h-10 w-10 rounded-xl border flex items-center justify-center shrink-0 transition-colors"
                       style={{
-                        borderColor: 'rgba(34,197,94,0.3)',
-                        color: '#4ade80',
-                        background: 'rgba(34,197,94,0.06)',
+                        borderColor: 'var(--fx-border)',
+                        color: 'var(--fx-success)',
+                        background: 'var(--fx-surface-2)',
                       }}
                       title="Download signed BOL"
                     >
@@ -1904,8 +1921,8 @@ export function LoadDetailSheet({
                 <div
                   className="rounded-2xl p-4"
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'var(--fx-surface)',
+                    border: '1px solid var(--fx-border)',
                   }}
                 >
                   <p className="text-[14px] font-bold text-fx-text mb-1">
@@ -1918,7 +1935,7 @@ export function LoadDetailSheet({
                     href="https://www.triumphbusiness.com/freight-factoring"
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full h-11 rounded-xl border border-blue-500/40 text-blue-400 text-[12px] font-bold flex items-center justify-center gap-2 hover:bg-blue-500/10 transition-colors"
+                    className="w-full h-11 rounded-xl border border-fx-border text-fx-text-muted text-[12px] font-bold flex items-center justify-center gap-2 hover:border-fx-orange/40 transition-colors"
                   >
                     <DollarSign size={13} />
                     FACTOR THIS LOAD
@@ -1928,12 +1945,15 @@ export function LoadDetailSheet({
                 {/* ELD Tracking */}
                 <div
                   className="rounded-2xl p-4"
-                  style={{ background: 'rgba(100,0,0,0.5)', border: '1px solid rgba(160,0,0,0.5)' }}
+                  style={{
+                    background: 'var(--fx-surface)',
+                    border: '1px solid var(--fx-border)',
+                  }}
                 >
-                  <p className="text-[13px] font-black text-white uppercase tracking-wide mb-1">
+                  <p className="text-[13px] font-black text-fx-text uppercase tracking-wide mb-1">
                     Streamline Your Tracking
                   </p>
-                  <p className="text-[12px] text-white/70 leading-snug mb-3">
+                  <p className="text-[12px] text-fx-text-muted leading-snug mb-3">
                     Provide real-time visibility on your loads with a simple, one-time ELD
                     connection.
                   </p>
@@ -1941,8 +1961,7 @@ export function LoadDetailSheet({
                     href="https://www.samsara.com"
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full h-11 rounded-xl bg-white text-[12px] font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-                    style={{ color: '#7a0000' }}
+                    className="w-full h-11 rounded-xl border border-fx-border text-fx-text-muted text-[12px] font-bold flex items-center justify-center gap-2 hover:border-fx-orange/40 transition-colors"
                   >
                     <Zap size={13} />
                     CONNECT NOW
@@ -1953,8 +1972,8 @@ export function LoadDetailSheet({
                 <div
                   className="rounded-2xl p-4"
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'var(--fx-surface)',
+                    border: '1px solid var(--fx-border)',
                   }}
                 >
                   <p className="text-[14px] font-bold text-fx-text mb-1">
@@ -1978,8 +1997,8 @@ export function LoadDetailSheet({
                 <div
                   className="rounded-2xl p-4"
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'var(--fx-surface)',
+                    border: '1px solid var(--fx-border)',
                   }}
                 >
                   <p className="text-[14px] font-bold text-fx-text mb-1">Per Load Insurance</p>
@@ -2018,7 +2037,8 @@ export function LoadDetailSheet({
                   }
                   className="w-full h-11 rounded-2xl border border-fx-orange/40 text-sm font-semibold text-fx-orange flex items-center justify-center gap-2 hover:bg-fx-orange/5 transition-colors"
                 >
-                  ⬇ Download Rate Confirmation
+                  <Download size={14} aria-hidden="true" />
+                  Download Rate Confirmation
                 </button>
               )}
               {/* Broker: complete load CTA when delivered + BOL signed */}
@@ -2062,7 +2082,7 @@ export function LoadDetailSheet({
                 (cancelConfirm ? (
                   <div className="flex flex-col gap-2">
                     {liveStatus === 'awarded' && (
-                      <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
+                      <p className="text-xs text-fx-orange bg-fx-orange/10 border border-fx-orange/20 rounded-xl px-3 py-2">
                         Warning: This load has been awarded to a carrier. Cancelling may impact your
                         reputation.
                       </p>
@@ -2077,7 +2097,7 @@ export function LoadDetailSheet({
                       <button
                         onClick={handleCancel}
                         disabled={cancelling}
-                        className="flex-1 h-11 rounded-2xl bg-red-500 text-sm font-bold text-white disabled:opacity-50"
+                        className="flex-1 h-11 rounded-2xl bg-fx-danger text-sm font-bold text-white disabled:opacity-50"
                       >
                         {cancelling ? (
                           <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
@@ -2090,7 +2110,7 @@ export function LoadDetailSheet({
                 ) : (
                   <button
                     onClick={() => setCancelConfirm(true)}
-                    className="w-full h-11 rounded-2xl border border-red-500/30 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+                    className="w-full h-11 rounded-2xl border border-fx-border text-sm font-semibold text-fx-danger hover:bg-fx-danger-dim transition-colors"
                   >
                     Cancel Load
                   </button>
@@ -2146,7 +2166,7 @@ export function LoadDetailSheet({
             ) : (
               <div className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-semibold text-fx-text-muted bg-fx-surface border border-fx-border">
                 {liveStatus === 'awarded'
-                  ? '🎉 Load Awarded'
+                  ? 'Load Awarded'
                   : `Status: ${liveStatus.replace('_', ' ')}`}
               </div>
             ))}
@@ -2176,7 +2196,7 @@ export function LoadDetailSheet({
             company?.id && (
               <button
                 onClick={() => setReviewShipperOpen(true)}
-                className="w-full h-11 rounded-2xl border border-fx-border text-sm font-semibold text-fx-text-muted flex items-center justify-center gap-2 hover:border-yellow-400/40 hover:text-yellow-400 transition-colors"
+                className="w-full h-11 rounded-2xl border border-fx-border text-sm font-semibold text-fx-text-muted flex items-center justify-center gap-2 hover:border-fx-orange/40 hover:text-fx-orange transition-colors"
               >
                 <Star size={14} />
                 Review Shipper
@@ -2199,22 +2219,23 @@ export function LoadDetailSheet({
                 <button
                   onClick={handleConfirmReceipt}
                   disabled={confirmingReceipt}
-                  className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white disabled:opacity-50 active-scale"
-                  style={{
-                    background: 'linear-gradient(145deg, #22c55e, #16a34a)',
-                    boxShadow: '0 4px 20px rgba(34,197,94,0.35)',
-                  }}
+                  className="w-full h-[52px] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold text-white disabled:opacity-50 active-scale bg-orange-gradient"
+                  style={{ boxShadow: '0 4px 20px rgba(232,96,48,0.4)' }}
                 >
                   {confirmingReceipt ? (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    '✓ Confirm Receipt'
+                    <>
+                      <Check size={16} strokeWidth={2.5} aria-hidden="true" />
+                      Confirm Receipt
+                    </>
                   )}
                 </button>
               )}
               {liveStatus === 'delivered' && receiptConfirmed && (
-                <div className="w-full h-11 rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-green-400 bg-green-500/10 border border-green-500/20">
-                  ✓ Receipt Confirmed
+                <div className="w-full h-11 rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-fx-success bg-fx-surface border border-fx-border">
+                  <Check size={14} strokeWidth={2.5} aria-hidden="true" />
+                  Receipt Confirmed
                 </div>
               )}
               {load.postedBy && (

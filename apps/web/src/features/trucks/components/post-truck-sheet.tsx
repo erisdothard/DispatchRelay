@@ -121,7 +121,7 @@ export function PostTruckSheet({ open, onClose, onCreated, truck }: PostTruckShe
   }
 
   const fieldClass =
-    'w-full h-12 bg-[#111] border border-fx-border rounded-xl text-fx-text text-sm font-medium px-4 focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all duration-200';
+    'w-full h-12 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm font-medium px-4 focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all duration-200';
 
   return (
     <BottomSheet open={open} onClose={onClose} title={truck ? 'Edit Truck' : 'Post Truck'}>
@@ -259,7 +259,7 @@ export function PostTruckSheet({ open, onClose, onCreated, truck }: PostTruckShe
         </div>
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-3">{error}</p>
+          <p className="text-sm text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3">{error}</p>
         )}
 
         <Button

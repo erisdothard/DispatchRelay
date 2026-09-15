@@ -20,7 +20,9 @@ export function BrokerVerifiedBadge({
     <span
       className={cn(
         'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold',
-        'bg-blue-500/15 text-blue-400 border border-blue-500/25',
+        // Neutral on purpose: this is a standing trust marker on every card, not a
+        // done state, so it must not repeat green down the whole load list.
+        'bg-fx-surface-2 text-fx-text-muted border border-fx-border',
         className,
       )}
     >

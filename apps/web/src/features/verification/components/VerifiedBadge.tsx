@@ -10,22 +10,22 @@ const CONFIG = {
   verified: {
     icon: ShieldCheck,
     label: 'Verified',
-    className: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
+    className: 'text-fx-success bg-fx-success-dim border-transparent',
   },
   pending: {
     icon: Clock,
     label: 'Pending',
-    className: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
+    className: 'text-fx-text-muted bg-fx-surface-2 border-fx-border',
   },
   failed: {
     icon: ShieldAlert,
     label: 'Failed',
-    className: 'text-red-400 bg-red-400/10 border-red-400/30',
+    className: 'text-fx-danger bg-fx-danger-dim border-transparent',
   },
   expired: {
     icon: ShieldAlert,
     label: 'Expired',
-    className: 'text-zinc-400 bg-zinc-400/10 border-zinc-400/30',
+    className: 'text-fx-danger bg-fx-danger-dim border-transparent',
   },
 } satisfies Record<
   VerificationStatus,

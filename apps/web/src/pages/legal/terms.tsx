@@ -3,11 +3,11 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-fx-text-main">
+    <div className="min-h-screen bg-fx-bg text-fx-text">
       <div className="max-w-2xl mx-auto px-4 py-10">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-sm text-fx-text-dim hover:text-fx-text-main mb-8 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-fx-text-dim hover:text-fx-text mb-8 transition-colors"
         >
           <ArrowLeft size={14} /> Back
         </Link>
@@ -17,7 +17,7 @@ export default function TermsPage() {
 
         <div className="prose prose-invert prose-sm max-w-none space-y-6 text-fx-text-dim leading-relaxed">
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">1. Acceptance</h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">1. Acceptance</h2>
             <p>
               By creating a DispatchRelay account or using our platform, you agree to these Terms of
               Service. If you do not agree, do not use DispatchRelay.
@@ -25,9 +25,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">
-              2. Platform Description
-            </h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">2. Platform Description</h2>
             <p>
               DispatchRelay is a freight marketplace connecting carriers, freight brokers, and
               shippers. We provide tools for load posting, bidding, booking, document management,
@@ -37,7 +35,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">3. Eligibility</h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">3. Eligibility</h2>
             <p>
               You must be at least 18 years old and legally authorized to operate in the freight
               industry in your jurisdiction. Carriers must hold valid operating authority. By
@@ -46,7 +44,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">4. User Obligations</h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">4. User Obligations</h2>
             <p>
               You agree to: provide accurate information, maintain valid credentials and insurance,
               honor accepted loads, comply with all applicable federal and state transportation laws
@@ -56,7 +54,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">5. Payments</h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">5. Payments</h2>
             <p>
               Subscription fees are billed monthly via Stripe. Freight payments are processed
               through the platform per agreed rates. Quick Pay fees (2%) are disclosed before
@@ -66,9 +64,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">
-              6. Prohibited Conduct
-            </h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">6. Prohibited Conduct</h2>
             <p>
               You may not: post fraudulent loads or falsify credentials, circumvent platform
               payments by transacting off-platform with matched parties, use the platform for
@@ -78,7 +74,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">
+            <h2 className="text-base font-semibold text-fx-text mb-2">
               7. Limitation of Liability
             </h2>
             <p>
@@ -90,7 +86,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">8. Termination</h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">8. Termination</h2>
             <p>
               We may suspend or terminate accounts for violations of these terms, fraudulent
               activity, or non-payment. You may close your account at any time from Settings.
@@ -99,7 +95,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">9. Governing Law</h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">9. Governing Law</h2>
             <p>
               These terms are governed by the laws of the State of Texas, without regard to conflict
               of law provisions. Disputes shall be resolved by binding arbitration under AAA
@@ -108,16 +104,15 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-fx-text-main mb-2">10. Contact</h2>
+            <h2 className="text-base font-semibold text-fx-text mb-2">10. Contact</h2>
             <p>
-              Questions? Contact us at{' '}
-              <span className="text-fx-text-main">legal@dispatchrelay.co</span>.
+              Questions? Contact us at <span className="text-fx-text">legal@dispatchrelay.co</span>.
             </p>
           </section>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-zinc-800 flex items-center gap-4 text-xs text-fx-text-dim">
-          <Link to="/privacy" className="hover:text-fx-text-main transition-colors">
+        <div className="mt-10 pt-6 border-t border-fx-border flex items-center gap-4 text-xs text-fx-text-dim">
+          <Link to="/privacy" className="hover:text-fx-text transition-colors">
             Privacy Policy
           </Link>
           <span>·</span>

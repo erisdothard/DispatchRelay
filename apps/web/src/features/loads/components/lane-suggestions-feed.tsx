@@ -7,8 +7,8 @@ interface Props {
 
 const SOURCE_LABELS: Record<string, { label: string; color: string }> = {
   preference: { label: 'Preferred', color: 'text-fx-orange bg-fx-orange/10' },
-  history: { label: 'From History', color: 'text-blue-400 bg-blue-400/10' },
-  popular: { label: 'Popular', color: 'text-emerald-400 bg-emerald-400/10' },
+  history: { label: 'From History', color: 'text-fx-text-muted bg-fx-surface-2' },
+  popular: { label: 'Popular', color: 'text-fx-text bg-fx-surface-3' },
 };
 
 export function LaneSuggestionsFeed({ suggestions }: Props) {
@@ -35,7 +35,10 @@ export function LaneSuggestionsFeed({ suggestions }: Props) {
   return (
     <div className="space-y-4">
       {Object.entries(grouped).map(([source, items]) => {
-        const meta = SOURCE_LABELS[source] ?? { label: source, color: 'text-zinc-400 bg-zinc-800' };
+        const meta = SOURCE_LABELS[source] ?? {
+          label: source,
+          color: 'text-fx-text-muted bg-fx-surface-2',
+        };
         return (
           <div key={source}>
             <span
@@ -50,7 +53,7 @@ export function LaneSuggestionsFeed({ suggestions }: Props) {
                   className="bg-fx-surface border border-fx-border rounded-xl p-3 flex items-center gap-3"
                 >
                   <div className="w-9 h-9 rounded-lg bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
-                    <MapPin size={15} className="text-fx-orange" />
+                    <MapPin size={15} className="text-fx-text-muted" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-fx-text">

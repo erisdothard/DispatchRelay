@@ -211,7 +211,7 @@ export function SignatureModal({
           />
         </div>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm text-fx-danger">{error}</p>}
 
         <div className="flex gap-3">
           <button

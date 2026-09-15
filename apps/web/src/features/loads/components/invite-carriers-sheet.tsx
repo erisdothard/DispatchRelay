@@ -71,7 +71,7 @@ export function InviteCarriersSheet({ open, onClose, loadId }: Props) {
         <div className="flex-1 relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fx-text-dim" />
           <input
-            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg pl-9 pr-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             placeholder="Search by name or MC#..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -118,7 +118,7 @@ export function InviteCarriersSheet({ open, onClose, loadId }: Props) {
       </div>
 
       {error && (
-        <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-400">
+        <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-fx-danger-dim border border-fx-danger-dim text-xs text-fx-danger">
           <AlertCircle size={13} />
           {error}
         </div>

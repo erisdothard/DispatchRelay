@@ -71,9 +71,11 @@ export function TopHeader({
               className="relative w-10 h-10 rounded-xl bg-fx-surface border border-fx-border flex items-center justify-center text-fx-text-muted hover:text-fx-orange hover:border-fx-orange/40 transition-all duration-200"
             >
               <Bell size={18} />
+              {/* A quiet neutral dot, not a count: the bottom nav owns the one live
+                  orange badge per screen, so the header never competes with it. */}
               {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-fx-orange rounded-full text-[10px] font-bold text-white flex items-center justify-center">
-                  {notificationCount > 9 ? '9+' : notificationCount}
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-fx-text-muted ring-2 ring-fx-surface">
+                  <span className="sr-only">{notificationCount} unread</span>
                 </span>
               )}
             </button>

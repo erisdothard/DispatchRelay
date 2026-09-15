@@ -1,4 +1,14 @@
-import { ArrowRight, Scale, Calendar, Zap, Clock, Shield, AlertCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  Scale,
+  Calendar,
+  Zap,
+  Clock,
+  Shield,
+  AlertCircle,
+  AlertTriangle,
+  Snowflake,
+} from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/shared/lib/utils';
 import {
@@ -75,8 +85,8 @@ function MarketBadge({ load }: { load: Load }) {
       className={cn(
         'text-[10px] font-bold px-2 py-0.5 rounded-full border',
         above
-          ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
-          : 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+          ? 'text-fx-text bg-fx-surface-3 border-fx-border-2'
+          : 'text-fx-danger bg-fx-danger-dim border-transparent',
       )}
     >
       {above ? 'Above Market' : 'Below Market'}
@@ -129,11 +139,11 @@ export function LoadCard({
       <div className="flex items-start justify-between gap-2 mb-3">
         {/* Route */}
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="text-[15px] font-bold text-white tracking-tight truncate">
+          <span className="text-[15px] font-bold text-fx-text tracking-tight truncate">
             {load.originCity}, {load.originState}
           </span>
           <ArrowRight size={13} className="text-fx-text-dim shrink-0" strokeWidth={2.5} />
-          <span className="text-[15px] font-bold text-white tracking-tight truncate">
+          <span className="text-[15px] font-bold text-fx-text tracking-tight truncate">
             {load.destCity}, {load.destState}
           </span>
         </div>
@@ -142,8 +152,8 @@ export function LoadCard({
         <div
           className="shrink-0 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
           style={{
-            background: `${rate.color}1A`,
-            border: `1px solid ${rate.color}40`,
+            background: `color-mix(in srgb, ${rate.color} 10%, transparent)`,
+            border: `1px solid color-mix(in srgb, ${rate.color} 25%, transparent)`,
             color: rate.color,
           }}
         >
@@ -162,15 +172,15 @@ export function LoadCard({
           const badgeVariant = getStatusBadgeVariant(load.status);
           const label = getStatusLabel(load.status);
           const colors = {
-            blue: { text: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' },
-            orange: {
-              text: 'text-orange-400',
-              bg: 'bg-orange-400/10',
-              border: 'border-orange-400/20',
+            blue: { text: 'text-fx-text-muted', bg: 'bg-fx-surface-2', border: 'border-fx-border' },
+            orange: { text: 'text-fx-text', bg: 'bg-fx-surface-3', border: 'border-fx-border-2' },
+            green: {
+              text: 'text-fx-success',
+              bg: 'bg-fx-success-dim',
+              border: 'border-transparent',
             },
-            green: { text: 'text-green-400', bg: 'bg-green-400/10', border: 'border-green-400/20' },
-            red: { text: 'text-red-400', bg: 'bg-red-400/10', border: 'border-red-400/20' },
-            gray: { text: 'text-gray-400', bg: 'bg-gray-400/10', border: 'border-gray-400/20' },
+            red: { text: 'text-fx-danger', bg: 'bg-fx-danger-dim', border: 'border-transparent' },
+            gray: { text: 'text-fx-text-dim', bg: 'bg-fx-surface-2', border: 'border-fx-border' },
           };
           const c = colors[badgeVariant];
           return (
@@ -187,13 +197,15 @@ export function LoadCard({
           );
         })()}
         {load.tempControlled && (
-          <span className="text-[11px] font-semibold text-blue-400 bg-blue-400/10 px-2.5 py-1 rounded-full border border-blue-400/20">
-            ❄ Temp
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-fx-text-muted bg-fx-surface-2 px-2.5 py-1 rounded-full border border-fx-border">
+            <Snowflake size={11} strokeWidth={2.25} aria-hidden="true" />
+            Temp
           </span>
         )}
         {load.hazmat && (
-          <span className="text-[11px] font-semibold text-red-400 bg-red-400/10 px-2.5 py-1 rounded-full border border-red-400/20">
-            ⚠ HAZMAT
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-fx-orange bg-fx-orange/10 px-2.5 py-1 rounded-full border border-fx-orange/30">
+            <AlertTriangle size={11} strokeWidth={2.25} aria-hidden="true" />
+            HAZMAT
           </span>
         )}
         {load.bidCount !== undefined && load.bidCount > 0 && (
@@ -207,7 +219,7 @@ export function LoadCard({
       {!isCompact && (
         <div
           className="flex items-center gap-0 mb-4 rounded-ios-xs overflow-hidden"
-          style={{ border: '1px solid rgba(255,255,255,0.06)' }}
+          style={{ border: '1px solid var(--fx-border)' }}
         >
           {[
             { icon: <Scale size={11} />, value: `${(load.weightLbs / 1000).toFixed(0)}k lbs` },
@@ -226,7 +238,7 @@ export function LoadCard({
             <div
               key={i}
               className="flex-1 flex items-center justify-center gap-1 py-2"
-              style={i < 2 ? { borderRight: '1px solid rgba(255,255,255,0.06)' } : {}}
+              style={i < 2 ? { borderRight: '1px solid var(--fx-border)' } : {}}
             >
               <span className="text-fx-text-dim">{icon}</span>
               <span className="text-[11px] text-fx-text-dim font-medium">{value}</span>
@@ -247,7 +259,7 @@ export function LoadCard({
                     'font-extrabold leading-none tracking-[-0.03em]',
                     isCompact ? 'text-[20px]' : 'text-[28px]',
                   )}
-                  style={{ color: rate.health === 'low' ? '#F87171' : '#FFFFFF' }}
+                  style={{ color: rate.health === 'low' ? 'var(--fx-danger)' : 'var(--fx-text)' }}
                 >
                   ${load.ratePerMile.toFixed(2)}
                 </span>
@@ -259,7 +271,7 @@ export function LoadCard({
                   'font-extrabold leading-none tracking-[-0.03em]',
                   isCompact ? 'text-[20px]' : 'text-[28px]',
                 )}
-                style={{ color: rate.health === 'low' ? '#F87171' : '#FFFFFF' }}
+                style={{ color: rate.health === 'low' ? 'var(--fx-danger)' : 'var(--fx-text)' }}
               >
                 ${load.rateUsd.toLocaleString()}
               </span>
@@ -280,7 +292,7 @@ export function LoadCard({
                   className="h-4 w-4 rounded object-cover"
                 />
               ) : (
-                <div className="h-4 w-4 rounded bg-brand/10 flex items-center justify-center text-[8px] font-medium text-brand">
+                <div className="h-4 w-4 rounded bg-fx-surface-2 flex items-center justify-center text-[8px] font-medium text-fx-text-muted">
                   {load.companyName.slice(0, 2).toUpperCase()}
                 </div>
               )}
@@ -300,7 +312,7 @@ export function LoadCard({
             <BrokerVerifiedBadge companyId={load.companyId} compact />
             {profit && <span className="text-[10px] font-semibold text-fx-text-dim">{profit}</span>}
             {load.assigneeId && (
-              <span className="text-[10px] font-semibold text-sky-400 bg-sky-400/10 px-2 py-0.5 rounded-full border border-sky-400/20">
+              <span className="text-[10px] font-semibold text-fx-text-muted bg-fx-surface-2 px-2 py-0.5 rounded-full border border-fx-border">
                 Assigned
               </span>
             )}
@@ -324,12 +336,12 @@ export function LoadCard({
               <div className="flex flex-col items-end gap-1">
                 <button
                   disabled
-                  className="h-9 px-5 rounded-full text-[13px] font-bold text-white/40 bg-fx-surface-2 border border-fx-border cursor-not-allowed"
+                  className="h-9 px-5 rounded-full text-[13px] font-bold text-fx-text-dim bg-fx-surface-2 border border-fx-border cursor-not-allowed"
                 >
                   Bid Now
                 </button>
                 {carrierEligibleReason && (
-                  <span className="flex items-center gap-1 text-[9px] text-amber-400 max-w-[140px] text-right leading-tight">
+                  <span className="flex items-center gap-1 text-[9px] text-fx-orange max-w-[140px] text-right leading-tight">
                     <AlertCircle size={9} className="shrink-0" />
                     {carrierEligibleReason}
                   </span>

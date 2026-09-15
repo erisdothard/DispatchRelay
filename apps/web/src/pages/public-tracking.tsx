@@ -75,7 +75,7 @@ export default function PublicTrackingPage() {
   }, [livePing?.recorded_at, now]);
 
   return (
-    <div className="min-h-dvh flex flex-col" style={{ background: '#0a0a12' }}>
+    <div className="min-h-dvh flex flex-col" style={{ background: 'var(--fx-bg)' }}>
       {/* Header */}
       <div className="px-5 pt-safe pb-4">
         <div className="flex items-center gap-3">
@@ -86,7 +86,7 @@ export default function PublicTrackingPage() {
             <span className="text-sm font-bold text-white">FX</span>
           </div>
           <div>
-            <p className="text-[17px] font-bold text-white tracking-[-0.01em]">
+            <p className="text-[17px] font-bold text-fx-text tracking-[-0.01em]">
               DispatchRelay Tracking
             </p>
             <p className="text-[11px] text-fx-text-dim">Public tracking link</p>
@@ -118,7 +118,7 @@ export default function PublicTrackingPage() {
                   <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">
                     From
                   </p>
-                  <p className="text-[14px] font-semibold text-white">
+                  <p className="text-[14px] font-semibold text-fx-text">
                     {load.originCity}, {load.originState}
                   </p>
                 </div>
@@ -126,7 +126,7 @@ export default function PublicTrackingPage() {
                   <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">
                     To
                   </p>
-                  <p className="text-[14px] font-semibold text-white">
+                  <p className="text-[14px] font-semibold text-fx-text">
                     {load.destCity}, {load.destState}
                   </p>
                 </div>
@@ -146,7 +146,7 @@ export default function PublicTrackingPage() {
                   <p className="text-[11px] text-fx-text-dim font-medium mb-0.5 uppercase tracking-wide">
                     Delivery
                   </p>
-                  <p className="text-[14px] font-semibold text-white">
+                  <p className="text-[14px] font-semibold text-fx-text">
                     {new Date(load.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -159,16 +159,16 @@ export default function PublicTrackingPage() {
             {/* Map */}
             <div className="bg-fx-surface rounded-ios p-4 card-highlight">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-white">Live Tracking</p>
+                <p className="text-sm font-semibold text-fx-text">Live Tracking</p>
                 {gpsEligible && livePosition && !isStale && (
-                  <span className="text-xs text-green-400 font-medium flex items-center gap-1">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span className="text-xs text-fx-success font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 bg-fx-success rounded-full animate-pulse" />
                     Live {agoLabel && `· ${agoLabel}`}
                   </span>
                 )}
                 {gpsEligible && livePosition && isStale && (
-                  <span className="text-xs text-yellow-400 font-medium flex items-center gap-1">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full" />
+                  <span className="text-xs text-fx-text-muted font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 bg-fx-text-muted rounded-full" />
                     Stale · {agoLabel}
                   </span>
                 )}
@@ -189,7 +189,7 @@ export default function PublicTrackingPage() {
               />
               <div className="flex items-center justify-between text-xs mt-3">
                 <div className="flex items-center gap-1">
-                  <MapPin size={12} className="text-green-400" />
+                  <MapPin size={12} className="text-fx-text-dim" />
                   <span className="text-fx-text-dim">
                     Pickup: {new Date(load.pickupDate + 'T12:00:00').toLocaleDateString()}
                   </span>
@@ -208,9 +208,9 @@ export default function PublicTrackingPage() {
               <div className="bg-fx-surface rounded-ios overflow-hidden card-highlight">
                 <div
                   className="px-5 py-3.5 text-center"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                  style={{ borderBottom: '1px solid var(--fx-divider)' }}
                 >
-                  <p className="text-[14px] font-semibold text-white">Shipment Progress</p>
+                  <p className="text-[14px] font-semibold text-fx-text">Shipment Progress</p>
                 </div>
                 {milestones.map((m, i) => (
                   <div
@@ -218,13 +218,13 @@ export default function PublicTrackingPage() {
                     className="flex items-start justify-between px-5 py-4"
                     style={
                       i < milestones.length - 1
-                        ? { borderBottom: '1px solid rgba(255,255,255,0.05)' }
+                        ? { borderBottom: '1px solid var(--fx-divider)' }
                         : {}
                     }
                   >
                     <div className="flex-1">
                       <p
-                        className={`text-[14px] font-semibold ${m.current ? 'text-fx-orange' : m.completed ? 'text-white' : 'text-fx-text-dim'}`}
+                        className={`text-[14px] font-semibold ${m.current ? 'text-fx-orange' : m.completed ? 'text-fx-text' : 'text-fx-text-dim'}`}
                       >
                         {m.label}
                       </p>

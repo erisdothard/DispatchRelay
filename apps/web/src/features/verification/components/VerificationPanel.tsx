@@ -97,7 +97,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShieldCheck size={18} className="text-fx-orange" />
-          <h3 className="text-sm font-semibold text-fx-text-main uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-fx-text uppercase tracking-wider">
             Carrier Verification
           </h3>
         </div>
@@ -107,10 +107,10 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
             <span
               className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
                 ((verification as Record<string, unknown>).risk_score as number) <= 30
-                  ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20'
+                  ? 'text-fx-success bg-fx-success-dim border-transparent'
                   : ((verification as Record<string, unknown>).risk_score as number) <= 60
-                    ? 'text-amber-400 bg-amber-400/10 border-amber-400/20'
-                    : 'text-red-400 bg-red-400/10 border-red-400/20'
+                    ? 'text-fx-text-muted bg-fx-surface-2 border-fx-border'
+                    : 'text-fx-danger bg-fx-danger-dim border-transparent'
               }`}
             >
               Risk {(verification as Record<string, unknown>).risk_score as number}
@@ -132,8 +132,8 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
               active === s.key
                 ? 'bg-fx-orange/10 border-fx-orange/40 text-fx-orange'
                 : sectionDone(verification, s.key)
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                  : 'bg-zinc-800 border-zinc-700 text-fx-text-dim'
+                  ? 'bg-fx-surface-2 border-fx-border text-fx-success'
+                  : 'bg-fx-surface-2 border-fx-border-2 text-fx-text-dim'
             }`}
           >
             {sectionDone(verification, s.key) && <CheckCircle2 size={11} />}
@@ -144,9 +144,9 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
 
       {/* FMCSA panel */}
       {active === 'fmcsa' && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
+        <div className="bg-fx-surface border border-fx-border rounded-xl p-4 space-y-3">
           {FMCSA_IS_PLACEHOLDER && (
-            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-400/10 border border-amber-400/25 text-xs text-amber-400">
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-fx-surface-2 border border-fx-border text-xs text-fx-text-muted">
               <FlaskConical size={13} className="shrink-0" />
               <span>
                 FMCSA lookup is in <strong>test mode</strong> — all carriers auto-approved. Register
@@ -155,7 +155,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
                   href="https://portal.fmcsa.dot.gov/Developer"
                   target="_blank"
                   rel="noreferrer"
-                  className="underline underline-offset-2 hover:text-amber-300"
+                  className="underline underline-offset-2 hover:text-fx-text"
                 >
                   portal.fmcsa.dot.gov
                 </a>{' '}
@@ -164,7 +164,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
             </div>
           )}
           {verification?.fmcsa_verified_at && (
-            <div className="text-xs text-emerald-400 flex items-center gap-1">
+            <div className="text-xs text-fx-success flex items-center gap-1">
               <CheckCircle2 size={12} /> Verified{' '}
               {new Date(verification.fmcsa_verified_at).toLocaleDateString()} —{' '}
               {verification.fmcsa_status}
@@ -176,7 +176,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
                 MC Number
               </label>
               <input
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text-main focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border-2 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="MC-XXXXXX"
                 value={mcNumber}
                 onChange={(e) => setMcNumber(e.target.value)}
@@ -187,7 +187,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
                 DOT Number
               </label>
               <input
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text-main focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border-2 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="XXXXXXX"
                 value={dotNumber}
                 onChange={(e) => setDotNumber(e.target.value)}
@@ -203,7 +203,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
           </button>
           {verification?.safety_rating && (
             <p className="text-xs text-fx-text-dim">
-              Safety rating: <span className="text-fx-text-main">{verification.safety_rating}</span>
+              Safety rating: <span className="text-fx-text">{verification.safety_rating}</span>
             </p>
           )}
         </div>
@@ -211,9 +211,9 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
 
       {/* Insurance panel */}
       {active === 'insurance' && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
+        <div className="bg-fx-surface border border-fx-border rounded-xl p-4 space-y-3">
           {verification?.insurance_cert_url && (
-            <div className="text-xs text-emerald-400 flex items-center gap-1">
+            <div className="text-xs text-fx-success flex items-center gap-1">
               <CheckCircle2 size={12} /> Certificate uploaded — expires{' '}
               {verification.insurance_expires_at
                 ? new Date(verification.insurance_expires_at).toLocaleDateString()
@@ -226,7 +226,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
                 Insurance Carrier
               </label>
               <input
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text-main focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border-2 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="e.g. Great West Casualty"
                 value={insCarrier}
                 onChange={(e) => setInsCarrier(e.target.value)}
@@ -237,7 +237,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
                 Policy Number
               </label>
               <input
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text-main focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border-2 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="Policy #"
                 value={insPolicy}
                 onChange={(e) => setInsPolicy(e.target.value)}
@@ -249,7 +249,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
               </label>
               <input
                 type="number"
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text-main focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border-2 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 placeholder="1000000"
                 value={insAmount}
                 onChange={(e) => setInsAmount(e.target.value)}
@@ -261,7 +261,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
               </label>
               <input
                 type="date"
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text-main focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border-2 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 value={insExpires}
                 onChange={(e) => setInsExpires(e.target.value)}
               />
@@ -271,7 +271,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
             <label className="block text-[11px] text-fx-text-dim uppercase tracking-wider mb-1">
               Certificate of Insurance (PDF / Image)
             </label>
-            <label className="flex items-center gap-2 h-10 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 cursor-pointer hover:border-fx-orange transition-colors">
+            <label className="flex items-center gap-2 h-10 w-full bg-fx-surface-2 border border-fx-border-2 rounded-lg px-3 cursor-pointer hover:border-fx-orange transition-colors">
               <Upload size={14} className="text-fx-text-dim" />
               <span className="text-sm text-fx-text-dim">
                 {insCertFile ? insCertFile.name : 'Choose file…'}
@@ -298,9 +298,9 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
 
       {/* W-9 panel */}
       {active === 'w9' && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
+        <div className="bg-fx-surface border border-fx-border rounded-xl p-4 space-y-3">
           {verification?.w9_url && (
-            <div className="text-xs text-emerald-400 flex items-center gap-1">
+            <div className="text-xs text-fx-success flex items-center gap-1">
               <CheckCircle2 size={12} /> W-9 uploaded{' '}
               {verification.w9_uploaded_at
                 ? new Date(verification.w9_uploaded_at).toLocaleDateString()
@@ -311,7 +311,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
             <label className="block text-[11px] text-fx-text-dim uppercase tracking-wider mb-1">
               W-9 Form (PDF)
             </label>
-            <label className="flex items-center gap-2 h-10 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 cursor-pointer hover:border-fx-orange transition-colors">
+            <label className="flex items-center gap-2 h-10 w-full bg-fx-surface-2 border border-fx-border-2 rounded-lg px-3 cursor-pointer hover:border-fx-orange transition-colors">
               <Upload size={14} className="text-fx-text-dim" />
               <span className="text-sm text-fx-text-dim">
                 {w9File ? w9File.name : 'Choose PDF…'}
@@ -335,7 +335,7 @@ export function VerificationPanel({ companyId, userId, initial }: Props) {
       )}
 
       {error && (
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-400">
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-fx-danger-dim border border-transparent text-xs text-fx-danger">
           <AlertCircle size={13} />
           {error}
         </div>

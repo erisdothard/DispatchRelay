@@ -65,18 +65,18 @@ export function RatingModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-t-2xl sm:rounded-2xl p-5 space-y-4 mx-4 mb-0 sm:mb-auto">
+      <div className="relative w-full max-w-md bg-fx-surface border border-fx-border rounded-t-2xl sm:rounded-2xl p-5 space-y-4 mx-4 mb-0 sm:mb-auto">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-fx-text-main">Rate Your Experience</h3>
+            <h3 className="text-sm font-semibold text-fx-text">Rate Your Experience</h3>
             <p className="text-xs text-fx-text-dim mt-0.5">
               {loadNumber} · {ratedCompanyName}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-fx-text-dim hover:text-fx-text-main transition-colors"
+            className="text-fx-text-dim hover:text-fx-text transition-colors"
           >
             <X size={18} />
           </button>
@@ -96,7 +96,7 @@ export function RatingModal({
         </div>
 
         {/* Sub-ratings */}
-        <div className="space-y-2 border-t border-zinc-800 pt-3">
+        <div className="space-y-2 border-t border-fx-border pt-3">
           {(['communication', 'reliability', 'professionalism'] as const).map((key) => (
             <div key={key} className="flex items-center justify-between">
               <span className="text-xs text-fx-text-dim capitalize">{key}</span>
@@ -116,7 +116,7 @@ export function RatingModal({
             Comment (optional)
           </label>
           <textarea
-            className="w-full h-20 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-fx-text-main resize-none focus:outline-none focus:border-fx-orange"
+            className="w-full h-20 bg-fx-surface-2 border border-fx-border rounded-lg px-3 py-2 text-sm text-fx-text resize-none focus:outline-none focus:border-fx-orange"
             placeholder="Share your experience…"
             maxLength={500}
             value={comment}
@@ -125,7 +125,7 @@ export function RatingModal({
           <p className="text-[10px] text-fx-text-dim text-right mt-0.5">{comment.length}/500</p>
         </div>
 
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-fx-danger">{error}</p>}
 
         <button
           onClick={handleSubmit}

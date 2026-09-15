@@ -21,7 +21,7 @@ export function StarRating({ value, onChange, max = 5, size = 20, readOnly = fal
         >
           <Star
             size={size}
-            className={star <= value ? 'text-amber-400 fill-amber-400' : 'text-zinc-600'}
+            className={star <= value ? 'text-fx-orange fill-fx-orange' : 'text-fx-text-dim'}
           />
         </button>
       ))}
@@ -34,7 +34,7 @@ export function RatingDisplay({ value, count }: { value: number | null; count?: 
   return (
     <div className="flex items-center gap-1.5">
       <StarRating value={Math.round(value)} readOnly size={13} />
-      <span className="text-xs font-semibold text-fx-text-main">{value.toFixed(1)}</span>
+      <span className="text-xs font-semibold text-fx-text">{value.toFixed(1)}</span>
       {count !== undefined && <span className="text-xs text-fx-text-dim">({count})</span>}
     </div>
   );

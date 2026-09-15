@@ -1,5 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Package, Clock, TrendingDown, CheckCircle, Radio } from 'lucide-react';
+import {
+  Search,
+  Package,
+  Clock,
+  TrendingDown,
+  CheckCircle,
+  Radio,
+  Lock,
+  MapPin,
+  Receipt as ReceiptIcon,
+  MessageSquare,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { INCIDENT_TYPE_ICONS } from '@/features/driver/lib/incident-type-icons';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -202,10 +215,8 @@ export default function DriverDashboard() {
           }}
           className="w-full flex items-center justify-between rounded-2xl p-4 active-scale"
           style={{
-            background: sharingLocation
-              ? 'linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.08))'
-              : 'rgba(255,255,255,0.04)',
-            border: `1px solid ${sharingLocation ? 'rgba(34,197,94,0.35)' : 'rgba(255,255,255,0.08)'}`,
+            background: 'var(--fx-surface)',
+            border: '1px solid var(--fx-border)',
             opacity: hasInTransitLoads ? 0.9 : 1,
           }}
         >
@@ -213,14 +224,17 @@ export default function DriverDashboard() {
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
               style={{
-                background: sharingLocation ? 'rgba(34,197,94,0.2)' : 'rgba(232,96,48,0.12)',
+                background: sharingLocation ? 'rgba(232,96,48,0.2)' : 'rgba(232,96,48,0.12)',
               }}
             >
-              <Radio size={18} className={sharingLocation ? 'text-green-400' : 'text-fx-orange'} />
+              <Radio size={18} className="text-fx-orange" />
             </div>
             <div className="text-left">
-              <p className="text-[14px] font-semibold text-white">
-                Share Location {hasInTransitLoads && '🔒'}
+              <p className="text-[14px] font-semibold text-fx-text inline-flex items-center gap-1.5">
+                Share Location
+                {hasInTransitLoads && (
+                  <Lock size={13} aria-label="Locked" className="shrink-0 text-fx-text-muted" />
+                )}
               </p>
               <p className="text-[11px] text-fx-text-dim mt-0.5">
                 {hasInTransitLoads
@@ -235,7 +249,7 @@ export default function DriverDashboard() {
           </div>
           <div
             className="w-12 h-7 rounded-full relative transition-colors"
-            style={{ background: sharingLocation ? '#22c55e' : 'rgba(255,255,255,0.12)' }}
+            style={{ background: sharingLocation ? '#E86030' : 'var(--fx-surface-3)' }}
           >
             <div
               className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform"
@@ -256,22 +270,22 @@ export default function DriverDashboard() {
             awarded: {
               label: 'Awaiting Dispatch',
               sub: 'Your carrier is finalizing paperwork. Stand by.',
-              color: 'bg-fx-surface border-white/[0.08]',
+              color: 'bg-fx-surface border-fx-border',
               textColor: 'text-fx-text-muted',
-              btnClass: 'bg-fx-surface-2 text-fx-text-dim border border-white/[0.08]',
+              btnClass: 'bg-fx-surface-2 text-fx-text-dim border border-fx-border',
             },
             dispatched: {
               label: 'Navigate to Pickup',
               sub: `${priorityLoad.originCity}, ${priorityLoad.originState}`,
-              color: 'bg-blue-500/10 border-blue-500/30',
-              textColor: 'text-blue-400',
-              btnClass: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+              color: 'bg-fx-surface border-fx-border',
+              textColor: 'text-fx-text',
+              btnClass: 'bg-fx-orange text-white',
             },
             in_transit: {
               label: 'Deliver & Sign BOL',
               sub: `${priorityLoad.destCity}, ${priorityLoad.destState}`,
-              color: 'bg-fx-orange/10 border-fx-orange/30',
-              textColor: 'text-fx-orange',
+              color: 'bg-fx-surface border-fx-border',
+              textColor: 'text-fx-text',
               btnClass: 'bg-fx-orange text-white',
             },
           }[priorityLoad.status as 'awarded' | 'dispatched' | 'in_transit'];
@@ -304,7 +318,7 @@ export default function DriverDashboard() {
               <h2 className="text-xs font-bold text-fx-text-muted uppercase tracking-widest">
                 Waiting on Broker
               </h2>
-              <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-green-500 text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-fx-orange text-white text-[10px] font-bold flex items-center justify-center">
                 {deliveredLoads.length}
               </span>
             </div>
@@ -313,12 +327,12 @@ export default function DriverDashboard() {
                 <button
                   key={load.id}
                   onClick={() => setSelectedLoad(load)}
-                  className="w-full text-left p-4 rounded-2xl border bg-green-500/[0.06] border-green-500/20"
-                  style={{ boxShadow: 'inset 3px 0 0 rgba(34, 197, 94, 0.65)' }}
+                  className="w-full text-left p-4 rounded-2xl border bg-fx-surface border-fx-border"
+                  style={{ boxShadow: 'inset 3px 0 0 var(--fx-border-2)' }}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-bold text-fx-orange">{load.loadNumber}</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-500/20 text-green-400">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-fx-success-dim text-fx-success">
                       DELIVERED
                     </span>
                   </div>
@@ -460,34 +474,46 @@ export default function DriverDashboard() {
             Quick Actions
           </h2>
           <div className="grid grid-cols-2 gap-3">
-            {[
-              // Only show "Send GPS" if user has permission (driver or owner-operator)
-              ...(canSendGpsPermission
-                ? [
-                    {
-                      label: 'Send GPS',
-                      icon: '📍',
-                      action: () => {
-                        if (!hasConsented) {
-                          setConsentModalOpen(true);
-                          return;
-                        }
-                        setManualGpsToggle(true);
+            {(
+              [
+                // Only show "Send GPS" if user has permission (driver or owner-operator)
+                ...(canSendGpsPermission
+                  ? [
+                      {
+                        label: 'Send GPS',
+                        icon: MapPin,
+                        action: () => {
+                          if (!hasConsented) {
+                            setConsentModalOpen(true);
+                            return;
+                          }
+                          setManualGpsToggle(true);
+                        },
                       },
-                    },
-                  ]
-                : []),
-              { label: 'Scan Receipt', icon: '🧾', action: () => navigate('/driver/receipts') },
-              { label: 'Tire Log', icon: '🛞', action: () => navigate('/driver/tire-log') },
-              { label: 'Messages', icon: '💬', action: () => navigate('/messages') },
-            ].map((item) => (
+                    ]
+                  : []),
+                {
+                  label: 'Scan Receipt',
+                  icon: ReceiptIcon,
+                  action: () => navigate('/driver/receipts'),
+                },
+                {
+                  label: 'Tire Log',
+                  icon: INCIDENT_TYPE_ICONS.tire,
+                  action: () => navigate('/driver/tire-log'),
+                },
+                { label: 'Messages', icon: MessageSquare, action: () => navigate('/messages') },
+              ] as { label: string; icon: LucideIcon; action: () => void }[]
+            ).map((item) => (
               <button
                 key={item.label}
                 onClick={item.action}
                 className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200"
               >
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-xs font-semibold text-fx-text-muted">{item.label}</span>
+                <span className="w-10 h-10 rounded-ios-xs bg-fx-orange/15 flex items-center justify-center">
+                  <item.icon size={20} aria-hidden="true" className="text-fx-orange" />
+                </span>
+                <span className="text-xs font-semibold text-fx-text">{item.label}</span>
               </button>
             ))}
           </div>

@@ -81,9 +81,9 @@ export function CsvImportSheet({ open, onClose, onSuccess }: CsvImportSheetProps
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Upload size={18} className="text-fx-orange" />
-              <h2 className="text-[17px] font-bold text-white">Import Loads from CSV</h2>
+              <h2 className="text-[17px] font-bold text-fx-text">Import Loads from CSV</h2>
             </div>
-            <button onClick={onClose} className="p-1 text-fx-text-dim hover:text-white">
+            <button onClick={onClose} className="p-1 text-fx-text-dim hover:text-fx-text">
               <X size={20} />
             </button>
           </div>
@@ -102,7 +102,7 @@ export function CsvImportSheet({ open, onClose, onSuccess }: CsvImportSheetProps
                 className="border-2 border-dashed border-fx-border rounded-ios p-8 text-center cursor-pointer hover:border-fx-orange/50 transition-colors mb-4"
               >
                 <FileText size={32} className="text-fx-text-dim mx-auto mb-3" />
-                <p className="text-[14px] font-semibold text-white mb-1">Drop your CSV here</p>
+                <p className="text-[14px] font-semibold text-fx-text mb-1">Drop your CSV here</p>
                 <p className="text-[12px] text-fx-text-dim">or click to browse — max 50 rows</p>
               </div>
               <input
@@ -116,7 +116,9 @@ export function CsvImportSheet({ open, onClose, onSuccess }: CsvImportSheetProps
                 }}
               />
 
-              {parseError && <p className="text-red-400 text-sm text-center mb-4">{parseError}</p>}
+              {parseError && (
+                <p className="text-fx-danger text-sm text-center mb-4">{parseError}</p>
+              )}
 
               {/* Required columns hint */}
               <div className="bg-fx-surface-2 rounded-ios-xs p-3">
@@ -150,18 +152,18 @@ export function CsvImportSheet({ open, onClose, onSuccess }: CsvImportSheetProps
           {step === 'preview' && (
             <div>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[13px] font-semibold text-white">
+                <p className="text-[13px] font-semibold text-fx-text">
                   {rows.length} loads ready to import
                 </p>
                 <button
                   onClick={handleReset}
-                  className="text-[12px] text-fx-text-dim hover:text-white"
+                  className="text-[12px] text-fx-text-dim hover:text-fx-text"
                 >
                   Change file
                 </button>
               </div>
 
-              {parseError && <p className="text-red-400 text-sm mb-3">{parseError}</p>}
+              {parseError && <p className="text-fx-danger text-sm mb-3">{parseError}</p>}
 
               <div className="overflow-x-auto rounded-ios-xs border border-fx-border mb-5 max-h-[250px] overflow-y-auto">
                 <table className="w-full text-[12px]">
@@ -183,10 +185,10 @@ export function CsvImportSheet({ open, onClose, onSuccess }: CsvImportSheetProps
                           i % 2 === 0 ? '' : 'bg-fx-surface-2/30',
                         )}
                       >
-                        <td className="px-3 py-2 text-white">
+                        <td className="px-3 py-2 text-fx-text">
                           {row.origin_city}, {row.origin_state}
                         </td>
-                        <td className="px-3 py-2 text-white">
+                        <td className="px-3 py-2 text-fx-text">
                           {row.dest_city}, {row.dest_state}
                         </td>
                         <td className="px-3 py-2 text-fx-text-dim">{row.equipment}</td>
@@ -212,7 +214,7 @@ export function CsvImportSheet({ open, onClose, onSuccess }: CsvImportSheetProps
           {step === 'importing' && (
             <div className="py-12 text-center">
               <div className="w-10 h-10 border-2 border-fx-orange border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-white font-semibold">Importing {rows.length} loads...</p>
+              <p className="text-fx-text font-semibold">Importing {rows.length} loads...</p>
               <p className="text-fx-text-dim text-sm mt-1">This may take a moment</p>
             </div>
           )}
@@ -220,32 +222,39 @@ export function CsvImportSheet({ open, onClose, onSuccess }: CsvImportSheetProps
           {/* Step: Done */}
           {step === 'done' && result && (
             <div className="py-6 text-center">
-              <CheckCircle size={40} className="text-emerald-400 mx-auto mb-4" />
-              <p className="text-[17px] font-bold text-white mb-4">Import Complete</p>
+              <CheckCircle size={40} className="text-fx-success mx-auto mb-4" />
+              <p className="text-[17px] font-bold text-fx-text mb-4">Import Complete</p>
 
               <div className="grid grid-cols-2 gap-3 mb-5">
                 <div className="bg-fx-surface-2 rounded-ios-xs p-3">
                   <p className="text-[11px] text-fx-text-dim uppercase tracking-wider mb-1">
                     Succeeded
                   </p>
-                  <p className="text-[22px] font-extrabold text-emerald-400">{result.succeeded}</p>
+                  <p className="text-[22px] font-extrabold text-fx-text">{result.succeeded}</p>
                 </div>
                 <div className="bg-fx-surface-2 rounded-ios-xs p-3">
                   <p className="text-[11px] text-fx-text-dim uppercase tracking-wider mb-1">
                     Failed
                   </p>
-                  <p className="text-[22px] font-extrabold text-red-400">{result.failed}</p>
+                  <p
+                    className={cn(
+                      'text-[22px] font-extrabold',
+                      result.failed > 0 ? 'text-fx-danger' : 'text-fx-text',
+                    )}
+                  >
+                    {result.failed}
+                  </p>
                 </div>
               </div>
 
               {result.errors.length > 0 && (
-                <div className="bg-red-400/10 border border-red-400/20 rounded-ios-xs p-3 mb-4 text-left">
+                <div className="bg-fx-danger-dim border border-fx-danger-dim rounded-ios-xs p-3 mb-4 text-left">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <AlertTriangle size={13} className="text-red-400" />
-                    <span className="text-[12px] font-bold text-red-400">Errors</span>
+                    <AlertTriangle size={13} className="text-fx-danger" />
+                    <span className="text-[12px] font-bold text-fx-danger">Errors</span>
                   </div>
                   {result.errors.slice(0, 5).map((e, i) => (
-                    <p key={i} className="text-[11px] text-red-400/80">
+                    <p key={i} className="text-[11px] text-fx-text-muted">
                       Row {e.row}: {e.message}
                     </p>
                   ))}
@@ -260,7 +269,7 @@ export function CsvImportSheet({ open, onClose, onSuccess }: CsvImportSheetProps
               <div className="flex gap-3">
                 <button
                   onClick={handleReset}
-                  className="flex-1 h-11 bg-fx-surface-2 rounded-ios-xs font-semibold text-white text-sm active-scale"
+                  className="flex-1 h-11 bg-fx-surface-2 rounded-ios-xs font-semibold text-fx-text text-sm active-scale"
                 >
                   Import Another
                 </button>

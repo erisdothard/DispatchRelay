@@ -75,12 +75,12 @@ export function CarrierPreferencesSheet({
               value={prefs.homeCity}
               onChange={(e) => setPrefs((p) => ({ ...p, homeCity: e.target.value }))}
               placeholder="City"
-              className="flex-1 h-11 bg-fx-surface border border-fx-border rounded-ios-xs px-3 text-sm text-white placeholder:text-fx-text-dim focus:border-fx-orange outline-none"
+              className="flex-1 h-11 bg-fx-surface border border-fx-border rounded-ios-xs px-3 text-sm text-fx-text placeholder:text-fx-text-dim focus:border-fx-orange outline-none"
             />
             <select
               value={prefs.homeState}
               onChange={(e) => setPrefs((p) => ({ ...p, homeState: e.target.value }))}
-              className="w-20 h-11 bg-fx-surface border border-fx-border rounded-ios-xs px-2 text-sm text-white focus:border-fx-orange outline-none"
+              className="w-20 h-11 bg-fx-surface border border-fx-border rounded-ios-xs px-2 text-sm text-fx-text focus:border-fx-orange outline-none"
             >
               <option value="">ST</option>
               {US_STATES.map((s) => (
@@ -193,7 +193,7 @@ export function CarrierPreferencesSheet({
                 setPrefs((p) => ({ ...p, minRatePerMile: parseFloat(e.target.value) || 0 }))
               }
               placeholder="0.00"
-              className="w-full h-11 bg-fx-surface border border-fx-border rounded-ios-xs pl-7 pr-12 text-sm text-white placeholder:text-fx-text-dim focus:border-fx-orange outline-none"
+              className="w-full h-11 bg-fx-surface border border-fx-border rounded-ios-xs pl-7 pr-12 text-sm text-fx-text placeholder:text-fx-text-dim focus:border-fx-orange outline-none"
             />
             <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-fx-text-dim text-xs">
               /mi
@@ -201,7 +201,7 @@ export function CarrierPreferencesSheet({
           </div>
         </section>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && <p className="text-fx-danger text-sm">{error}</p>}
 
         <button
           onClick={handleSave}

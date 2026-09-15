@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Route } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 
 export default function NotFound() {
@@ -6,7 +7,9 @@ export default function NotFound() {
 
   return (
     <div className="min-h-dvh flex flex-col items-center justify-center px-6 text-center">
-      <div className="text-6xl mb-6">🛣️</div>
+      <div className="w-16 h-16 rounded-2xl bg-fx-surface-2 flex items-center justify-center mb-6">
+        <Route size={32} className="text-fx-text-muted" aria-hidden="true" />
+      </div>
       <h1 className="text-5xl font-extrabold text-fx-orange mb-2">404</h1>
       <p className="text-lg font-bold text-fx-text mb-2">Road ends here</p>
       <p className="text-sm text-fx-text-muted mb-8 max-w-xs">

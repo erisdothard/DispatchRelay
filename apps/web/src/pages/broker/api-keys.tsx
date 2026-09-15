@@ -109,7 +109,7 @@ export default function BrokerApiKeysPage() {
                   <button
                     onClick={() => revokeMutation.mutate(key.id)}
                     disabled={revokeMutation.isPending}
-                    className="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
+                    className="w-7 h-7 rounded-lg bg-fx-danger-dim border border-fx-border flex items-center justify-center text-fx-danger hover:border-fx-danger transition-colors disabled:opacity-40"
                   >
                     <Trash2 size={12} />
                   </button>
@@ -119,7 +119,7 @@ export default function BrokerApiKeysPage() {
                   {key.scopes.map((s) => (
                     <span
                       key={s}
-                      className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-800 text-fx-text-dim"
+                      className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-fx-surface-2 text-fx-text-dim"
                     >
                       {s}
                     </span>
@@ -149,11 +149,11 @@ export default function BrokerApiKeysPage() {
       >
         {newKey ? (
           <div className="space-y-4">
-            <div className="p-3 rounded-xl bg-amber-400/10 border border-amber-400/25 text-xs text-amber-400 flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-fx-orange/10 border border-fx-orange/25 text-xs text-fx-orange flex items-center gap-2">
               <Shield size={14} />
               <span>Copy this key now. It won't be shown again.</span>
             </div>
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 font-mono text-xs text-fx-text break-all">
+            <div className="bg-fx-surface-2 border border-fx-border rounded-lg p-3 font-mono text-xs text-fx-text break-all">
               {newKey}
             </div>
             <button
@@ -178,7 +178,7 @@ export default function BrokerApiKeysPage() {
                 Name *
               </label>
               <input
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="My TMS Integration"
@@ -196,7 +196,7 @@ export default function BrokerApiKeysPage() {
                     className={`text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors ${
                       selectedScopes.has(s)
                         ? 'bg-fx-orange/10 border-fx-orange/40 text-fx-orange'
-                        : 'bg-zinc-800 border-zinc-700 text-fx-text-dim hover:border-zinc-600'
+                        : 'bg-fx-surface-2 border-fx-border text-fx-text-dim hover:border-fx-border-2'
                     }`}
                   >
                     {s}
@@ -206,7 +206,7 @@ export default function BrokerApiKeysPage() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-400">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-fx-danger-dim border border-fx-danger text-xs text-fx-danger">
                 <AlertCircle size={13} />
                 {error}
               </div>

@@ -20,14 +20,14 @@ interface AuditEntry {
 }
 
 const ACTION_COLORS: Record<string, string> = {
-  created: 'text-green-400  bg-green-400/10',
-  updated: 'text-blue-400   bg-blue-400/10',
-  deleted: 'text-red-400    bg-red-400/10',
-  status_changed: 'text-yellow-400 bg-yellow-400/10',
-  bid_accepted: 'text-green-400  bg-green-400/10',
-  bid_declined: 'text-red-400    bg-red-400/10',
-  booking_confirmed: 'text-fx-orange  bg-orange-500/10',
-  payment_recorded: 'text-purple-400 bg-purple-400/10',
+  created: 'text-fx-text-muted bg-fx-surface-2',
+  updated: 'text-fx-text-muted bg-fx-surface-2',
+  deleted: 'text-fx-danger bg-fx-danger-dim',
+  status_changed: 'text-fx-text-muted bg-fx-surface-2',
+  bid_accepted: 'text-fx-success bg-fx-success-dim',
+  bid_declined: 'text-fx-danger bg-fx-danger-dim',
+  booking_confirmed: 'text-fx-text-muted bg-fx-surface-2',
+  payment_recorded: 'text-fx-success bg-fx-success-dim',
 };
 
 const PAGE_SIZE = 50;
@@ -101,19 +101,19 @@ export default function AuditLogPage() {
             className="h-10 bg-fx-surface border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
             style={{ colorScheme: 'dark' }}
           >
-            <option value="" style={{ background: '#141414' }}>
+            <option value="" style={{ background: 'var(--fx-surface)' }}>
               All Events
             </option>
-            <option value="load" style={{ background: '#141414' }}>
+            <option value="load" style={{ background: 'var(--fx-surface)' }}>
               Loads
             </option>
-            <option value="bid" style={{ background: '#141414' }}>
+            <option value="bid" style={{ background: 'var(--fx-surface)' }}>
               Bids
             </option>
-            <option value="booking_confirmed" style={{ background: '#141414' }}>
+            <option value="booking_confirmed" style={{ background: 'var(--fx-surface)' }}>
               Bookings
             </option>
-            <option value="payment_recorded" style={{ background: '#141414' }}>
+            <option value="payment_recorded" style={{ background: 'var(--fx-surface)' }}>
               Payments
             </option>
           </select>

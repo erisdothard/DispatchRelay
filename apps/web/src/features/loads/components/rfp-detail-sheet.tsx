@@ -34,12 +34,12 @@ export function RfpDetailSheet({ open, onClose, rfp, isOwner }: Props) {
         <span
           className={`inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded-md ${
             rfp.status === 'open'
-              ? 'text-emerald-400 bg-emerald-400/10'
+              ? 'text-fx-text bg-fx-surface-3'
               : rfp.status === 'evaluating'
-                ? 'text-amber-400 bg-amber-400/10'
+                ? 'text-fx-text-muted bg-fx-surface-2'
                 : rfp.status === 'awarded'
-                  ? 'text-blue-400 bg-blue-400/10'
-                  : 'text-zinc-400 bg-zinc-400/10'
+                  ? 'text-fx-success bg-fx-success-dim'
+                  : 'text-fx-text-dim bg-fx-surface-2'
           }`}
         >
           {rfp.status}
@@ -110,7 +110,7 @@ export function RfpDetailSheet({ open, onClose, rfp, isOwner }: Props) {
                 {p.notes && <p className="text-[10px] text-fx-text-dim mt-1">{p.notes}</p>}
               </div>
               {p.status === 'awarded' ? (
-                <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                <span className="text-[10px] font-bold text-fx-success flex items-center gap-1">
                   <Award size={12} /> Awarded
                 </span>
               ) : isOwner && rfp.status === 'evaluating' ? (

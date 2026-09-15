@@ -48,13 +48,10 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
       >
         <div className="absolute inset-0 bg-black/80 no-print" onClick={onClose} />
 
-        <div
-          className="print-page relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-t-3xl"
-          style={{ background: '#0e0e16', border: '1px solid rgba(255,255,255,0.1)' }}
-        >
+        <div className="print-page relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-t-3xl bg-fx-surface border border-fx-border">
           {/* Header */}
           <div className="flex items-center justify-between px-6 pt-6 pb-4 no-print">
-            <h2 className="text-lg font-bold text-white">Signed Bill of Lading</h2>
+            <h2 className="text-lg font-bold text-fx-text">Signed Bill of Lading</h2>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => window.print()}
@@ -64,7 +61,7 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
               </button>
               <button
                 onClick={onClose}
-                className="text-fx-text-dim hover:text-white transition-colors"
+                className="text-fx-text-dim hover:text-fx-text transition-colors"
               >
                 <X size={18} />
               </button>
@@ -74,14 +71,11 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
           {/* BOL Content */}
           <div className="px-6 pb-8 space-y-5">
             {/* Title */}
-            <div
-              className="text-center pb-4"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
-            >
+            <div className="text-center pb-4 border-b border-fx-border">
               <p className="text-[11px] font-bold text-fx-text-muted uppercase tracking-widest">
                 DispatchRelay
               </p>
-              <p className="text-xl font-extrabold text-white mt-1">Bill of Lading</p>
+              <p className="text-xl font-extrabold text-fx-text mt-1">Bill of Lading</p>
               <p className="text-sm text-fx-text-muted mt-0.5">Load #{load.loadNumber}</p>
             </div>
 
@@ -91,7 +85,7 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
                 <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-1">
                   Origin
                 </p>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-fx-text">
                   {load.originCity}, {load.originState}
                 </p>
                 {load.originAddress && (
@@ -102,7 +96,7 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
                 <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-1">
                   Destination
                 </p>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-fx-text">
                   {load.destCity}, {load.destState}
                 </p>
                 {load.destAddress && (
@@ -112,13 +106,7 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
             </div>
 
             {/* Load details */}
-            <div
-              className="rounded-xl p-4 grid grid-cols-2 gap-3"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
-            >
+            <div className="rounded-xl p-4 grid grid-cols-2 gap-3 bg-fx-surface-2 border border-fx-border">
               {[
                 { label: 'Equipment', value: load.equipment },
                 { label: 'Weight', value: `${(load.weightLbs / 1000).toFixed(0)}k lbs` },
@@ -165,20 +153,14 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
                   <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
                     {label}
                   </p>
-                  <p className="text-sm font-semibold text-white">{value}</p>
+                  <p className="text-sm font-semibold text-fx-text">{value}</p>
                 </div>
               ))}
             </div>
 
             {/* Signature block */}
-            <div
-              className="rounded-xl p-4"
-              style={{
-                background: 'rgba(34,197,94,0.06)',
-                border: '1px solid rgba(34,197,94,0.2)',
-              }}
-            >
-              <p className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-3">
+            <div className="rounded-xl p-4 bg-fx-surface-2 border border-fx-border">
+              <p className="text-[10px] font-bold text-fx-success uppercase tracking-widest mb-3">
                 Electronic Signature
               </p>
 
@@ -200,13 +182,13 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
                   <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
                     Signed By
                   </p>
-                  <p className="text-sm font-semibold text-white">{doc.signatory_name ?? '—'}</p>
+                  <p className="text-sm font-semibold text-fx-text">{doc.signatory_name ?? '—'}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest mb-0.5">
                     Signed At
                   </p>
-                  <p className="text-sm font-semibold text-white">{signedAt}</p>
+                  <p className="text-sm font-semibold text-fx-text">{signedAt}</p>
                 </div>
               </div>
             </div>
@@ -224,11 +206,7 @@ export function SignedBolViewer({ doc, load, onClose }: SignedBolViewerProps) {
               )}
               <button
                 onClick={() => window.print()}
-                className="flex items-center gap-2 h-11 px-4 rounded-xl text-sm font-semibold text-fx-text-dim hover:text-white transition-colors"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
+                className="flex items-center gap-2 h-11 px-4 rounded-xl text-sm font-semibold text-fx-text-dim hover:text-fx-text transition-colors bg-fx-surface-2 border border-fx-border"
               >
                 <Printer size={16} /> Print
               </button>

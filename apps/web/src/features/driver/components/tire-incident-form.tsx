@@ -324,7 +324,9 @@ export function TireIncidentForm({ open, onClose, onCreated }: TireIncidentFormP
             </div>
 
             {error && (
-              <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-3 py-2">{error}</p>
+              <p className="text-xs text-fx-danger bg-fx-danger-dim rounded-xl px-3 py-2">
+                {error}
+              </p>
             )}
 
             {/* Submit */}

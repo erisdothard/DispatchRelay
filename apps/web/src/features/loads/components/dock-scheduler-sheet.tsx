@@ -44,7 +44,7 @@ export function DockSchedulerSheet({ open, onClose, facilityId, companyId, loadI
         </label>
         <input
           type="date"
-          className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+          className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
@@ -56,7 +56,7 @@ export function DockSchedulerSheet({ open, onClose, facilityId, companyId, loadI
           Notes
         </label>
         <input
-          className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+          className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
           placeholder="Optional notes..."
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -107,7 +107,7 @@ export function DockSchedulerSheet({ open, onClose, facilityId, companyId, loadI
       )}
 
       {error && (
-        <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-400">
+        <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-fx-danger-dim border border-fx-danger-dim text-xs text-fx-danger">
           <AlertCircle size={13} />
           {error}
         </div>

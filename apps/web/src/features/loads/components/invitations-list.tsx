@@ -76,7 +76,7 @@ export function InvitationsList({ invitations, onViewLoad }: Props) {
                     respondMutation.mutate({ invitationId: inv.id, status: 'declined' })
                   }
                   disabled={respondMutation.isPending}
-                  className="flex-1 h-9 rounded-xl border border-fx-border text-fx-text-muted text-xs font-semibold flex items-center justify-center gap-1 hover:border-red-500/40 hover:text-red-400 transition-colors"
+                  className="flex-1 h-9 rounded-xl border border-fx-border text-fx-text-muted text-xs font-semibold flex items-center justify-center gap-1 hover:border-fx-danger hover:text-fx-danger transition-colors"
                 >
                   <X size={13} />
                   Decline
@@ -86,10 +86,10 @@ export function InvitationsList({ invitations, onViewLoad }: Props) {
               <div
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg w-fit ${
                   inv.status === 'accepted'
-                    ? 'text-emerald-400 bg-emerald-400/10'
-                    : inv.status === 'declined'
-                      ? 'text-red-400 bg-red-400/10'
-                      : 'text-amber-400 bg-amber-400/10'
+                    ? 'text-fx-success bg-fx-success-dim'
+                    : inv.status === 'declined' || inv.status === 'expired'
+                      ? 'text-fx-danger bg-fx-danger-dim'
+                      : 'text-fx-text-muted bg-fx-surface-2'
                 }`}
               >
                 {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}

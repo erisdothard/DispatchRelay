@@ -11,7 +11,8 @@ const buttonVariants = cva(
         secondary: 'bg-fx-surface-2 text-fx-text hover:bg-fx-surface-3 border border-fx-border',
         outline: 'border border-fx-orange text-fx-orange hover:bg-fx-orange/10',
         ghost: 'text-fx-text-muted hover:text-fx-text hover:bg-fx-surface-2',
-        danger: 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20',
+        danger:
+          'bg-fx-danger-dim text-fx-danger border border-fx-danger-dim hover:bg-fx-danger hover:text-white',
       },
       size: {
         sm: 'h-9 px-4 text-sm',

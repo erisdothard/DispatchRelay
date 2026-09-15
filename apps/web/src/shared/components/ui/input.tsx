@@ -29,7 +29,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             'text-sm font-medium',
             icon ? 'pl-10' : 'pl-4',
             iconRight ? 'pr-10' : 'pr-4',
-            error && 'border-red-500 focus:border-red-500 focus:ring-red-500/30',
+            error && 'border-fx-danger focus:border-fx-danger focus:ring-fx-danger-dim',
             className,
           )}
           {...props}
@@ -40,7 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           </div>
         )}
       </div>
-      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-1 text-xs text-fx-danger">{error}</p>}
     </div>
   ),
 );

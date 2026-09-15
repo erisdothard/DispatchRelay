@@ -146,9 +146,9 @@ export default function LaneIntelligencePage() {
   }
 
   const confidenceColor = {
-    high: 'text-emerald-400',
-    medium: 'text-amber-400',
-    low: 'text-red-400',
+    high: 'text-fx-text',
+    medium: 'text-fx-text-muted',
+    low: 'text-fx-text-dim',
   };
 
   return (
@@ -156,7 +156,7 @@ export default function LaneIntelligencePage() {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <BarChart2 size={20} className="text-fx-orange" />
-          <h1 className="text-xl font-bold text-white">Lane Intelligence</h1>
+          <h1 className="text-xl font-bold text-fx-text">Lane Intelligence</h1>
         </div>
         <p className="text-fx-text-dim text-sm">
           Market rates for any lane, powered by real booking data.
@@ -173,7 +173,7 @@ export default function LaneIntelligencePage() {
             <select
               value={params.originState}
               onChange={(e) => setParams((p) => ({ ...p, originState: e.target.value }))}
-              className="w-full bg-fx-surface-2 border border-fx-border rounded-ios-xs px-3 h-10 text-white text-sm focus:outline-none focus:border-fx-orange"
+              className="w-full bg-fx-surface-2 border border-fx-border rounded-ios-xs px-3 h-10 text-fx-text text-sm focus:outline-none focus:border-fx-orange"
             >
               <option value="">Select state</option>
               {US_STATES.map((s) => (
@@ -190,7 +190,7 @@ export default function LaneIntelligencePage() {
             <select
               value={params.destState}
               onChange={(e) => setParams((p) => ({ ...p, destState: e.target.value }))}
-              className="w-full bg-fx-surface-2 border border-fx-border rounded-ios-xs px-3 h-10 text-white text-sm focus:outline-none focus:border-fx-orange"
+              className="w-full bg-fx-surface-2 border border-fx-border rounded-ios-xs px-3 h-10 text-fx-text text-sm focus:outline-none focus:border-fx-orange"
             >
               <option value="">Select state</option>
               {US_STATES.map((s) => (
@@ -236,7 +236,7 @@ export default function LaneIntelligencePage() {
       {searched && (
         <div className="bg-fx-surface rounded-ios p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[15px] font-bold text-white">
+            <h2 className="text-[15px] font-bold text-fx-text">
               {searched.originState} → {searched.destState}
             </h2>
             <span className="text-[11px] text-fx-text-dim bg-fx-surface-2 px-2 py-1 rounded-full">
@@ -268,7 +268,7 @@ export default function LaneIntelligencePage() {
                       <div className="text-[11px] text-fx-text-dim uppercase tracking-wider mb-1">
                         {item.label}
                       </div>
-                      <div className="text-[18px] font-bold text-white">
+                      <div className="text-[18px] font-bold text-fx-text">
                         {item.value != null ? `$${item.value.toFixed(2)}` : '—'}
                       </div>
                     </div>
@@ -302,7 +302,7 @@ export default function LaneIntelligencePage() {
             <button
               onClick={() => void handleAiEstimate()}
               disabled={aiLoading || !stats || stats.sample_count === 0}
-              className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-ios-xs font-semibold text-sm text-white flex items-center justify-center gap-2 disabled:opacity-40 hover:border-fx-orange/50 transition-colors active-scale"
+              className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-ios-xs font-semibold text-sm text-fx-text flex items-center justify-center gap-2 disabled:opacity-40 hover:border-fx-orange/50 transition-colors active-scale"
             >
               <Sparkles size={14} className="text-fx-orange" />
               {aiLoading ? 'Analyzing...' : 'AI Rate Estimate'}
@@ -311,7 +311,7 @@ export default function LaneIntelligencePage() {
             <div className="bg-fx-surface-2 rounded-ios-xs p-4 border border-fx-orange/20">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles size={14} className="text-fx-orange" />
-                <span className="text-[13px] font-bold text-white">AI Rate Estimate</span>
+                <span className="text-[13px] font-bold text-fx-text">AI Rate Estimate</span>
                 <span
                   className={cn(
                     'ml-auto text-[11px] font-semibold',
@@ -342,7 +342,7 @@ export default function LaneIntelligencePage() {
               </p>
               <button
                 onClick={() => setAiSuggestion(null)}
-                className="mt-2 text-[11px] text-fx-text-dim hover:text-white"
+                className="mt-2 text-[11px] text-fx-text-dim hover:text-fx-text"
               >
                 Dismiss
               </button>

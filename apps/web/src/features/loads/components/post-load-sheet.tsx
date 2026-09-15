@@ -6,6 +6,7 @@ import {
   Loader2,
   ChevronDown,
   ChevronRight,
+  AlertTriangle,
 } from 'lucide-react';
 import { BottomSheet } from '@/shared/components/bottom-sheet';
 import { Input } from '@/shared/components/ui/input';
@@ -367,7 +368,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
   }
 
   const fieldClass =
-    'w-full h-12 bg-[#111] border border-fx-border rounded-xl text-fx-text text-sm font-medium px-4 focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all duration-200';
+    'w-full h-12 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm font-medium px-4 focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all duration-200';
 
   return (
     <BottomSheet open={open} onClose={onClose} title="Post New Load">
@@ -525,20 +526,11 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                   key={eq}
                   type="button"
                   onClick={() => set('equipment', eq)}
-                  className="px-3 py-2 rounded-xl text-[12px] font-semibold transition-all"
-                  style={
+                  className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all border ${
                     selected
-                      ? {
-                          background: 'rgba(232,96,48,0.18)',
-                          border: '1px solid rgba(232,96,48,0.6)',
-                          color: '#E86030',
-                        }
-                      : {
-                          background: '#111',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          color: 'rgba(255,255,255,0.5)',
-                        }
-                  }
+                      ? 'bg-fx-orange/15 border-fx-orange/60 text-fx-orange'
+                      : 'bg-fx-surface-2 border-fx-border text-fx-text-muted'
+                  }`}
                 >
                   {EQUIPMENT_LABELS[eq] ?? eq}
                 </button>
@@ -560,20 +552,11 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                   key={opt}
                   type="button"
                   onClick={() => set('fullPartial', opt)}
-                  className="flex-1 h-10 rounded-xl text-[12px] font-semibold transition-all"
-                  style={
+                  className={`flex-1 h-10 rounded-xl text-[12px] font-semibold transition-all border ${
                     selected
-                      ? {
-                          background: 'rgba(232,96,48,0.18)',
-                          border: '1px solid rgba(232,96,48,0.6)',
-                          color: '#E86030',
-                        }
-                      : {
-                          background: '#111',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          color: 'rgba(255,255,255,0.5)',
-                        }
-                  }
+                      ? 'bg-fx-orange/15 border-fx-orange/60 text-fx-orange'
+                      : 'bg-fx-surface-2 border-fx-border text-fx-text-muted'
+                  }`}
                 >
                   {opt === 'full' ? 'Full Truckload' : 'Partial'}
                 </button>
@@ -704,10 +687,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
 
         {/* Rate Intelligence Chip */}
         {(fetchingRate || rateSuggestion) && form.totalMiles && (
-          <div
-            className="rounded-xl p-3 flex items-start gap-3"
-            style={{ background: 'rgba(232,96,48,0.08)', border: '1px solid rgba(232,96,48,0.2)' }}
-          >
+          <div className="rounded-xl p-3 flex items-start gap-3 bg-fx-orange/10 border border-fx-orange/20">
             <TrendingUp size={16} className="text-fx-orange shrink-0 mt-0.5" />
             {fetchingRate ? (
               <div className="flex items-center gap-2">
@@ -719,10 +699,10 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                 <p className="text-[10px] font-bold text-fx-orange uppercase tracking-widest mb-1">
                   AI Rate Suggestion
                   {rateSuggestion.confidence === 'high' && (
-                    <span className="ml-1 text-green-400">● High Confidence</span>
+                    <span className="ml-1 text-fx-text">● High Confidence</span>
                   )}
                   {rateSuggestion.confidence === 'medium' && (
-                    <span className="ml-1 text-yellow-400">● Medium</span>
+                    <span className="ml-1 text-fx-text-muted">● Medium</span>
                   )}
                   {rateSuggestion.confidence === 'low' && (
                     <span className="ml-1 text-fx-text-dim">● Low Data</span>
@@ -756,12 +736,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                         key={i}
                         type="button"
                         onClick={() => set('rateUsd', String(total))}
-                        className="flex-1 text-[10px] font-bold rounded-lg py-1.5 transition-colors"
-                        style={{
-                          background: 'rgba(232,96,48,0.12)',
-                          border: '1px solid rgba(232,96,48,0.25)',
-                          color: '#E86030',
-                        }}
+                        className="flex-1 text-[10px] font-bold rounded-lg py-1.5 transition-colors bg-fx-orange/10 border border-fx-orange/25 text-fx-orange"
                       >
                         {label} · ${total.toLocaleString()}
                       </button>
@@ -806,19 +781,26 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
               const borderColor = isLow
                 ? 'border-fx-danger'
                 : isFair
-                  ? 'border-fx-warning'
-                  : 'border-fx-success';
+                  ? 'border-fx-border'
+                  : 'border-fx-border-2';
               const textColor = isLow
                 ? 'text-fx-danger'
                 : isFair
-                  ? 'text-fx-warning'
-                  : 'text-fx-success';
+                  ? 'text-fx-text-muted'
+                  : 'text-fx-text';
               return (
                 <div
                   className={`mt-2 px-3 py-2 rounded-ios-xs border ${borderColor} bg-fx-surface-2`}
                 >
                   <p className={`text-[11px] font-semibold ${textColor}`}>
-                    {isLow && '⚠ Low Rate Alert — '}
+                    {isLow && (
+                      <>
+                        <span className="inline-flex items-center gap-1 align-bottom">
+                          <AlertTriangle size={11} strokeWidth={2.25} aria-hidden="true" />
+                          Low Rate Alert —
+                        </span>{' '}
+                      </>
+                    )}
                     {isGood ? 'Above' : isFair ? 'At' : 'Below'} market avg (${marketAvg.toFixed(2)}
                     /mi)
                     {' · '}
@@ -834,8 +816,8 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         <div
           className="flex gap-6 rounded-xl p-4"
           style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            background: 'var(--fx-surface)',
+            border: '1px solid var(--fx-border)',
           }}
         >
           <label className="flex items-center gap-2.5 cursor-pointer">
@@ -843,7 +825,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
               type="checkbox"
               checked={form.hazmat}
               onChange={(e) => set('hazmat', e.target.checked)}
-              className="w-4 h-4 accent-orange-500 rounded"
+              className="w-4 h-4 accent-fx-orange rounded"
             />
             <span className="text-sm font-semibold text-fx-text-muted">HAZMAT</span>
           </label>
@@ -852,7 +834,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
               type="checkbox"
               checked={form.tempControlled}
               onChange={(e) => set('tempControlled', e.target.checked)}
-              className="w-4 h-4 accent-orange-500 rounded"
+              className="w-4 h-4 accent-fx-orange rounded"
             />
             <span className="text-sm font-semibold text-fx-text-muted">Temp Controlled</span>
           </label>
@@ -899,7 +881,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                   className={`flex-1 h-9 rounded-lg text-xs font-semibold border transition-colors ${
                     selected
                       ? 'bg-fx-orange/10 border-fx-orange/40 text-fx-orange'
-                      : 'bg-zinc-800 border-zinc-700 text-fx-text-dim hover:border-zinc-600'
+                      : 'bg-fx-surface-2 border-fx-border text-fx-text-dim hover:border-fx-border-2'
                   }`}
                 >
                   {labels[opt]}
@@ -924,20 +906,11 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                     key={m.user_id}
                     type="button"
                     onClick={() => set('assigneeId', selected ? null : m.user_id)}
-                    className="px-3 py-2 rounded-xl text-[12px] font-semibold transition-all"
-                    style={
+                    className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all border ${
                       selected
-                        ? {
-                            background: 'rgba(232,96,48,0.18)',
-                            border: '1px solid rgba(232,96,48,0.6)',
-                            color: '#E86030',
-                          }
-                        : {
-                            background: '#111',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            color: 'rgba(255,255,255,0.5)',
-                          }
-                    }
+                        ? 'bg-fx-orange/15 border-fx-orange/60 text-fx-orange'
+                        : 'bg-fx-surface-2 border-fx-border text-fx-text-muted'
+                    }`}
                   >
                     {label}
                   </button>
@@ -1169,7 +1142,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
                     type="checkbox"
                     checked={form.stackable}
                     onChange={(e) => set('stackable', e.target.checked)}
-                    className="w-4 h-4 accent-orange-500 rounded"
+                    className="w-4 h-4 accent-fx-orange rounded"
                   />
                   <span className="text-sm font-semibold text-fx-text-muted">Stackable</span>
                 </label>
@@ -1267,7 +1240,7 @@ export function PostLoadSheet({ open, onClose, onCreated }: PostLoadSheetProps) 
         </div>
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-3">{error}</p>
+          <p className="text-sm text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3">{error}</p>
         )}
 
         <Button

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Circle, MapContainer, Marker, Polyline, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Truck } from 'lucide-react';
 import {
   KEYLESS_TILE_CREDIT,
   KEYLESS_TILE_MAX_NATIVE_ZOOM,
@@ -149,7 +150,7 @@ export function LeafletRouteMap({
   className,
 }: LeafletRouteMapProps) {
   const [map, setMap] = useState<L.Map | null>(null);
-  const originIcon = useMemo(() => pinIcon('#22c55e'), []);
+  const originIcon = useMemo(() => pinIcon('#8E8E93'), []);
   const destIcon = useMemo(() => pinIcon(MAP_ORANGE), []);
   const truckIcon = useMemo(() => driverIcon(heading, inTransit), [heading, inTransit]);
   const replayIcon = useMemo(() => driverIcon(null, true), []);
@@ -233,7 +234,7 @@ export function LeafletRouteMap({
             cursor: 'pointer',
           }}
         >
-          <span style={{ fontSize: 13 }}>🚛</span>
+          <Truck size={13} strokeWidth={2.25} className="text-fx-orange" aria-hidden="true" />
           <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>
             FIND DRIVER
           </span>
@@ -296,8 +297,8 @@ export function LeafletRouteMap({
               width: 7,
               height: 7,
               borderRadius: '50%',
-              background: '#22c55e',
-              boxShadow: '0 0 6px #22c55e',
+              background: 'var(--fx-success)',
+              boxShadow: '0 0 6px var(--fx-success)',
               display: 'inline-block',
               animation: 'pulse 1.4s ease-in-out infinite',
             }}

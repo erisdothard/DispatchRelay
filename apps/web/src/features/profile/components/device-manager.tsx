@@ -59,7 +59,7 @@ export function DeviceManager() {
             <button
               onClick={() => removeMutation.mutate(device.id)}
               disabled={removeMutation.isPending}
-              className="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-40"
+              className="w-7 h-7 rounded-lg bg-fx-danger-dim border border-fx-danger-dim flex items-center justify-center text-fx-danger hover:bg-fx-danger hover:text-white transition-colors disabled:opacity-40"
             >
               <Trash2 size={12} />
             </button>

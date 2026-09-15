@@ -130,10 +130,10 @@ export default function AdminDashboard() {
   }, []);
 
   const roleColor: Record<string, string> = {
-    carrier: 'text-fx-orange',
-    broker: 'text-blue-400',
-    shipper: 'text-emerald-400',
-    admin: 'text-purple-400',
+    carrier: 'text-fx-text-muted',
+    broker: 'text-fx-text-muted',
+    shipper: 'text-fx-text-muted',
+    admin: 'text-fx-text-muted',
   };
 
   return (
@@ -164,21 +164,21 @@ export default function AdminDashboard() {
                 value={stats?.totalCompanies ?? 0}
                 trend="up"
                 trendValue=""
-                icon={<Building2 size={18} className="text-blue-400" />}
+                icon={<Building2 size={18} className="text-fx-text-muted" />}
               />
               <StatCard
                 label="Total Loads"
                 value={stats?.totalLoads ?? 0}
                 trend="up"
                 trendValue=""
-                icon={<Package size={18} className="text-emerald-400" />}
+                icon={<Package size={18} className="text-fx-text-muted" />}
               />
               <StatCard
                 label="Trucks Posted"
                 value={stats?.totalTrucks ?? 0}
                 trend="up"
                 trendValue=""
-                icon={<Truck size={18} className="text-amber-400" />}
+                icon={<Truck size={18} className="text-fx-text-muted" />}
               />
             </div>
           </section>
@@ -191,21 +191,21 @@ export default function AdminDashboard() {
             <div className="bg-fx-surface rounded-2xl divide-y divide-fx-border">
               <div className="flex items-center justify-between px-4 py-3">
                 <div className="flex items-center gap-2.5">
-                  <TrendingUp size={16} className="text-emerald-400" />
+                  <TrendingUp size={16} className="text-fx-text-muted" />
                   <span className="text-sm text-fx-text">Active Loads</span>
                 </div>
                 <span className="text-sm font-semibold text-fx-text">{stats?.activeLoads}</span>
               </div>
               <div className="flex items-center justify-between px-4 py-3">
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle size={16} className="text-blue-400" />
+                  <CheckCircle size={16} className="text-fx-success" />
                   <span className="text-sm text-fx-text">Completed</span>
                 </div>
                 <span className="text-sm font-semibold text-fx-text">{stats?.completedLoads}</span>
               </div>
               <div className="flex items-center justify-between px-4 py-3">
                 <div className="flex items-center gap-2.5">
-                  <Clock size={16} className="text-amber-400" />
+                  <Clock size={16} className="text-fx-text-muted" />
                   <span className="text-sm text-fx-text">Pending Verifications</span>
                 </div>
                 <span className="text-sm font-semibold text-fx-text">
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
                       {v.mc_number && <p className="text-xs text-fx-text-dim">MC# {v.mc_number}</p>}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <AlertCircle size={14} className="text-amber-400" />
+                      <AlertCircle size={14} className="text-fx-text-dim" />
                       <Badge variant="orange" size="sm">
                         Pending
                       </Badge>
@@ -282,29 +282,29 @@ export default function AdminDashboard() {
                 onClick={() => navigate('/admin/audit-log')}
                 className="flex items-center gap-3 px-4 py-3.5 w-full text-left"
               >
-                <FileText size={16} className="text-purple-400" />
+                <FileText size={16} className="text-fx-text-muted" />
                 <span className="text-sm text-fx-text">Audit Log</span>
               </button>
               <button
                 onClick={() => navigate('/admin/factoring-risk')}
                 className="flex items-center gap-3 px-4 py-3.5 w-full text-left"
               >
-                <AlertCircle size={16} className="text-amber-400" />
+                <AlertCircle size={16} className="text-fx-text-muted" />
                 <span className="text-sm text-fx-text">Factoring Risk</span>
               </button>
               <button
                 onClick={() => navigate('/admin/notifications')}
                 className="flex items-center gap-3 px-4 py-3.5 w-full text-left"
               >
-                <CheckCircle size={16} className="text-emerald-400" />
+                <CheckCircle size={16} className="text-fx-text-muted" />
                 <span className="text-sm text-fx-text">Notification Health</span>
               </button>
               <button
                 onClick={() => void signOut()}
                 className="flex items-center gap-3 px-4 py-3.5 w-full text-left"
               >
-                <LogOut size={16} className="text-red-400" />
-                <span className="text-sm text-red-400">Sign Out</span>
+                <LogOut size={16} className="text-fx-danger" />
+                <span className="text-sm text-fx-danger">Sign Out</span>
               </button>
             </div>
           </section>

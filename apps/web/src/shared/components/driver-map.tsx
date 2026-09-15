@@ -23,7 +23,7 @@ export interface DriverPin {
   latitude: number;
   longitude: number;
   heading: number | null;
-  /** On an in-transit load (orange) vs. sharing GPS off-load (blue). */
+  /** On an in-transit load (orange) vs. sharing GPS off-load (neutral grey). */
   onLoad: boolean;
 }
 
@@ -46,7 +46,7 @@ function initialsOf(name: string): string {
     .toUpperCase();
 }
 
-const pinColor = (onLoad: boolean) => (onLoad ? '#e86030' : '#3b82f6');
+const pinColor = (onLoad: boolean) => (onLoad ? '#e86030' : '#8E8E93');
 
 function bounds(pins: DriverPin[]) {
   const lats = pins.map((p) => p.latitude);

@@ -5,6 +5,7 @@ import type { IncidentType, IncidentSeverity } from '@/services/driver-incidents
 import { getDriverLoads } from '@/services/loads.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { isDemoActive } from '@/lib/demo/demo-session';
+import { INCIDENT_TYPE_ICONS } from '@/features/driver/lib/incident-type-icons';
 import type { Load } from '@dispatchrelay/shared';
 
 interface IncidentFormProps {
@@ -13,24 +14,24 @@ interface IncidentFormProps {
   onCreated: () => void;
 }
 
-const INCIDENT_TYPES: { value: IncidentType; label: string; emoji: string }[] = [
-  { value: 'tire', label: 'Tire Issue', emoji: '🛞' },
-  { value: 'engine', label: 'Engine / Mechanical', emoji: '⚙️' },
-  { value: 'brake', label: 'Brakes', emoji: '🛑' },
-  { value: 'lights', label: 'Lights / Electrical', emoji: '💡' },
-  { value: 'body_damage', label: 'Body Damage', emoji: '🚛' },
-  { value: 'accident', label: 'Accident', emoji: '⚠️' },
-  { value: 'driver_illness', label: 'Driver Illness', emoji: '🏥' },
-  { value: 'cargo', label: 'Cargo Issue', emoji: '📦' },
-  { value: 'fuel', label: 'Fuel / DEF', emoji: '⛽' },
-  { value: 'other', label: 'Other', emoji: '📝' },
+const INCIDENT_TYPES: { value: IncidentType; label: string }[] = [
+  { value: 'tire', label: 'Tire Issue' },
+  { value: 'engine', label: 'Engine / Mechanical' },
+  { value: 'brake', label: 'Brakes' },
+  { value: 'lights', label: 'Lights / Electrical' },
+  { value: 'body_damage', label: 'Body Damage' },
+  { value: 'accident', label: 'Accident' },
+  { value: 'driver_illness', label: 'Driver Illness' },
+  { value: 'cargo', label: 'Cargo Issue' },
+  { value: 'fuel', label: 'Fuel / DEF' },
+  { value: 'other', label: 'Other' },
 ];
 
 const SEVERITIES: { value: IncidentSeverity; label: string; color: string }[] = [
-  { value: 'minor', label: 'Minor', color: '#4ade80' },
-  { value: 'moderate', label: 'Moderate', color: '#facc15' },
-  { value: 'severe', label: 'Severe', color: '#fb923c' },
-  { value: 'critical', label: 'Critical', color: '#f87171' },
+  { value: 'minor', label: 'Minor', color: 'var(--fx-text-muted)' },
+  { value: 'moderate', label: 'Moderate', color: '#E86030' },
+  { value: 'severe', label: 'Severe', color: 'var(--fx-danger)' },
+  { value: 'critical', label: 'Critical', color: 'var(--fx-danger)' },
 ];
 
 export function IncidentForm({ open, onClose, onCreated }: IncidentFormProps) {
@@ -158,6 +159,7 @@ export function IncidentForm({ open, onClose, onCreated }: IncidentFormProps) {
             <div className="grid grid-cols-2 gap-2">
               {INCIDENT_TYPES.map((t) => {
                 const selected = incidentType === t.value;
+                const Icon = INCIDENT_TYPE_ICONS[t.value];
                 return (
                   <button
                     key={t.value}
@@ -172,13 +174,13 @@ export function IncidentForm({ open, onClose, onCreated }: IncidentFormProps) {
                             color: '#E86030',
                           }
                         : {
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.08)',
+                            background: 'var(--fx-surface-2)',
+                            border: '1px solid var(--fx-border)',
                             color: 'rgba(255,255,255,0.55)',
                           }
                     }
                   >
-                    <span>{t.emoji}</span>
+                    <Icon size={16} aria-hidden="true" className="shrink-0" />
                     <span>{t.label}</span>
                   </button>
                 );
@@ -203,14 +205,14 @@ export function IncidentForm({ open, onClose, onCreated }: IncidentFormProps) {
                     style={
                       selected
                         ? {
-                            background: `${s.color}20`,
-                            border: `1px solid ${s.color}60`,
+                            background: `color-mix(in srgb, ${s.color} 12%, transparent)`,
+                            border: `1px solid color-mix(in srgb, ${s.color} 38%, transparent)`,
                             color: s.color,
                           }
                         : {
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            color: 'rgba(255,255,255,0.4)',
+                            background: 'var(--fx-surface-2)',
+                            border: '1px solid var(--fx-border)',
+                            color: 'var(--fx-text-dim)',
                           }
                     }
                   >
@@ -269,9 +271,9 @@ export function IncidentForm({ open, onClose, onCreated }: IncidentFormProps) {
                           color: '#E86030',
                         }
                       : {
-                          background: 'rgba(255,255,255,0.04)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          color: 'rgba(255,255,255,0.4)',
+                          background: 'var(--fx-surface-2)',
+                          border: '1px solid var(--fx-border)',
+                          color: 'var(--fx-text-dim)',
                         }
                   }
                 >
@@ -291,9 +293,9 @@ export function IncidentForm({ open, onClose, onCreated }: IncidentFormProps) {
                             color: '#E86030',
                           }
                         : {
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            color: 'rgba(255,255,255,0.4)',
+                            background: 'var(--fx-surface-2)',
+                            border: '1px solid var(--fx-border)',
+                            color: 'var(--fx-text-dim)',
                           }
                     }
                   >
@@ -375,7 +377,7 @@ export function IncidentForm({ open, onClose, onCreated }: IncidentFormProps) {
           </div>
 
           {error && (
-            <p className="text-sm text-red-400 bg-red-400/10 rounded-xl px-3 py-2">{error}</p>
+            <p className="text-sm text-fx-danger bg-fx-danger-dim rounded-xl px-3 py-2">{error}</p>
           )}
 
           <div className="flex gap-3">

@@ -43,42 +43,21 @@ export function BrokerCreditBadge({ companyId, inline = true }: BrokerCreditBadg
 
   if (!metrics) return null;
 
-  const daysColor =
-    metrics.avg_days_to_pay <= 14
-      ? 'text-green-400'
-      : metrics.avg_days_to_pay <= 30
-        ? 'text-yellow-400'
-        : 'text-red-400';
+  // Neutral unless it's a problem: slow payers (> 30d) and poor on-time (< 70%) go danger.
+  const daysColor = metrics.avg_days_to_pay <= 30 ? 'text-fx-text' : 'text-fx-danger';
 
-  const onTimeColor =
-    metrics.on_time_pct >= 90
-      ? 'text-green-400'
-      : metrics.on_time_pct >= 70
-        ? 'text-yellow-400'
-        : 'text-red-400';
+  const onTimeColor = metrics.on_time_pct >= 70 ? 'text-fx-text' : 'text-fx-danger';
 
   if (inline) {
     return (
       <div className="flex items-center gap-2">
-        <div
-          className="flex items-center gap-1.5 rounded-full px-2.5 py-1"
-          style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
+        <div className="flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-fx-surface-2 border border-fx-border">
           <Clock size={11} className={daysColor} />
           <span className={`text-[11px] font-bold ${daysColor}`}>
             Pays ~{Math.round(metrics.avg_days_to_pay)}d
           </span>
         </div>
-        <div
-          className="flex items-center gap-1.5 rounded-full px-2.5 py-1"
-          style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
+        <div className="flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-fx-surface-2 border border-fx-border">
           <TrendingUp size={11} className={onTimeColor} />
           <span className={`text-[11px] font-bold ${onTimeColor}`}>
             {Math.round(metrics.on_time_pct)}% on-time
@@ -89,10 +68,7 @@ export function BrokerCreditBadge({ companyId, inline = true }: BrokerCreditBadg
   }
 
   return (
-    <div
-      className="rounded-xl p-3 space-y-2"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-    >
+    <div className="rounded-xl p-3 space-y-2 bg-fx-surface-2 border border-fx-border">
       <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest">
         Broker Payment History
       </p>

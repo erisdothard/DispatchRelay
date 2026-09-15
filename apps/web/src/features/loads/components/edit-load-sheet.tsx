@@ -184,7 +184,7 @@ export function EditLoadSheet({ load, onClose, onUpdated }: EditLoadSheetProps) 
   if (!load || !canEdit) return null;
 
   const fieldClass =
-    'w-full h-12 bg-[#111] border border-fx-border rounded-xl text-fx-text text-sm font-medium px-4 focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all duration-200';
+    'w-full h-12 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm font-medium px-4 focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all duration-200';
 
   return (
     <BottomSheet open={!!load} onClose={onClose} title="Edit Load">
@@ -483,7 +483,7 @@ export function EditLoadSheet({ load, onClose, onUpdated }: EditLoadSheetProps) 
               type="checkbox"
               checked={hazmat}
               onChange={(e) => setHazmat(e.target.checked)}
-              className="w-4 h-4 accent-orange-500 rounded"
+              className="w-4 h-4 accent-fx-orange rounded"
             />
             <span className="text-sm font-semibold text-fx-text-muted">HAZMAT</span>
           </label>
@@ -492,7 +492,7 @@ export function EditLoadSheet({ load, onClose, onUpdated }: EditLoadSheetProps) 
               type="checkbox"
               checked={tempControlled}
               onChange={(e) => setTempControlled(e.target.checked)}
-              className="w-4 h-4 accent-orange-500 rounded"
+              className="w-4 h-4 accent-fx-orange rounded"
             />
             <span className="text-sm font-semibold text-fx-text-muted">Temp Controlled</span>
           </label>
@@ -537,7 +537,7 @@ export function EditLoadSheet({ load, onClose, onUpdated }: EditLoadSheetProps) 
         )}
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-3">{error}</p>
+          <p className="text-sm text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3">{error}</p>
         )}
 
         <Button

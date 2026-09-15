@@ -76,9 +76,9 @@ export function FactoringSheet({
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Zap size={18} className="text-fx-orange" />
-              <h2 className="text-[17px] font-bold text-white">QuickPay / Factoring</h2>
+              <h2 className="text-[17px] font-bold text-fx-text">QuickPay / Factoring</h2>
             </div>
-            <button onClick={onClose} className="p-1 text-fx-text-dim hover:text-white">
+            <button onClick={onClose} className="p-1 text-fx-text-dim hover:text-fx-text">
               <X size={20} />
             </button>
           </div>
@@ -87,11 +87,11 @@ export function FactoringSheet({
           <div className="bg-fx-surface-2 rounded-ios-xs p-4 mb-5">
             <div className="flex justify-between items-center mb-1">
               <span className="text-[12px] text-fx-text-dim uppercase tracking-wider">Load</span>
-              <span className="text-[13px] font-bold text-white">{loadNumber}</span>
+              <span className="text-[13px] font-bold text-fx-text">{loadNumber}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-[12px] text-fx-text-dim uppercase tracking-wider">Invoice</span>
-              <span className="text-[20px] font-extrabold text-white">
+              <span className="text-[20px] font-extrabold text-fx-text">
                 ${invoiceAmount.toLocaleString()}
               </span>
             </div>
@@ -117,7 +117,7 @@ export function FactoringSheet({
                   <div
                     className={cn(
                       'text-[18px] font-extrabold',
-                      selectedFee === opt.value ? 'text-fx-orange' : 'text-white',
+                      selectedFee === opt.value ? 'text-fx-orange' : 'text-fx-text',
                     )}
                   >
                     {opt.label}
@@ -132,17 +132,17 @@ export function FactoringSheet({
           <div className="bg-fx-surface-2 rounded-ios-xs p-4 mb-5 space-y-2">
             <div className="flex justify-between text-[13px]">
               <span className="text-fx-text-dim">Invoice amount</span>
-              <span className="text-white">${invoiceAmount.toLocaleString()}</span>
+              <span className="text-fx-text">${invoiceAmount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-[13px]">
               <span className="text-fx-text-dim">Factor fee ({selectedFee}%)</span>
-              <span className="text-red-400">
+              <span className="text-fx-danger">
                 −${feeAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}
               </span>
             </div>
             <div className="border-t border-fx-border pt-2 flex justify-between">
-              <span className="text-[14px] font-bold text-white">You receive</span>
-              <span className="text-[18px] font-extrabold text-emerald-400">
+              <span className="text-[14px] font-bold text-fx-text">You receive</span>
+              <span className="text-[18px] font-extrabold text-fx-success">
                 ${netPayout.toLocaleString(undefined, { maximumFractionDigits: 2 })}
               </span>
             </div>
@@ -164,11 +164,11 @@ export function FactoringSheet({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Any additional information..."
               rows={2}
-              className="w-full bg-fx-surface-2 border border-fx-border rounded-ios-xs px-3 py-2 text-white text-sm resize-none focus:outline-none focus:border-fx-orange"
+              className="w-full bg-fx-surface-2 border border-fx-border rounded-ios-xs px-3 py-2 text-fx-text text-sm resize-none focus:outline-none focus:border-fx-orange"
             />
           </div>
 
-          {error && <p className="text-red-400 text-sm mb-4 text-center">{error}</p>}
+          {error && <p className="text-fx-danger text-sm mb-4 text-center">{error}</p>}
 
           <button
             onClick={() => void handleSubmit()}

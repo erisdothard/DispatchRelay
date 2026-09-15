@@ -66,8 +66,8 @@ export function BidSheet({ open, onClose, load, onBidSubmitted }: BidSheetProps)
     <BottomSheet open={open} onClose={handleClose} title="Submit Bid">
       {success ? (
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <div className="w-16 h-16 rounded-full bg-green-500/15 flex items-center justify-center mb-4">
-            <Zap size={28} className="text-green-400" />
+          <div className="w-16 h-16 rounded-full bg-fx-success-dim flex items-center justify-center mb-4">
+            <Zap size={28} className="text-fx-success" />
           </div>
           <p className="text-lg font-bold text-fx-text">Bid Submitted!</p>
           <p className="text-sm text-fx-text-muted mt-1">The broker will be notified</p>
@@ -123,7 +123,7 @@ export function BidSheet({ open, onClose, load, onBidSubmitted }: BidSheetProps)
             {bidNum > 0 && (
               <p
                 className={`text-xs mt-1.5 font-semibold ${
-                  diff > 5 ? 'text-red-400' : diff < -5 ? 'text-green-400' : 'text-fx-text-muted'
+                  diff > 5 ? 'text-fx-orange' : diff < -5 ? 'text-fx-text' : 'text-fx-text-muted'
                 }`}
               >
                 {diff > 0 ? `+${diff.toFixed(1)}%` : `${diff.toFixed(1)}%`} vs asking rate
@@ -153,7 +153,7 @@ export function BidSheet({ open, onClose, load, onBidSubmitted }: BidSheetProps)
           </div>
 
           {error && (
-            <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-4 py-3">{error}</p>
+            <p className="text-xs text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3">{error}</p>
           )}
 
           <button

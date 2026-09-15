@@ -35,26 +35,30 @@ interface FleetDriver {
   current_load_number: string | null;
 }
 
+// `color` feeds the map pin SVG (a data URI, so it must be a literal hex, not a CSS var);
+// `dot` is the theme-aware token used in the UI. On duty = available, so it keeps the
+// success signal; driving is the one orange; off duty and sleeper are neutral but sit
+// at clearly different lightness steps so they never read as the same status.
 const DUTY_STATUS_CONFIG = {
   on_duty: {
-    color: '#22c55e',
+    color: '#34D399',
+    dot: 'bg-fx-success',
     label: 'On Duty',
-    icon: '🟢',
   },
   driving: {
-    color: '#f97316',
+    color: '#E86030',
+    dot: 'bg-fx-orange',
     label: 'In Transit',
-    icon: '🟠',
   },
   off_duty: {
-    color: '#9ca3af',
+    color: '#9A9A9F',
+    dot: 'bg-fx-text-dim',
     label: 'Off Duty',
-    icon: '⚪',
   },
   sleeper: {
-    color: '#6366f1',
+    color: '#48484A',
+    dot: 'bg-fx-border-2',
     label: 'Sleeper',
-    icon: '🔵',
   },
 } as const;
 
@@ -124,7 +128,9 @@ export default function FleetAvailabilityPage() {
               }`}
             >
               <div className="text-center">
-                <div className="text-2xl mb-1">{DUTY_STATUS_CONFIG[status].icon}</div>
+                <div className="text-2xl mb-1 h-8 flex items-center justify-center">
+                  <span className={`w-3.5 h-3.5 rounded-full ${DUTY_STATUS_CONFIG[status].dot}`} />
+                </div>
                 <p className="text-xl font-bold text-fx-text">{dutySummary[status] || 0}</p>
                 <p className="text-[10px] text-fx-text-dim uppercase font-semibold mt-0.5">
                   {DUTY_STATUS_CONFIG[status].label}
@@ -227,7 +233,11 @@ export default function FleetAvailabilityPage() {
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{DUTY_STATUS_CONFIG[driver.duty_status].icon}</span>
+                  <span className="text-xl w-5 h-7 flex items-center justify-center">
+                    <span
+                      className={`w-3 h-3 rounded-full ${DUTY_STATUS_CONFIG[driver.duty_status].dot}`}
+                    />
+                  </span>
                   <div>
                     <p className="text-sm font-bold text-fx-text">{driver.driver_name}</p>
                     <Badge

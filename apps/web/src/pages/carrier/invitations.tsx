@@ -19,7 +19,7 @@ export default function CarrierInvitationsPage() {
         {loading && <SkeletonList count={3} />}
 
         {error && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-sm text-red-400">
+          <div className="p-4 rounded-xl bg-fx-danger-dim border border-fx-danger-dim text-sm text-fx-danger">
             {error}
           </div>
         )}

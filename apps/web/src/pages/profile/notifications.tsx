@@ -155,7 +155,9 @@ export default function NotificationsPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <div className="text-center mb-6">
-          <div className="text-4xl mb-3">🔔</div>
+          <div className="w-16 h-16 rounded-2xl bg-fx-surface-2 flex items-center justify-center mx-auto mb-3">
+            <Bell size={32} className="text-fx-text-muted" aria-hidden="true" />
+          </div>
           <h1 className="text-xl font-bold text-fx-text">Notification Settings</h1>
           <p className="text-sm text-fx-text-muted mt-1">Choose how you want to be notified</p>
         </div>
@@ -234,7 +236,7 @@ export default function NotificationsPage() {
           onClick={handleSave}
           disabled={saving}
           className={`w-full h-12 rounded-2xl font-semibold transition-all flex items-center justify-center gap-2 ${
-            saved ? 'bg-green-500 text-white' : 'bg-fx-orange text-white hover:opacity-90'
+            saved ? 'bg-fx-success-dim text-fx-success' : 'bg-fx-orange text-white hover:opacity-90'
           }`}
         >
           {saving ? (

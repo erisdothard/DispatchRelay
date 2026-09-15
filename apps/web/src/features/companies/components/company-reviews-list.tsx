@@ -25,20 +25,13 @@ export function CompanyReviewsList({ companyId }: CompanyReviewsListProps) {
   return (
     <div className="space-y-4">
       {reviews.map((review) => (
-        <div
-          key={review.id}
-          className="rounded-xl p-4"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
+        <div key={review.id} className="rounded-xl p-4 bg-fx-surface border border-fx-border">
           <div className="flex items-center gap-2 mb-2">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-4 w-4 ${i < review.overall ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'}`}
+                  className={`h-4 w-4 ${i < review.overall ? 'fill-fx-orange text-fx-orange' : 'text-fx-text-dim'}`}
                 />
               ))}
             </div>

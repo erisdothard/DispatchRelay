@@ -1,5 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  ArrowLeft,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  Wallet,
+  Receipt as ReceiptIcon,
+} from 'lucide-react';
+import { RECEIPT_CATEGORY_ICONS } from '@/features/driver/lib/receipt-category-icons';
+import { INCIDENT_TYPE_ICONS } from '@/features/driver/lib/incident-type-icons';
 import { SkeletonList } from '@/shared/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
@@ -24,14 +33,18 @@ const CATEGORY_LABELS: Record<ReceiptCategory, string> = {
 
 const CATEGORY_COLORS: Record<ReceiptCategory, string> = {
   fuel: '#e86030',
-  maintenance: '#3b82f6',
-  tolls: '#8b5cf6',
-  meals: '#22c55e',
-  lodging: '#f59e0b',
-  parking: '#06b6d4',
-  supplies: '#ec4899',
+  maintenance: '#E86030',
+  tolls: '#E86030',
+  meals: '#E86030',
+  lodging: '#E86030',
+  parking: '#E86030',
+  supplies: '#E86030',
   other: '#6b7280',
 };
+
+// Same glyphs as the category and incident maps, so fuel and tyres read identically app-wide.
+const FuelIcon = RECEIPT_CATEGORY_ICONS.fuel;
+const TireIcon = INCIDENT_TYPE_ICONS.tire;
 
 function getMonthRange(year: number, month: number) {
   const start = `${year}-${String(month + 1).padStart(2, '0')}-01`;
@@ -162,7 +175,7 @@ export default function ExpensesPage() {
                 value={`$${(summary?.totalUsd ?? 0).toFixed(0)}`}
                 trend="flat"
                 trendValue="this month"
-                icon={<span className="text-sm">💰</span>}
+                icon={<Wallet size={14} aria-hidden="true" />}
                 highlight
               />
               <StatCard
@@ -170,21 +183,21 @@ export default function ExpensesPage() {
                 value={`$${(summary?.fuelUsd ?? 0).toFixed(0)}`}
                 trend="flat"
                 trendValue="fuel expenses"
-                icon={<span className="text-sm">⛽</span>}
+                icon={<FuelIcon size={14} aria-hidden="true" />}
               />
               <StatCard
                 label="Receipts"
                 value={String(summary?.receiptCount ?? 0)}
                 trend="flat"
                 trendValue="scanned"
-                icon={<span className="text-sm">🧾</span>}
+                icon={<ReceiptIcon size={14} aria-hidden="true" />}
               />
               <StatCard
                 label="Tire Incidents"
                 value={String(tireCount)}
                 trend="flat"
                 trendValue="all time"
-                icon={<span className="text-sm">🛞</span>}
+                icon={<TireIcon size={14} aria-hidden="true" />}
               />
             </div>
 
@@ -203,9 +216,9 @@ export default function ExpensesPage() {
                           <span className="text-xs font-semibold text-fx-text-dim">
                             {CATEGORY_LABELS[cat as ReceiptCategory] ?? cat}
                           </span>
-                          <span className="text-xs font-bold text-white">${amt.toFixed(2)}</span>
+                          <span className="text-xs font-bold text-fx-text">${amt.toFixed(2)}</span>
                         </div>
-                        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-fx-surface-2 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{
@@ -226,14 +239,14 @@ export default function ExpensesPage() {
                 onClick={() => navigate('/driver/receipts')}
                 className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 transition-all"
               >
-                <span className="text-2xl">🧾</span>
+                <ReceiptIcon size={20} aria-hidden="true" className="text-fx-text-muted" />
                 <span className="text-xs font-semibold text-fx-text-muted">All Receipts</span>
               </button>
               <button
                 onClick={() => navigate('/driver/tire-log')}
                 className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 transition-all"
               >
-                <span className="text-2xl">🛞</span>
+                <TireIcon size={20} aria-hidden="true" className="text-fx-text-muted" />
                 <span className="text-xs font-semibold text-fx-text-muted">Tire Log</span>
               </button>
             </div>

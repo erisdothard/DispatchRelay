@@ -135,9 +135,11 @@ export default function TrackingPage() {
           onClick={() => navigate(-1)}
           className="w-9 h-9 rounded-full bg-fx-surface flex items-center justify-center card-highlight active-scale"
         >
-          <ArrowLeft size={17} className="text-white" strokeWidth={2.5} />
+          <ArrowLeft size={17} className="text-fx-text" strokeWidth={2.5} />
         </button>
-        <p className="text-[17px] font-semibold text-white tracking-[-0.01em]">Tracking Shipment</p>
+        <p className="text-[17px] font-semibold text-fx-text tracking-[-0.01em]">
+          Tracking Shipment
+        </p>
         <button
           onClick={() => load && setMenuOpen(true)}
           className={`w-9 h-9 rounded-full bg-fx-surface flex items-center justify-center card-highlight active-scale ${!load ? 'opacity-40' : ''}`}
@@ -155,7 +157,7 @@ export default function TrackingPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchTracking(query)}
-            className="flex-1 h-12 bg-fx-surface border border-fx-border rounded-ios-xs px-4 text-[14px] text-white placeholder:text-fx-text-dim focus:ring-1 focus:ring-fx-orange/50 outline-none card-highlight"
+            className="flex-1 h-12 bg-fx-surface border border-fx-border rounded-ios-xs px-4 text-[14px] text-fx-text placeholder:text-fx-text-dim focus:ring-1 focus:ring-fx-orange/50 outline-none card-highlight"
           />
           <button
             onClick={() => fetchTracking(query)}
@@ -238,7 +240,7 @@ export default function TrackingPage() {
                       {label}
                     </p>
                     <p
-                      className={`text-[14px] font-semibold tracking-[-0.01em] ${accent ? 'text-fx-orange' : 'text-white'}`}
+                      className={`text-[14px] font-semibold tracking-[-0.01em] ${accent ? 'text-fx-orange' : 'text-fx-text'}`}
                     >
                       {value}
                     </p>
@@ -250,16 +252,16 @@ export default function TrackingPage() {
             {/* Map Section */}
             <div className="bg-fx-surface rounded-ios p-4 card-highlight">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-white">Live Tracking</p>
+                <p className="text-sm font-semibold text-fx-text">Live Tracking</p>
                 {gpsEligible && livePosition && !isStale && (
-                  <span className="text-xs text-green-400 font-medium flex items-center gap-1">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span className="text-xs text-fx-success font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 bg-fx-success rounded-full animate-pulse" />
                     Live {agoLabel && `· ${agoLabel}`}
                   </span>
                 )}
                 {gpsEligible && livePosition && isStale && (
-                  <span className="text-xs text-yellow-400 font-medium flex items-center gap-1">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full" />
+                  <span className="text-xs text-fx-text-muted font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 bg-fx-text-muted rounded-full" />
                     Stale · {agoLabel}
                   </span>
                 )}
@@ -308,8 +310,8 @@ export default function TrackingPage() {
                     }}
                     className={`w-full h-11 rounded-ios-xs flex items-center justify-center gap-2 text-sm font-semibold mb-3 active-scale transition-colors ${
                       gpsSending
-                        ? 'bg-green-500/15 text-green-400 border border-green-500/25'
-                        : 'bg-green-500/15 text-green-400 border border-green-500/25 hover:bg-green-500/25'
+                        ? 'bg-fx-success-dim text-fx-success border border-fx-border'
+                        : 'bg-fx-orange/15 text-fx-orange border border-fx-orange/25 hover:bg-fx-orange/25'
                     }`}
                   >
                     <Radio size={15} />
@@ -333,7 +335,7 @@ export default function TrackingPage() {
                     }}
                     className={`w-full h-11 rounded-ios-xs flex items-center justify-center gap-2 text-sm font-semibold mb-3 active-scale transition-colors ${
                       gpsRequested
-                        ? 'bg-green-500/15 text-green-400 border border-green-500/25'
+                        ? 'bg-fx-surface-2 text-fx-text-muted border border-fx-border'
                         : 'bg-fx-orange/15 text-fx-orange border border-fx-orange/25 hover:bg-fx-orange/25'
                     }`}
                   >
@@ -345,7 +347,7 @@ export default function TrackingPage() {
               {/* Distance info */}
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1">
-                  <MapPin size={12} className="text-green-400" />
+                  <MapPin size={12} className="text-fx-text-dim" />
                   <span className="text-fx-text-dim">
                     Pickup:{' '}
                     {load.pickupDate
@@ -366,7 +368,7 @@ export default function TrackingPage() {
 
               {/* Live GPS telemetry — shown only when real pings are available */}
               {livePosition && (
-                <div className="flex items-center gap-3 mt-2 pt-2 border-t border-white/5 text-[11px] text-fx-text-dim">
+                <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[color:var(--fx-divider)] text-[11px] text-fx-text-dim">
                   {speedKmh != null && (
                     <span className="flex items-center gap-1">
                       <span className="text-fx-orange font-semibold">{speedKmh}</span> km/h
@@ -374,21 +376,22 @@ export default function TrackingPage() {
                   )}
                   {accuracyM != null && (
                     <span className="flex items-center gap-1">
-                      ±<span className="text-white/60 font-semibold">{accuracyM}</span> m accuracy
+                      ±<span className="text-fx-text-muted font-semibold">{accuracyM}</span> m
+                      accuracy
                     </span>
                   )}
-                  <span className="ml-auto text-green-400 font-semibold">GPS</span>
+                  <span className="ml-auto text-fx-success font-semibold">GPS</span>
                 </div>
               )}
 
               {/* Predictive ETA */}
               {eta && (
-                <div className="flex items-center gap-3 mt-2 pt-2 border-t border-white/5">
+                <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[color:var(--fx-divider)]">
                   <div className="flex-1">
                     <p className="text-[11px] text-fx-text-dim uppercase tracking-wide font-medium">
                       ETA
                     </p>
-                    <p className="text-sm font-bold text-white">
+                    <p className="text-sm font-bold text-fx-text">
                       {new Date(eta.estimatedArrival).toLocaleTimeString('en-US', {
                         hour: 'numeric',
                         minute: '2-digit',
@@ -423,10 +426,10 @@ export default function TrackingPage() {
                 className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 card-orange-highlight"
                 style={{ background: 'linear-gradient(145deg, #F07040, #C03A12)' }}
               >
-                <span className="text-sm font-bold text-white">FX</span>
+                <span className="text-sm font-bold text-fx-text">FX</span>
               </div>
               <div className="flex-1">
-                <p className="text-[15px] font-semibold text-white tracking-[-0.01em]">
+                <p className="text-[15px] font-semibold text-fx-text tracking-[-0.01em]">
                   DispatchRelay Support
                 </p>
                 <p className="text-[12px] text-fx-text-dim mt-0.5">Customer Services</p>
@@ -467,7 +470,7 @@ export default function TrackingPage() {
                         year: 'numeric',
                       })}
                     </p>
-                    <p className="text-[15px] font-bold text-white tracking-[-0.01em] mt-0.5">
+                    <p className="text-[15px] font-bold text-fx-text tracking-[-0.01em] mt-0.5">
                       {load.originCity}
                     </p>
                   </div>
@@ -480,7 +483,7 @@ export default function TrackingPage() {
                         year: 'numeric',
                       })}
                     </p>
-                    <p className="text-[15px] font-bold text-white tracking-[-0.01em] mt-0.5">
+                    <p className="text-[15px] font-bold text-fx-text tracking-[-0.01em] mt-0.5">
                       {load.destCity}
                     </p>
                   </div>
@@ -493,9 +496,9 @@ export default function TrackingPage() {
               <div className="bg-fx-surface rounded-ios overflow-hidden card-highlight">
                 <div
                   className="px-5 py-3.5 text-center"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                  style={{ borderBottom: '1px solid var(--fx-divider)' }}
                 >
-                  <p className="text-[14px] font-semibold text-white tracking-[-0.01em]">
+                  <p className="text-[14px] font-semibold text-fx-text tracking-[-0.01em]">
                     Detail Status
                   </p>
                 </div>
@@ -505,13 +508,13 @@ export default function TrackingPage() {
                     className="flex items-start justify-between px-5 py-4"
                     style={
                       i < milestones.length - 1
-                        ? { borderBottom: '1px solid rgba(255,255,255,0.05)' }
+                        ? { borderBottom: '1px solid var(--fx-divider)' }
                         : {}
                     }
                   >
                     <div className="flex-1">
                       <p
-                        className={`text-[14px] font-semibold tracking-[-0.01em] ${m.current ? 'text-fx-orange' : m.completed ? 'text-white' : 'text-fx-text-dim'}`}
+                        className={`text-[14px] font-semibold tracking-[-0.01em] ${m.current ? 'text-fx-orange' : m.completed ? 'text-fx-text' : 'text-fx-text-dim'}`}
                       >
                         {m.label}
                       </p>
@@ -556,11 +559,11 @@ export default function TrackingPage() {
               <p className="text-center text-[13px] text-fx-text-dim font-medium py-2 px-5">
                 {load.loadNumber}
               </p>
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ borderTop: '1px solid var(--fx-divider)' }}>
                 {/* Copy Load # */}
                 <button
-                  className="w-full h-14 flex items-center justify-center text-[16px] font-medium text-white active-scale"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                  className="w-full h-14 flex items-center justify-center text-[16px] font-medium text-fx-text active-scale"
+                  style={{ borderBottom: '1px solid var(--fx-divider)' }}
                   onClick={async () => {
                     await navigator.clipboard.writeText(load.loadNumber);
                     setCopied(true);
@@ -572,8 +575,8 @@ export default function TrackingPage() {
                 </button>
                 {/* Share — creates public tracking token */}
                 <button
-                  className="w-full h-14 flex items-center justify-center text-[16px] font-medium text-white active-scale"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                  className="w-full h-14 flex items-center justify-center text-[16px] font-medium text-fx-text active-scale"
+                  style={{ borderBottom: '1px solid var(--fx-divider)' }}
                   onClick={async () => {
                     try {
                       const token = await createTrackingToken(load.loadNumber, user!.id);
@@ -599,8 +602,8 @@ export default function TrackingPage() {
                 </button>
                 {/* Refresh */}
                 <button
-                  className="w-full h-14 flex items-center justify-center text-[16px] font-medium text-white active-scale"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                  className="w-full h-14 flex items-center justify-center text-[16px] font-medium text-fx-text active-scale"
+                  style={{ borderBottom: '1px solid var(--fx-divider)' }}
                   onClick={() => {
                     setMenuOpen(false);
                     void fetchTracking(load.loadNumber);

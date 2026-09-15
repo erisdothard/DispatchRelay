@@ -2,15 +2,25 @@ import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Truck } from 'lucide-react';
 import { geocodeCity } from '@/lib/geocoding';
 import { KeylessTiles, LeafletAutoResize, MapCredit } from './leaflet-route-map';
 
 // ── Apple-style truck pins with pulse for available trucks ────────────────────
 
+// Leaflet divIcons take an HTML string, so the lucide Truck glyph (v0.469 paths) is inlined here.
+const TRUCK_ICON_SVG =
+  `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" ` +
+  `stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">` +
+  `<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>` +
+  `<path d="M15 18H9"/>` +
+  `<path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>` +
+  `<circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>`;
+
 function makePinIcon(status: string) {
   const isAvailable = status === 'available';
   const isBooked = status === 'booked';
-  const color = isAvailable ? '#22c55e' : isBooked ? '#e86030' : '#6b7280';
+  const color = isAvailable ? '#E86030' : isBooked ? '#AEAEB2' : '#6b7280';
   const pulse = isAvailable
     ? `<div style="position:absolute;inset:0;border-radius:50%;background:${color};` +
       `animation:fx-pulse-ring 2s ease-out infinite;pointer-events:none;z-index:0"></div>`
@@ -24,7 +34,7 @@ function makePinIcon(status: string) {
       `<div style="position:relative;z-index:1;width:26px;height:26px;background:${color};` +
       `border-radius:50%;border:2.5px solid rgba(255,255,255,0.9);` +
       `box-shadow:0 3px 12px rgba(0,0,0,0.5),0 0 0 1px ${color}40;` +
-      `display:flex;align-items:center;justify-content:center;font-size:11px">🚛</div>` +
+      `display:flex;align-items:center;justify-content:center;color:#fff">${TRUCK_ICON_SVG}</div>` +
       `</div>`,
     iconSize: [26, 26],
     iconAnchor: [13, 13],
@@ -152,9 +162,9 @@ export function FleetMap({ trucks, className = 'h-44' }: FleetMapProps) {
                     style={{
                       color:
                         truck.status === 'available'
-                          ? '#22c55e'
+                          ? '#E86030'
                           : truck.status === 'booked'
-                            ? '#e86030'
+                            ? '#D1D1D6'
                             : '#9ca3af',
                     }}
                   >
@@ -185,7 +195,7 @@ export function FleetMap({ trucks, className = 'h-44' }: FleetMapProps) {
           padding: '4px 10px',
         }}
       >
-        <span style={{ fontSize: 13 }}>🚛</span>
+        <Truck size={13} strokeWidth={2.25} color="#fff" aria-hidden="true" />
         <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>
           {pins.length} truck{pins.length !== 1 ? 's' : ''}
         </span>

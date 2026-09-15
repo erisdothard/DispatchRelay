@@ -230,7 +230,14 @@ export default function CarrierLoadsPage() {
               My Loads
               {myAwarded.length + myInProgress.length + myDelivered.length + negotiations.length >
                 0 && (
-                <span className="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                <span
+                  className={cn(
+                    'text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1',
+                    tab === 'my_loads'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-fx-orange/15 text-fx-orange',
+                  )}
+                >
                   {myAwarded.length +
                     myInProgress.length +
                     myDelivered.length +
@@ -249,7 +256,12 @@ export default function CarrierLoadsPage() {
               <Sparkles size={12} />
               Matches
               {topMatches.length > 0 && (
-                <span className="bg-white/20 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                <span
+                  className={cn(
+                    'text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1',
+                    tab === 'matches' ? 'bg-white/20 text-white' : 'bg-fx-orange/15 text-fx-orange',
+                  )}
+                >
                   {topMatches.length}
                 </span>
               )}
@@ -320,7 +332,7 @@ export default function CarrierLoadsPage() {
                 placeholder="Search origin, destination, commodity…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-12 bg-fx-surface border border-fx-border rounded-2xl pl-10 pr-10 text-sm text-white placeholder:text-fx-text-dim focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all"
+                className="w-full h-12 bg-fx-surface border border-fx-border rounded-2xl pl-10 pr-10 text-sm text-fx-text placeholder:text-fx-text-dim focus:border-fx-orange focus:ring-1 focus:ring-fx-orange/30 outline-none transition-all"
               />
               {search && (
                 <button
@@ -471,26 +483,26 @@ export default function CarrierLoadsPage() {
                   {
                     label: 'Bidding',
                     count: negotiations.length,
-                    textColor: 'text-blue-400',
-                    bgClass: 'bg-blue-400/10 border border-blue-400/25',
+                    textColor: 'text-fx-text',
+                    bgClass: 'bg-fx-surface-2 border border-fx-border',
                   },
                   {
                     label: 'Needs Dispatch',
                     count: myAwarded.length,
-                    textColor: 'text-amber-400',
-                    bgClass: 'bg-amber-400/10 border border-amber-400/25',
-                  },
-                  {
-                    label: 'Running',
-                    count: myInProgress.length,
                     textColor: 'text-fx-orange',
                     bgClass: 'bg-fx-orange/10 border border-fx-orange/25',
                   },
                   {
+                    label: 'Running',
+                    count: myInProgress.length,
+                    textColor: 'text-fx-text',
+                    bgClass: 'bg-fx-surface-2 border border-fx-border',
+                  },
+                  {
                     label: 'Delivered',
                     count: myDelivered.length,
-                    textColor: 'text-green-400',
-                    bgClass: 'bg-green-400/10 border border-green-400/25',
+                    textColor: 'text-fx-success',
+                    bgClass: 'bg-fx-success-dim border border-fx-border',
                   },
                 ]
                   .filter((s) => s.count > 0)
@@ -512,8 +524,8 @@ export default function CarrierLoadsPage() {
               {/* Bidding On — one card per negotiation (a broker counter folds into its bid) */}
               {negotiations.length > 0 && (
                 <div className="space-y-3 mb-6">
-                  <div style={{ borderLeft: '3px solid #60A5FA', paddingLeft: '12px' }}>
-                    <p className="text-[17px] font-bold text-blue-400 leading-tight">Bidding On</p>
+                  <div style={{ borderLeft: '3px solid var(--fx-border-2)', paddingLeft: '12px' }}>
+                    <p className="text-[17px] font-bold text-fx-text leading-tight">Bidding On</p>
                     <p className="text-[11px] text-fx-text-dim mt-0.5">
                       Open negotiations with brokers
                     </p>
@@ -532,9 +544,9 @@ export default function CarrierLoadsPage() {
               {/* Needs Dispatch */}
               {myAwarded.length > 0 && (
                 <div className="space-y-3 mb-6">
-                  <div style={{ borderLeft: '3px solid #F59E0B', paddingLeft: '12px' }}>
+                  <div style={{ borderLeft: '3px solid #E86030', paddingLeft: '12px' }}>
                     <div className="flex items-center gap-2">
-                      <p className="text-[17px] font-bold text-amber-400 leading-tight">
+                      <p className="text-[17px] font-bold text-fx-orange leading-tight">
                         Needs Dispatch
                       </p>
                       <RivePulse className="w-4 h-4" />
@@ -557,10 +569,8 @@ export default function CarrierLoadsPage() {
               {/* In Progress */}
               {myInProgress.length > 0 && (
                 <div className="space-y-3 mb-6">
-                  <div style={{ borderLeft: '3px solid #E86030', paddingLeft: '12px' }}>
-                    <p className="text-[17px] font-bold text-fx-orange leading-tight">
-                      In Progress
-                    </p>
+                  <div style={{ borderLeft: '3px solid var(--fx-border-2)', paddingLeft: '12px' }}>
+                    <p className="text-[17px] font-bold text-fx-text leading-tight">In Progress</p>
                     <p className="text-[11px] text-fx-text-dim mt-0.5">
                       Truck is running — tap to monitor
                     </p>
@@ -579,8 +589,8 @@ export default function CarrierLoadsPage() {
               {/* Pending Close-Out */}
               {myDelivered.length > 0 && (
                 <div className="space-y-3 mb-6">
-                  <div style={{ borderLeft: '3px solid #4ADE80', paddingLeft: '12px' }}>
-                    <p className="text-[17px] font-bold text-green-400 leading-tight">
+                  <div style={{ borderLeft: '3px solid var(--fx-border-2)', paddingLeft: '12px' }}>
+                    <p className="text-[17px] font-bold text-fx-text leading-tight">
                       Pending Close-Out
                     </p>
                     <p className="text-[11px] text-fx-text-dim mt-0.5">

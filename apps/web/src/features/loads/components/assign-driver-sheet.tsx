@@ -113,13 +113,13 @@ export function AssignDriverSheet({ open, onClose, load, onAssigned }: AssignDri
 
         {/* Current co-driver — removable */}
         {mode === 'co-driver' && load.secondDriverId && (
-          <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/20 rounded-2xl">
-            <Users size={16} className="text-green-400 shrink-0" />
-            <p className="text-xs font-semibold text-green-400 flex-1">Co-driver assigned</p>
+          <div className="flex items-center gap-3 p-3 bg-fx-surface-2 border border-fx-border rounded-2xl">
+            <Users size={16} className="text-fx-success shrink-0" />
+            <p className="text-xs font-semibold text-fx-text flex-1">Co-driver assigned</p>
             <button
               onClick={handleRemoveCoDriver}
               disabled={assigning !== null}
-              className="w-7 h-7 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center hover:bg-red-500/20"
+              className="w-7 h-7 rounded-lg bg-fx-surface-3 text-fx-text-muted flex items-center justify-center hover:bg-fx-danger-dim hover:text-fx-danger"
             >
               <X size={13} />
             </button>
@@ -127,7 +127,9 @@ export function AssignDriverSheet({ open, onClose, load, onAssigned }: AssignDri
         )}
 
         {error && (
-          <p className="text-[13px] text-red-400 bg-red-500/10 rounded-xl px-4 py-3">{error}</p>
+          <p className="text-[13px] text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3">
+            {error}
+          </p>
         )}
 
         {loading ? (
@@ -157,14 +159,16 @@ export function AssignDriverSheet({ open, onClose, load, onAssigned }: AssignDri
                   <UserCheck size={18} className="text-fx-orange" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-semibold text-white">{driver.fullName}</p>
+                  <p className="text-sm font-semibold text-fx-text">{driver.fullName}</p>
                   <p className="text-xs text-fx-text-muted">{driver.email}</p>
                 </div>
                 {assigning === driver.id && (
                   <Loader2 size={18} className="text-fx-orange animate-spin" />
                 )}
-                {isPrimary && <span className="text-xs font-bold text-green-400">Primary</span>}
-                {isCoDriver && <span className="text-xs font-bold text-blue-400">Co-Driver</span>}
+                {isPrimary && <span className="text-xs font-bold text-fx-text">Primary</span>}
+                {isCoDriver && (
+                  <span className="text-xs font-bold text-fx-text-muted">Co-Driver</span>
+                )}
               </button>
             );
           })

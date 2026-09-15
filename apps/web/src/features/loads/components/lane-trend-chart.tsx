@@ -39,7 +39,7 @@ export function LaneTrendChart({ data, height = 40, className }: LaneTrendChartP
   const lastRate = rates[rates.length - 1];
   const firstRate = rates[0];
   const trend = lastRate - firstRate;
-  const color = trend >= 0 ? '#34d399' : '#f87171'; // green / red
+  const color = trend >= 0 ? '#E86030' : '#8E8E93'; // fx-orange when rising, neutral grey when falling
 
   return (
     <div className={className}>

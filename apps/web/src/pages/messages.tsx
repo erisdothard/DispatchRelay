@@ -529,17 +529,17 @@ export default function MessagesPage() {
                       className={cn(
                         'rounded-2xl px-4 py-2.5 transition-all',
                         mine
-                          ? 'bg-fx-orange text-white rounded-br-sm'
+                          ? 'bg-fx-orange-deep text-white rounded-br-sm'
                           : 'bg-fx-surface border border-fx-border text-fx-text rounded-bl-sm',
                         msg.sender_id === user?.id && 'cursor-pointer',
-                        isSelected && 'ring-2 ring-red-400/50',
+                        isSelected && 'ring-2 ring-fx-danger',
                       )}
                     >
                       <p className="text-sm leading-snug">{msg.text}</p>
                       <p
                         className={cn(
                           'text-[10px] mt-1',
-                          mine ? 'text-white/60 text-right' : 'text-fx-text-dim',
+                          mine ? 'text-white text-right' : 'text-fx-text-dim',
                         )}
                       >
                         {new Date(msg.created_at).toLocaleTimeString('en-US', {
@@ -552,7 +552,7 @@ export default function MessagesPage() {
                       <button
                         onClick={() => handleDelete(msg.id)}
                         disabled={deleting}
-                        className="absolute -top-3 right-0 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                        className="absolute -top-3 right-0 w-7 h-7 bg-fx-danger rounded-full flex items-center justify-center shadow-lg hover:brightness-110 transition-colors disabled:opacity-50"
                       >
                         <Trash2 size={13} className="text-white" />
                       </button>

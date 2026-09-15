@@ -44,7 +44,7 @@ export function BidButtonAnimated({
           !disabled &&
           'bg-fx-orange text-white hover:bg-fx-orange/90 shadow-lg shadow-fx-orange/20',
         state === 'loading' && 'bg-fx-orange/70 text-white cursor-wait',
-        state === 'success' && 'bg-green-500 text-white',
+        state === 'success' && 'bg-fx-success-dim text-fx-success',
         disabled && 'bg-fx-surface-2 text-fx-text-dim cursor-not-allowed border border-fx-border',
         className,
       )}

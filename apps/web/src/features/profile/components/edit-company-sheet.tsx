@@ -4,7 +4,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { updateCompany, uploadCompanyLogo } from '@/services/companies.service';
-import { Camera } from 'lucide-react';
+import { Camera, Check } from 'lucide-react';
 
 interface EditCompanySheetProps {
   open: boolean;
@@ -335,12 +335,13 @@ export function EditCompanySheet({ open, onClose }: EditCompanySheetProps) {
         </div>
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-3">{error}</p>
+          <p className="text-sm text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3">{error}</p>
         )}
 
         {success && !uploading && (
-          <p className="text-sm text-green-400 bg-green-400/10 rounded-xl px-4 py-3 text-center font-semibold">
-            ✓ Saved! All team members will see this change.
+          <p className="flex items-center justify-center gap-1.5 text-sm text-fx-success bg-fx-surface-2 rounded-xl px-4 py-3 text-center font-semibold">
+            <Check size={14} strokeWidth={2.5} className="shrink-0" aria-hidden="true" />
+            Saved! All team members will see this change.
           </p>
         )}
 

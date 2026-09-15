@@ -176,7 +176,7 @@ export default function FleetHeatmapPage() {
             </div>
           </div>
           <div className="bg-fx-surface border border-fx-border rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-green-400">
+            <div className="text-2xl font-bold text-fx-text">
               {loading ? '—' : stats.coverage_miles.toLocaleString()}
             </div>
             <div className="text-[10px] text-fx-text-muted uppercase font-semibold mt-1">
@@ -227,11 +227,12 @@ export default function FleetHeatmapPage() {
                 blur={25}
                 max={1.0}
                 gradient={{
-                  0.0: '#0000ff',
-                  0.25: '#00ff00',
-                  0.5: '#ffff00',
-                  0.75: '#ff7f00',
-                  1.0: '#ff0000',
+                  // Single brand-orange ramp (fx-orange #E86030 at the hot end)
+                  0.0: '#FBE3D8',
+                  0.35: '#F4B294',
+                  0.65: '#EE8458',
+                  0.85: '#E86030',
+                  1.0: '#C24A1F',
                 }}
               />
             </MapContainer>
@@ -246,7 +247,7 @@ export default function FleetHeatmapPage() {
         </h2>
         <div className="space-y-2">
           <div className="bg-fx-surface border border-fx-border rounded-xl p-3 flex items-start gap-3">
-            <TrendingUp size={16} className="text-green-400 mt-0.5" />
+            <TrendingUp size={16} className="text-fx-text-muted mt-0.5" />
             <div className="flex-1">
               <p className="text-sm font-semibold text-fx-text">High Activity Zones</p>
               <p className="text-xs text-fx-text-muted mt-0.5">

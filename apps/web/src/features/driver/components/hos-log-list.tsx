@@ -6,10 +6,10 @@ interface Props {
 }
 
 const STATUS_ICONS: Record<DutyStatus, { icon: React.ElementType; color: string }> = {
-  driving: { icon: Truck, color: 'text-emerald-400 bg-emerald-400/10' },
-  on_duty_not_driving: { icon: Clock, color: 'text-blue-400 bg-blue-400/10' },
-  sleeper_berth: { icon: Moon, color: 'text-purple-400 bg-purple-400/10' },
-  off_duty: { icon: Coffee, color: 'text-zinc-400 bg-zinc-400/10' },
+  driving: { icon: Truck, color: 'text-fx-text bg-fx-surface-3' },
+  on_duty_not_driving: { icon: Clock, color: 'text-fx-text bg-fx-surface-3' },
+  sleeper_berth: { icon: Moon, color: 'text-fx-text-muted bg-fx-surface-2' },
+  off_duty: { icon: Coffee, color: 'text-fx-text-muted bg-fx-surface-2' },
 };
 
 const STATUS_LABELS: Record<DutyStatus, string> = {

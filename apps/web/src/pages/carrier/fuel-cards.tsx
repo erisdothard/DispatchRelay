@@ -53,9 +53,9 @@ export default function CarrierFuelCardsPage() {
   });
 
   const STATUS_COLORS: Record<string, string> = {
-    active: 'text-emerald-400 bg-emerald-400/10',
-    frozen: 'text-blue-400 bg-blue-400/10',
-    cancelled: 'text-red-400 bg-red-400/10',
+    active: 'text-fx-success bg-fx-success-dim',
+    frozen: 'text-fx-text-muted bg-fx-surface-2',
+    cancelled: 'text-fx-text-dim bg-fx-surface-2',
   };
 
   return (
@@ -73,7 +73,7 @@ export default function CarrierFuelCardsPage() {
               <p className="text-[10px] font-semibold text-fx-text-muted uppercase mt-0.5">Spent</p>
             </div>
             <div className="p-3 text-center">
-              <p className="text-lg font-extrabold text-fx-orange">
+              <p className="text-lg font-extrabold text-fx-text">
                 {summary.total_gallons.toLocaleString()}
               </p>
               <p className="text-[10px] font-semibold text-fx-text-muted uppercase mt-0.5">
@@ -81,7 +81,7 @@ export default function CarrierFuelCardsPage() {
               </p>
             </div>
             <div className="p-3 text-center">
-              <p className="text-lg font-extrabold text-emerald-400">
+              <p className="text-lg font-extrabold text-fx-text">
                 ${summary.savings_estimate.toLocaleString()}
               </p>
               <p className="text-[10px] font-semibold text-fx-text-muted uppercase mt-0.5">Saved</p>
@@ -137,7 +137,7 @@ export default function CarrierFuelCardsPage() {
                     <button
                       type="button"
                       onClick={() => statusMutation.mutate({ cardId: card.id, status: 'frozen' })}
-                      className="mx-4 mb-3 -mt-2 text-[10px] font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                      className="mx-4 mb-3 -mt-2 text-[10px] font-semibold text-fx-text-muted hover:text-fx-text flex items-center gap-1"
                     >
                       <Snowflake size={10} /> Freeze Card
                     </button>
@@ -146,7 +146,7 @@ export default function CarrierFuelCardsPage() {
                     <button
                       type="button"
                       onClick={() => statusMutation.mutate({ cardId: card.id, status: 'active' })}
-                      className="mx-4 mb-3 -mt-2 text-[10px] font-semibold text-emerald-400 hover:text-emerald-300"
+                      className="mx-4 mb-3 -mt-2 text-[10px] font-semibold text-fx-orange hover:text-fx-orange-hover"
                     >
                       Unfreeze
                     </button>
@@ -168,7 +168,7 @@ export default function CarrierFuelCardsPage() {
                 <div
                   key={tx.id}
                   className="flex items-center gap-3 py-2.5"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                  style={{ borderBottom: '1px solid var(--fx-border)' }}
                 >
                   <div className="w-8 h-8 rounded-lg bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
                     <Fuel size={13} className="text-fx-text-muted" />

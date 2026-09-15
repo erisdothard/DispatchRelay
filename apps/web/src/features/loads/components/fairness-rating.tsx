@@ -8,17 +8,17 @@ const LABEL_STYLES: Record<
   { color: string; bg: string; border: string }
 > = {
   Excellent: {
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-400/10',
-    border: 'border-emerald-400/20',
+    color: 'text-fx-orange',
+    bg: 'bg-fx-orange/15',
+    border: 'border-fx-orange/30',
   },
   'Above Average': {
-    color: 'text-green-400',
-    bg: 'bg-green-400/10',
-    border: 'border-green-400/20',
+    color: 'text-fx-text',
+    bg: 'bg-fx-surface-3',
+    border: 'border-fx-border-2',
   },
-  Fair: { color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20' },
-  'Below Market': { color: 'text-red-400', bg: 'bg-red-400/10', border: 'border-red-400/20' },
+  Fair: { color: 'text-fx-text-muted', bg: 'bg-fx-surface', border: 'border-fx-border' },
+  'Below Market': { color: 'text-fx-danger', bg: 'bg-fx-danger-dim', border: 'border-transparent' },
 };
 
 const CONFIDENCE_LABEL: Record<RateFairness['confidence'], string> = {
@@ -66,18 +66,17 @@ export function FairnessRating({ loadId }: { loadId: string }) {
         </div>
         <div className="h-2 rounded-full bg-fx-surface overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${fairness.percentile}%`,
-              background:
-                fairness.percentile >= 75
-                  ? 'linear-gradient(90deg, #34D399, #10B981)'
-                  : fairness.percentile >= 50
-                    ? 'linear-gradient(90deg, #4ADE80, #22C55E)'
-                    : fairness.percentile >= 25
-                      ? 'linear-gradient(90deg, #FBBF24, #F59E0B)'
-                      : 'linear-gradient(90deg, #F87171, #EF4444)',
-            }}
+            className={cn(
+              'h-full rounded-full transition-all duration-500',
+              fairness.percentile >= 75
+                ? 'bg-fx-orange'
+                : fairness.percentile >= 50
+                  ? 'bg-fx-orange/75'
+                  : fairness.percentile >= 25
+                    ? 'bg-fx-orange/50'
+                    : 'bg-fx-orange/30',
+            )}
+            style={{ width: `${fairness.percentile}%` }}
           />
         </div>
       </div>
@@ -85,7 +84,7 @@ export function FairnessRating({ loadId }: { loadId: string }) {
       {/* Market comparison row */}
       <div
         className="flex items-center gap-0 rounded-lg overflow-hidden"
-        style={{ border: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ border: '1px solid var(--fx-border)' }}
       >
         {[
           { label: 'Min', value: `$${fairness.market_min.toFixed(2)}` },
@@ -96,7 +95,7 @@ export function FairnessRating({ loadId }: { loadId: string }) {
           <div
             key={item.label}
             className={cn('flex-1 text-center py-2', item.label === 'This' && 'bg-fx-surface')}
-            style={i < 3 ? { borderRight: '1px solid rgba(255,255,255,0.06)' } : {}}
+            style={i < 3 ? { borderRight: '1px solid var(--fx-border)' } : {}}
           >
             <p className="text-[9px] font-semibold text-fx-text-dim uppercase">{item.label}</p>
             <p

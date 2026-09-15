@@ -10,17 +10,17 @@ export interface Toast {
 }
 
 const ICONS: Record<ToastVariant, React.ReactNode> = {
-  success: <CheckCircle size={16} className="text-emerald-400 shrink-0" />,
-  error: <AlertCircle size={16} className="text-red-400 shrink-0" />,
-  info: <Info size={16} className="text-blue-400 shrink-0" />,
-  warning: <AlertTriangle size={16} className="text-amber-400 shrink-0" />,
+  success: <CheckCircle size={16} className="text-fx-success shrink-0" />,
+  error: <AlertCircle size={16} className="text-fx-danger shrink-0" />,
+  info: <Info size={16} className="text-fx-text-muted shrink-0" />,
+  warning: <AlertTriangle size={16} className="text-fx-orange shrink-0" />,
 };
 
 const BORDER: Record<ToastVariant, string> = {
-  success: 'border-emerald-500/30',
-  error: 'border-red-500/30',
-  info: 'border-blue-500/30',
-  warning: 'border-amber-500/30',
+  success: 'border-fx-border',
+  error: 'border-fx-danger-dim',
+  info: 'border-fx-border',
+  warning: 'border-fx-orange/30',
 };
 
 interface ToastItemProps {

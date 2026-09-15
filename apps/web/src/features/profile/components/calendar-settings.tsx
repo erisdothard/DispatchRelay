@@ -93,7 +93,7 @@ export function CalendarSettings() {
         <>
           {/* Connected state */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="flex items-center gap-1.5 text-[12px] font-semibold text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full border border-emerald-400/20">
+            <span className="flex items-center gap-1.5 text-[12px] font-semibold text-fx-success bg-fx-success-dim px-2.5 py-1 rounded-full border border-transparent">
               <Check size={10} />
               Connected
             </span>
@@ -105,7 +105,7 @@ export function CalendarSettings() {
           </div>
 
           {justConnected && (
-            <p className="text-[11px] text-emerald-400 mb-3">
+            <p className="text-[11px] text-fx-success mb-3">
               Calendar connected. New load assignments will auto-sync.
             </p>
           )}
@@ -128,7 +128,7 @@ export function CalendarSettings() {
             <button
               onClick={handleDisconnect}
               disabled={disconnecting}
-              className="flex items-center gap-2 h-8 px-3 rounded-lg text-[12px] font-semibold text-red-400 bg-red-400/10 border border-red-400/20 transition-colors hover:bg-red-400/20"
+              className="flex items-center gap-2 h-8 px-3 rounded-lg text-[12px] font-semibold text-fx-danger bg-fx-surface border border-fx-border transition-colors hover:bg-fx-danger-dim"
             >
               <Link2Off size={12} />
               {disconnecting ? 'Disconnecting...' : 'Disconnect'}
@@ -136,7 +136,7 @@ export function CalendarSettings() {
           </div>
 
           {!integration.enabled && (
-            <p className="text-[10px] text-amber-400 mt-2">
+            <p className="text-[10px] text-fx-text-muted mt-2">
               Sync is paused. New assignments won&apos;t create calendar events.
             </p>
           )}
@@ -150,7 +150,7 @@ export function CalendarSettings() {
           </p>
           <button
             onClick={handleConnect}
-            className="flex items-center gap-2 h-9 px-4 rounded-lg text-[13px] font-bold text-white bg-fx-surface border border-fx-border transition-colors hover:border-fx-orange"
+            className="flex items-center gap-2 h-9 px-4 rounded-lg text-[13px] font-bold text-fx-text bg-fx-surface border border-fx-border transition-colors hover:border-fx-orange"
           >
             <svg viewBox="0 0 24 24" width={16} height={16} className="shrink-0">
               <path

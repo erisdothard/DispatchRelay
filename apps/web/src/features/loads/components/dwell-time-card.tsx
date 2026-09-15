@@ -7,16 +7,16 @@ interface DwellTimeCardProps {
 
 function getDwellColor(minutes: number | undefined): string {
   if (!minutes) return 'text-fx-text-dim';
-  if (minutes > 120) return 'text-red-400';
-  if (minutes > 60) return 'text-yellow-400';
-  return 'text-green-400';
+  if (minutes > 120) return 'text-fx-danger';
+  if (minutes > 60) return 'text-fx-orange';
+  return 'text-fx-text';
 }
 
 function getDwellBg(minutes: number | undefined): string {
-  if (!minutes) return 'bg-white/5';
-  if (minutes > 120) return 'bg-red-500/10';
-  if (minutes > 60) return 'bg-yellow-500/10';
-  return 'bg-green-500/10';
+  if (!minutes) return 'bg-fx-surface-2';
+  if (minutes > 120) return 'bg-fx-danger-dim';
+  if (minutes > 60) return 'bg-fx-surface-2';
+  return 'bg-fx-surface-2';
 }
 
 function formatDwell(minutes: number | undefined): string {
@@ -46,13 +46,13 @@ export function DwellTimeCard({ records }: DwellTimeCardProps) {
             className={`flex items-center justify-between p-3 rounded-xl ${getDwellBg(record.dwellMinutes)}`}
           >
             <div>
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-fx-text">
                 {record.label || `${record.stopType === 'pickup' ? 'Pickup' : 'Delivery'}`}
               </p>
               <p className="text-xs text-fx-text-dim mt-0.5">
                 {record.stopType === 'pickup' ? 'Pickup' : 'Delivery'}
                 {record.detentionFlagged && (
-                  <span className="text-red-400 ml-2 font-semibold">DETENTION</span>
+                  <span className="text-fx-danger ml-2 font-semibold">DETENTION</span>
                 )}
               </p>
             </div>

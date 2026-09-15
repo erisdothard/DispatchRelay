@@ -4,7 +4,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Camera } from 'lucide-react';
+import { Camera, Check } from 'lucide-react';
 
 interface EditProfileSheetProps {
   open: boolean;
@@ -25,21 +25,21 @@ const DEFAULT_AVATARS = [
   svgUri(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#C03A12"/><path d="M10 17l10-6 10 6v12l-10 6-10-6V17z" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="10,17 20,23 30,17" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="23" x2="20" y2="35" stroke="white" stroke-width="1.5"/></svg>`,
   ),
-  // Map pin — blue
+  // Map pin — light orange
   svgUri(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#3B82F6"/><path d="M20 10c-4.4 0-8 3.6-8 8 0 5.5 8 14 8 14s8-8.5 8-14c0-4.4-3.6-8-8-8z" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="18" r="2.5" fill="none" stroke="white" stroke-width="1.5"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#F07848"/><path d="M20 10c-4.4 0-8 3.6-8 8 0 5.5 8 14 8 14s8-8.5 8-14c0-4.4-3.6-8-8-8z" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="18" r="2.5" fill="none" stroke="white" stroke-width="1.5"/></svg>`,
   ),
-  // Headset / dispatcher — purple
+  // Headset / dispatcher — graphite
   svgUri(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#8B5CF6"/><path d="M12 22v-3a8 8 0 0116 0v3" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"/><rect x="10" y="21" width="4" height="7" rx="2" fill="none" stroke="white" stroke-width="1.5"/><rect x="26" y="21" width="4" height="7" rx="2" fill="none" stroke="white" stroke-width="1.5"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#3A3A3C"/><path d="M12 22v-3a8 8 0 0116 0v3" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"/><rect x="10" y="21" width="4" height="7" rx="2" fill="none" stroke="white" stroke-width="1.5"/><rect x="26" y="21" width="4" height="7" rx="2" fill="none" stroke="white" stroke-width="1.5"/></svg>`,
   ),
-  // Route — green
+  // Route — slate grey
   svgUri(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#10B981"/><circle cx="13" cy="13" r="2.5" fill="none" stroke="white" stroke-width="1.5"/><circle cx="27" cy="27" r="2.5" fill="none" stroke="white" stroke-width="1.5"/><path d="M13 15.5c0 4 7 3 7 7s7 4 7 4" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2.5 2"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#636366"/><circle cx="13" cy="13" r="2.5" fill="none" stroke="white" stroke-width="1.5"/><circle cx="27" cy="27" r="2.5" fill="none" stroke="white" stroke-width="1.5"/><path d="M13 15.5c0 4 7 3 7 7s7 4 7 4" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2.5 2"/></svg>`,
   ),
-  // Star / rating — amber
+  // Star / rating — burnt orange
   svgUri(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#F59E0B"/><polygon points="20,11 22.5,17.5 29.5,17.5 24,22 26,29 20,25 14,29 16,22 10.5,17.5 17.5,17.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#D05020"/><polygon points="20,11 22.5,17.5 29.5,17.5 24,22 26,29 20,25 14,29 16,22 10.5,17.5 17.5,17.5" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   ),
 ];
 
@@ -220,12 +220,13 @@ export function EditProfileSheet({ open, onClose }: EditProfileSheetProps) {
         </div>
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-3">{error}</p>
+          <p className="text-sm text-fx-danger bg-fx-danger-dim rounded-xl px-4 py-3">{error}</p>
         )}
 
         {success && (
-          <p className="text-sm text-green-400 bg-green-400/10 rounded-xl px-4 py-3 text-center font-semibold">
-            ✓ Saved!
+          <p className="flex items-center justify-center gap-1.5 text-sm text-fx-success bg-fx-surface-2 rounded-xl px-4 py-3 text-center font-semibold">
+            <Check size={14} strokeWidth={2.5} className="shrink-0" aria-hidden="true" />
+            Saved!
           </p>
         )}
 

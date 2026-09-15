@@ -1,5 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Package, Clock, TrendingDown, CheckCircle } from 'lucide-react';
+import {
+  Search,
+  Package,
+  Clock,
+  TrendingDown,
+  CheckCircle,
+  DoorOpen,
+  FileText,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TopHeader } from '@/shared/components/top-header';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -114,8 +122,8 @@ export default function ShipperDashboard() {
                     onClick={() => setSelectedLoad(load)}
                     className={`w-full text-left p-4 rounded-2xl border ${
                       isDelivered
-                        ? 'bg-green-500/10 border-green-500/30'
-                        : 'bg-fx-orange/10 border-fx-orange/30'
+                        ? 'bg-fx-surface border-fx-orange/30'
+                        : 'bg-fx-surface border-fx-border'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -123,8 +131,8 @@ export default function ShipperDashboard() {
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                           isDelivered
-                            ? 'bg-green-500/20 text-green-400'
-                            : 'bg-fx-orange/20 text-fx-orange'
+                            ? 'bg-fx-orange/15 text-fx-orange'
+                            : 'bg-fx-surface-2 text-fx-text-muted'
                         }`}
                       >
                         {isDelivered ? 'CONFIRM RECEIPT' : 'IN TRANSIT'}
@@ -241,22 +249,36 @@ export default function ShipperDashboard() {
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'Book Shipment', icon: '📦', action: () => navigate('/shipper/loads') },
+              {
+                label: 'Book Shipment',
+                icon: <Package size={20} className="text-fx-orange" />,
+                action: () => navigate('/shipper/loads'),
+              },
               {
                 label: 'Dock Schedule',
-                icon: '🚪',
+                icon: <DoorOpen size={20} className="text-fx-orange" />,
                 action: () => navigate('/shipper/dock-scheduling'),
               },
-              { label: 'RFPs', icon: '📑', action: () => navigate('/shipper/rfps') },
-              { label: 'Track Load', icon: '🔍', action: () => navigate('/track') },
+              {
+                label: 'RFPs',
+                icon: <FileText size={20} className="text-fx-orange" />,
+                action: () => navigate('/shipper/rfps'),
+              },
+              {
+                label: 'Track Load',
+                icon: <Search size={20} className="text-fx-orange" />,
+                action: () => navigate('/track'),
+              },
             ].map((item) => (
               <button
                 key={item.label}
                 onClick={item.action}
                 className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:border-fx-orange/50 hover:bg-fx-surface-2 transition-all duration-200"
               >
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-xs font-semibold text-fx-text-muted">{item.label}</span>
+                <span className="w-10 h-10 rounded-ios-xs bg-fx-orange/15 flex items-center justify-center">
+                  {item.icon}
+                </span>
+                <span className="text-xs font-semibold text-fx-text">{item.label}</span>
               </button>
             ))}
           </div>

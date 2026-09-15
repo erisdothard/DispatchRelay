@@ -11,11 +11,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { Rfp } from '@/services/rfp.service';
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'text-zinc-400 bg-zinc-400/10',
-  open: 'text-emerald-400 bg-emerald-400/10',
-  evaluating: 'text-amber-400 bg-amber-400/10',
-  awarded: 'text-blue-400 bg-blue-400/10',
-  closed: 'text-red-400 bg-red-400/10',
+  draft: 'text-fx-text-dim bg-fx-surface-2',
+  open: 'text-fx-text bg-fx-surface-2',
+  evaluating: 'text-fx-orange bg-fx-orange/10',
+  awarded: 'text-fx-success bg-fx-success-dim',
+  closed: 'text-fx-text-dim bg-fx-surface-2',
 };
 
 export default function ShipperRfpsPage() {

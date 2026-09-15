@@ -39,7 +39,7 @@ const PACKING_GROUPS = ['I - Great Danger', 'II - Medium Danger', 'III - Minor D
 export function HazmatFields({ data, onChange }: Props) {
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-400/10 border border-amber-400/25 text-xs text-amber-400">
+      <div className="flex items-center gap-2 p-2.5 rounded-lg bg-fx-orange/10 border border-fx-orange/25 text-xs text-fx-orange">
         <AlertTriangle size={13} className="shrink-0" />
         <span>
           PHMSA requires these fields for hazmat shipments (49 CFR 172.200-204). BOL signing will be
@@ -53,7 +53,7 @@ export function HazmatFields({ data, onChange }: Props) {
           Proper Shipping Name *
         </label>
         <input
-          className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+          className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
           placeholder="e.g. Gasoline"
           value={data.properShippingName}
           onChange={(e) => onChange('properShippingName', e.target.value)}
@@ -67,7 +67,7 @@ export function HazmatFields({ data, onChange }: Props) {
             Hazard Class *
           </label>
           <select
-            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             value={data.hazmatClass}
             onChange={(e) => onChange('hazmatClass', e.target.value)}
           >
@@ -86,7 +86,7 @@ export function HazmatFields({ data, onChange }: Props) {
             UN Number *
           </label>
           <input
-            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             placeholder="UN1203"
             value={data.unNumber}
             onChange={(e) => onChange('unNumber', e.target.value)}
@@ -99,7 +99,7 @@ export function HazmatFields({ data, onChange }: Props) {
             Packing Group *
           </label>
           <select
-            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             value={data.packingGroup}
             onChange={(e) => onChange('packingGroup', e.target.value)}
           >
@@ -118,7 +118,7 @@ export function HazmatFields({ data, onChange }: Props) {
             Quantity *
           </label>
           <input
-            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             placeholder="e.g. 5000 lbs"
             value={data.quantity}
             onChange={(e) => onChange('quantity', e.target.value)}
@@ -135,7 +135,7 @@ export function HazmatFields({ data, onChange }: Props) {
           <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fx-text-dim" />
           <input
             type="tel"
-            className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+            className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg pl-9 pr-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
             placeholder="1-800-XXX-XXXX"
             value={data.emergencyPhone}
             onChange={(e) => onChange('emergencyPhone', e.target.value)}
@@ -150,7 +150,7 @@ export function HazmatFields({ data, onChange }: Props) {
             type="checkbox"
             checked={data.placardRequired}
             onChange={(e) => onChange('placardRequired', e.target.checked)}
-            className="w-4 h-4 accent-orange-500 rounded"
+            className="w-4 h-4 accent-fx-orange rounded"
           />
           <span className="text-sm font-semibold text-fx-text-muted">Placard Required</span>
         </label>
@@ -159,7 +159,7 @@ export function HazmatFields({ data, onChange }: Props) {
             type="checkbox"
             checked={data.reportableQuantity}
             onChange={(e) => onChange('reportableQuantity', e.target.checked)}
-            className="w-4 h-4 accent-orange-500 rounded"
+            className="w-4 h-4 accent-fx-orange rounded"
           />
           <span className="text-sm font-semibold text-fx-text-muted">Reportable Quantity</span>
         </label>

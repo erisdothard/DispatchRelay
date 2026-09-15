@@ -50,11 +50,11 @@ export function SyncIndicator() {
       disabled={syncing || !online || status.pending === 0}
       className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all ${
         !online
-          ? 'bg-red-500/10 border-red-500/30 text-red-400'
+          ? 'bg-fx-danger-dim border-transparent text-fx-danger'
           : status.failed > 0
-            ? 'bg-amber-400/10 border-amber-400/30 text-amber-400'
+            ? 'bg-fx-danger-dim border-transparent text-fx-danger'
             : syncing
-              ? 'bg-blue-400/10 border-blue-400/30 text-blue-400'
+              ? 'bg-fx-surface-2 border-fx-border-2 text-fx-text'
               : 'bg-fx-surface border-fx-border text-fx-text-muted'
       }`}
     >

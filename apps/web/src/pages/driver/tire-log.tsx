@@ -10,6 +10,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getDriverIncidents } from '@/services/driver-incidents.service';
 import type { DriverIncident } from '@/services/driver-incidents.service';
 import { IncidentForm } from '@/features/driver/components/incident-form';
+import {
+  INCIDENT_TYPE_ICONS,
+  FALLBACK_INCIDENT_ICON,
+} from '@/features/driver/lib/incident-type-icons';
 
 const SEVERITY_COLORS: Record<string, 'orange' | 'blue' | 'green' | 'gray'> = {
   minor: 'green',
@@ -36,19 +40,6 @@ const TYPE_LABELS: Record<string, string> = {
   cargo: 'Cargo Issue',
   fuel: 'Fuel / DEF',
   other: 'Other',
-};
-
-const TYPE_EMOJI: Record<string, string> = {
-  tire: '🛞',
-  engine: '⚙️',
-  brake: '🛑',
-  lights: '💡',
-  body_damage: '🚛',
-  accident: '⚠️',
-  driver_illness: '🏥',
-  cargo: '📦',
-  fuel: '⛽',
-  other: '📝',
 };
 
 export default function TireLogPage() {
@@ -95,61 +86,68 @@ export default function TireLogPage() {
             subtitle="Tap the + button to log your first incident"
           />
         ) : (
-          incidents.map((incident) => (
-            <div
-              key={incident.id}
-              className="bg-fx-surface border border-fx-border rounded-2xl p-4"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-base">{TYPE_EMOJI[incident.incidentType] ?? '📝'}</span>
-                    <span className="text-sm font-semibold text-white">
-                      {TYPE_LABELS[incident.incidentType] ?? incident.incidentType}
-                    </span>
-                    <Badge variant={SEVERITY_COLORS[incident.severity] ?? 'gray'} size="sm">
-                      {SEVERITY_LABELS[incident.severity] ?? incident.severity}
-                    </Badge>
-                    {incident.resolvedAt && (
-                      <Badge variant="green" size="sm">
-                        Resolved
+          incidents.map((incident) => {
+            const TypeIcon = INCIDENT_TYPE_ICONS[incident.incidentType] ?? FALLBACK_INCIDENT_ICON;
+            return (
+              <div
+                key={incident.id}
+                className="bg-fx-surface border border-fx-border rounded-2xl p-4"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <TypeIcon
+                        size={16}
+                        aria-hidden="true"
+                        className="shrink-0 text-fx-text-muted"
+                      />
+                      <span className="text-sm font-semibold text-white">
+                        {TYPE_LABELS[incident.incidentType] ?? incident.incidentType}
+                      </span>
+                      <Badge variant={SEVERITY_COLORS[incident.severity] ?? 'gray'} size="sm">
+                        {SEVERITY_LABELS[incident.severity] ?? incident.severity}
                       </Badge>
-                    )}
+                      {incident.resolvedAt && (
+                        <Badge variant="green" size="sm">
+                          Resolved
+                        </Badge>
+                      )}
+                    </div>
                   </div>
+                  <p className="text-xs text-fx-text-dim shrink-0">
+                    {new Date(incident.incidentDate + 'T12:00:00').toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </p>
                 </div>
-                <p className="text-xs text-fx-text-dim shrink-0">
-                  {new Date(incident.incidentDate + 'T12:00:00').toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </p>
+
+                {incident.locationText && (
+                  <p className="text-xs text-fx-text-dim mb-1">{incident.locationText}</p>
+                )}
+                {incident.description && (
+                  <p className="text-xs text-fx-text-dim">{incident.description}</p>
+                )}
+                {incident.loadNumber && (
+                  <p className="text-xs text-fx-orange mt-1">Load: {incident.loadNumber}</p>
+                )}
+
+                {incident.photos.length > 0 && (
+                  <div className="flex gap-2 mt-2 overflow-x-auto">
+                    {incident.photos.map((url, i) => (
+                      <img
+                        key={i}
+                        src={url}
+                        alt={`Photo ${i + 1}`}
+                        className="w-14 h-14 rounded-xl object-cover shrink-0 border border-fx-border"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-
-              {incident.locationText && (
-                <p className="text-xs text-fx-text-dim mb-1">{incident.locationText}</p>
-              )}
-              {incident.description && (
-                <p className="text-xs text-fx-text-dim">{incident.description}</p>
-              )}
-              {incident.loadNumber && (
-                <p className="text-xs text-fx-orange mt-1">Load: {incident.loadNumber}</p>
-              )}
-
-              {incident.photos.length > 0 && (
-                <div className="flex gap-2 mt-2 overflow-x-auto">
-                  {incident.photos.map((url, i) => (
-                    <img
-                      key={i}
-                      src={url}
-                      alt={`Photo ${i + 1}`}
-                      className="w-14 h-14 rounded-xl object-cover shrink-0 border border-fx-border"
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

@@ -37,7 +37,7 @@ export function BackhaulCard({ opportunity: opp, onView }: Props) {
 
       {opp.deadhead_miles != null && (
         <div className="mt-1.5">
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md text-emerald-400 bg-emerald-400/10">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md text-fx-text-muted bg-fx-surface-2">
             {opp.deadhead_miles} mi deadhead
           </span>
         </div>

@@ -128,7 +128,7 @@ function BolUploadSheet({
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div
         className="relative w-full max-w-lg rounded-t-3xl p-6 space-y-4"
-        style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.08)' }}
+        style={{ background: 'var(--fx-surface)', border: '1px solid var(--fx-border)' }}
       >
         <div>
           <h2 className="text-lg font-bold text-fx-text">Upload Bill of Lading</h2>
@@ -240,7 +240,7 @@ function BolUploadSheet({
           </>
         )}
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm text-fx-danger">{error}</p>}
 
         {/* Actions */}
         <div className="flex gap-3">
@@ -505,7 +505,7 @@ export default function DriverDocumentsPage() {
                             ) : doc.type === 'bill_of_lading' && doc.signed_at ? (
                               <button
                                 onClick={() => setViewingSignedBol({ doc, load })}
-                                className="h-8 px-3 rounded-xl bg-green-500/15 border border-green-500/30 text-green-400 text-[11px] font-bold flex items-center gap-1.5"
+                                className="h-8 px-3 rounded-xl bg-fx-success-dim border border-fx-border text-fx-success text-[11px] font-bold flex items-center gap-1.5"
                               >
                                 <CheckCircle2 size={12} /> View Signed BOL
                               </button>
@@ -522,11 +522,11 @@ export default function DriverDocumentsPage() {
                             <button
                               onClick={() => handleDeleteDoc(doc.id)}
                               disabled={deleting === doc.id}
-                              className="text-fx-text-dim hover:text-red-400 transition-colors disabled:opacity-40"
+                              className="text-fx-text-dim hover:text-fx-danger transition-colors disabled:opacity-40"
                               title="Delete document"
                             >
                               {deleting === doc.id ? (
-                                <span className="w-3.5 h-3.5 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin inline-block" />
+                                <span className="w-3.5 h-3.5 border-2 border-fx-danger-dim border-t-fx-danger rounded-full animate-spin inline-block" />
                               ) : (
                                 <Trash2 size={14} />
                               )}
@@ -560,8 +560,8 @@ export default function DriverDocumentsPage() {
                             <span className="w-3 h-3 border-2 border-fx-orange/30 border-t-fx-orange rounded-full animate-spin" />
                           ) : justUploaded === load.id ? (
                             <>
-                              <CheckCircle2 size={12} className="text-green-400" />
-                              <span className="text-green-400">Done!</span>
+                              <CheckCircle2 size={12} className="text-fx-success" />
+                              <span className="text-fx-success">Done!</span>
                             </>
                           ) : (
                             <>

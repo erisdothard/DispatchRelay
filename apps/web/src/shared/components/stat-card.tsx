@@ -43,14 +43,14 @@ export function StatCard({
 
       {trend && trendValue && (
         <div className="flex items-center gap-1">
-          {trend === 'up' && <TrendingUp size={12} className="text-green-400" />}
-          {trend === 'down' && <TrendingDown size={12} className="text-red-400" />}
+          {trend === 'up' && <TrendingUp size={12} className="text-fx-success" />}
+          {trend === 'down' && <TrendingDown size={12} className="text-fx-danger" />}
           {trend === 'flat' && <Minus size={12} className="text-fx-text-muted" />}
           <span
             className={cn(
               'text-xs font-medium',
-              trend === 'up' && 'text-green-400',
-              trend === 'down' && 'text-red-400',
+              trend === 'up' && 'text-fx-success',
+              trend === 'down' && 'text-fx-danger',
               trend === 'flat' && 'text-fx-text-muted',
             )}
           >

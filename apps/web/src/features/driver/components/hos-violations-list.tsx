@@ -9,9 +9,9 @@ interface Props {
 }
 
 const SEVERITY_COLORS: Record<string, string> = {
-  critical: 'text-red-400 bg-red-400/10 border-red-400/20',
-  warning: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  info: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+  critical: 'text-fx-danger bg-fx-danger-dim border-transparent',
+  warning: 'text-fx-orange bg-fx-orange/10 border-fx-orange/25',
+  info: 'text-fx-text-muted bg-fx-surface-2 border-fx-border',
 };
 
 export function HosViolationsList({ violations, driverId }: Props) {
@@ -31,8 +31,8 @@ export function HosViolationsList({ violations, driverId }: Props) {
   if (violations.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-12 h-12 rounded-full bg-emerald-400/10 flex items-center justify-center mx-auto mb-3">
-          <Check size={20} className="text-emerald-400" />
+        <div className="w-12 h-12 rounded-full bg-fx-success-dim flex items-center justify-center mx-auto mb-3">
+          <Check size={20} className="text-fx-success" />
         </div>
         <p className="text-fx-text-muted text-sm">No violations</p>
         <p className="text-fx-text-dim text-xs mt-1">You're in compliance!</p>
@@ -50,14 +50,14 @@ export function HosViolationsList({ violations, driverId }: Props) {
           <div
             key={v.id}
             className={`bg-fx-surface border rounded-xl p-4 space-y-2 ${
-              isAcked ? 'border-fx-border opacity-60' : 'border-red-500/30'
+              isAcked ? 'border-fx-border opacity-60' : 'border-fx-border-2'
             }`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertTriangle
                   size={14}
-                  className={isAcked ? 'text-fx-text-dim' : 'text-red-400'}
+                  className={isAcked ? 'text-fx-text-dim' : 'text-fx-danger'}
                 />
                 <span className="text-sm font-semibold text-fx-text">
                   {v.violation_type.replace(/_/g, ' ')}
@@ -78,7 +78,7 @@ export function HosViolationsList({ violations, driverId }: Props) {
               </span>
 
               {isAcked ? (
-                <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-[10px] text-fx-success font-semibold flex items-center gap-1">
                   <Check size={10} /> Acknowledged
                 </span>
               ) : (

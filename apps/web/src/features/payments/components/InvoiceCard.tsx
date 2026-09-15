@@ -19,27 +19,27 @@ const STATUS_CONFIG: Record<
 > = {
   pending: {
     label: 'Pending',
-    className: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
+    className: 'text-fx-text-muted bg-fx-surface-2 border-fx-border',
     icon: Clock,
   },
   invoiced: {
     label: 'Invoiced',
-    className: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
+    className: 'text-fx-text-muted bg-fx-surface-2 border-fx-border',
     icon: Clock,
   },
   approved: {
     label: 'Approved',
-    className: 'text-blue-400 bg-blue-400/10 border-blue-400/30',
+    className: 'text-fx-text bg-fx-surface-2 border-fx-border-2',
     icon: CheckCircle2,
   },
   paid: {
     label: 'Paid',
-    className: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
+    className: 'text-fx-success bg-fx-success-dim border-transparent',
     icon: CheckCircle2,
   },
   cancelled: {
     label: 'Cancelled',
-    className: 'text-zinc-500 bg-zinc-500/10 border-zinc-500/30',
+    className: 'text-fx-text-dim bg-fx-surface-2 border-fx-border',
     icon: AlertCircle,
   },
 };
@@ -70,12 +70,12 @@ export function InvoiceCard({ invoice, userRole, onUpdate }: Props) {
   };
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
+    <div className="bg-fx-surface border border-fx-border rounded-xl p-4 space-y-3">
       {/* Row 1: amount + status */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <DollarSign size={16} className="text-fx-orange" />
-          <span className="text-lg font-bold text-fx-text-main">{fmtUsd(invoice.amount_usd)}</span>
+          <span className="text-lg font-bold text-fx-text">{fmtUsd(invoice.amount_usd)}</span>
         </div>
         <span
           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium ${className}`}
@@ -92,7 +92,9 @@ export function InvoiceCard({ invoice, userRole, onUpdate }: Props) {
           <span className="capitalize">{invoice.payment_method.replace('_', ' ')}</span>
         )}
         {invoice.quick_pay_fee_usd && (
-          <span className="text-amber-400">Quick Pay fee: {fmtUsd(invoice.quick_pay_fee_usd)}</span>
+          <span className="text-fx-text-muted">
+            Quick Pay fee: {fmtUsd(invoice.quick_pay_fee_usd)}
+          </span>
         )}
       </div>
 
@@ -101,7 +103,7 @@ export function InvoiceCard({ invoice, userRole, onUpdate }: Props) {
         <button
           onClick={() => handle(() => approveInvoice(invoice.id))}
           disabled={loading}
-          className="h-9 w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-sm font-semibold rounded-lg transition-colors"
+          className="h-9 w-full bg-fx-orange hover:bg-fx-orange/90 disabled:opacity-40 text-white text-sm font-semibold rounded-lg transition-colors"
         >
           {loading ? 'Processing…' : 'Approve Invoice'}
         </button>
@@ -128,9 +130,9 @@ export function InvoiceCard({ invoice, userRole, onUpdate }: Props) {
               )
             }
             disabled={loading}
-            className="h-10 flex flex-col items-center justify-center bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 border border-zinc-700 rounded-lg transition-colors"
+            className="h-10 flex flex-col items-center justify-center bg-fx-surface-2 hover:bg-fx-surface-3 disabled:opacity-40 border border-fx-border-2 rounded-lg transition-colors"
           >
-            <span className="text-xs font-semibold text-fx-text-main">Net 30</span>
+            <span className="text-xs font-semibold text-fx-text">Net 30</span>
             <span className="text-[10px] text-fx-text-dim">No fee</span>
           </button>
           <button
@@ -149,7 +151,7 @@ export function InvoiceCard({ invoice, userRole, onUpdate }: Props) {
       )}
 
       {err && (
-        <p className="text-xs text-red-400 flex items-center gap-1">
+        <p className="text-xs text-fx-danger flex items-center gap-1">
           <AlertCircle size={11} /> {err}
         </p>
       )}

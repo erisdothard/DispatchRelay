@@ -74,11 +74,11 @@ export function OnboardingChecklist({
   if (allDone) return null;
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+    <div className="bg-fx-surface border border-fx-border rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-fx-border">
         <div>
-          <p className="text-sm font-semibold text-fx-text-main">Get started</p>
+          <p className="text-sm font-semibold text-fx-text">Get started</p>
           <p className="text-xs text-fx-text-dim mt-0.5">
             {doneCount} of {steps.length} complete
           </p>
@@ -86,7 +86,7 @@ export function OnboardingChecklist({
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="text-xs text-fx-text-dim hover:text-fx-text-main transition-colors"
+            className="text-xs text-fx-text-dim hover:text-fx-text transition-colors"
           >
             Dismiss
           </button>
@@ -94,7 +94,7 @@ export function OnboardingChecklist({
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-zinc-800">
+      <div className="h-1 bg-fx-surface-3">
         <div
           className="h-full bg-fx-orange transition-all duration-500"
           style={{ width: `${(doneCount / steps.length) * 100}%` }}
@@ -102,21 +102,21 @@ export function OnboardingChecklist({
       </div>
 
       {/* Steps */}
-      <div className="divide-y divide-zinc-800">
+      <div className="divide-y divide-fx-border">
         {steps.map((step) => (
           <Link
             key={step.id}
             to={step.done ? '#' : step.href}
-            className={`flex items-center gap-3 px-4 py-3 transition-colors ${step.done ? 'opacity-50 cursor-default' : 'hover:bg-zinc-800/50'}`}
+            className={`flex items-center gap-3 px-4 py-3 transition-colors ${step.done ? 'opacity-50 cursor-default' : 'hover:bg-fx-surface-2'}`}
           >
             {step.done ? (
-              <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
+              <CheckCircle2 size={18} className="text-fx-success shrink-0" />
             ) : (
-              <Circle size={18} className="text-zinc-600 shrink-0" />
+              <Circle size={18} className="text-fx-text-dim shrink-0" />
             )}
             <div className="flex-1 min-w-0">
               <p
-                className={`text-sm font-medium ${step.done ? 'line-through text-fx-text-dim' : 'text-fx-text-main'}`}
+                className={`text-sm font-medium ${step.done ? 'line-through text-fx-text-dim' : 'text-fx-text'}`}
               >
                 {step.label}
               </p>

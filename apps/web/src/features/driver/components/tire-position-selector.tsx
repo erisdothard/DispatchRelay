@@ -31,7 +31,7 @@ export function TirePositionSelector({ selected, onSelect }: TirePositionSelecto
           width="110"
           height="140"
           rx="12"
-          fill="#1a1a2e"
+          style={{ fill: 'var(--fx-surface-2)' }}
           stroke="#333"
           strokeWidth="1.5"
         />
@@ -42,7 +42,7 @@ export function TirePositionSelector({ selected, onSelect }: TirePositionSelecto
           width="90"
           height="40"
           rx="8"
-          fill="#222240"
+          style={{ fill: 'var(--fx-surface-3)' }}
           stroke="#444"
           strokeWidth="1"
         />
@@ -63,7 +63,7 @@ export function TirePositionSelector({ selected, onSelect }: TirePositionSelecto
           width="110"
           height="75"
           rx="8"
-          fill="#1a1a2e"
+          style={{ fill: 'var(--fx-surface-2)' }}
           stroke="#333"
           strokeWidth="1.5"
         />
@@ -79,7 +79,7 @@ export function TirePositionSelector({ selected, onSelect }: TirePositionSelecto
                 width="22"
                 height="18"
                 rx="4"
-                fill={isSelected ? '#e86030' : '#2a2a40'}
+                style={{ fill: isSelected ? '#e86030' : 'var(--fx-surface-3)' }}
                 stroke={isSelected ? '#ff8050' : '#444'}
                 strokeWidth={isSelected ? 2 : 1}
               />

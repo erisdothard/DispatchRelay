@@ -10,9 +10,9 @@ interface Props {
 }
 
 const RISK_CONFIG: Record<string, { color: string; label: string }> = {
-  low: { color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20', label: 'Verified' },
-  medium: { color: 'text-amber-400 bg-amber-400/10 border-amber-400/20', label: 'Review' },
-  high: { color: 'text-red-400 bg-red-400/10 border-red-400/20', label: 'High Risk' },
+  low: { color: 'text-fx-success bg-fx-surface-2 border-fx-border', label: 'Verified' },
+  medium: { color: 'text-fx-text bg-fx-surface-2 border-fx-border-2', label: 'Review' },
+  high: { color: 'text-fx-danger bg-fx-danger-dim border-transparent', label: 'High Risk' },
 };
 
 export function IdentityRiskBadge({ userId }: Props) {
@@ -35,7 +35,7 @@ export function IdentityRiskBadge({ userId }: Props) {
       </div>
 
       {riskProfile.is_voip && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-400/10 border border-amber-400/25 text-xs text-amber-400">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-fx-surface-2 border border-fx-border text-xs text-fx-text-muted">
           <Phone size={12} />
           <span className="font-semibold">VoIP phone detected</span>
         </div>
@@ -45,7 +45,7 @@ export function IdentityRiskBadge({ userId }: Props) {
         <div className="space-y-1">
           {riskProfile.risk_factors.map((factor, i) => (
             <div key={i} className="flex items-center gap-1.5 text-[10px] text-fx-text-dim">
-              <AlertTriangle size={9} className="text-amber-400 shrink-0" />
+              <AlertTriangle size={9} className="text-fx-text-muted shrink-0" />
               {factor}
             </div>
           ))}

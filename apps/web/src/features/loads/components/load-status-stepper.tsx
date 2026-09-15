@@ -154,8 +154,8 @@ export function LoadStatusStepper({
   const terminalStatuses: LoadStatus[] = ['cancelled', 'expired'];
   if (terminalStatuses.includes(currentStatus)) {
     return (
-      <div className="bg-red-500/10 border border-red-500/20 rounded-2xl px-4 py-3">
-        <p className="text-sm font-semibold text-red-400 capitalize">{currentStatus}</p>
+      <div className="bg-fx-danger-dim border border-transparent rounded-2xl px-4 py-3">
+        <p className="text-sm font-semibold text-fx-danger capitalize">{currentStatus}</p>
       </div>
     );
   }
@@ -178,7 +178,7 @@ export function LoadStatusStepper({
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                       done
-                        ? 'bg-green-500'
+                        ? 'bg-fx-success'
                         : current
                           ? 'bg-fx-orange ring-4 ring-fx-orange/20'
                           : 'bg-fx-surface border-2 border-fx-border'
@@ -194,7 +194,7 @@ export function LoadStatusStepper({
                   </div>
                   <p
                     className={`text-[9px] font-semibold mt-1 text-center leading-tight ${
-                      done ? 'text-green-400' : current ? 'text-fx-orange' : 'text-fx-text-dim'
+                      done ? 'text-fx-success' : current ? 'text-fx-orange' : 'text-fx-text-dim'
                     } ${future ? 'opacity-50' : ''}`}
                     style={{ maxWidth: 48 }}
                   >
@@ -206,7 +206,7 @@ export function LoadStatusStepper({
                 {!isLast && (
                   <div
                     className={`flex-1 h-[2px] mx-0.5 rounded-full ${
-                      i < currentIdx ? 'bg-green-500' : 'bg-fx-border'
+                      i < currentIdx ? 'bg-fx-success' : 'bg-fx-border'
                     }`}
                   />
                 )}
@@ -220,7 +220,7 @@ export function LoadStatusStepper({
           !(role === 'carrier' && (nextStatus === 'in_transit' || nextStatus === 'delivered')) && (
             <div className="pt-1">
               {error && (
-                <p className="text-xs text-red-400 bg-red-500/10 rounded-xl px-3 py-2 mb-3">
+                <p className="text-xs text-fx-danger bg-fx-danger-dim rounded-xl px-3 py-2 mb-3">
                   {error}
                 </p>
               )}

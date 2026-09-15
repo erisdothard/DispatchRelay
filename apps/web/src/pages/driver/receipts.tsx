@@ -9,6 +9,7 @@ import { Badge } from '@/shared/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { getReceipts } from '@/services/receipts.service';
 import { ReceiptCaptureSheet } from '@/features/driver/components/receipt-capture-sheet';
+import { RECEIPT_CATEGORY_ICONS } from '@/features/driver/lib/receipt-category-icons';
 import type { Receipt, ReceiptCategory } from '@dispatchrelay/shared';
 
 const CATEGORY_LABELS: Record<ReceiptCategory, string> = {
@@ -20,17 +21,6 @@ const CATEGORY_LABELS: Record<ReceiptCategory, string> = {
   parking: 'Parking',
   supplies: 'Supplies',
   other: 'Other',
-};
-
-const CATEGORY_ICONS: Record<ReceiptCategory, string> = {
-  fuel: '⛽',
-  maintenance: '🔧',
-  tolls: '🛣️',
-  meals: '🍔',
-  lodging: '🏨',
-  parking: '🅿️',
-  supplies: '📦',
-  other: '📋',
 };
 
 const ALL_CATEGORIES: ReceiptCategory[] = [
@@ -93,19 +83,23 @@ export default function ReceiptsPage() {
           >
             All
           </button>
-          {ALL_CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilterCategory(filterCategory === cat ? null : cat)}
-              className={`shrink-0 h-8 px-3 rounded-full text-xs font-semibold transition-all ${
-                filterCategory === cat
-                  ? 'bg-fx-orange text-white'
-                  : 'bg-fx-surface border border-fx-border text-fx-text-muted'
-              }`}
-            >
-              {CATEGORY_ICONS[cat]} {CATEGORY_LABELS[cat]}
-            </button>
-          ))}
+          {ALL_CATEGORIES.map((cat) => {
+            const Icon = RECEIPT_CATEGORY_ICONS[cat];
+            return (
+              <button
+                key={cat}
+                onClick={() => setFilterCategory(filterCategory === cat ? null : cat)}
+                className={`shrink-0 h-8 px-3 rounded-full text-xs font-semibold transition-all inline-flex items-center gap-1.5 ${
+                  filterCategory === cat
+                    ? 'bg-fx-orange text-white'
+                    : 'bg-fx-surface border border-fx-border text-fx-text-muted'
+                }`}
+              >
+                <Icon size={14} aria-hidden="true" className="shrink-0" />
+                {CATEGORY_LABELS[cat]}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -136,43 +130,51 @@ export default function ReceiptsPage() {
             subtitle="Tap the + button to scan your first receipt"
           />
         ) : (
-          receipts.map((receipt) => (
-            <div
-              key={receipt.id}
-              className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3"
-            >
-              {/* Thumbnail */}
-              <img
-                src={receipt.imageUrl}
-                alt="Receipt"
-                className="w-14 h-14 rounded-xl object-cover shrink-0 border border-fx-border"
-              />
+          receipts.map((receipt) => {
+            const CategoryIcon = RECEIPT_CATEGORY_ICONS[receipt.category];
+            return (
+              <div
+                key={receipt.id}
+                className="bg-fx-surface border border-fx-border rounded-2xl p-4 flex items-center gap-3"
+              >
+                {/* Thumbnail */}
+                <img
+                  src={receipt.imageUrl}
+                  alt="Receipt"
+                  className="w-14 h-14 rounded-xl object-cover shrink-0 border border-fx-border"
+                />
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <Badge variant="orange" size="sm">
-                    {CATEGORY_ICONS[receipt.category]} {CATEGORY_LABELS[receipt.category]}
-                  </Badge>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <Badge variant="orange" size="sm">
+                      <span className="inline-flex items-center gap-1">
+                        {CategoryIcon && (
+                          <CategoryIcon size={12} aria-hidden="true" className="shrink-0" />
+                        )}
+                        {CATEGORY_LABELS[receipt.category]}
+                      </span>
+                    </Badge>
+                  </div>
+                  <p className="text-sm font-semibold text-white truncate">
+                    {receipt.vendorName || 'Unknown vendor'}
+                  </p>
+                  <p className="text-xs text-fx-text-dim">
+                    {new Date(receipt.receiptDate + 'T12:00:00').toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                    {receipt.loadNumber && (
+                      <span className="text-fx-orange ml-2">{receipt.loadNumber}</span>
+                    )}
+                  </p>
                 </div>
-                <p className="text-sm font-semibold text-white truncate">
-                  {receipt.vendorName || 'Unknown vendor'}
-                </p>
-                <p className="text-xs text-fx-text-dim">
-                  {new Date(receipt.receiptDate + 'T12:00:00').toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                  {receipt.loadNumber && (
-                    <span className="text-fx-orange ml-2">{receipt.loadNumber}</span>
-                  )}
+
+                <p className="text-sm font-bold text-white shrink-0">
+                  ${receipt.amountUsd.toFixed(2)}
                 </p>
               </div>
-
-              <p className="text-sm font-bold text-white shrink-0">
-                ${receipt.amountUsd.toFixed(2)}
-              </p>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

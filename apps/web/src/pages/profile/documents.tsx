@@ -123,7 +123,9 @@ export default function DocumentsPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <div className="text-center mb-6">
-          <div className="text-4xl mb-3">📄</div>
+          <div className="w-16 h-16 rounded-2xl bg-fx-surface-2 flex items-center justify-center mx-auto mb-3">
+            <FileText size={32} className="text-fx-text-muted" aria-hidden="true" />
+          </div>
           <h1 className="text-xl font-bold text-fx-text">Your Documents</h1>
           <p className="text-sm text-fx-text-muted mt-1">
             {isCarrier ? 'Upload required carrier documents' : 'Upload required broker documents'}
@@ -139,7 +141,9 @@ export default function DocumentsPage() {
             </div>
             <span
               className={`text-xs font-bold px-2 py-1 rounded-full ${
-                allUploaded ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
+                allUploaded
+                  ? 'bg-fx-success-dim text-fx-success'
+                  : 'bg-fx-surface-2 text-fx-text-muted'
               }`}
             >
               {allUploaded ? 'Complete' : 'In Progress'}
@@ -150,7 +154,7 @@ export default function DocumentsPage() {
             <div className="flex-1 h-2 bg-fx-border rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
-                  allUploaded ? 'bg-green-500' : 'bg-fx-orange'
+                  allUploaded ? 'bg-fx-success' : 'bg-fx-orange'
                 }`}
                 style={{ width: `${(uploadedCount / documents.length) * 100}%` }}
               />
@@ -163,10 +167,10 @@ export default function DocumentsPage() {
 
         {/* Required Notice */}
         {!allUploaded && (
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 mb-6 flex items-start gap-3">
-            <AlertCircle size={18} className="text-yellow-400 shrink-0 mt-0.5" />
+          <div className="bg-fx-orange/10 border border-fx-orange/25 rounded-2xl p-4 mb-6 flex items-start gap-3">
+            <AlertCircle size={18} className="text-fx-orange shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-yellow-400">Verification Required</p>
+              <p className="text-sm font-semibold text-fx-orange">Verification Required</p>
               <p className="text-xs text-fx-text-muted mt-1">
                 Upload all required documents to get verified and start hauling.
               </p>
@@ -182,15 +186,15 @@ export default function DocumentsPage() {
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                     doc.uploaded
-                      ? 'bg-green-500/10 border border-green-500/20'
+                      ? 'bg-fx-success-dim border border-fx-border'
                       : 'bg-fx-surface-2 border border-fx-border'
                   }`}
                 >
                   {doc.uploaded ? (
                     doc.verified ? (
-                      <Shield size={18} className="text-green-400" />
+                      <Shield size={18} className="text-fx-success" />
                     ) : (
-                      <Check size={18} className="text-green-400" />
+                      <Check size={18} className="text-fx-success" />
                     )
                   ) : (
                     <FileText size={18} className="text-fx-text-dim" />
@@ -210,8 +214,8 @@ export default function DocumentsPage() {
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full ${
                           doc.verified
-                            ? 'bg-green-500/20 text-green-400'
-                            : 'bg-yellow-500/20 text-yellow-400'
+                            ? 'bg-fx-success-dim text-fx-success'
+                            : 'bg-fx-surface-2 text-fx-text-muted'
                         }`}
                       >
                         {doc.verified ? 'Verified' : 'Pending Review'}

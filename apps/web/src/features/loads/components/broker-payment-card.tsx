@@ -23,8 +23,8 @@ export function BrokerPaymentCard({
 }: BrokerPaymentCardProps) {
   const { paymentTerms, avgDaysToPay, quickPay, quickPayFee, factoringAccepted } = PLACEHOLDER;
 
-  const daysColor =
-    avgDaysToPay <= 14 ? 'text-green-400' : avgDaysToPay <= 30 ? 'text-yellow-400' : 'text-red-400';
+  // Neutral unless it's a problem: slow payers (> 30d) go danger.
+  const daysColor = avgDaysToPay <= 30 ? 'text-fx-text' : 'text-fx-danger';
 
   return (
     <div
@@ -50,13 +50,13 @@ export function BrokerPaymentCard({
 
       <div className="flex flex-wrap gap-2">
         {quickPay && (
-          <span className="flex items-center gap-1 text-[11px] font-semibold text-blue-400 bg-blue-500/10 rounded-full px-2.5 py-0.5 border border-blue-500/20">
+          <span className="flex items-center gap-1 text-[11px] font-semibold text-fx-text-muted bg-fx-surface-2 rounded-full px-2.5 py-0.5 border border-fx-border">
             <Clock size={11} />
             QuickPay ({quickPayFee}% fee)
           </span>
         )}
         {factoringAccepted && (
-          <span className="flex items-center gap-1 text-[11px] font-semibold text-green-400 bg-green-500/10 rounded-full px-2.5 py-0.5 border border-green-500/20">
+          <span className="flex items-center gap-1 text-[11px] font-semibold text-fx-text-muted bg-fx-surface-2 rounded-full px-2.5 py-0.5 border border-fx-border">
             <ShieldCheck size={11} />
             Factoring Accepted
           </span>

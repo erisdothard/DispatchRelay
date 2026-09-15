@@ -100,7 +100,7 @@ export default function ShipperDockSchedulingPage() {
                       <button
                         onClick={() => checkIn.mutate(appt.id)}
                         disabled={checkIn.isPending}
-                        className="h-8 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-1 hover:bg-emerald-500/20 transition-colors disabled:opacity-40"
+                        className="h-8 px-3 rounded-lg bg-fx-orange/10 border border-fx-orange/30 text-fx-orange text-xs font-semibold flex items-center gap-1 hover:bg-fx-orange/20 transition-colors disabled:opacity-40"
                       >
                         <LogIn size={12} /> Check In
                       </button>
@@ -109,7 +109,7 @@ export default function ShipperDockSchedulingPage() {
                       <button
                         onClick={() => checkOut.mutate(appt.id)}
                         disabled={checkOut.isPending}
-                        className="h-8 px-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold flex items-center gap-1 hover:bg-blue-500/20 transition-colors disabled:opacity-40"
+                        className="h-8 px-3 rounded-lg bg-fx-surface-2 border border-fx-border-2 text-fx-text text-xs font-semibold flex items-center gap-1 hover:bg-fx-surface-3 transition-colors disabled:opacity-40"
                       >
                         <LogOut size={12} /> Check Out
                       </button>

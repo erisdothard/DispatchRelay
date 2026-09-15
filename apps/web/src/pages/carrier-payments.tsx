@@ -9,10 +9,10 @@ import { cn } from '@/shared/lib/utils';
 import type { Load } from '@dispatchrelay/shared';
 
 const STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  requested: { label: 'Pending Review', color: 'text-amber-400', icon: <Clock size={13} /> },
-  approved: { label: 'Approved', color: 'text-blue-400', icon: <CheckCircle size={13} /> },
-  funded: { label: 'Funded', color: 'text-emerald-400', icon: <CheckCircle size={13} /> },
-  denied: { label: 'Denied', color: 'text-red-400', icon: <XCircle size={13} /> },
+  requested: { label: 'Pending Review', color: 'text-fx-text-muted', icon: <Clock size={13} /> },
+  approved: { label: 'Approved', color: 'text-fx-text', icon: <CheckCircle size={13} /> },
+  funded: { label: 'Funded', color: 'text-fx-success', icon: <CheckCircle size={13} /> },
+  denied: { label: 'Denied', color: 'text-fx-danger', icon: <XCircle size={13} /> },
   cancelled: { label: 'Cancelled', color: 'text-fx-text-dim', icon: <XCircle size={13} /> },
 };
 
@@ -64,7 +64,7 @@ export default function CarrierPaymentsPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <DollarSign size={20} className="text-fx-orange" />
-          <h1 className="text-xl font-bold text-white">Payments</h1>
+          <h1 className="text-xl font-bold text-fx-text">Payments</h1>
         </div>
         <p className="text-fx-text-dim text-sm">Invoice management, QuickPay, and factoring.</p>
       </div>
@@ -73,13 +73,13 @@ export default function CarrierPaymentsPage() {
       <div className="grid grid-cols-2 gap-3 mb-6">
         <div className="bg-fx-surface rounded-ios p-4">
           <p className="text-[11px] text-fx-text-dim uppercase tracking-wider mb-1">Total Funded</p>
-          <p className="text-[22px] font-extrabold text-emerald-400">
+          <p className="text-[22px] font-extrabold text-fx-text">
             ${totalFunded.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </p>
         </div>
         <div className="bg-fx-surface rounded-ios p-4">
           <p className="text-[11px] text-fx-text-dim uppercase tracking-wider mb-1">Pending</p>
-          <p className="text-[22px] font-extrabold text-amber-400">{pendingCount}</p>
+          <p className="text-[22px] font-extrabold text-fx-text">{pendingCount}</p>
         </div>
       </div>
 
@@ -94,7 +94,7 @@ export default function CarrierPaymentsPage() {
             <Zap size={18} className="text-fx-orange" />
           </div>
           <div className="text-left">
-            <p className="text-[14px] font-bold text-white">Request QuickPay</p>
+            <p className="text-[14px] font-bold text-fx-text">Request QuickPay</p>
             <p className="text-[12px] text-fx-text-dim">
               {quickPayLoad
                 ? `${quickPayLoad.loadNumber} · $${quickPayLoad.rateUsd.toLocaleString()} invoice — paid in hours`
@@ -111,7 +111,7 @@ export default function CarrierPaymentsPage() {
       </h2>
 
       {error && (
-        <div className="mb-3 p-3 rounded-ios bg-red-500/10 border border-red-500/30 text-sm text-red-400">
+        <div className="mb-3 p-3 rounded-ios bg-fx-danger-dim border border-fx-danger-dim text-sm text-fx-danger">
           {error}
         </div>
       )}
@@ -133,7 +133,7 @@ export default function CarrierPaymentsPage() {
             return (
               <div key={req.id} className="bg-fx-surface rounded-ios p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[13px] font-bold text-white">
+                  <span className="text-[13px] font-bold text-fx-text">
                     Load #{req.loadNumber ?? '—'}
                   </span>
                   <div
@@ -147,7 +147,7 @@ export default function CarrierPaymentsPage() {
                   <span className="text-fx-text-dim">
                     Invoice: ${req.invoiceAmount.toLocaleString()}
                   </span>
-                  <span className="text-emerald-400 font-bold">
+                  <span className="text-fx-text font-bold">
                     Net: $
                     {(req.netPayout ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </span>

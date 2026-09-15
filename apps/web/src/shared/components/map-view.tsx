@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Map, { Marker, Source, Layer, type MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { Truck } from 'lucide-react';
 import { geocodeCity, geocodeAddress } from '@/lib/geocoding';
 import { isKeylessMapMode, makePinSvg } from '@/lib/map-engine';
 import { LeafletRouteMap } from './leaflet-route-map';
@@ -351,7 +352,7 @@ export function MapView({
 
         {/* Origin pin */}
         <Marker longitude={originPos[1]} latitude={originPos[0]} anchor="bottom">
-          <div dangerouslySetInnerHTML={{ __html: makePinSvg('#22c55e') }} />
+          <div dangerouslySetInnerHTML={{ __html: makePinSvg('#8E8E93') }} />
         </Marker>
 
         {/* Destination pin */}
@@ -399,7 +400,7 @@ export function MapView({
             cursor: 'pointer',
           }}
         >
-          <span style={{ fontSize: 13 }}>🚛</span>
+          <Truck size={13} strokeWidth={2.25} className="text-fx-orange" aria-hidden="true" />
           <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>
             FIND DRIVER
           </span>
@@ -469,8 +470,8 @@ export function MapView({
               width: 7,
               height: 7,
               borderRadius: '50%',
-              background: '#22c55e',
-              boxShadow: '0 0 6px #22c55e',
+              background: 'var(--fx-success)',
+              boxShadow: '0 0 6px var(--fx-success)',
               display: 'inline-block',
               animation: 'pulse 1.4s ease-in-out infinite',
             }}

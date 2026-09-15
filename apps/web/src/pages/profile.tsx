@@ -149,7 +149,7 @@ export default function ProfilePage() {
             <Badge variant="orange">{role.charAt(0).toUpperCase() + role.slice(1)}</Badge>
             {company?.rating && (
               <div className="flex items-center gap-1">
-                <Star size={13} className="text-yellow-400 fill-yellow-400" />
+                <Star size={13} className="text-fx-orange fill-fx-orange" />
                 <span className="text-sm font-bold text-fx-text">{company.rating}</span>
                 <span className="text-xs text-fx-text-muted">/ 5.0</span>
               </div>
@@ -249,23 +249,23 @@ export default function ProfilePage() {
                   <button
                     key={item.label}
                     onClick={item.danger ? handleSignOut : item.onPress}
-                    className={`w-full flex items-center gap-3 p-4 hover:bg-fx-surface-2 transition-colors text-left ${item.danger ? 'hover:bg-red-500/5' : ''}`}
+                    className={`w-full flex items-center gap-3 p-4 hover:bg-fx-surface-2 transition-colors text-left ${item.danger ? 'hover:bg-fx-danger-dim' : ''}`}
                   >
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                         item.danger
-                          ? 'bg-red-500/10 border border-red-500/20'
+                          ? 'bg-fx-danger-dim border border-fx-border'
                           : 'bg-fx-surface-2 border border-fx-border'
                       }`}
                     >
                       <item.icon
                         size={16}
-                        className={item.danger ? 'text-red-400' : 'text-fx-text-muted'}
+                        className={item.danger ? 'text-fx-danger' : 'text-fx-text-muted'}
                       />
                     </div>
                     <div className="flex-1">
                       <p
-                        className={`text-sm font-semibold ${item.danger ? 'text-red-400' : 'text-fx-text'}`}
+                        className={`text-sm font-semibold ${item.danger ? 'text-fx-danger' : 'text-fx-text'}`}
                       >
                         {item.label}
                       </p>

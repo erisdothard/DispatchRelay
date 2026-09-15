@@ -104,7 +104,7 @@ export default function CarrierRfpsPage() {
               </label>
               <input
                 type="number"
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 value={rate}
                 onChange={(e) => setRate(e.target.value)}
                 placeholder="$0.00"
@@ -116,7 +116,7 @@ export default function CarrierRfpsPage() {
               </label>
               <input
                 type="number"
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 value={transitDays}
                 onChange={(e) => setTransitDays(e.target.value)}
               />
@@ -126,14 +126,14 @@ export default function CarrierRfpsPage() {
                 Notes
               </label>
               <textarea
-                className="w-full h-16 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-fx-text resize-none focus:outline-none focus:border-fx-orange"
+                className="w-full h-16 bg-fx-surface-2 border border-fx-border rounded-lg px-3 py-2 text-sm text-fx-text resize-none focus:outline-none focus:border-fx-orange"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-400">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-fx-danger-dim border border-fx-danger-dim text-xs text-fx-danger">
                 <AlertCircle size={13} />
                 {error}
               </div>
@@ -179,7 +179,7 @@ function RfpCard({
             <button
               key={lane.id}
               onClick={() => onPropose(lane)}
-              className="w-full flex items-center gap-2 p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-left hover:border-fx-orange/30 transition-colors"
+              className="w-full flex items-center gap-2 p-2 rounded-lg bg-fx-surface border border-fx-border text-left hover:border-fx-orange/30 transition-colors"
             >
               <span className="text-xs text-fx-text flex-1">
                 {lane.origin_city}, {lane.origin_state} → {lane.dest_city}, {lane.dest_state}

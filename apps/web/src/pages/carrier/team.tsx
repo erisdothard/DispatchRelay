@@ -73,8 +73,8 @@ function DriverCard({
       className="w-full text-left bg-fx-surface border border-fx-border rounded-2xl p-4 transition-colors active:bg-fx-surface-2"
     >
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-11 h-11 rounded-xl bg-fx-orange/10 border border-fx-orange/20 flex items-center justify-center shrink-0">
-          <span className="text-sm font-extrabold text-fx-orange">
+        <div className="w-11 h-11 rounded-xl bg-fx-surface-2 border border-fx-border flex items-center justify-center shrink-0">
+          <span className="text-sm font-extrabold text-fx-text">
             {name
               .split(' ')
               .map((n) => n[0])
@@ -88,7 +88,7 @@ function DriverCard({
             {driverLoads.length} load{driverLoads.length !== 1 ? 's' : ''} assigned
           </p>
         </div>
-        <Badge variant={activeLoad ? 'orange' : 'green'}>
+        <Badge variant={activeLoad ? 'blue' : 'gray'}>
           {activeLoad ? 'In Transit' : 'Available'}
         </Badge>
       </div>
@@ -101,11 +101,11 @@ const STATUS_BADGE: Record<
   string,
   { label: string; variant: 'orange' | 'blue' | 'green' | 'gray' }
 > = {
-  in_transit: { label: 'In Transit', variant: 'orange' },
-  dispatched: { label: 'Dispatched', variant: 'blue' },
-  awarded: { label: 'Awarded', variant: 'blue' },
+  in_transit: { label: 'In Transit', variant: 'blue' },
+  dispatched: { label: 'Dispatched', variant: 'gray' },
+  awarded: { label: 'Awarded', variant: 'orange' },
   delivered: { label: 'Delivered', variant: 'green' },
-  completed: { label: 'Completed', variant: 'gray' },
+  completed: { label: 'Completed', variant: 'green' },
 };
 
 const DONE_STATUSES = new Set(['delivered', 'completed']);
@@ -136,8 +136,8 @@ function ActiveLoadRow({ load }: { load: Load }) {
         </div>
         {!isDone &&
           (ping ? (
-            <span className="text-[10px] text-green-400 font-semibold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-[10px] text-fx-success font-semibold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-fx-success rounded-full animate-pulse" />
               Live GPS
             </span>
           ) : (
@@ -162,7 +162,7 @@ function ActiveLoadRow({ load }: { load: Load }) {
             </span>
           )}
           {lastPing && <span>Last: {lastPing}</span>}
-          <span className="ml-auto text-green-400 flex items-center gap-1">
+          <span className="ml-auto text-fx-text-muted flex items-center gap-1">
             <Radio size={10} /> Tracking
           </span>
         </div>
@@ -210,7 +210,7 @@ function DriverDetailSheet({
             <p className="text-base font-bold text-fx-text">{name}</p>
             {driver.email && <p className="text-xs text-fx-text-dim">{driver.email}</p>}
           </div>
-          <Badge variant={activeLoad ? 'orange' : 'green'}>
+          <Badge variant={activeLoad ? 'blue' : 'gray'}>
             {activeLoad ? 'In Transit' : 'Available'}
           </Badge>
         </div>
@@ -282,7 +282,7 @@ function DriverGpsMap({ load }: { load: Load }) {
             </span>
           )}
           {lastPing && <span>Last ping: {lastPing}</span>}
-          <span className="ml-auto text-green-400 flex items-center gap-1">
+          <span className="ml-auto text-fx-text-muted flex items-center gap-1">
             <Radio size={12} /> Live
           </span>
         </div>
@@ -301,25 +301,25 @@ const ROLE_META: Record<
     label: 'Owner',
     desc: 'Full control, billing, and member management',
     icon: Crown,
-    color: 'text-yellow-400',
+    color: 'text-fx-text',
   },
   admin: {
     label: 'Admin',
     desc: 'Manage team, loads, and settings',
     icon: Shield,
-    color: 'text-blue-400',
+    color: 'text-fx-text',
   },
   dispatcher: {
     label: 'Dispatcher',
     desc: 'Assign drivers, dispatch loads, update status',
     icon: Truck,
-    color: 'text-fx-orange',
+    color: 'text-fx-text-muted',
   },
   accounting: {
     label: 'Accounting',
     desc: 'View rates, invoices, and financials',
     icon: Calculator,
-    color: 'text-green-400',
+    color: 'text-fx-text-muted',
   },
   viewer: {
     label: 'Viewer',
@@ -331,7 +331,7 @@ const ROLE_META: Record<
     label: 'Driver',
     desc: 'View assigned loads, GPS tracking, and document uploads',
     icon: UserCheck,
-    color: 'text-green-300',
+    color: 'text-fx-text-muted',
   },
 };
 
@@ -523,8 +523,8 @@ function MembersTabContent() {
               </span>{' '}
               {ROLE_META[inviteRole].desc}
             </p>
-            {inviteError && <p className="text-xs text-red-400">{inviteError}</p>}
-            {inviteSuccess && <p className="text-xs text-green-400">{inviteSuccess}</p>}
+            {inviteError && <p className="text-xs text-fx-danger">{inviteError}</p>}
+            {inviteSuccess && <p className="text-xs text-fx-success">{inviteSuccess}</p>}
             {lastInviteLink && (
               <div className="bg-fx-surface-2 border border-fx-border rounded-xl p-3 space-y-2">
                 <p className="text-[10px] font-bold text-fx-text-muted uppercase tracking-widest">
@@ -595,7 +595,7 @@ function MembersTabContent() {
                     </select>
                     <button
                       onClick={() => handleRemove(member.id)}
-                      className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-lg bg-fx-surface-2 text-fx-text-muted hover:bg-fx-danger-dim hover:text-fx-danger flex items-center justify-center transition-colors"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -636,7 +636,7 @@ function MembersTabContent() {
                 {canManage && (
                   <button
                     onClick={() => handleRevokeInvite(invite.id)}
-                    className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center"
+                    className="w-8 h-8 rounded-lg bg-fx-surface-2 text-fx-text-muted hover:bg-fx-danger-dim hover:text-fx-danger flex items-center justify-center"
                   >
                     <Trash2 size={13} />
                   </button>

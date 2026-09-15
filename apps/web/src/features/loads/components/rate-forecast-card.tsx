@@ -32,8 +32,11 @@ export function RateForecastCard({
   const { currentRate, forecastRate, weeklyChange, trend, confidence } = PLACEHOLDER;
 
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
+  // Neutral on purpose: this card is shown to carriers (rates up = good) and to brokers and
+  // shippers (rates up = bad) via load-detail-sheet and lane-intelligence, so a fixed
+  // good/bad hue would be wrong for one audience. Direction is carried by icon and sign.
   const trendColor =
-    trend === 'up' ? 'text-green-400' : trend === 'down' ? 'text-red-400' : 'text-fx-text-muted';
+    trend === 'up' ? 'text-fx-text' : trend === 'down' ? 'text-fx-text-muted' : 'text-fx-text-dim';
 
   return (
     <div

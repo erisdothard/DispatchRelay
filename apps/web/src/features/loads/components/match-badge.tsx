@@ -8,10 +8,8 @@ interface MatchBadgeProps {
 export function MatchBadge({ score, className }: MatchBadgeProps) {
   const color =
     score >= 80
-      ? '#34D399' // green
-      : score >= 60
-        ? '#E86030' // fx-orange
-        : '#6B7280'; // gray
+      ? '#E86030' // fx-orange: a strong match is the highlight
+      : 'var(--fx-text-muted)'; // neutral
 
   return (
     <div
@@ -20,8 +18,8 @@ export function MatchBadge({ score, className }: MatchBadgeProps) {
         className,
       )}
       style={{
-        background: `${color}1A`,
-        border: `1px solid ${color}40`,
+        background: `color-mix(in srgb, ${color} 10%, transparent)`,
+        border: `1px solid color-mix(in srgb, ${color} 25%, transparent)`,
         color,
       }}
     >

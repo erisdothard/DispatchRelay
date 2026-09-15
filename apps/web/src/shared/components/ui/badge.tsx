@@ -9,12 +9,12 @@ interface BadgeProps {
 
 const variantStyles = {
   orange: 'bg-fx-orange/15 text-fx-orange border border-fx-orange/30',
-  blue: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
-  green: 'bg-green-500/15 text-green-400 border border-green-500/30',
-  yellow: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30',
-  red: 'bg-red-500/15 text-red-400 border border-red-500/30',
+  blue: 'bg-fx-surface-2 text-fx-text border border-fx-border-2',
+  green: 'bg-fx-success-dim text-fx-success border border-transparent',
+  yellow: 'bg-fx-surface-3 text-fx-text border border-fx-border-2',
+  red: 'bg-fx-danger-dim text-fx-danger border border-transparent',
   gray: 'bg-fx-surface-2 text-fx-text-muted border border-fx-border',
-  purple: 'bg-purple-500/15 text-purple-400 border border-purple-500/30',
+  purple: 'bg-fx-surface-2 text-fx-text-muted border border-fx-border-2',
 };
 
 export function Badge({ children, variant = 'gray', size = 'sm', className }: BadgeProps) {

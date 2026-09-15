@@ -26,22 +26,27 @@ export function analyzeRate(load: Load): RateAnalysis {
   const pct = ((load.ratePerMile - market) / market) * 100;
 
   if (pct >= 15)
-    return { health: 'hot', label: 'Hot Rate', delta: `+${pct.toFixed(0)}% mkt`, color: '#34D399' };
+    return { health: 'hot', label: 'Hot Rate', delta: `+${pct.toFixed(0)}% mkt`, color: '#E86030' };
   if (pct >= 3)
     return {
       health: 'good',
       label: 'Good Rate',
       delta: `+${pct.toFixed(0)}% mkt`,
-      color: '#60A5FA',
+      color: 'var(--fx-text)',
     };
   if (pct >= -8)
     return {
       health: 'fair',
       label: 'Fair Rate',
       delta: `${pct.toFixed(0)}% mkt`,
-      color: '#F59E0B',
+      color: 'var(--fx-text-dim)',
     };
-  return { health: 'low', label: 'Below Mkt', delta: `${pct.toFixed(0)}% mkt`, color: '#F87171' };
+  return {
+    health: 'low',
+    label: 'Below Mkt',
+    delta: `${pct.toFixed(0)}% mkt`,
+    color: 'var(--fx-danger)',
+  };
 }
 
 export function getLoadAge(postedAt?: string): string {
@@ -56,10 +61,16 @@ export function getLoadAge(postedAt?: string): string {
 
 export function getBrokerCreditLabel(score?: number): { label: string; color: string } | null {
   if (!score) return null;
-  if (score >= 85) return { label: `Credit A+`, color: '#34D399' };
-  if (score >= 70) return { label: `Credit B`, color: '#60A5FA' };
-  if (score >= 55) return { label: `Credit C`, color: '#F59E0B' };
-  return { label: 'Credit D', color: '#F87171' };
+  if (score >= 85) return { label: `Credit A+`, color: 'var(--fx-text)' };
+  // Tiers are neutral by palette rule, so they step down in lightness instead of hue:
+  // full text, a midpoint, dim, then danger. Every tier must stay distinct (see test).
+  if (score >= 70)
+    return {
+      label: `Credit B`,
+      color: 'color-mix(in srgb, var(--fx-text) 50%, var(--fx-text-dim))',
+    };
+  if (score >= 55) return { label: `Credit C`, color: 'var(--fx-text-dim)' };
+  return { label: 'Credit D', color: 'var(--fx-danger)' };
 }
 
 export function calcGrossProfit(load: Load): string | null {

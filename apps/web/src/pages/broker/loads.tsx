@@ -123,26 +123,26 @@ export default function BrokerLoadsPage() {
     {
       key: 'delivered',
       label: 'Awaiting Close-Out',
-      accent: 'text-green-400',
-      badge: 'bg-green-500 text-white',
+      accent: 'text-fx-success',
+      badge: 'bg-fx-success-dim text-fx-success',
     },
     {
       key: 'awarded',
       label: 'Awarded',
-      accent: 'text-amber-400',
-      badge: 'bg-amber-400 text-amber-900',
+      accent: 'text-fx-text-muted',
+      badge: 'bg-fx-surface-2 border border-fx-border text-fx-text',
     },
     {
       key: 'dispatched',
       label: 'Dispatched',
-      accent: 'text-blue-400',
-      badge: 'bg-blue-500 text-white',
+      accent: 'text-fx-text-muted',
+      badge: 'bg-fx-surface-2 border border-fx-border text-fx-text',
     },
     {
       key: 'in_transit',
       label: 'In Transit',
-      accent: 'text-fx-orange',
-      badge: 'bg-fx-orange text-white',
+      accent: 'text-fx-text-muted',
+      badge: 'bg-fx-surface-2 border border-fx-border text-fx-text',
     },
     {
       key: 'posted',
@@ -159,8 +159,8 @@ export default function BrokerLoadsPage() {
     {
       key: 'cancelled',
       label: 'Cancelled',
-      accent: 'text-red-400',
-      badge: 'bg-red-500/20 text-red-400',
+      accent: 'text-fx-danger',
+      badge: 'bg-fx-danger-dim text-fx-danger',
     },
     {
       key: 'expired',

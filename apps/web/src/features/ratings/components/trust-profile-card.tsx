@@ -6,13 +6,13 @@ interface Props {
 }
 
 const GRADE_COLORS: Record<string, string> = {
-  'A+': 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-  A: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-  'B+': 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-  B: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-  'C+': 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  C: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  D: 'text-red-400 bg-red-400/10 border-red-400/20',
+  'A+': 'text-fx-text bg-fx-surface-2 border-fx-border-2',
+  A: 'text-fx-text bg-fx-surface-2 border-fx-border-2',
+  'B+': 'text-fx-text bg-fx-surface-2 border-fx-border',
+  B: 'text-fx-text bg-fx-surface-2 border-fx-border',
+  'C+': 'text-fx-text-muted bg-fx-surface-2 border-fx-border',
+  C: 'text-fx-text-muted bg-fx-surface-2 border-fx-border',
+  D: 'text-fx-danger bg-fx-danger-dim border-transparent',
 };
 
 function RatingBar({
@@ -32,7 +32,7 @@ function RatingBar({
         <span className="text-fx-text-muted">{icon}</span>
       </div>
       <span className="text-xs text-fx-text-muted flex-1">{label}</span>
-      <div className="w-24 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+      <div className="w-24 h-1.5 bg-fx-surface-3 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full bg-fx-orange transition-all"
           style={{ width: `${pct}%` }}
@@ -45,14 +45,14 @@ function RatingBar({
 
 export function TrustProfileCard({ profile }: Props) {
   const gradeColor =
-    GRADE_COLORS[profile.trust_grade] ?? 'text-zinc-400 bg-zinc-800 border-zinc-700';
+    GRADE_COLORS[profile.trust_grade] ?? 'text-fx-text-muted bg-fx-surface-2 border-fx-border';
 
   return (
     <div className="bg-fx-surface border border-fx-border rounded-2xl overflow-hidden">
       {/* Header */}
       <div
         className="p-4 flex items-center gap-3"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ borderBottom: '1px solid var(--fx-border)' }}
       >
         <div className="w-12 h-12 rounded-xl bg-fx-orange/10 border-2 border-fx-orange/30 flex items-center justify-center">
           <span className="text-lg font-extrabold text-fx-orange">
@@ -71,9 +71,9 @@ export function TrustProfileCard({ profile }: Props) {
       {/* Overall rating */}
       <div
         className="px-4 py-3 flex items-center gap-2"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ borderBottom: '1px solid var(--fx-border)' }}
       >
-        <Star size={16} className="text-yellow-400 fill-yellow-400" />
+        <Star size={16} className="text-fx-orange fill-fx-orange" />
         <span className="text-xl font-extrabold text-fx-text">
           {profile.avg_overall.toFixed(1)}
         </span>
@@ -113,7 +113,7 @@ export function TrustProfileCard({ profile }: Props) {
       {profile.avg_detention_minutes != null && (
         <div
           className="px-4 py-3 flex items-center gap-2"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+          style={{ borderTop: '1px solid var(--fx-border)' }}
         >
           <Shield size={14} className="text-fx-text-muted" />
           <span className="text-xs text-fx-text-muted">Avg Detention:</span>

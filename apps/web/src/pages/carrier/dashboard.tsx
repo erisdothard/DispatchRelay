@@ -162,7 +162,7 @@ export default function CarrierDashboard() {
       </div>
 
       {/* Divider */}
-      <div className="mx-5 mb-6 h-px bg-white/[0.05]" />
+      <div className="mx-5 mb-6 h-px bg-fx-border" />
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto scrollbar-hide px-5 space-y-8 pb-2">
@@ -172,13 +172,13 @@ export default function CarrierDashboard() {
             <button
               key={item.label}
               onClick={() => navigate(item.path)}
-              className="bg-fx-surface border border-white/[0.06] rounded-ios-sm p-4 flex items-center gap-3 active-scale card-highlight text-left transition-colors hover:bg-fx-surface-2"
+              className="bg-fx-surface border border-fx-border rounded-ios-sm p-4 flex items-center gap-3 active-scale card-highlight text-left transition-colors hover:bg-fx-surface-2"
             >
               <div className="w-10 h-10 rounded-ios-xs bg-fx-orange/15 flex items-center justify-center shrink-0">
                 {item.icon}
               </div>
               <div className="min-w-0">
-                <p className="text-[13px] font-semibold text-white truncate">{item.label}</p>
+                <p className="text-[13px] font-semibold text-fx-text truncate">{item.label}</p>
                 <p className="text-[11px] text-fx-text-dim truncate mt-0.5">{item.sub}</p>
               </div>
             </button>
@@ -192,7 +192,7 @@ export default function CarrierDashboard() {
               label="Negotiating"
               title="Bidding On"
               badge={
-                <span className="text-[11px] font-bold text-white bg-blue-500 px-2.5 py-1 rounded-full">
+                <span className="text-[11px] font-bold text-white bg-fx-orange px-2.5 py-1 rounded-full">
                   {negotiations.length}
                 </span>
               }
@@ -225,7 +225,7 @@ export default function CarrierDashboard() {
               label="Pending"
               title="Action Required"
               badge={
-                <span className="text-[11px] font-bold text-amber-900 bg-amber-400 px-2.5 py-1 rounded-full">
+                <span className="text-[11px] font-bold text-white bg-fx-orange px-2.5 py-1 rounded-full">
                   {awardedLoads.length}
                 </span>
               }
@@ -235,21 +235,21 @@ export default function CarrierDashboard() {
                 <button
                   key={load.id}
                   onClick={() => setSelectedLoad(load)}
-                  className="w-full text-left bg-amber-500/[0.06] border border-amber-500/20 rounded-ios-sm p-4 active-scale transition-colors"
-                  style={{ boxShadow: 'inset 3px 0 0 rgba(251, 191, 36, 0.65)' }}
+                  className="w-full text-left bg-fx-surface border border-fx-border rounded-ios-sm p-4 active-scale transition-colors"
+                  style={{ boxShadow: 'inset 3px 0 0 rgba(232, 96, 48, 0.65)' }}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <p className="text-[11px] text-fx-text-dim">Load {load.loadNumber}</p>
-                      <p className="text-[15px] font-bold text-white mt-0.5">
+                      <p className="text-[15px] font-bold text-fx-text mt-0.5">
                         {load.originCity} → {load.destCity}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[15px] font-bold text-fx-orange">
+                      <p className="text-[15px] font-bold text-fx-text">
                         ${load.rateUsd.toLocaleString()}
                       </p>
-                      <span className="text-[10px] font-semibold text-amber-400 tracking-[0.06em] uppercase">
+                      <span className="text-[10px] font-semibold text-fx-orange tracking-[0.06em] uppercase">
                         Needs Dispatch
                       </span>
                     </div>
@@ -257,14 +257,14 @@ export default function CarrierDashboard() {
                   <div className="flex items-center justify-between">
                     <p className="text-[11px] text-fx-text-dim">
                       {load.assignedDriverId ? (
-                        <span className="text-green-400 font-semibold">
+                        <span className="text-fx-text font-semibold">
                           {load.driverName ?? 'Driver assigned'}
                         </span>
                       ) : (
-                        <span className="text-amber-400">No driver assigned</span>
+                        <span className="text-fx-text-muted">No driver assigned</span>
                       )}
                     </p>
-                    <p className="text-[11px] font-bold text-amber-400">
+                    <p className="text-[11px] font-bold text-fx-orange">
                       Sign Rate Con &amp; Dispatch →
                     </p>
                   </div>
@@ -281,7 +281,7 @@ export default function CarrierDashboard() {
               label="Waiting"
               title="Pending Broker Close-Out"
               badge={
-                <span className="text-[11px] font-bold text-green-900 bg-green-400 px-2.5 py-1 rounded-full">
+                <span className="text-[11px] font-bold text-white bg-fx-orange px-2.5 py-1 rounded-full">
                   {deliveredLoads.length}
                 </span>
               }
@@ -291,32 +291,32 @@ export default function CarrierDashboard() {
                 <button
                   key={load.id}
                   onClick={() => setSelectedLoad(load)}
-                  className="w-full text-left bg-green-500/[0.06] border border-green-500/20 rounded-ios-sm p-4 active-scale transition-colors"
-                  style={{ boxShadow: 'inset 3px 0 0 rgba(34, 197, 94, 0.65)' }}
+                  className="w-full text-left bg-fx-surface border border-fx-border rounded-ios-sm p-4 active-scale transition-colors"
+                  style={{ boxShadow: 'inset 3px 0 0 var(--fx-border-2)' }}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <p className="text-[11px] text-fx-text-dim">Load {load.loadNumber}</p>
-                      <p className="text-[15px] font-bold text-white mt-0.5">
+                      <p className="text-[15px] font-bold text-fx-text mt-0.5">
                         {load.originCity} → {load.destCity}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[15px] font-bold text-fx-orange">
+                      <p className="text-[15px] font-bold text-fx-text">
                         ${load.rateUsd.toLocaleString()}
                       </p>
-                      <span className="text-[10px] font-semibold text-green-400 tracking-[0.06em] uppercase">
+                      <span className="text-[10px] font-semibold text-fx-success tracking-[0.06em] uppercase">
                         Delivered
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-[11px] text-fx-text-dim">
-                      <span className="text-green-400 font-semibold">
+                      <span className="text-fx-text-muted font-semibold">
                         Waiting on broker to complete
                       </span>
                     </p>
-                    <p className="text-[11px] font-bold text-green-400">View Details →</p>
+                    <p className="text-[11px] font-bold text-fx-text-muted">View Details →</p>
                   </div>
                 </button>
               ))}
@@ -349,7 +349,7 @@ export default function CarrierDashboard() {
               {inProgressLoads.map((currentLoad) => (
                 <div
                   key={currentLoad.id}
-                  className={`${inProgressLoads.length > 1 ? 'min-w-[85%] snap-center shrink-0' : 'w-full'} bg-fx-surface border border-white/[0.06] rounded-ios card-highlight transition-colors`}
+                  className={`${inProgressLoads.length > 1 ? 'min-w-[85%] snap-center shrink-0' : 'w-full'} bg-fx-surface border border-fx-border rounded-ios card-highlight transition-colors`}
                 >
                   <button
                     type="button"
@@ -361,13 +361,13 @@ export default function CarrierDashboard() {
                         ID {currentLoad.loadNumber}
                       </p>
                       {currentLoad.assignedDriverId && (
-                        <span className="text-[11px] font-semibold text-green-400">
+                        <span className="text-[11px] font-semibold text-fx-text-muted">
                           {currentLoad.driverName ?? 'Driver assigned'}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-1 mb-4">
-                      <span className="text-[11px] font-bold text-fx-orange bg-fx-orange/15 px-2 py-0.5 rounded-full">
+                      <span className="text-[11px] font-bold text-fx-text-muted bg-fx-surface-2 px-2 py-0.5 rounded-full">
                         {EQUIPMENT_LABELS[currentLoad.equipment] ?? currentLoad.equipment}
                       </span>
                       {currentLoad.weightLbs > 0 && (
@@ -421,7 +421,7 @@ export default function CarrierDashboard() {
                             },
                           )}
                         </p>
-                        <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
+                        <p className="text-[15px] font-bold text-fx-text mt-0.5 tracking-[-0.01em]">
                           {currentLoad.originCity}
                         </p>
                       </div>
@@ -437,7 +437,7 @@ export default function CarrierDashboard() {
                             },
                           )}
                         </p>
-                        <p className="text-[15px] font-bold text-white mt-0.5 tracking-[-0.01em]">
+                        <p className="text-[15px] font-bold text-fx-text mt-0.5 tracking-[-0.01em]">
                           {currentLoad.destCity}
                         </p>
                       </div>
@@ -503,7 +503,7 @@ export default function CarrierDashboard() {
               />
             ) : (
               <div className="space-y-3">
-                {recentLoads.map((load, i) => {
+                {recentLoads.map((load) => {
                   const bol = bolStatuses.find((b) => b.loadId === load.id);
                   const showBolBadge = ['dispatched', 'in_transit'].includes(load.status);
 
@@ -511,25 +511,23 @@ export default function CarrierDashboard() {
                     <button
                       key={load.id}
                       onClick={() => setSelectedLoad(load)}
-                      className="relative w-full bg-orange-gradient rounded-ios p-5 card-orange-highlight text-left active-scale overflow-hidden grain"
-                      style={{
-                        filter:
-                          i === 1 ? 'brightness(0.91)' : i === 2 ? 'brightness(0.82)' : 'none',
-                      }}
+                      className="relative w-full bg-fx-surface border border-fx-border rounded-ios p-5 text-left active-scale overflow-hidden"
                     >
                       <p
-                        className="text-[34px] font-black text-white leading-none mb-1"
+                        className="text-[34px] font-black text-fx-orange leading-none mb-1"
                         style={{ letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}
                       >
                         {load.loadNumber}
                       </p>
-                      <p className="text-[10px] text-white/40 font-semibold mb-3 tracking-[0.08em] uppercase">
+                      <p className="text-[10px] text-fx-text-dim font-semibold mb-3 tracking-[0.08em] uppercase">
                         {load.commodity}
-                        {load.totalMiles ? <span className="text-white/25 mx-1.5">·</span> : null}
+                        {load.totalMiles ? (
+                          <span className="text-fx-text-dim mx-1.5">·</span>
+                        ) : null}
                         {load.totalMiles ? `${load.totalMiles} mi` : null}
                       </p>
                       <div className="flex items-center justify-between">
-                        <p className="text-[13px] text-white/80 font-semibold">
+                        <p className="text-[13px] text-fx-text-muted font-semibold">
                           {load.originCity} → {load.destCity}
                         </p>
                         <div className="flex items-center gap-1.5">
@@ -537,16 +535,16 @@ export default function CarrierDashboard() {
                             <span
                               className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                                 bol.signed
-                                  ? 'bg-green-500/30 text-green-200'
+                                  ? 'bg-fx-surface-3 text-fx-text'
                                   : bol.hasBol
-                                    ? 'bg-orange-400/30 text-orange-200'
-                                    : 'bg-white/15 text-white/60'
+                                    ? 'bg-fx-surface-2 text-fx-text-muted'
+                                    : 'bg-fx-surface-2 text-fx-text-dim'
                               }`}
                             >
                               {bol.signed ? 'BOL Signed' : bol.hasBol ? 'BOL Pending' : 'No BOL'}
                             </span>
                           )}
-                          <span className="text-[11px] font-bold text-white bg-black/25 px-2.5 py-1 rounded-full">
+                          <span className="text-[11px] font-bold text-fx-text-muted bg-fx-surface-2 px-2.5 py-1 rounded-full">
                             {load.status === 'delivered'
                               ? 'Delivered'
                               : load.status === 'completed'

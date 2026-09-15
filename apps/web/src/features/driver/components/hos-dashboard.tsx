@@ -14,22 +14,22 @@ const STATUS_CONFIG: Record<DutyStatus, { label: string; icon: React.ElementType
     driving: {
       label: 'Driving',
       icon: Truck,
-      color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
+      color: 'text-fx-orange bg-fx-surface-2 border-fx-border-2',
     },
     on_duty_not_driving: {
       label: 'On Duty',
       icon: Clock,
-      color: 'text-blue-400 bg-blue-400/10 border-blue-400/30',
+      color: 'text-fx-orange bg-fx-surface-2 border-fx-border-2',
     },
     sleeper_berth: {
       label: 'Sleeper',
       icon: Moon,
-      color: 'text-purple-400 bg-purple-400/10 border-purple-400/30',
+      color: 'text-fx-orange bg-fx-surface-2 border-fx-border-2',
     },
     off_duty: {
       label: 'Off Duty',
       icon: Coffee,
-      color: 'text-zinc-400 bg-zinc-400/10 border-zinc-400/30',
+      color: 'text-fx-orange bg-fx-surface-2 border-fx-border-2',
     },
   };
 
@@ -55,7 +55,7 @@ function Gauge({
       </p>
       <div className="flex items-end gap-1 mb-2">
         <span
-          className={`text-xl font-extrabold ${isDanger ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-fx-text'}`}
+          className={`text-xl font-extrabold ${isDanger ? 'text-fx-danger' : isWarning ? 'text-fx-orange' : 'text-fx-text'}`}
         >
           {current.toFixed(1)}
         </span>
@@ -63,10 +63,10 @@ function Gauge({
           / {max} {unit}
         </span>
       </div>
-      <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+      <div className="w-full h-1.5 bg-fx-surface-3 rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${
-            isDanger ? 'bg-red-400' : isWarning ? 'bg-amber-400' : 'bg-fx-orange'
+            isDanger ? 'bg-fx-danger' : isWarning ? 'bg-fx-orange' : 'bg-fx-orange/50'
           }`}
           style={{ width: `${pct}%` }}
         />
@@ -132,7 +132,7 @@ export function HosDashboard({ status, driverId }: Props) {
 
       {/* Break warning */}
       {status.hours_until_break <= 1 && status.current_status === 'driving' && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-400/10 border border-amber-400/30 text-xs text-amber-400">
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-fx-orange/10 border border-fx-orange/30 text-xs text-fx-orange">
           <AlertTriangle size={14} />
           <span className="font-semibold">
             30-minute break required within {status.hours_until_break.toFixed(1)} hours
@@ -172,7 +172,7 @@ export function HosDashboard({ status, driverId }: Props) {
 
       {/* Notes */}
       <input
-        className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+        className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
         placeholder="Add notes (optional)..."
         value={notes}
         onChange={(e) => setNotes(e.target.value)}

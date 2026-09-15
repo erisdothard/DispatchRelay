@@ -4,15 +4,15 @@ import { BottomSheet } from '@/shared/components/bottom-sheet';
 import type { AppNotification } from '../hooks/use-notifications';
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
-  new_bid: <Zap size={14} className="text-green-400" />,
-  bid_accepted: <Zap size={14} className="text-fx-orange" />,
-  bid_declined: <Zap size={14} className="text-red-400" />,
-  new_message: <MessageSquare size={14} className="text-blue-400" />,
-  load_status_change: <Package size={14} className="text-fx-orange" />,
-  load_booked: <Package size={14} className="text-green-400" />,
-  load_cancelled: <Package size={14} className="text-red-400" />,
-  gps_request: <Radio size={14} className="text-green-400" />,
-  bol_signed: <FileCheck size={14} className="text-green-400" />,
+  new_bid: <Zap size={14} className="text-fx-orange" />,
+  bid_accepted: <Zap size={14} className="text-fx-success" />,
+  bid_declined: <Zap size={14} className="text-fx-danger" />,
+  new_message: <MessageSquare size={14} className="text-fx-text-muted" />,
+  load_status_change: <Package size={14} className="text-fx-text-muted" />,
+  load_booked: <Package size={14} className="text-fx-text-muted" />,
+  load_cancelled: <Package size={14} className="text-fx-danger" />,
+  gps_request: <Radio size={14} className="text-fx-orange" />,
+  bol_signed: <FileCheck size={14} className="text-fx-success" />,
 };
 
 function timeAgo(iso: string): string {
@@ -78,7 +78,7 @@ export function NotificationSheet({
               onClick={() => onNotificationClick?.(n)}
               className={`w-full text-left flex items-start gap-3 p-3 rounded-xl transition-colors ${
                 !n.read
-                  ? 'bg-fx-orange/5 border border-fx-orange/15'
+                  ? 'bg-fx-surface-2 border border-fx-border-2'
                   : 'bg-fx-surface border border-fx-border'
               } ${n.load_id && onNotificationClick ? 'cursor-pointer hover:bg-fx-surface-2' : ''}`}
             >

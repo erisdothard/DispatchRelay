@@ -9,6 +9,8 @@ const config: Config = {
           orange: '#E86030',
           'orange-hover': '#D05020',
           'orange-light': '#F07848',
+          // Deeper orange for surfaces carrying normal-size white text (white on it: 4.68:1).
+          'orange-deep': '#C94A1F',
           bg: 'var(--fx-bg)',
           surface: 'var(--fx-surface)',
           'surface-2': 'var(--fx-surface-2)',
@@ -18,6 +20,11 @@ const config: Config = {
           text: 'var(--fx-text)',
           'text-muted': 'var(--fx-text-muted)',
           'text-dim': 'var(--fx-text-dim)',
+          // Status colours: green for done, red for problems. Everything else is orange or neutral.
+          success: 'var(--fx-success)',
+          'success-dim': 'var(--fx-success-dim)',
+          danger: 'var(--fx-danger)',
+          'danger-dim': 'var(--fx-danger-dim)',
         },
       },
       fontFamily: {

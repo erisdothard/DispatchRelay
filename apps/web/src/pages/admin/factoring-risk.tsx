@@ -12,10 +12,10 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const RISK_COLORS: Record<string, string> = {
-  low: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-  medium: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  high: 'text-red-400 bg-red-400/10 border-red-400/20',
-  critical: 'text-red-500 bg-red-500/10 border-red-500/30',
+  low: 'text-fx-text-muted bg-fx-surface-2 border-fx-border',
+  medium: 'text-fx-orange bg-fx-orange/10 border-fx-orange/30',
+  high: 'text-fx-danger bg-fx-danger-dim border-fx-danger-dim',
+  critical: 'text-fx-danger bg-fx-danger-dim border-fx-danger',
 };
 
 export default function AdminFactoringRiskPage() {
@@ -59,7 +59,7 @@ export default function AdminFactoringRiskPage() {
           <div className="bg-fx-surface border border-fx-border rounded-xl p-3">
             <p className="text-[10px] font-bold text-fx-text-dim uppercase">High Risk</p>
             <p
-              className={`text-xl font-extrabold mt-1 ${highRiskCount > 0 ? 'text-red-400' : 'text-emerald-400'}`}
+              className={`text-xl font-extrabold mt-1 ${highRiskCount > 0 ? 'text-fx-danger' : 'text-fx-text'}`}
             >
               {highRiskCount}
             </p>
@@ -123,11 +123,11 @@ export default function AdminFactoringRiskPage() {
                         {(p.exposure_limit / 1000).toFixed(0)}K
                       </span>
                     </div>
-                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-fx-surface-3 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${
                           p.outstanding_amount / p.exposure_limit > 0.8
-                            ? 'bg-red-400'
+                            ? 'bg-fx-danger'
                             : 'bg-fx-orange'
                         }`}
                         style={{
@@ -142,7 +142,7 @@ export default function AdminFactoringRiskPage() {
                     <div className="flex gap-2">
                       <input
                         type="number"
-                        className="flex-1 h-8 bg-zinc-800 border border-zinc-700 rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
+                        className="flex-1 h-8 bg-fx-surface-2 border border-fx-border rounded-lg px-2 text-xs text-fx-text focus:outline-none focus:border-fx-orange"
                         placeholder="New limit"
                         value={newLimit}
                         onChange={(e) => setNewLimit(e.target.value)}

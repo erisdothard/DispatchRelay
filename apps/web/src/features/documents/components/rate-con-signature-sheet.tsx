@@ -313,10 +313,7 @@ export function RateConSignatureSheet({
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div
-        className="relative w-full max-w-lg rounded-t-3xl p-6 space-y-4"
-        style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.08)' }}
-      >
+      <div className="relative w-full max-w-lg rounded-t-3xl p-6 space-y-4 bg-fx-surface border border-fx-border">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <FileText size={16} className="text-fx-orange" />
@@ -330,7 +327,7 @@ export function RateConSignatureSheet({
             Rate: <span className="text-fx-orange font-bold">${load.rateUsd.toLocaleString()}</span>
             {load.totalMiles ? ` · ${load.totalMiles} mi` : ''}
           </p>
-          <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2 mt-2">
+          <p className="text-xs text-fx-text-muted bg-fx-surface-2 border border-fx-border rounded-xl px-3 py-2 mt-2">
             By signing, carrier agrees to transport this load at the stated rate. Required before
             dispatch.
           </p>
@@ -395,7 +392,7 @@ export function RateConSignatureSheet({
           </span>
         </label>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm text-fx-danger">{error}</p>}
 
         <div className="flex gap-3">
           <button

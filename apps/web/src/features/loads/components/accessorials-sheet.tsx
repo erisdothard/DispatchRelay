@@ -23,9 +23,9 @@ const TYPES: AccessorialType[] = [
 ];
 
 const STATUS_COLORS = {
-  pending: 'text-yellow-400 bg-yellow-400/10',
-  approved: 'text-green-400 bg-green-400/10',
-  denied: 'text-red-400 bg-red-400/10',
+  pending: 'text-fx-text-muted bg-fx-surface-3',
+  approved: 'text-fx-success bg-fx-success-dim',
+  denied: 'text-fx-danger bg-fx-danger-dim',
 };
 
 interface AccessorialsSheetProps {
@@ -113,10 +113,7 @@ export function AccessorialsSheet({
     <BottomSheet open={open} onClose={onClose} title="Accessorial Charges">
       <div className="space-y-4">
         {/* Invoice summary */}
-        <div
-          className="rounded-xl p-4"
-          style={{ background: 'rgba(232,96,48,0.06)', border: '1px solid rgba(232,96,48,0.15)' }}
-        >
+        <div className="rounded-xl p-4 bg-fx-surface-2 border border-fx-border">
           <div className="flex justify-between items-center">
             <span className="text-xs font-bold text-fx-text-muted uppercase tracking-wider">
               Base Rate
@@ -128,7 +125,7 @@ export function AccessorialsSheet({
               <span className="text-xs font-bold text-fx-text-muted uppercase tracking-wider">
                 Accessorials
               </span>
-              <span className="text-sm font-bold text-green-400">
+              <span className="text-sm font-bold text-fx-text">
                 +${approvedTotal.toLocaleString()}
               </span>
             </div>
@@ -167,7 +164,7 @@ export function AccessorialsSheet({
               style={{ colorScheme: 'dark' }}
             >
               {TYPES.map((t) => (
-                <option key={t} value={t} style={{ background: '#141414' }}>
+                <option key={t} value={t} className="bg-fx-surface-2 text-fx-text">
                   {ACCESSORIAL_LABELS[t]}
                 </option>
               ))}
@@ -188,7 +185,7 @@ export function AccessorialsSheet({
               onChange={(e) => setAddNotes(e.target.value)}
               className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-xl text-fx-text text-sm px-3 focus:border-fx-orange outline-none"
             />
-            {error && <p className="text-xs text-red-400">{error}</p>}
+            {error && <p className="text-xs text-fx-danger">{error}</p>}
             <div className="flex gap-2">
               <button
                 type="submit"
@@ -243,13 +240,13 @@ export function AccessorialsSheet({
                     <div className="flex gap-1.5 shrink-0">
                       <button
                         onClick={() => handleApprove(charge.id)}
-                        className="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 flex items-center justify-center"
+                        className="w-8 h-8 rounded-lg bg-fx-orange/15 text-fx-orange hover:bg-fx-orange/25 flex items-center justify-center"
                       >
                         <Check size={14} />
                       </button>
                       <button
                         onClick={() => handleDeny(charge.id)}
-                        className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center"
+                        className="w-8 h-8 rounded-lg bg-fx-surface-2 text-fx-text-muted hover:bg-fx-danger-dim hover:text-fx-danger flex items-center justify-center"
                       >
                         <X size={14} />
                       </button>

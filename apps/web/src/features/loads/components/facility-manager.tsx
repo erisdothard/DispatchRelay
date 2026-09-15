@@ -91,7 +91,7 @@ export function FacilityManager({ facilities, selectedId, onSelect, companyId }:
               Name
             </label>
             <input
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+              className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Warehouse name"
@@ -102,7 +102,7 @@ export function FacilityManager({ facilities, selectedId, onSelect, companyId }:
               Address
             </label>
             <input
-              className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+              className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Street address"
@@ -114,7 +114,7 @@ export function FacilityManager({ facilities, selectedId, onSelect, companyId }:
                 City
               </label>
               <input
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
@@ -124,7 +124,7 @@ export function FacilityManager({ facilities, selectedId, onSelect, companyId }:
                 State
               </label>
               <input
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 maxLength={2}
@@ -135,7 +135,7 @@ export function FacilityManager({ facilities, selectedId, onSelect, companyId }:
                 ZIP
               </label>
               <input
-                className="w-full h-10 bg-zinc-800 border border-zinc-700 rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
+                className="w-full h-10 bg-fx-surface-2 border border-fx-border rounded-lg px-3 text-sm text-fx-text focus:outline-none focus:border-fx-orange"
                 value={zip}
                 onChange={(e) => setZip(e.target.value)}
               />
@@ -144,7 +144,7 @@ export function FacilityManager({ facilities, selectedId, onSelect, companyId }:
         </div>
 
         {error && (
-          <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-400">
+          <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-fx-danger-dim border border-fx-danger-dim text-xs text-fx-danger">
             <AlertCircle size={13} />
             {error}
           </div>

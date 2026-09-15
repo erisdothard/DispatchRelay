@@ -201,8 +201,8 @@ export default function OnboardingPage() {
   if (inviteExpired) {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center px-6 text-center gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-2">
-          <Mail size={28} className="text-red-400" />
+        <div className="w-16 h-16 rounded-2xl bg-fx-danger-dim flex items-center justify-center mb-2">
+          <Mail size={28} className="text-fx-danger" />
         </div>
         <p className="text-xl font-bold text-fx-text">This invite has expired</p>
         <p className="text-sm text-fx-text-muted max-w-xs">
@@ -381,7 +381,7 @@ export default function OnboardingPage() {
           </div>
 
           {error && (
-            <p className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3">
+            <p className="text-[13px] text-fx-danger bg-fx-danger-dim rounded-ios-xs px-4 py-3">
               {error}
             </p>
           )}
@@ -525,7 +525,7 @@ export default function OnboardingPage() {
           />
 
           {error && (
-            <p className="text-[13px] text-red-400 bg-red-500/10 rounded-ios-xs px-4 py-3">
+            <p className="text-[13px] text-fx-danger bg-fx-danger-dim rounded-ios-xs px-4 py-3">
               {error}
             </p>
           )}

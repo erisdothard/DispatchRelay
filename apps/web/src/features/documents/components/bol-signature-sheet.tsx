@@ -315,10 +315,7 @@ export function BolSignatureSheet({
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div
-        className="relative w-full max-w-lg rounded-t-3xl p-6 space-y-4"
-        style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.08)' }}
-      >
+      <div className="relative w-full max-w-lg rounded-t-3xl p-6 space-y-4 bg-fx-surface border border-fx-border">
         <div>
           <h2 className="text-lg font-bold text-fx-text">Loader Signature — Bill of Lading</h2>
           <p className="text-sm text-fx-text-muted mt-0.5">
@@ -375,14 +372,14 @@ export function BolSignatureSheet({
 
         {/* BOL field warnings */}
         {bolWarnings.length > 0 && (
-          <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/25">
-            <p className="text-xs font-bold text-yellow-400 mb-1">Missing Required Fields</p>
-            <ul className="text-xs text-yellow-300/80 space-y-0.5">
+          <div className="p-3 rounded-xl bg-fx-orange/10 border border-fx-orange/25">
+            <p className="text-xs font-bold text-fx-orange mb-1">Missing Required Fields</p>
+            <ul className="text-xs text-fx-text-muted space-y-0.5">
               {bolWarnings.map((w, i) => (
                 <li key={i}>- {w}</li>
               ))}
             </ul>
-            <p className="text-[10px] text-yellow-400/60 mt-2">
+            <p className="text-[10px] text-fx-text-dim mt-2">
               Update the load details before signing to ensure compliance.
             </p>
           </div>
@@ -402,7 +399,7 @@ export function BolSignatureSheet({
           </span>
         </label>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm text-fx-danger">{error}</p>}
 
         <div className="flex gap-3">
           <button
