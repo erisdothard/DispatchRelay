@@ -90,7 +90,8 @@ describe('DemoQueryBuilder over seeded tables', () => {
       .eq('posted_by', 'demo-broker')
       .eq('status', 'bid_received');
     expect(result.data).toBeNull();
-    expect(result.count).toBe(2);
+    // DR-1046 only — DR-1050 is seeded back to "posted" while Apex's counter is out.
+    expect(result.count).toBe(1);
   });
 
   it('errors on single() with no rows and returns null from maybeSingle()', async () => {

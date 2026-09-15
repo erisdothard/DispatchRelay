@@ -64,7 +64,7 @@ const CONVERSATIONS: ConversationSeed[] = [
       [driver, 'Copy that boss 👍', 19.2],
       [driver, 'Fueled up in Jackson, 62% on hours.', 9.5],
       [carrier, 'Good. Take your 10 in Longview if you need it — appointment isn’t till 7.', 9],
-      [driver, 'Just passed the weigh station, all clear.', 1, false],
+      [driver, 'Just passed the weigh station, all clear.', 1],
     ],
   },
   {
@@ -160,7 +160,6 @@ const CONVERSATIONS: ConversationSeed[] = [
         broker,
         'I’ll have rates to you by end of day. Blue Ridge and Rivera both run that lane.',
         4,
-        false,
       ],
     ],
   },
@@ -301,15 +300,17 @@ export const simulateReply: DemoHandler = (args, { identity, db }) => {
       last_message: text,
       last_message_at: now,
     });
-    db.insert('notifications', [
-      {
-        user_id: identity.id,
-        type: 'new_message',
-        title: `Message from ${String(other.full_name ?? 'DispatchRelay user')}`,
-        body: text,
-        load_id: null,
-      },
-    ]);
+    // One outstanding bell item per sender: a chatty thread refreshes it instead of stacking.
+    const title = `Message from ${String(other.full_name ?? 'DispatchRelay user')}`;
+    const pending = (n: Row) =>
+      n.user_id === identity.id && n.type === 'new_message' && n.title === title && !n.read;
+    if (db.read('notifications').some(pending)) {
+      db.update('notifications', pending, { body: text, created_at: now });
+    } else {
+      db.insert('notifications', [
+        { user_id: identity.id, type: 'new_message', title, body: text, load_id: null },
+      ]);
+    }
   }, REPLY_DELAY_MS);
   return null;
 };

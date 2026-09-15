@@ -473,10 +473,17 @@ function bidToRow(seed: BidSeed): Row {
   };
 }
 
+/**
+ * Loads the broker has already acted on. Apex countered Rivera at $920 on DR-1050 and is
+ * waiting on the carrier, so it sits back on the board instead of the "Bids to Review" queue;
+ * that leaves DR-1046 as the one load badging the broker's nav.
+ */
+const STATUS_OVERRIDES: Partial<Record<string, Load['status']>> = { 'load-009': 'posted' };
+
 function buildLoadsAndBids(): { loads: Row[]; bids: Row[] } {
   const bids = BID_SEEDS.map(bidToRow);
   const loads = DEMO_LOADS.map((load, i) => {
-    const row = loadToRow(load, i);
+    const row = loadToRow({ ...load, status: STATUS_OVERRIDES[load.id] ?? load.status }, i);
     const open = row.status === 'posted' || row.status === 'bid_received';
     // Open loads show the bids that actually exist, so the broker's review list matches the count.
     return open ? { ...row, bid_count: bids.filter((b) => b.load_id === row.id).length } : row;
@@ -589,7 +596,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
       'Apex Freight countered your $900 bid with $920 on DR-1050.',
       'load-009',
       3,
-      false,
+      true,
     ],
     [
       'load_status_change',
@@ -597,7 +604,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
       'Load DR-1045 (Miami → Charlotte) is now delivered.',
       'load-004',
       5,
-      false,
+      true,
     ],
     [
       'load_assigned',
@@ -624,7 +631,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
       'Blue Ridge Logistics bid $1,975 on load DR-1046.',
       'load-005',
       9,
-      false,
+      true,
     ],
     [
       'new_bid',
@@ -632,7 +639,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
       'Summit Haulers bid $940 on load DR-1050.',
       'load-009',
       5,
-      false,
+      true,
     ],
     [
       'load_status_change',
@@ -666,7 +673,7 @@ const NOTIFICATIONS_BY_USER: Record<string, NotificationSeed[]> = {
       'Load DR-1045 (Miami → Charlotte) is now delivered. Confirm receipt to close out.',
       'load-004',
       6,
-      false,
+      true,
     ],
     [
       'bol_signed',
