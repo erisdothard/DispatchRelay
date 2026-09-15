@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export type DemoRole = 'carrier' | 'broker' | 'shipper' | 'driver';
 
@@ -12,7 +12,31 @@ export async function isDemoBuild(page: Page): Promise<boolean> {
   return (await page.locator('[data-demo-build]').count()) > 0;
 }
 
-/** Signs in as a demo persona on every navigation, exactly like picking a role card. */
+/**
+ * Reveals the email + password form. Demo builds keep it collapsed behind
+ * "Sign in with email"; other builds show it straight away.
+ */
+export async function openEmailSignIn(page: Page): Promise<void> {
+  const toggle = page.getByRole('button', { name: 'Sign in with email' });
+  if ((await toggle.count()) > 0 && (await toggle.getAttribute('aria-expanded')) !== 'true') {
+    await toggle.click();
+  }
+  await page.locator('input[type="email"]').waitFor();
+}
+
+const ROLE_LABELS: Record<DemoRole, string> = {
+  carrier: 'Carrier',
+  broker: 'Broker',
+  shipper: 'Shipper',
+  driver: 'Driver',
+};
+
+/** The one-tap sign-in row for a demo account on the login screen. */
+export function demoAccountButton(page: Page, role: DemoRole): Locator {
+  return page.getByRole('button', { name: new RegExp(`^${ROLE_LABELS[role]}\\b`) });
+}
+
+/** Signs in as a demo persona on every navigation, as if the account had been picked at login. */
 export async function signInAsDemo(page: Page, role: DemoRole): Promise<void> {
   await page.addInitScript((r) => sessionStorage.setItem('fx_demo_role', r), role);
 }

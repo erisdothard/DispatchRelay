@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { isDemoBuild } from './helpers/demo';
+import { isDemoBuild, openEmailSignIn } from './helpers/demo';
 
 const NO_PASSWORD_RESET = 'Demo builds have no password reset';
 
@@ -12,17 +12,22 @@ test.describe('Auth flows', () => {
 
   test('login page renders correctly', async ({ page }) => {
     await page.goto('/login');
+    await openEmailSignIn(page);
     await expect(page.locator('input[type="email"]')).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
     await expect(page.locator('button[type="submit"]')).toBeVisible();
   });
 
-  test('invalid login shows error', async ({ page }) => {
+  test('invalid login shows error and stays on login', async ({ page }) => {
     await page.goto('/login');
+    await openEmailSignIn(page);
     await page.fill('input[type="email"]', 'notreal@test.com');
     await page.fill('input[type="password"]', 'wrongpassword');
     await page.click('button[type="submit"]');
-    await expect(page.locator('text=/invalid|incorrect|error/i')).toBeVisible({ timeout: 8000 });
+    await expect(page.getByRole('alert')).toContainText(/invalid|incorrect|error/i, {
+      timeout: 8000,
+    });
+    await expect(page).toHaveURL(/\/login$/);
   });
 
   test('forgot password page is accessible', async ({ page }) => {

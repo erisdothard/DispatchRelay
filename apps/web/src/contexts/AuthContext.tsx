@@ -184,7 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (IS_DEMO_ENV) {
         const identity = demoIdentityForCredentials(email, password);
         if (!identity) {
-          return { error: 'Email or password is incorrect. Use one of the demo accounts below.' };
+          return { error: 'Email or password is incorrect. Use one of the demo accounts above.' };
         }
         enterDemoMode(identity.role);
         return { error: null };

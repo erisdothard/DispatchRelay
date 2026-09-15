@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 import {
   DEMO_PASSWORD,
+  demoAccountButton,
   isDemoBuild,
+  openEmailSignIn,
   signInAsDemo,
   watchForProblems,
   type DemoRole,
@@ -13,6 +15,13 @@ const DEMO_EMAILS = [
   'shipper@dispatchrelay.co',
   'driver@dispatchrelay.co',
 ];
+
+const DEMO_PEOPLE: Record<DemoRole, string> = {
+  carrier: 'Marcus Rivera',
+  broker: 'Sarah Chen',
+  shipper: 'James Park',
+  driver: 'Carlos Mendez',
+};
 
 /** Every screen each demo persona can reach from its navigation. */
 const SHARED_ROUTES = [
@@ -63,33 +72,51 @@ test.describe('Demo mode (no backend)', () => {
     test.skip(!(await isDemoBuild(page)), 'Only runs against a demo build');
   });
 
-  test('login lists the demo accounts next to the role cards', async ({ page }) => {
-    await expect(page.locator('input[type="email"]')).toBeVisible();
-    await expect(page.getByText('Demo accounts')).toBeVisible();
-    for (const email of DEMO_EMAILS) await expect(page.getByText(email)).toBeVisible();
-    for (const label of ['Carrier', 'Broker', 'Shipper', 'Driver']) {
-      await expect(page.getByText(label, { exact: true })).toBeVisible();
+  test('login shows each demo account once, with the email form collapsed', async ({ page }) => {
+    for (const [role, person] of Object.entries(DEMO_PEOPLE) as [DemoRole, string][]) {
+      await expect(demoAccountButton(page, role)).toBeVisible();
+      await expect(demoAccountButton(page, role)).toContainText(person);
+      await expect(page.getByText(person, { exact: false })).toHaveCount(1);
     }
+    await expect(page.getByText('Demo accounts')).toHaveCount(0);
+    await expect(page.getByText('Or jump straight in', { exact: false })).toHaveCount(0);
     await expect(page.getByText('Sign in with Google')).toHaveCount(0);
+
+    const toggle = page.getByRole('button', { name: 'Sign in with email' });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('input[type="email"]')).toHaveCount(0);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('input[type="email"]')).toBeFocused();
+    await expect(page.getByText(DEMO_PASSWORD, { exact: true })).toBeVisible();
+  });
+
+  test('tapping a demo account signs straight in as that persona', async ({ page }) => {
+    await demoAccountButton(page, 'broker').click();
+    await expect(page).toHaveURL(/\/broker$/);
+    await expect(page.getByText('Sarah Chen')).toBeVisible();
+    // Same session as a credential sign-in: it is persisted for reloads.
+    expect(await page.evaluate(() => sessionStorage.getItem('fx_demo_role'))).toBe('broker');
   });
 
   test('a demo email and password open that persona', async ({ page }) => {
-    await page.fill('input[type="email"]', 'broker@dispatchrelay.co');
+    await openEmailSignIn(page);
+    await page.fill('input[type="email"]', DEMO_EMAILS[2]);
     await page.fill('input[type="password"]', DEMO_PASSWORD);
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/\/broker$/);
-    await expect(page.getByText('Sarah Chen')).toBeVisible();
+    await expect(page).toHaveURL(/\/shipper$/);
+    await expect(page.getByText('James Park')).toBeVisible();
   });
 
-  test('tapping a demo account fills the form', async ({ page }) => {
-    await page.getByRole('button', { name: /shipper@dispatchrelay\.co/ }).click();
-    await expect(page.locator('input[type="email"]')).toHaveValue('shipper@dispatchrelay.co');
-    await expect(page.locator('input[type="password"]')).toHaveValue(DEMO_PASSWORD);
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(/\/shipper$/);
+  test('demo accounts are reachable from the keyboard', async ({ page }) => {
+    await demoAccountButton(page, 'carrier').focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/\/carrier$/);
+    await expect(page.getByText('Marcus Rivera')).toBeVisible();
   });
 
   test('a wrong password is rejected', async ({ page }) => {
+    await openEmailSignIn(page);
     await page.fill('input[type="email"]', 'carrier@dispatchrelay.co');
     await page.fill('input[type="password"]', 'not-the-password');
     await page.click('button[type="submit"]');
@@ -104,12 +131,6 @@ test.describe('Demo mode (no backend)', () => {
     }
   });
 
-  test('picking a role card lands on that dashboard with seeded data', async ({ page }) => {
-    await page.getByText('Broker', { exact: true }).click();
-    await expect(page).toHaveURL(/\/broker$/);
-    await expect(page.getByText('Sarah Chen')).toBeVisible();
-  });
-
   test('/demo links open straight into a dashboard, defaulting to carrier', async ({ page }) => {
     await page.goto('/demo/shipper');
     await expect(page).toHaveURL(/\/shipper$/);
@@ -120,7 +141,7 @@ test.describe('Demo mode (no backend)', () => {
   });
 
   test('the chosen role survives a page reload', async ({ page }) => {
-    await page.getByText('Driver', { exact: true }).click();
+    await demoAccountButton(page, 'driver').click();
     await expect(page.getByText('Carlos Mendez')).toBeVisible();
     await page.reload();
     await expect(page).toHaveURL(/\/driver$/);
