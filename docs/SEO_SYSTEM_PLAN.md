@@ -345,37 +345,37 @@ No key is ever committed. Note the deliberate absence of the `VITE_` prefix on a
 | R-10 | **CSP** `connect-src` does not allow `fmcsa.dot.gov` or `eia.gov`.                                                                                                                                            | Non-issue by design — the browser only ever calls same-origin `/api/*`. No CSP change needed. JSON-LD is unaffected (`'unsafe-inline'` is already present in `script-src`).                       |
 | R-11 | Pre-existing: root `middleware.ts` imports `next/server` in a non-Next app (§1.7); root `package.json` references a nonexistent `freightx-academy` app (§1.1).                                                | **Out of scope — flagged, not touched.** Happy to clean up separately if you want it.                                                                                                             |
 
-### Open decisions — I need your call on these
+### Decisions — resolved 2026-09-17
 
-**D-1 — Homepage strategy.** Pre-rendering `/` means writing content into `dist/index.html`,
-the file the SPA boots from (§2.1). Options:
+| #   | Decision                                                                                                                                                                                                                               |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D-1 | **Marketing site owns `/`; the app shell moves to `/app`.** Reframed from the original question — there was no marketing site at all, only the app's splash screen, so "pre-render the homepage" had nothing to pre-render. See §2.1a. |
+| D-2 | **OSRM public server** for lane distance, behind an interface so it can be swapped if reliability disappoints.                                                                                                                         |
+| D-3 | **Zero new runtime dependencies, at every phase.** The generator is plain Node; Phase 3 will call the Anthropic API with `fetch`.                                                                                                      |
+| D-4 | **Placeholder pricing, visibly marked.** `/pricing` ships the tier structure with `$—` figures and a notice stating the numbers are illustrative and nothing is charged.                                                               |
+| D-5 | **Waitlist is the homepage CTA** (new). Sign-up cannot work — the backend is retired — so the page asks for an email instead of implying an account it cannot create.                                                                  |
 
-- **(a) Recommended:** inject pre-rendered marketing markup into the existing `#root` div.
-  React replaces it on mount. Full content for crawlers, app untouched, tiny risk of a brief
-  content swap on slow connections.
-- **(b)** Leave `/` exactly as-is this phase and pre-render only the new marketing paths.
-  Zero risk, but the homepage — your most-linked URL — stays invisible.
-- **(c)** Serve a fully static marketing homepage and move the app entry elsewhere. Cleanest
-  result, most invasive; I would not do this without a strong reason.
+### 2.1a Revision to the core decision — the site/app split
 
-**D-2 — Mileage source for the Lane Cost Calculator.** Fuel cost from EIA is settled. Distance
-is not. Options: OSRM public demo server (free, no key, no SLA); Mapbox Directions (a
-`VITE_MAPBOX_TOKEN` already exists in `.env.example` — but it is browser-scoped, so this would
-need a server-side token); or a static great-circle estimate with a road-factor multiplier (no
-dependency, less accurate, must be labelled clearly). My lean: **OSRM to start**, swap later if
-reliability disappoints.
+The original §2.1 assumed a marketing homepage existed to pre-render. It did not:
+`/` rendered `SplashPage`, a phone-app intro carrying one sentence of generic copy and a
+button to `/onboarding`. Injecting marketing content into `#root` would also have meant
+**crawlers and humans receiving different pages**, since React would immediately replace the
+injected markup with the splash screen. That is cloaking, not pre-rendering.
 
-**D-3 — Dependencies.** I would like to keep Phase 1 at **zero new runtime dependencies** — the
-generator can be plain Node with template literals. Phase 3 will need `@anthropic-ai/sdk` (or
-plain `fetch` against the API, which needs nothing). If you would rather I use plain `fetch`
-throughout and add nothing at all, say so and I will.
+The shipped arrangement instead separates the two surfaces:
 
-**D-4 — Scope of `/` content.** There is currently no pricing content anywhere in the repo
-(§1.5) and no positioning copy to work from. For `/pricing` I will need either your actual
-tiers and prices, or approval to ship the page with clearly-marked placeholder tiers. I will not
-invent pricing.
+```
+dist/index.html          ← generated marketing homepage, zero JavaScript
+dist/pricing/index.html  ← generated
+dist/for/*/index.html    ← generated
+dist/app.html            ← the SPA entry, formerly dist/index.html
+```
 
----
+`vercel.json` rewrites every non-marketing path to `/app.html`, so `/carrier/loads`,
+`/login` and every other app route boot exactly as before. The generator performs the
+`index.html → app.html` move itself, after `vite build`, and refuses to move a file that does
+not contain `id="root"`.
 
 ## 6. Phased Task List
 
@@ -384,27 +384,42 @@ invent pricing.
 - [x] Inspect repo: framework, build, routing, hosting, marketing vs. app boundary
 - [x] Verify rendering empirically — build, serve, `curl` the output
 - [x] Write this document
-- [ ] **→ Awaiting your approval to start Phase 1**
+- [x] **→ Approved; Phase 1 complete**
 
-### Phase 1 — Make the marketing site AI-readable
+### Phase 1 — Make the marketing site AI-readable ✅ Complete
 
-- [ ] Resolve D-1 (homepage strategy)
-- [ ] Remove `user-scalable=no` and `maximum-scale=1.0` from the viewport meta tag
-- [ ] Fix the site-wide hardcoded canonical (R-1)
-- [ ] Remove the stale Supabase `dns-prefetch`
-- [ ] Build `scripts/seo/generate.mjs` + layout/head/JSON-LD renderers
-- [ ] Pre-render: home, `/pricing`, role pages, comparison shells
-- [ ] Per-page title, description, canonical, OG, Twitter
-- [ ] JSON-LD: `Organization`, `SoftwareApplication`, `FAQPage` where relevant
-- [ ] Generate `sitemap.xml` from emitted pages; tighten `robots.txt` (add `/driver/`, `/admin/`)
-- [ ] **Verify with `curl` that content is in the raw HTML**; verify R-2 on a preview deploy
-- [ ] Commit: `feat(web): pre-render marketing pages as static HTML`
+- [x] Resolve D-1 — marketing site at `/`, app shell at `/app` (§2.1a)
+- [x] Remove `user-scalable=no` and `maximum-scale=1.0` from the viewport meta tag
+- [x] Retire the site-wide hardcoded canonical (R-1); the shell is now `noindex`
+- [x] Remove the stale Supabase `dns-prefetch`
+- [x] Build `scripts/seo/generate.mjs` + layout / section / JSON-LD renderers, zero dependencies
+- [x] Pre-render: `/`, `/pricing`, `/for/carriers`, `/for/brokers`, `/for/shippers`
+- [x] Per-page title, description, canonical, OG, Twitter
+- [x] JSON-LD: `Organization`, `WebSite`, `SoftwareApplication`, `FAQPage`, `BreadcrumbList`
+- [x] Generate `sitemap.xml` from emitted pages; tighten `robots.txt`
+- [x] Waitlist endpoint (`/api/waitlist`) + progressive-enhancement form (D-5)
+- [x] Five build-time validators, failing the build on violation
+- [x] 38 tests covering rendering, escaping, validators and the endpoint
+- [x] Verified by building, serving `dist`, and fetching over HTTP — see below
+- [ ] **Verify R-2 on a preview deploy** — the one thing that cannot be checked locally
+
+**Local verification (build → serve `dist` → `curl`):**
+
+| Check                    | Result                                                    |
+| ------------------------ | --------------------------------------------------------- |
+| `/` returns real content | 1,841 words, one `<h1>`, **zero `<script src>`** requests |
+| `/` is no longer the SPA | no `id="root"` in the response                            |
+| `/app.html` is the SPA   | `id="root"` present, `noindex`, loads the bundle          |
+| Canonicals               | each page points at its own URL, not the homepage         |
+| JSON-LD                  | one `@graph` block per page, parses, correct `@type`s     |
+| `sitemap.xml`            | 5 URLs, generated from the emitted pages                  |
+| Mobile layout            | 0px horizontal overflow at 390px                          |
 
 ### Phase 2 — Free public tools (one at a time)
 
 - [ ] **Tool 1 — Carrier Lookup.** `api/carrier-lookup.ts` proxy (R-3), caching + rate limiting
       (R-4), input validation, landing page + FAQ + JSON-LD + soft CTA, tests
-- [ ] **Tool 2 — Lane Cost Calculator.** Resolve D-2; EIA client + `api/fuel-price.ts`; estimate
+- [ ] **Tool 2 — Lane Cost Calculator.** D-2 resolved (OSRM); EIA client + `api/fuel-price.ts`; estimate
       labelling (R-9); landing page; tests
 - [ ] **Tool 3 — Rate Confirmation Generator.** Additively widen `generateRateCon` params (§1.6);
       form → PDF; landing page; tests
@@ -429,6 +444,7 @@ invent pricing.
 
 ## 7. Change Log
 
-| Date       | Phase | Summary                                                                                                                                                              |
-| ---------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-17 | 0     | Audit complete. Confirmed pure CSR SPA serving byte-identical, content-free HTML on every URL. No marketing surface exists. Architecture proposed; 4 decisions open. |
+| Date       | Phase | Summary                                                                                                                                                                                                                                  |
+| ---------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-17 | 1     | Phase 1 shipped. Marketing site generated as static HTML at `/`, `/pricing` and three role pages; SPA entry moved to `/app.html`; waitlist endpoint added; 38 tests. D-1 reframed and resolved (§2.1a), D-2/D-3/D-4 answered, D-5 added. |
+| 2026-09-17 | 0     | Audit complete. Confirmed pure CSR SPA serving byte-identical, content-free HTML on every URL. No marketing surface exists. Architecture proposed; 4 decisions open.                                                                     |

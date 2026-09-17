@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0B0F19" />
   <meta name="description"
     content="DispatchRelay — The modern freight marketplace. Connect carriers, brokers, and shippers. Post loads, bid instantly, track in real time." />
@@ -13,8 +13,9 @@
   <meta name="apple-mobile-web-app-title" content="DispatchRelay" />
   <title>DispatchRelay — Move Freight Smarter</title>
 
-  <!-- Canonical -->
-  <link rel="canonical" href="https://dispatchrelay.co" />
+  <!-- The app shell serves every app route; the marketing site at / carries
+       the canonical tags. Indexing the shell would index a spinner. -->
+  <meta name="robots" content="noindex" />
 
   <!-- Favicon -->
   <link rel="icon" href="/logo.svg" type="image/svg+xml" />
@@ -47,7 +48,6 @@
   </style>
 
   <!-- DNS Prefetch for external services -->
-  <link rel="dns-prefetch" href="https://qeovhjdrwihnyfcbnujk.supabase.co" />
   <link rel="dns-prefetch" href="https://js.stripe.com" />
 
   <!-- Preconnect for fonts -->

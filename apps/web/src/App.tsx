@@ -90,7 +90,10 @@ export default function App() {
       <Suspense fallback={<PageSkeleton />}>
         <Routes>
           {/* Public */}
+          {/* The marketing site owns "/" in production; the app shell answers at
+              /app. "/" stays routed so the dev server still boots the app. */}
           <Route path="/" element={<SplashPage />} />
+          <Route path="/app" element={<SplashPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/demo" element={<DemoPage />} />
           <Route path="/demo/:role" element={<DemoPage />} />

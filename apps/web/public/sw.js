@@ -10,7 +10,7 @@ self.addEventListener('push', (event) => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: 'DispatchRelay', body: event.data.text(), url: '/' };
+    payload = { title: 'DispatchRelay', body: event.data.text(), url: '/app' };
   }
 
   const title = payload.title ?? 'DispatchRelay';
@@ -18,7 +18,7 @@ self.addEventListener('push', (event) => {
     body: payload.body ?? '',
     icon: '/logo.svg',
     badge: '/logo.svg',
-    data: { url: payload.url ?? '/' },
+    data: { url: payload.url ?? '/app' },
     tag: payload.tag ?? 'dispatchrelay',
     renotify: !!payload.tag,
   };
@@ -28,7 +28,7 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data?.url ?? '/';
+  const url = event.notification.data?.url ?? '/app';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {

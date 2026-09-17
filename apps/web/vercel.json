@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../.. && pnpm build:web",
+  "buildCommand": "cd ../.. && pnpm build:web && pnpm build:site",
   "outputDirectory": "dist",
   "installCommand": "npm install -g pnpm@10.29.2 && pnpm install",
   "framework": "vite",
@@ -9,8 +9,8 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/((?!api/|manifest\\.json|assets/|.*\\.).*)",
-      "destination": "/index.html"
+      "source": "/((?!api/|assets/|manifest\\.json|app\\.html|pricing|for/|sitemap\\.xml|robots\\.txt|.*\\.).*)",
+      "destination": "/app.html"
     }
   ],
   "headers": [

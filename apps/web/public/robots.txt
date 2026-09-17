@@ -1,16 +1,26 @@
 User-agent: *
 Allow: /
+Allow: /pricing
+Allow: /for/
 Allow: /privacy
 Allow: /terms
 
-# Disallow authenticated app pages from indexing
+# The app shell and everything behind a login
+Disallow: /app
+Disallow: /app.html
 Disallow: /carrier/
 Disallow: /broker/
 Disallow: /shipper/
+Disallow: /driver/
+Disallow: /admin/
 Disallow: /messages
 Disallow: /profile
 Disallow: /track/
+Disallow: /t/
 Disallow: /onboarding
+Disallow: /login
 Disallow: /reset-password
+Disallow: /forgot-password
+Disallow: /claim-account
 
 Sitemap: https://dispatchrelay.co/sitemap.xml

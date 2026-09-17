@@ -11,6 +11,7 @@
     "dev:all": "turbo run dev --filter=@dispatchrelay/web --filter=freightx-academy",
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@dispatchrelay/web",
+    "build:site": "node scripts/seo/generate.mjs",
     "build:academy": "turbo run build --filter=freightx-academy",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
