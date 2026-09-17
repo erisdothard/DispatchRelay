@@ -20,7 +20,7 @@ describe('content records', () => {
   it('ships the pages the sitemap and nav assume exist', () => {
     const paths = pages.map((p) => p.path);
     expect(paths).toContain('/');
-    expect(paths).toContain('/pricing');
+    expect(paths).toContain('/for/carriers');
     expect(new Set(paths).size).toBe(paths.length);
   });
 

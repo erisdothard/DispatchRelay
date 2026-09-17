@@ -393,7 +393,7 @@ not contain `id="root"`.
 - [x] Retire the site-wide hardcoded canonical (R-1); the shell is now `noindex`
 - [x] Remove the stale Supabase `dns-prefetch`
 - [x] Build `scripts/seo/generate.mjs` + layout / section / JSON-LD renderers, zero dependencies
-- [x] Pre-render: `/`, `/pricing`, `/for/carriers`, `/for/brokers`, `/for/shippers`
+- [x] Pre-render: `/`, `/for/carriers`, `/for/brokers`, `/for/shippers`
 - [x] Per-page title, description, canonical, OG, Twitter
 - [x] JSON-LD: `Organization`, `WebSite`, `SoftwareApplication`, `FAQPage`, `BreadcrumbList`
 - [x] Generate `sitemap.xml` from emitted pages; tighten `robots.txt`
@@ -444,7 +444,8 @@ not contain `id="root"`.
 
 ## 7. Change Log
 
-| Date       | Phase | Summary                                                                                                                                                                                                                                  |
-| ---------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-17 | 1     | Phase 1 shipped. Marketing site generated as static HTML at `/`, `/pricing` and three role pages; SPA entry moved to `/app.html`; waitlist endpoint added; 38 tests. D-1 reframed and resolved (§2.1a), D-2/D-3/D-4 answered, D-5 added. |
-| 2026-09-17 | 0     | Audit complete. Confirmed pure CSR SPA serving byte-identical, content-free HTML on every URL. No marketing surface exists. Architecture proposed; 4 decisions open.                                                                     |
+| Date       | Phase | Summary                                                                                                                                                                                                                  |
+| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-09-17 | 1     | D-4 reversed: `/pricing` removed. A tiered price list presents a custom build as self-serve SaaS. The `tiers` section type and its styles went with it.                                                                  |
+| 2026-09-17 | 1     | Phase 1 shipped. Marketing site generated as static HTML at `/` and three role pages; SPA entry moved to `/app.html`; waitlist endpoint added; 44 tests. D-1 reframed and resolved (§2.1a), D-2/D-3 answered, D-5 added. |
+| 2026-09-17 | 0     | Audit complete. Confirmed pure CSR SPA serving byte-identical, content-free HTML on every URL. No marketing surface exists. Architecture proposed; 4 decisions open.                                                     |

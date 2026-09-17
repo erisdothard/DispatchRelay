@@ -45,12 +45,12 @@ describe('generator output', () => {
     expect(home).not.toContain('id="root"');
     expect(home).toContain('<h1>');
 
-    for (const page of ['pricing', 'for/carriers', 'for/brokers', 'for/shippers']) {
+    for (const page of ['for/carriers', 'for/brokers', 'for/shippers']) {
       expect(await readFile(join(dist, page, 'index.html'), 'utf8')).toContain('<h1>');
     }
 
     const sitemap = await readFile(join(dist, 'sitemap.xml'), 'utf8');
-    expect(sitemap).toContain('<loc>https://dispatchrelay.co/pricing</loc>');
+    expect(sitemap).toContain('<loc>https://dispatchrelay.co/for/carriers</loc>');
   });
 
   it('replaces a stale app.html left by a previous build', async () => {

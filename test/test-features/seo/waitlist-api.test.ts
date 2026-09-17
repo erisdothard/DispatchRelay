@@ -94,12 +94,12 @@ describe('POST /api/waitlist', () => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           Accept: 'text/html',
-          Referer: 'https://dispatchrelay.co/pricing#waitlist',
+          Referer: 'https://dispatchrelay.co/for/carriers#waitlist',
         },
         body,
       }),
     );
     expect(res.status).toBe(303);
-    expect(res.headers.get('location')).toBe('https://dispatchrelay.co/pricing#waitlist');
+    expect(res.headers.get('location')).toBe('https://dispatchrelay.co/for/carriers#waitlist');
   });
 });

@@ -89,13 +89,6 @@ section:first-of-type { border-top: 0; }
 .steps li::before { content: counter(step); position: absolute; left: 0; top: -2px; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; display: flex; align-items: center; justify-content: center; }
 .steps strong { display: block; }
 
-/* ---- pricing ---- */
-.notice { background: var(--accent-soft); border: 1px solid rgba(232,96,48,.35); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 30px; }
-.notice p { color: var(--text); margin: 0; font-size: 15px; }
-.tier .price { font-family: Outfit, sans-serif; font-size: 2.3rem; font-weight: 700; color: var(--text); line-height: 1; }
-.tier .price span { font-size: 1rem; font-weight: 500; color: var(--text-dim); }
-.tier ul { margin: 18px 0 0; }
-
 /* ---- faq ---- */
 .faq { display: grid; gap: 14px; }
 .faq details { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; }

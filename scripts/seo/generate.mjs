@@ -71,7 +71,7 @@ async function relocateSpaEntry() {
   );
 }
 
-/** `/pricing` -> `dist/pricing/index.html`; `/` -> `dist/index.html`. */
+/** `/for/carriers` -> `dist/for/carriers/index.html`; `/` -> `dist/index.html`. */
 function outputPathFor(routePath) {
   return routePath === '/'
     ? join(distDir, 'index.html')

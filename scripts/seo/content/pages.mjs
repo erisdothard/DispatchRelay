@@ -110,7 +110,7 @@ const home = {
         },
         {
           q: 'What does it cost?',
-          a: 'Pricing is not final. The pricing page shows the shape of the plans and is clearly marked as placeholder until the numbers are set.',
+          a: 'There is no per-seat price list. DispatchRelay is built to fit the operation it runs in, so scope and cost are worked out per build rather than picked off a pricing page.',
         },
         {
           q: 'Who is it built for?',
@@ -119,91 +119,6 @@ const home = {
         {
           q: 'Does it work on a phone?',
           a: 'Yes. It is built mobile-first, which matters most for drivers, who use it in a truck rather than at a desk.',
-        },
-      ],
-    },
-  ],
-};
-
-const pricing = {
-  path: '/pricing',
-  navLabel: 'Pricing',
-  breadcrumb: 'Pricing',
-  title: 'Pricing — DispatchRelay',
-  description:
-    'DispatchRelay pricing. Plans for owner-operators, small fleets and brokers. Prices are not final — the live demo is free to try with no signup.',
-  sections: [
-    {
-      type: 'hero',
-      eyebrow: 'Not final',
-      heading: 'Pricing',
-      lede: 'The plan structure below is real. **The numbers are placeholders** and will change before accounts open.',
-      actions: [
-        { label: 'Try the live demo', href: '/demo', primary: true },
-        { label: 'Join the waitlist', href: '#waitlist' },
-      ],
-    },
-    {
-      type: 'tiers',
-      id: 'plans',
-      heading: 'Planned tiers',
-      notice:
-        '**Placeholder pricing.** These figures are illustrative, not an offer. Nothing is charged today and no payment method is collected — the demo is open to anyone.',
-      tiers: [
-        {
-          name: 'Owner-operator',
-          price: '$—',
-          unit: '/ month (TBD)',
-          summary: 'One truck, one driver, one person doing all of it.',
-          includes: ['Load board and matching', 'Bidding and counters', 'Live tracking', 'Documents and BOL signing'],
-        },
-        {
-          name: 'Small fleet',
-          price: '$—',
-          unit: '/ month (TBD)',
-          summary: 'A handful of trucks and a dispatcher who is not always the owner.',
-          includes: [
-            'Everything in Owner-operator',
-            'Team seats and dispatch permissions',
-            'Fleet and equipment records',
-            'Driver hours and expense logging',
-          ],
-        },
-        {
-          name: 'Broker',
-          price: '$—',
-          unit: '/ month (TBD)',
-          summary: 'Posting freight and covering it with carriers you trust.',
-          includes: [
-            'Post loads and compare bids',
-            'FMCSA carrier verification',
-            'Carrier relationships and history',
-            'Rate confirmations and invoicing',
-          ],
-        },
-      ],
-    },
-    {
-      type: 'waitlist',
-      id: 'waitlist',
-      heading: 'Tell us what you’d pay',
-      body: 'Pricing is genuinely open. Leave an email and we’ll ask you directly before the numbers are set.',
-      note: 'One email when access opens. Nothing else.',
-    },
-    {
-      type: 'faq',
-      faq: [
-        {
-          q: 'Why are the prices blank?',
-          a: 'Because they are not decided, and publishing a number we intend to change would be dishonest. The tier structure is real; the figures are placeholders.',
-        },
-        {
-          q: 'Is there a free trial?',
-          a: 'The demo is free and open right now with no signup and no card. Trial terms for real accounts have not been set.',
-        },
-        {
-          q: 'Do I need a card to try it?',
-          a: 'No. The demo collects nothing. The waitlist collects an email address and nothing else.',
         },
       ],
     },
@@ -324,4 +239,4 @@ const shippers = rolePage({
   ],
 });
 
-export const pages = [home, pricing, carriers, brokers, shippers];
+export const pages = [home, carriers, brokers, shippers];

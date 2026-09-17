@@ -61,26 +61,6 @@ const renderers = {
       </div>
     </section>`,
 
-  tiers: ({ id, heading, notice, tiers }) => `
-    <section${id ? ` id="${esc(id)}"` : ''}>
-      <div class="wrap">
-        <h2>${esc(heading)}</h2>
-        ${notice ? `<div class="notice"><p>${prose(notice)}</p></div>` : ''}
-        <div class="grid">
-          ${each(
-            tiers,
-            (t) => `
-          <article class="card tier">
-            <h3>${esc(t.name)}</h3>
-            <p class="price">${esc(t.price)}${t.unit ? ` <span>${esc(t.unit)}</span>` : ''}</p>
-            <p>${prose(t.summary)}</p>
-            <ul>${each(t.includes, (f) => `<li>${prose(f)}</li>`)}</ul>
-          </article>`,
-          )}
-        </div>
-      </div>
-    </section>`,
-
   faq: ({ id, heading, faq }) => `
     <section${id ? ` id="${esc(id)}"` : ''}>
       <div class="wrap">
